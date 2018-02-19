@@ -1,0 +1,16 @@
+[
+{
+  "modid": "craftlogic",
+  "name": "CraftLogic",
+  "description": "Shared dependency mod.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Radviger"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
