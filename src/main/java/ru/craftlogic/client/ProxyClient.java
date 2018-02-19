@@ -12,11 +12,15 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import ru.craftlogic.api.block.Colored;
 import ru.craftlogic.api.block.holders.ScreenHolder;
+import ru.craftlogic.api.entity.EntityThrownItem;
 import ru.craftlogic.api.item.ItemBlockBase;
 import ru.craftlogic.api.world.TileEntities;
+import ru.craftlogic.client.render.RenderThrownItem;
 import ru.craftlogic.common.ProxyCommon;
 
 import javax.annotation.Nullable;
+
+import static ru.craftlogic.CraftLogic.registerEntityRenderer;
 
 public class ProxyClient extends ProxyCommon {
     private final Minecraft client = Minecraft.getMinecraft();
@@ -44,6 +48,7 @@ public class ProxyClient extends ProxyCommon {
                 this.client.getItemColors().registerItemColorHandler(((Colored)item)::getItemColor, item);
             }
         }
+        registerEntityRenderer(EntityThrownItem.class, rm -> new RenderThrownItem(rm, client.getRenderItem()));
     }
 
     @Override

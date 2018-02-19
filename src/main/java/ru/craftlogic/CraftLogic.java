@@ -4,6 +4,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
@@ -16,12 +19,14 @@ import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -165,6 +170,29 @@ public class CraftLogic {
             }
         }
         return null;
+    }
+
+    private static int nextEntityId;
+
+    public static <E extends Entity> void registerEntity(Class<E> type, String name, int trackingRange, int updateFrequency, boolean sendsVelocityUpdates) {
+        String modid = getActiveModId();
+        if (!name.contains(":")) {
+            name = modid + ":" + name;
+        }
+        EntityRegistry.registerModEntity(new ResourceLocation(name), type, new ResourceLocation(name).getResourcePath(), nextEntityId++, modid, trackingRange, updateFrequency, sendsVelocityUpdates);
+    }
+
+    public static <E extends Entity> void registerEntity(Class<E> type, String name, int trackingRange, int updateFrequency, boolean sendsVelocityUpdates, int eggPrimary, int eggSecondary) {
+        String modid = getActiveModId();
+        if (!name.contains(":")) {
+            name = modid + ":" + name;
+        }
+        EntityRegistry.registerModEntity(new ResourceLocation(name), type, new ResourceLocation(name).getResourcePath(), nextEntityId++, modid, trackingRange, updateFrequency, sendsVelocityUpdates, eggPrimary, eggSecondary);
+    }
+
+    @SideOnly(Side.CLIENT)
+    public static <E extends Entity> void registerEntityRenderer(Class<E> type, Function<RenderManager, Render<E>> renderer) {
+        RenderingRegistry.registerEntityRenderingHandler(type, renderer::apply);
     }
 
     public static IBlockState registerBlock(@Nonnull Block block) {

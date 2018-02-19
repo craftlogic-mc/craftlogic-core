@@ -162,6 +162,10 @@ public final class Location extends BlockPos implements ChunkLocation {
         this.getWorld().playSound(null, x, y, z, sound, category, volume, pitch);
     }
 
+    public void playEvent(int id, int data) {
+        getWorld().playEvent(id, this, data);
+    }
+
     public Explosion explode(Entity exploder, float power, boolean igniteBlocks) {
         double x = this.getX() + 0.5;
         double y = this.getY() + 0.5;
