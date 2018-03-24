@@ -1,0 +1,20 @@
+{
+  "package": "ru.craftlogic.mixin",
+  "refmap": "mixins.craftlogic.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "block/MixinBlock",
+    "block/MixinBlockStone",
+    "item/MixinItem",
+    "item/MixinItemCompass$1",
+    "entity/player/MixinEntityPlayerMP",
+    "tileentity/MixinTileEntity",
+    "world/gen/structure/MixinVillageHouse4Garden",
+    "world/gen/structure/MixinVillageHouseBlacksmith",
+    "MixinCommandHandler"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,20 +1,18 @@
-package ru.craftlogic.common;
+package ru.craftlogic.common.command;
 
-import net.minecraft.command.*;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommand;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.command.WrongUsageException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.CommandBlockBaseLogic;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
 import ru.craftlogic.CraftLogic;
 import ru.craftlogic.api.Server;
-import ru.craftlogic.api.command.ArgumentCompleter;
-import ru.craftlogic.api.command.ArgumentCompletionContext;
-import ru.craftlogic.api.command.Command;
-import ru.craftlogic.api.command.CommandContext;
-import ru.craftlogic.api.util.CheckedConsumer;
+import ru.craftlogic.api.command.*;
 import ru.craftlogic.api.util.CheckedFunction;
+import ru.craftlogic.common.permission.PermissionManager;
 
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
@@ -27,11 +25,13 @@ import java.util.regex.Pattern;
 
 public class CommandRegistry {
     private final Server server;
-    private final ServerCommandManager commandManager;
+    private final AdvancedCommandManager commandManager;
     private Map<String, Map<String, CommandContainer>> commands = new HashMap<>();
     private Map<String, TypedArgCompleter> completers = new HashMap<>();
+    private Map<Class<? extends ru.craftlogic.api.command.CommandContainer>, List<ICommand>> typedCommands = new HashMap<>();
+    private boolean loaded;
 
-    public CommandRegistry(Server server, ServerCommandManager commandManager) {
+    public CommandRegistry(Server server, AdvancedCommandManager commandManager) {
         this.server = server;
         this.commandManager = commandManager;
     }
@@ -53,10 +53,43 @@ public class CommandRegistry {
                 this.commandManager.registerCommand(e.getValue().command);
             }
         }
+        this.loaded = true;
+    }
+
+    public ICommand registerCommand(String name, List<String> syntax, List<String> aliases, List<String> permissions, CommandExecutor executor) {
+        String modId = CraftLogic.getActiveModId();
+        List<ArgumentsPattern> patterns = new ArrayList<>();
+
+        for (String a : syntax) {
+            patterns.add(new ArgumentsPattern(a));
+        }
+
+        if (permissions.isEmpty()) {
+            permissions = Collections.singletonList("commands." + name);
+        }
+
+        CommandExtended cmd = new CommandExtended(
+            patterns,
+            name,
+            aliases,
+            permissions,
+            executor
+        );
+
+        this.commands.computeIfAbsent(modId, k -> new HashMap<>())
+            .put(name, new CommandContainer(modId, cmd));
+        if (this.loaded) {
+            this.commandManager.registerCommand(cmd);
+        }
+
+        return cmd;
+    }
+
+    public boolean unregisterCommand(ICommand command) {
+        return this.commandManager.unregisterCommand(command);
     }
 
     public void registerCommandContainer(Class<? extends ru.craftlogic.api.command.CommandContainer> objClass) {
-        String modId = CraftLogic.getActiveModId();
         for (Method method : objClass.getDeclaredMethods()) {
             if ((method.getModifiers() & Modifier.STATIC) > 0) {
                 if (method.isAnnotationPresent(Command.class)) {
@@ -65,24 +98,19 @@ public class CommandRegistry {
                         && method.getReturnType() == void.class) {
 
                         Command annotation = method.getAnnotation(Command.class);
-                        List<ArgumentsPattern> patterns = new ArrayList<>();
-
-                        for (String a : annotation.syntax()) {
-                            patterns.add(new ArgumentsPattern(a));
-                        }
 
                         try {
                             MethodHandle mh = MethodHandles.lookup().unreflect(method);
-                            CommandExtended cmd = new CommandExtended(
-                                patterns,
+                            ICommand cmd = this.registerCommand(
                                 annotation.name(),
-                                annotation.aliases(),
-                                annotation.permissions(),
+                                Arrays.asList(annotation.syntax()),
+                                Arrays.asList(annotation.aliases()),
+                                Arrays.asList(annotation.permissions()),
                                 mh::invoke
                             );
-
-                            this.commands.computeIfAbsent(modId, k -> new HashMap<>())
-                                .put(annotation.name(), new CommandContainer(modId, cmd));
+                            this.typedCommands
+                                    .getOrDefault(objClass, new ArrayList<>())
+                                    .add(cmd);
                         } catch (IllegalAccessException e) {
                             e.printStackTrace();
                         }
@@ -110,6 +138,19 @@ public class CommandRegistry {
         }
     }
 
+    public boolean unregisterCommandContainer(Class<? extends ru.craftlogic.api.command.CommandContainer> objClass) {
+        List<ICommand> cmds = this.typedCommands.get(objClass);
+        boolean any = false;
+        if (cmds != null) {
+            for (ICommand cmd : cmds) {
+                if (this.commandManager.unregisterCommand(cmd)) {
+                    any = true;
+                }
+            }
+        }
+        return any;
+    }
+
     public static class TypedArgCompleter {
         private final String type;
         private final boolean isEntityName;
@@ -124,9 +165,9 @@ public class CommandRegistry {
 
     public static class CommandContainer {
         public final String modId;
-        private final CommandExtended command;
+        public final ICommand command;
 
-        public CommandContainer(String modId, CommandExtended command) {
+        public CommandContainer(String modId, ICommand command) {
             this.modId = modId;
             this.command = command;
         }
@@ -140,11 +181,11 @@ public class CommandRegistry {
     public final class CommandExtended implements ICommand {
         private final List<ArgumentsPattern> patterns;
         private final String name;
-        private final String[] aliases;
-        private final String[] permissions;
-        private final CheckedConsumer<CommandContext, Throwable> executor;
+        private final List<String> aliases;
+        private final List<String> permissions;
+        private final CommandExecutor executor;
 
-        public CommandExtended(List<ArgumentsPattern> patterns, String name, String[] aliases, String[] permissions, CheckedConsumer<CommandContext, Throwable> executor) {
+        public CommandExtended(List<ArgumentsPattern> patterns, String name, List<String> aliases, List<String> permissions, CommandExecutor executor) {
             this.patterns = patterns;
             this.name = name;
             this.aliases = aliases;
@@ -164,7 +205,7 @@ public class CommandRegistry {
 
         @Override
         public List<String> getAliases() {
-            return Arrays.asList(this.aliases);
+            return this.aliases;
         }
 
         @Override
@@ -173,7 +214,7 @@ public class CommandRegistry {
                 if (pattern.matches(rawArgs) == MatchLevel.FULL) {
                     CommandContext ctx = pattern.parse(CommandRegistry.this.server, sender, rawArgs);
                     try {
-                        this.executor.accept(ctx);
+                        this.executor.execute(ctx);
                     } catch (CommandException e) {
                         throw e;
                     } catch (Throwable t) {
@@ -192,7 +233,7 @@ public class CommandRegistry {
                 return true;
             } else if (sender instanceof EntityPlayer) {
                 PermissionManager permissionManager = CommandRegistry.this.server.getPermissionManager();
-                return permissionManager.hasPermissions(((EntityPlayer)sender).getGameProfile(), this.permissions);
+                return permissionManager.hasPermissions(((EntityPlayer)sender).getGameProfile(), this.permissions.toArray(new String[0]));
             }
             return false;
         }

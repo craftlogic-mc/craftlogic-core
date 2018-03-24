@@ -1,5 +1,6 @@
 package ru.craftlogic.api.world;
 
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
@@ -21,10 +22,9 @@ public interface ChunkLocation {
     }
 
     default String getWorldName() {
-        World world = this.getWorld();
-        if (world != null) {
-            return world.provider.getDimensionType().getName();
-        } else {
+        try {
+            return DimensionType.getById(this.getDimension()).getName();
+        } catch (IllegalArgumentException e) {
             return "DIM" + this.getDimension();
         }
     }

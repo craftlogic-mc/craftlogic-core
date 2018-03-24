@@ -4,12 +4,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
-import ru.craftlogic.api.block.holders.InventoryHolder;
+import ru.craftlogic.api.inventory.holder.InventoryHolder;
 import ru.craftlogic.api.inventory.manager.InventoryItemManager;
 import ru.craftlogic.api.inventory.manager.WrappedInventoryItemManager;
+import ru.craftlogic.api.world.Locateable;
 import ru.craftlogic.api.world.Location;
 
-public class WrappedInventoryHolder implements InventoryHolder {
+public class WrappedInventoryHolder implements InventoryHolder, Locateable {
     protected final IInventory inventory;
     protected final Location location;
 

@@ -1,21 +1,20 @@
-package ru.craftlogic.api.block.holders;
+package ru.craftlogic.api.inventory.holder;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import ru.craftlogic.api.inventory.manager.InventoryItemManager;
-import ru.craftlogic.api.tile.TileEntityBase;
 import ru.craftlogic.api.util.ItemStackMatcher;
 import ru.craftlogic.api.util.WrappedInventoryHolder;
+import ru.craftlogic.api.world.Locateable;
 import ru.craftlogic.api.world.Location;
+import ru.craftlogic.api.world.WorldNameable;
 
 import javax.annotation.Nullable;
 import java.util.function.Predicate;
 
-public interface InventoryHolder extends IInventory {
-    Location getLocation();
-
+public interface InventoryHolder extends IInventory, WorldNameable {
     InventoryItemManager getItemManager();
 
     @Override
@@ -25,8 +24,13 @@ public interface InventoryHolder extends IInventory {
 
     @Override
     default boolean isUsableByPlayer(EntityPlayer player) {
-        Location location = this.getLocation();
-        return (!(this instanceof TileEntity) || !((TileEntity) this).isInvalid()) && player.getDistanceSqToCenter(location) <= this.getReachDistanceSq();
+        if (this instanceof TileEntity && ((TileEntity) this).isInvalid()) {
+            return false;
+        }
+        if (this instanceof Locateable && player.getDistanceSqToCenter(((Locateable) this).getLocation()) <= this.getReachDistanceSq()) {
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -70,20 +74,6 @@ public interface InventoryHolder extends IInventory {
 
     default int getReachDistanceSq() {
         return 25;
-    }
-
-    @Override
-    default String getName() {
-        if (this instanceof TileEntityBase) {
-            return ((TileEntityBase)this).getItemStack().getUnlocalizedName() + ".name";
-        } else {
-            return this.getLocation().getBlock().getUnlocalizedName() + ".name";
-        }
-    }
-
-    @Override
-    default boolean hasCustomName() {
-        return false;
     }
 
     @Override

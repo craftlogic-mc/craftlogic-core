@@ -10,8 +10,9 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import ru.craftlogic.api.Server;
 import ru.craftlogic.api.world.OnlinePlayer;
+import ru.craftlogic.api.world.Player;
 import ru.craftlogic.api.world.World;
-import ru.craftlogic.common.PermissionManager;
+import ru.craftlogic.common.permission.PermissionManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -92,11 +93,10 @@ public class CommandContext {
         this.sender.sendMessage(component);
     }
 
-    public void failure(String message, Object... args) throws CommandException {
-        throw new CommandException(message, args);
-    }
-
     public boolean checkPermissions(String... permissions) throws CommandException {
+        if (this.server.isSinglePlayer()) {
+            return true;
+        }
         if (this.sender instanceof MinecraftServer || this.sender instanceof CommandBlockBaseLogic) {
             return true;
         } else if (this.sender instanceof EntityPlayer) {
@@ -140,7 +140,15 @@ public class CommandContext {
             return this.value;
         }
 
-        public OnlinePlayer asPlayer() throws CommandException {
+        public Player asPlayer() throws CommandException {
+            Player player = this.context.server.getOfflinePlayerByName(this.value);
+            if (player == null) {
+                throw new CommandException("commands.generic.player.notFound", this.value);
+            }
+            return player;
+        }
+
+        public OnlinePlayer asOnlinePlayer() throws CommandException {
             OnlinePlayer player = this.context.server.getPlayerByName(this.value);
             if (player == null) {
                 throw new CommandException("commands.generic.player.notFound", this.value);

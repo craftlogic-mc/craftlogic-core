@@ -48,12 +48,12 @@ public class ProxyClient extends ProxyCommon {
                 this.client.getItemColors().registerItemColorHandler(((Colored)item)::getItemColor, item);
             }
         }
-        registerEntityRenderer(EntityThrownItem.class, rm -> new RenderThrownItem(rm, client.getRenderItem()));
     }
 
     @Override
     public void postInit() {
         super.postInit();
+        registerEntityRenderer(EntityThrownItem.class, rm -> new RenderThrownItem(rm, client.getRenderItem()));
     }
 
     @SubscribeEvent

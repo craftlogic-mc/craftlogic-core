@@ -1,6 +1,7 @@
-package ru.craftlogic.common;
+package ru.craftlogic.common.permission;
 
 import com.mojang.authlib.GameProfile;
+import net.minecraft.command.CommandException;
 import net.minecraft.server.management.PlayerProfileCache;
 import ru.craftlogic.api.command.*;
 import ru.craftlogic.api.world.Player;
@@ -31,7 +32,7 @@ public class PermissionCommands implements CommandContainer {
                 PermissionManager.Group group = permissionManager.getGroup(groupName);
                 if (ctx.action().equals("create")) {
                     if (group != null) {
-                        ctx.failure("commands.perm.group.create.exists", groupName);
+                        throw new CommandException("commands.perm.group.create.exists", groupName);
                     }
                     int priority = 0;
                     String parent = "default";
@@ -46,7 +47,7 @@ public class PermissionCommands implements CommandContainer {
                                     parent = vals[0];
                                     break;
                                 default:
-                                    ctx.failure("commands.perm.usage");
+                                    throw new CommandException("commands.perm.usage");
                             }
                         }
                     }
@@ -56,7 +57,7 @@ public class PermissionCommands implements CommandContainer {
                     ctx.sendMessage("commands.perm.group.create.success", groupName);
                 } else {
                     if (group == null) {
-                        ctx.failure("commands.perm.group.notFound", groupName);
+                        throw new CommandException("commands.perm.group.notFound", groupName);
                     } else {
                         switch (ctx.action()) {
                             case "info":
@@ -72,7 +73,7 @@ public class PermissionCommands implements CommandContainer {
                                 break;
                             case "delete":
                                 if (groupName.equals("default")) {
-                                    ctx.failure("commands.perm.group.delete.unable");
+                                    throw new CommandException("commands.perm.group.delete.unable");
                                 } else {
                                     permissionManager.groups.remove(groupName, group);
                                     permissionManager.save(true);
@@ -142,7 +143,7 @@ public class PermissionCommands implements CommandContainer {
                     PermissionManager.User user = permissionManager.getUser(player);
 
                 } else {
-                    ctx.failure("commands.perm.user.notfound");
+                    throw new CommandException("commands.perm.user.notfound");
                 }
         }
     }
@@ -199,7 +200,7 @@ public class PermissionCommands implements CommandContainer {
     @ArgumentCompleter(type = "XCoord")
     public static List<String> completerXCoord(ArgumentCompletionContext ctx) {
         if (ctx.partialName().isEmpty()) {
-            return singletonList(String.valueOf((ctx.targetBlock() != null ? ctx.targetBlock() : ctx.sender().getPosition()).getX()));
+            return singletonList(String.valueOf(ctx.targetBlockOrSelfLocation().getX()));
         }
         return emptyList();
     }
@@ -207,7 +208,7 @@ public class PermissionCommands implements CommandContainer {
     @ArgumentCompleter(type = "YCoord")
     public static List<String> completerYCoord(ArgumentCompletionContext ctx) {
         if (ctx.partialName().isEmpty()) {
-            return singletonList(String.valueOf((ctx.targetBlock() != null ? ctx.targetBlock() : ctx.sender().getPosition()).getY()));
+            return singletonList(String.valueOf(ctx.targetBlockOrSelfLocation().getY()));
         }
         return emptyList();
     }
@@ -215,7 +216,7 @@ public class PermissionCommands implements CommandContainer {
     @ArgumentCompleter(type = "ZCoord")
     public static List<String> completerZCoord(ArgumentCompletionContext ctx) {
         if (ctx.partialName().isEmpty()) {
-            return singletonList(String.valueOf((ctx.targetBlock() != null ? ctx.targetBlock() : ctx.sender().getPosition()).getZ()));
+            return singletonList(String.valueOf(ctx.targetBlockOrSelfLocation().getZ()));
         }
         return emptyList();
     }

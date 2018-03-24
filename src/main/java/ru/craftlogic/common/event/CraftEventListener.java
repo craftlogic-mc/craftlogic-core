@@ -1,4 +1,4 @@
-package ru.craftlogic.common;
+package ru.craftlogic.common.event;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.EntityLightningBolt;

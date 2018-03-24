@@ -30,18 +30,20 @@ import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.craftlogic.api.EventConverter;
 import ru.craftlogic.api.Server;
 import ru.craftlogic.api.block.BlockBase;
-import ru.craftlogic.api.block.LoopingSoundSource;
 import ru.craftlogic.api.block.holders.ScreenHolder;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
 import ru.craftlogic.api.item.ItemBlockBase;
+import ru.craftlogic.api.sound.SoundSource;
 import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.client.PositionedSoundLoop;
-import ru.craftlogic.common.CraftEventListener;
+import ru.craftlogic.client.sound.Sound;
 import ru.craftlogic.common.ProxyCommon;
+import ru.craftlogic.common.event.CraftEventListener;
 import ru.craftlogic.util.DimensionMap;
 
 import javax.annotation.Nonnull;
@@ -56,6 +58,8 @@ public class CraftLogic {
 
     @SidedProxy(clientSide = "ru.craftlogic.client.ProxyClient", serverSide = "ru.craftlogic.common.ProxyCommon")
     public static ProxyCommon PROXY;
+
+    private static final Logger LOGGER = LogManager.getLogger(MODID);
 
     private static Map<ResourceLocation, TileEntityInfo<?>> TILE_REGISTRY = new HashMap<>();
     private static Server SERVER;
@@ -226,15 +230,14 @@ public class CraftLogic {
     }
 
     @SideOnly(Side.CLIENT)
-    public static void playLoopingSound(LoopingSoundSource source, SoundEvent sound) {
-        playLoopingSound(source, sound, SoundCategory.BLOCKS);
+    public static void playSound(SoundSource source, SoundEvent sound) {
+        playSound(source, sound, SoundCategory.BLOCKS);
     }
 
     @SideOnly(Side.CLIENT)
-    public static void playLoopingSound(LoopingSoundSource source, SoundEvent sound, SoundCategory category) {
-        PositionedSoundLoop loop = new PositionedSoundLoop(source, sound, category);
+    public static void playSound(SoundSource source, SoundEvent sound, SoundCategory category) {
         SoundHandler soundHandler = getSoundHandler();
-        soundHandler.playSound(loop);
+        soundHandler.playSound(new Sound(source, sound, category));
     }
 
     @SideOnly(Side.CLIENT)

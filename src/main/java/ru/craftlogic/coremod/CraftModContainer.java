@@ -4,11 +4,13 @@ import com.google.common.eventbus.EventBus;
 import net.minecraftforge.fml.common.DummyModContainer;
 import net.minecraftforge.fml.common.LoadController;
 import net.minecraftforge.fml.common.ModMetadata;
+import ru.craftlogic.util.ReflectiveUsage;
 
-public class ModContainer extends DummyModContainer {
+@ReflectiveUsage
+public class CraftModContainer extends DummyModContainer {
     private final ModMetadata md = new ModMetadata();
 
-    public ModContainer() {
+    public CraftModContainer() {
         super("CraftLogic Coremod");
         this.md.modId = "craftlogic-coremod";
         this.md.name = "CraftLogic Coremod";

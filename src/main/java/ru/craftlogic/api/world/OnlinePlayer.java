@@ -2,11 +2,15 @@ package ru.craftlogic.api.world;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryEnderChest;
 import net.minecraft.network.play.server.SPacketPlayerPosLook;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameType;
+import ru.craftlogic.CraftLogic;
 import ru.craftlogic.api.Server;
+import ru.craftlogic.api.inventory.holder.InventoryHolder;
+import ru.craftlogic.api.block.holders.ScreenHolder;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -35,6 +39,18 @@ public class OnlinePlayer extends Player {
         return this.server.getWorld(Dimension.fromVanilla(this.entity.world.provider.getDimensionType()));
     }
 
+    public void openChestInventory(InventoryHolder holder) {
+        this.entity.displayGUIChest(holder);
+    }
+
+    public void showScreen(ScreenHolder holder) {
+        this.showScreen(holder, 0);
+    }
+
+    public void showScreen(ScreenHolder holder, int subId) {
+        CraftLogic.showScreen(holder, this.entity, subId);
+    }
+
     public boolean teleport(Location location) {
         return this.teleport(location.getX(), location.getY(), location.getZ(), location.getY(), location.getPitch());
     }
@@ -61,5 +77,17 @@ public class OnlinePlayer extends Player {
 
     public GameType getGameMode() {
         return this.entity.interactionManager.getGameType();
+    }
+
+    public Container getOpenContainer() {
+        return this.entity.openContainer;
+    }
+
+    public boolean isFlyingAllowed() {
+        return this.entity.capabilities.allowFlying;
+    }
+
+    public void setFlyingAllowed(boolean fly) {
+        this.entity.capabilities.allowFlying = fly;
     }
 }

@@ -4,41 +4,57 @@ import com.google.common.collect.ImmutableSet;
 import com.mojang.authlib.GameProfile;
 import jline.internal.Nullable;
 import net.minecraft.command.ICommand;
-import net.minecraft.command.ServerCommandManager;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.PlayerList;
 import net.minecraft.server.management.PlayerProfileCache;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.util.FakePlayer;
+import ru.craftlogic.api.command.AdvancedCommandManager;
 import ru.craftlogic.api.command.CommandContainer;
+import ru.craftlogic.api.command.CommandExecutor;
 import ru.craftlogic.api.event.EventManager;
 import ru.craftlogic.api.event.Listener;
-import ru.craftlogic.api.event.player.PlayerEvent;
 import ru.craftlogic.api.world.Dimension;
 import ru.craftlogic.api.world.OnlinePlayer;
 import ru.craftlogic.api.world.Player;
 import ru.craftlogic.api.world.World;
-import ru.craftlogic.common.*;
+import ru.craftlogic.common.command.CommandRegistry;
+import ru.craftlogic.common.command.GameplayCommands;
+import ru.craftlogic.common.permission.PermissionCommands;
+import ru.craftlogic.common.permission.PermissionManager;
+import ru.craftlogic.common.region.RegionCommands;
+import ru.craftlogic.common.region.RegionManager;
+import ru.craftlogic.common.script.ScriptCommands;
+import ru.craftlogic.common.script.ScriptManager;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Server implements Permissible, Listener {
-    private final MinecraftServer server;
-    private final PermissionManager permissionManager;
-    private final CommandRegistry commandRegistry;
-    private final RegionManager regionManager;
-    private final EventManager eventManager;
-    private final Set<OnlinePlayer> onlinePlayers = new HashSet<>();
-    private final Set<World> loadedWorlds = new HashSet<>();
+    final MinecraftServer server;
+    final PermissionManager permissionManager;
+    final CommandRegistry commandRegistry;
+    final RegionManager regionManager;
+    final EventManager eventManager;
+    final ScriptManager scriptManager;
+    final Set<OnlinePlayer> onlinePlayers = new HashSet<>();
+    final Set<World> loadedWorlds = new HashSet<>();
 
     public Server(MinecraftServer server) {
         this.server = server;
         this.permissionManager = new PermissionManager(this);
-        this.commandRegistry = new CommandRegistry(this, (ServerCommandManager) server.commandManager);
+        this.commandRegistry = new CommandRegistry(this, (AdvancedCommandManager) server.commandManager);
         this.regionManager = new RegionManager(this);
         this.eventManager = new EventManager(this);
+        this.scriptManager = new ScriptManager(this);
     }
 
     @Override
@@ -73,6 +89,10 @@ public class Server implements Permissible, Listener {
 
     public EventManager getEventManager() {
         return this.eventManager;
+    }
+
+    public ScriptManager getScriptManager() {
+        return this.scriptManager;
     }
 
     public Path getDataDirectory() {
@@ -145,11 +165,23 @@ public class Server implements Permissible, Listener {
     }
 
     public ICommand registerCommand(ICommand command) {
-        return ((ServerCommandManager)this.server.commandManager).registerCommand(command);
+        return ((AdvancedCommandManager)this.server.commandManager).registerCommand(command);
+    }
+
+    public boolean unregisterCommand(ICommand command) {
+        return this.commandRegistry.unregisterCommand(command);
+    }
+
+    public ICommand registerCommand(String name, List<String> syntax, List<String> aliases, List<String> permissions, CommandExecutor executor) {
+        return this.commandRegistry.registerCommand(name, syntax, aliases, permissions, executor);
     }
 
     public void registerCommands(Class<? extends CommandContainer> containerClass) {
         this.commandRegistry.registerCommandContainer(containerClass);
+    }
+
+    public boolean unregisterCommands(Class<? extends CommandContainer> containerClass) {
+        return this.commandRegistry.unregisterCommandContainer(containerClass);
     }
 
     public boolean isPlayerOnline(GameProfile profile) {
@@ -168,51 +200,49 @@ public class Server implements Permissible, Listener {
         return this.server.getPlayerList().bypassesPlayerLimit(player);
     }
 
-    public int isPlayerOperator(Player player) {
-        return this.isPlayerOperator(player.getProfile());
-    }
-
-    public boolean isBypassesPlayerLimit(Player player) {
-        return this.isBypassesPlayerLimit(player.getProfile());
-    }
-
     public boolean isPlayerWhitelisted(GameProfile player) {
         return this.server.getPlayerList().getWhitelistedPlayers().isWhitelisted(player);
-    }
-
-    public boolean isPlayerWhitelisted(Player player) {
-        return this.isPlayerWhitelisted(player.getProfile());
     }
 
     public void start() throws Exception {
         this.registerCommands(GameplayCommands.class);
         this.registerCommands(PermissionCommands.class);
         this.registerCommands(RegionCommands.class);
+        this.registerCommands(ScriptCommands.class);
 
         this.permissionManager.load();
         this.regionManager.load();
         this.commandRegistry.load();
+        this.scriptManager.load();
     }
 
     public void stop(StopReason reason) {
+        this.scriptManager.unload();
+
         if (reason != StopReason.CORE) {
             this.server.stopServer();
         }
     }
 
+    public NBTTagCompound loadOfflinePlayerData(FakePlayer player) {
+        return this.server.getPlayerList().readPlayerDataFromFile(player);
+    }
+
+    public void saveOfflinePlayerData(FakePlayer player) {
+        try {
+            Method saveData = PlayerList.class.getDeclaredMethod("writePlayerData", EntityPlayerMP.class);
+            saveData.setAccessible(true);
+            saveData.invoke(this.server.getPlayerList(), player);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean isSinglePlayer() {
+        return this.server.isSinglePlayer();
+    }
+
     public enum StopReason {
         PLUGIN, CORE
-    }
-
-    @Listen
-    private void onPlayerJoined(PlayerEvent.Joined event) {
-        OnlinePlayer player = event.getPlayer();
-        this.onlinePlayers.add(player);
-    }
-
-    @Listen
-    private void onPlayerLeft(PlayerEvent.Left event) {
-        OnlinePlayer player = event.getPlayer();
-        this.onlinePlayers.remove(player);
     }
 }

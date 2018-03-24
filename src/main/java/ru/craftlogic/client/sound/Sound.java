@@ -1,52 +1,58 @@
-package ru.craftlogic.client;
+package ru.craftlogic.client.sound;
 
 import net.minecraft.client.audio.ITickableSound;
 import net.minecraft.client.audio.PositionedSound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
-import ru.craftlogic.api.block.LoopingSoundSource;
+import ru.craftlogic.api.sound.SoundSource;
 import ru.craftlogic.api.world.Location;
 
-public class PositionedSoundLoop extends PositionedSound implements ITickableSound {
-    private final LoopingSoundSource source;
-    private final Location location;
+public class Sound extends PositionedSound implements ITickableSound {
+    private final SoundSource source;
 
-    public PositionedSoundLoop(LoopingSoundSource source, SoundEvent sound, SoundCategory category) {
+    public Sound(SoundSource source, SoundEvent sound, SoundCategory category) {
         super(sound, category);
         this.source = source;
-        this.repeat = true;
-        this.location = source.getLocation();
     }
 
-    public PositionedSoundLoop(LoopingSoundSource source, ResourceLocation sound, SoundCategory category) {
+    public Sound(SoundSource source, ResourceLocation sound, SoundCategory category) {
         super(sound, category);
         this.source = source;
-        this.repeat = true;
-        this.location = source.getLocation();
+    }
+
+    public Location getLocation() {
+        return this.source.getLocation();
+    }
+
+    @Override
+    public boolean canRepeat() {
+        return this.source.isSoundRepeatable(this.positionedSoundLocation);
     }
 
     @Override
     public boolean isDonePlaying() {
-        return !this.location.isBlockLoaded() || !this.source.isSoundActive(this.positionedSoundLocation);
+        return !getLocation().isBlockLoaded() || !this.source.isSoundActive(this.positionedSoundLocation);
     }
 
     @Override
-    public void update() {}
+    public void update() {
+        this.source.updateSound(this.positionedSoundLocation);
+    }
 
     @Override
     public float getXPosF() {
-        return (float) this.location.getDX();
+        return (float) getLocation().getDX();
     }
 
     @Override
     public float getYPosF() {
-        return (float) this.location.getDY();
+        return (float) getLocation().getDY();
     }
 
     @Override
     public float getZPosF() {
-        return (float) this.location.getDZ();
+        return (float) getLocation().getDZ();
     }
 
     @Override

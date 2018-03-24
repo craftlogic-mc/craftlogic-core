@@ -1,15 +1,25 @@
 buildscript {
     repositories {
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        mavenCentral()
+        maven {
+            name = 'forge'
+            url = "http://files.minecraftforge.net/maven" }
+        maven {
+            name = 'sponge'
+            url = 'http://repo.spongepowered.org/maven'
+        }
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
     }
 }
+apply plugin: 'java'
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'idea'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
-
 
 version = "0.0.1-ALPHA"
 group = "ru.craftlogic" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
@@ -21,7 +31,7 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12.2-14.23.0.2529"
+    version = "1.12.2-14.23.2.2634"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
@@ -29,7 +39,7 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20180114"
+    mappings = "snapshot_20180324"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     useDepAts = true
 }
@@ -41,9 +51,29 @@ runClient {
 
 repositories {
     maven { url = "http://maven.cil.li/" }
+    maven {
+        name 'spongepowered'
+        url 'https://repo.spongepowered.org/maven/'
+    }
+}
+
+configurations {
+    extend
+}
+
+mixin {
+    add sourceSets.main, "mixins.craftlogic.refmap.json"
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/org.spongepowered/mixin
+    extend(group: 'org.spongepowered', name: 'mixin', version: '0.7.7-SNAPSHOT') {
+        exclude module: 'launchwrapper'
+        exclude module: 'guava'
+    }
+    // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy
+    extend group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.14'
+
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
@@ -64,6 +94,8 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
+    configurations.compile.extendsFrom(configurations.extend)
 
 }
 
@@ -88,6 +120,18 @@ processResources {
 
 jar {
     manifest {
-        attributes 'FMLAT': 'craftlogic_at.cfg'
+        attributes (
+            'FMLAT': 'craftlogic_at.cfg',
+            'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
+            'TweakOrder': '0',
+            'MixinConfigs': 'mixins.craftlogic.json',
+            'FMLCorePlugin': 'ru.craftlogic.coremod.CraftLogicCoremod',
+            'FMLCorePluginContainsFMLMod': 'true',
+            'ForceLoadAsMod': 'true',
+        )
+    }
+
+    into('.') {
+        from configurations.extend
     }
 }

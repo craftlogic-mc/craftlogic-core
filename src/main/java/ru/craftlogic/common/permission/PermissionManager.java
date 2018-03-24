@@ -1,19 +1,20 @@
-package ru.craftlogic.common;
+package ru.craftlogic.common.permission;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.mojang.authlib.GameProfile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.craftlogic.api.Server;
-import ru.craftlogic.api.util.JsonConfiguration;
+import ru.craftlogic.api.util.ConfigurableManager;
 import ru.craftlogic.api.world.Player;
 
 import java.nio.file.Path;
 import java.util.*;
 
-public class PermissionManager implements JsonConfiguration {
+public class PermissionManager extends ConfigurableManager {
     private static final Logger LOGGER = LogManager.getLogger("PermissionManager");
 
     private final Server server;
@@ -21,7 +22,6 @@ public class PermissionManager implements JsonConfiguration {
     final Map<String, Group> groups = new HashMap<>();
     final Map<UUID, User> users = new HashMap<>();
     private final Map<Group, List<User>> groupUsersCache = new HashMap<>();
-    private boolean needsSave = false;
 
     public PermissionManager(Server server) {
         this.server = server;
@@ -39,29 +39,19 @@ public class PermissionManager implements JsonConfiguration {
     }
 
     @Override
-    public boolean isDirty() {
-        return this.needsSave;
-    }
-
-    @Override
-    public void setDirty(boolean dirty) {
-        this.needsSave = dirty;
-    }
-
-    @Override
-    public void load0(JsonObject root) {
+    public void load(JsonObject root) {
         {
             JsonObject groups = root.getAsJsonObject("groups");
             if (groups == null) {
                 LOGGER.warn("There's no groups to load! At all...");
                 groups = new JsonObject();
                 root.add("groups", groups);
-                this.needsSave = true;
+                this.setDirty(true);
             }
             if (!groups.has("default")) {
                 LOGGER.warn("Default group is missing! Creating empty one...");
                 groups.add("default", new JsonObject());
-                this.needsSave = true;
+                this.setDirty(true);
             }
             Map<String, JsonObject> groupCache = new HashMap<>();
             for (Map.Entry<String, JsonElement> entry : groups.entrySet()) {
@@ -135,7 +125,7 @@ public class PermissionManager implements JsonConfiguration {
     }
 
     @Override
-    public void save0(JsonObject root) {
+    public void save(JsonObject root) {
         {
             JsonObject groups = new JsonObject();
             for (Map.Entry<String, Group> entry : this.groups.entrySet()) {
@@ -147,7 +137,7 @@ public class PermissionManager implements JsonConfiguration {
                 if (!g.permissions.isEmpty()) {
                     JsonArray permissions = new JsonArray();
                     for (String permission : g.permissions) {
-                        permissions.add(permission);
+                        permissions.add(new JsonPrimitive(permission));
                     }
                     group.add("permissions", permissions);
                 }
@@ -171,14 +161,14 @@ public class PermissionManager implements JsonConfiguration {
             if (!u.permissions.isEmpty()) {
                 JsonArray permissions = new JsonArray();
                 for (String permission : u.permissions) {
-                    permissions.add(permission);
+                    permissions.add(new JsonPrimitive(permission));
                 }
                 user.add("permissions", permissions);
             }
             if (u.groups.size() > 1) {
                 JsonArray groups = new JsonArray();
                 for (Group group : u.groups) {
-                    groups.add(group.name);
+                    groups.add(new JsonPrimitive(group.name));
                 }
                 user.add("groups", groups);
             }

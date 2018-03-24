@@ -35,4 +35,8 @@ public class ArgumentCompletionContext {
     public BlockPos targetBlock() {
         return this.targetBlock;
     }
+
+    public BlockPos targetBlockOrSelfLocation() {
+        return this.targetBlock() != null ? this.targetBlock() : this.sender().getPosition();
+    }
 }

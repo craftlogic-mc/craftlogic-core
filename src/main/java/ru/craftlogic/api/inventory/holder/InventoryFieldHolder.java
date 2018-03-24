@@ -1,4 +1,4 @@
-package ru.craftlogic.api.block.holders;
+package ru.craftlogic.api.inventory.holder;
 
 import ru.craftlogic.api.inventory.InventoryField;
 import ru.craftlogic.api.util.CheckedConsumer;
@@ -11,12 +11,8 @@ import java.util.function.IntSupplier;
 public class InventoryFieldHolder {
     private final List<InventoryField> fields = new ArrayList<>();
 
-    public InventoryFieldHolder(CheckedConsumer<InventoryFieldHolder, ReflectiveOperationException> adder) {
-        try {
-            adder.accept(this);
-        } catch (ReflectiveOperationException e) {
-            e.printStackTrace();
-        }
+    public InventoryFieldHolder(FieldAdder adder) {
+        adder.add(this);
     }
 
     public void addReadOnlyField(IntSupplier getter) {
@@ -37,5 +33,16 @@ public class InventoryFieldHolder {
 
     public int getInvFieldCount() {
         return this.fields.size();
+    }
+
+    @FunctionalInterface
+    public interface FieldAdder extends CheckedConsumer<InventoryFieldHolder, ReflectiveOperationException> {
+        default void add(InventoryFieldHolder fieldHolder) {
+            try {
+                this.accept(fieldHolder);
+            } catch (ReflectiveOperationException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

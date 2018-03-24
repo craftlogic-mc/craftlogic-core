@@ -1,26 +1,26 @@
-package ru.craftlogic.common;
+package ru.craftlogic.common.region;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.craftlogic.api.Server;
 import ru.craftlogic.api.math.Bounding;
-import ru.craftlogic.api.util.JsonConfiguration;
+import ru.craftlogic.api.util.ConfigurableManager;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.api.world.World;
 
 import java.nio.file.Path;
 import java.util.*;
 
-public class RegionManager implements JsonConfiguration {
+public class RegionManager extends ConfigurableManager {
     private static final Logger LOGGER = LogManager.getLogger("RegionManager");
 
     private final Server server;
     private final Path regionsFile;
     final Map<String, Map<UUID, Region>> regions = new HashMap<>();
-    private boolean needsSave = false;
 
     public RegionManager(Server server) {
         this.server = server;
@@ -38,17 +38,7 @@ public class RegionManager implements JsonConfiguration {
     }
 
     @Override
-    public boolean isDirty() {
-        return this.needsSave;
-    }
-
-    @Override
-    public void setDirty(boolean dirty) {
-        this.needsSave = dirty;
-    }
-
-    @Override
-    public void load0(JsonObject root) {
+    public void load(JsonObject root) {
         for (Map.Entry<String, JsonElement> entry : root.entrySet()) {
             World world = this.server.getWorld(entry.getKey());
             if (world != null) {
@@ -80,7 +70,7 @@ public class RegionManager implements JsonConfiguration {
     }
 
     @Override
-    public void save0(JsonObject root) {
+    public void save(JsonObject root) {
         for (Map.Entry<String, Map<UUID, Region>> entry : this.regions.entrySet()) {
             JsonObject worldRegions = new JsonObject();
             for (Map.Entry<UUID, Region> _r : entry.getValue().entrySet()) {
@@ -89,7 +79,7 @@ public class RegionManager implements JsonConfiguration {
                 if (!r.members.isEmpty()) {
                     JsonArray members = new JsonArray();
                     for (UUID member : r.members) {
-                        members.add(member.toString());
+                        members.add(new JsonPrimitive(member.toString()));
                     }
                     region.add("members", members);
                 }

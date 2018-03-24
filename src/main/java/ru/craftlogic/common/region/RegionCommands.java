@@ -1,6 +1,7 @@
-package ru.craftlogic.common;
+package ru.craftlogic.common.region;
 
 import com.mojang.authlib.GameProfile;
+import net.minecraft.command.CommandException;
 import ru.craftlogic.api.command.*;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.api.world.OnlinePlayer;
@@ -26,7 +27,7 @@ public class RegionCommands implements CommandContainer {
             if (targetProfile != null && targetProfile.getId() != null) {
                 UUID targetId = targetProfile.getId();
                 if (targetId.equals(sender.getProfile().getId())) {
-                    ctx.failure("commands.home.player.yourself");
+                    throw new CommandException("commands.home.player.yourself");
                 }
                 RegionManager.Region region = regionManager.getRegion(sender.getWorld().getName(), targetId);
                 if (region != null) {
@@ -35,28 +36,27 @@ public class RegionCommands implements CommandContainer {
                             if (!region.members.contains(targetId)) {
                                 region.members.add(targetId);
                                 regionManager.save(true);
-                                ctx.failure("commands.home.invite.success", targetProfile.getName());
+                                throw new CommandException("commands.home.invite.success", targetProfile.getName());
                             } else {
-                                ctx.failure("commands.home.invite.already", targetProfile.getName());
+                                throw new CommandException("commands.home.invite.already", targetProfile.getName());
                             }
-                            break;
                         case "expel":
                             if (region.members.contains(targetId)) {
                                 region.members.remove(targetId);
-                                ctx.failure("commands.home.expel.success", targetProfile.getName());
+                                ctx.sendMessage("commands.home.expel.success", targetProfile.getName());
                                 regionManager.save(true);
                             } else {
-                                ctx.failure("commands.home.expel.already", targetProfile.getName());
+                                throw new CommandException("commands.home.expel.already", targetProfile.getName());
                             }
                             break;
                         case "ban":
-                            ctx.failure("commands.home.ban.unsupported");
+                            throw new CommandException("commands.home.ban.unsupported");
                     }
                 } else {
-                    ctx.failure("commands.home.missing", location.getWorldName());
+                    throw new CommandException("commands.home.missing", location.getWorldName());
                 }
             } else {
-                ctx.failure("commands.home.player.notFound", player);
+                throw new CommandException("commands.home.player.notFound", player);
             }
         } else if (ctx.has("const_0") && ctx.constant().equals("flag")) {
             String flag = ctx.get("flag").asString();
@@ -69,7 +69,7 @@ public class RegionCommands implements CommandContainer {
             RegionManager.Region region = regionManager.getRegion(sender.getWorld().getName(), sender.getProfile().getId());
             if (ctx.action().equals("create")) {
                 if (region != null) {
-                    ctx.failure("commands.home.create.already");
+                    throw new CommandException("commands.home.create.already");
                 } else {
                     int radius = 24;
                     List<RegionManager.Region> intersects = regionManager.getRegions(location, radius);
@@ -81,11 +81,11 @@ public class RegionCommands implements CommandContainer {
                         regionManager.save(true);
                         ctx.sendMessage("commands.home.create.success");
                     } else {
-                        ctx.failure("commands.home.create.intersects", radius);
+                        throw new CommandException("commands.home.create.intersects", radius);
                     }
                 }
             } else if (region == null) {
-                ctx.failure("commands.home.missing", location.getWorldName());
+                throw new CommandException("commands.home.missing", location.getWorldName());
             } else {
                 regionManager.regions.get(location.getWorldName()).remove(sender.getProfile().getId(), region);
                 ctx.sendMessage("commands.home.delete.success");
@@ -100,16 +100,16 @@ public class RegionCommands implements CommandContainer {
                 if (targetPlayer != null && targetPlayer.getId() != null) {
                     region = regionManager.getRegion(location.getWorldName(), targetPlayer.getId());
                     if (!region.members.contains(sender.getProfile().getId())) {
-                        ctx.failure("commands.home.accessDenied", targetPlayerName);
+                        throw new CommandException("commands.home.accessDenied", targetPlayerName);
                     }
                 } else {
-                    ctx.failure("commands.home.player.notFound", targetPlayerName);
+                    throw new CommandException("commands.home.player.notFound", targetPlayerName);
                 }
             } else {
                 region = regionManager.getRegion(sender.getWorld().getName(), sender.getProfile().getId());
             }
             if (region == null) {
-                ctx.failure("commands.home.missing", location.getWorldName());
+                throw new CommandException("commands.home.missing", location.getWorldName());
             } else {
                 if (sender.teleport(region.center)) {
                     if (region.owner.equals(sender.getProfile().getId())) {
