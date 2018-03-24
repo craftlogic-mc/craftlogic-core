@@ -15,7 +15,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import ru.craftlogic.api.block.BlockBase;
-import ru.craftlogic.api.inventory.holder.InventoryFieldHolder;
+import ru.craftlogic.api.inventory.InventoryFieldHolder;
 import ru.craftlogic.api.world.Locateable;
 import ru.craftlogic.api.world.Location;
 

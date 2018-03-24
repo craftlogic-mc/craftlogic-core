@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.Random;
 
 @Mixin(StructureVillagePieces.House4Garden.class)
-public abstract class MixinVillageHouse4Garden extends StructureVillagePieces.Village {
+public abstract class MixinVillageHouseGardener extends StructureVillagePieces.Village {
     @Shadow
     private boolean isRoofAccessible;
 
@@ -32,7 +32,6 @@ public abstract class MixinVillageHouse4Garden extends StructureVillagePieces.Vi
         }
 
         IBlockState cobble = this.getBiomeSpecificBlockState(Blocks.COBBLESTONE.getDefaultState());
-        IBlockState bricks = this.getBiomeSpecificBlockState(Blocks.STONEBRICK.getDefaultState());
         IBlockState planks = this.getBiomeSpecificBlockState(Blocks.PLANKS.getDefaultState());
         IBlockState stairs = this.getBiomeSpecificBlockState(Blocks.STONE_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.NORTH));
         IBlockState log = this.getBiomeSpecificBlockState(Blocks.LOG.getDefaultState());
@@ -40,18 +39,18 @@ public abstract class MixinVillageHouse4Garden extends StructureVillagePieces.Vi
         this.fillWithBlocks(world, boundings, 0, 0, 0, 4, 0, 4, cobble, cobble, false);
         this.fillWithBlocks(world, boundings, 0, 4, 0, 4, 4, 4, log, log, false);
         this.fillWithBlocks(world, boundings, 1, 4, 1, 3, 4, 3, planks, planks, false);
-        this.setBlockState(world, bricks, 0, 1, 0, boundings);
-        this.setBlockState(world, bricks, 0, 2, 0, boundings);
-        this.setBlockState(world, bricks, 0, 3, 0, boundings);
-        this.setBlockState(world, bricks, 4, 1, 0, boundings);
-        this.setBlockState(world, bricks, 4, 2, 0, boundings);
-        this.setBlockState(world, bricks, 4, 3, 0, boundings);
-        this.setBlockState(world, bricks, 0, 1, 4, boundings);
-        this.setBlockState(world, bricks, 0, 2, 4, boundings);
-        this.setBlockState(world, bricks, 0, 3, 4, boundings);
-        this.setBlockState(world, bricks, 4, 1, 4, boundings);
-        this.setBlockState(world, bricks, 4, 2, 4, boundings);
-        this.setBlockState(world, bricks, 4, 3, 4, boundings);
+        this.setBlockState(world, cobble, 0, 1, 0, boundings);
+        this.setBlockState(world, cobble, 0, 2, 0, boundings);
+        this.setBlockState(world, cobble, 0, 3, 0, boundings);
+        this.setBlockState(world, cobble, 4, 1, 0, boundings);
+        this.setBlockState(world, cobble, 4, 2, 0, boundings);
+        this.setBlockState(world, cobble, 4, 3, 0, boundings);
+        this.setBlockState(world, cobble, 0, 1, 4, boundings);
+        this.setBlockState(world, cobble, 0, 2, 4, boundings);
+        this.setBlockState(world, cobble, 0, 3, 4, boundings);
+        this.setBlockState(world, cobble, 4, 1, 4, boundings);
+        this.setBlockState(world, cobble, 4, 2, 4, boundings);
+        this.setBlockState(world, cobble, 4, 3, 4, boundings);
         this.fillWithBlocks(world, boundings, 0, 1, 1, 0, 3, 3, planks, planks, false);
         this.fillWithBlocks(world, boundings, 4, 1, 1, 4, 3, 3, planks, planks, false);
         this.fillWithBlocks(world, boundings, 1, 1, 4, 3, 3, 4, planks, planks, false);

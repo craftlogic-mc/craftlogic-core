@@ -9,7 +9,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameType;
 import ru.craftlogic.CraftLogic;
 import ru.craftlogic.api.Server;
-import ru.craftlogic.api.inventory.holder.InventoryHolder;
+import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.api.block.holders.ScreenHolder;
 
 import java.util.EnumSet;

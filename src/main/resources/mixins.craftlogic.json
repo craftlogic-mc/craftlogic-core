@@ -10,8 +10,13 @@
     "item/MixinItemCompass$1",
     "entity/player/MixinEntityPlayerMP",
     "tileentity/MixinTileEntity",
-    "world/gen/structure/MixinVillageHouse4Garden",
+    "world/gen/structure/MixinVillageHouseLibrary",
+    "world/gen/structure/MixinVillageHouseGardener",
     "world/gen/structure/MixinVillageHouseBlacksmith",
+    "world/gen/structure/MixinVillageHouseChurch",
+    "world/gen/structure/MixinVillageHouseButcher",
+    "world/gen/structure/MixinVillageWell",
+    "world/gen/structure/MixinVillageHall",
     "MixinCommandHandler"
   ],
   "injectors": {

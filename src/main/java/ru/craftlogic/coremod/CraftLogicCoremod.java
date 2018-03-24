@@ -6,6 +6,7 @@ import org.spongepowered.asm.launch.MixinBootstrap;
 import org.spongepowered.asm.mixin.Mixins;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 
 @IFMLLoadingPlugin.MCVersion("1.12.2")
@@ -43,7 +44,8 @@ public class CraftLogicCoremod implements IFMLLoadingPlugin {
 
     @Override
     public void injectData(Map<String, Object> map) {
-        CoreModManager.getIgnoredMods().add("groovy-2.4.14");
+        List<String> ignoredMods = CoreModManager.getIgnoredMods();
+        ignoredMods.add("groovy-2.4.14.jar");
     }
 
     @Override

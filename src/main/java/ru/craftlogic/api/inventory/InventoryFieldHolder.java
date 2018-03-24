@@ -1,6 +1,5 @@
-package ru.craftlogic.api.inventory.holder;
+package ru.craftlogic.api.inventory;
 
-import ru.craftlogic.api.inventory.InventoryField;
 import ru.craftlogic.api.util.CheckedConsumer;
 
 import java.util.ArrayList;

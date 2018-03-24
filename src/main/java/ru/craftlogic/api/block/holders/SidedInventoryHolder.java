@@ -1,7 +1,7 @@
 package ru.craftlogic.api.block.holders;
 
 import net.minecraft.inventory.ISidedInventory;
-import ru.craftlogic.api.inventory.holder.InventoryHolder;
+import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.api.util.WrappedSidedInventoryHolder;
 import ru.craftlogic.api.world.Location;
 

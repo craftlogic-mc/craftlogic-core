@@ -1,4 +1,4 @@
-package ru.craftlogic.api.inventory.holder;
+package ru.craftlogic.api.inventory;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;

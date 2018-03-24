@@ -50,7 +50,6 @@ runClient {
 }
 
 repositories {
-    maven { url = "http://maven.cil.li/" }
     maven {
         name 'spongepowered'
         url 'https://repo.spongepowered.org/maven/'
