@@ -1,62 +1,39 @@
 package ru.craftlogic.api.event.player;
 
-import net.minecraft.util.text.ITextComponent;
 import ru.craftlogic.api.event.Event;
-import ru.craftlogic.api.world.OnlinePlayer;
+import ru.craftlogic.api.world.OfflinePlayer;
 import ru.craftlogic.api.world.Player;
 
 public abstract class PlayerEvent extends Event {
-    private final Player player;
+    private final OfflinePlayer player;
 
-    public PlayerEvent(Player player) {
+    public PlayerEvent(OfflinePlayer player) {
         this.player = player;
     }
 
-    public Player getPlayer() {
+    public OfflinePlayer getPlayer() {
         return player;
     }
 
     public static class Joined extends PlayerEvent {
-        private ITextComponent message;
-
-        public Joined(OnlinePlayer player, ITextComponent message) {
+        public Joined(Player player) {
             super(player);
-            this.message = message;
-        }
-
-        public ITextComponent getMessage() {
-            return message;
-        }
-
-        public void setMessage(ITextComponent message) {
-            this.message = message;
         }
 
         @Override
-        public OnlinePlayer getPlayer() {
-            return (OnlinePlayer)super.getPlayer();
+        public Player getPlayer() {
+            return (Player)super.getPlayer();
         }
     }
 
     public static class Left extends PlayerEvent {
-        private ITextComponent message;
-
-        public Left(OnlinePlayer player, ITextComponent message) {
+        public Left(Player player) {
             super(player);
-            this.message = message;
-        }
-
-        public ITextComponent getMessage() {
-            return message;
-        }
-
-        public void setMessage(ITextComponent message) {
-            this.message = message;
         }
 
         @Override
-        public OnlinePlayer getPlayer() {
-            return (OnlinePlayer)super.getPlayer();
+        public Player getPlayer() {
+            return (Player)super.getPlayer();
         }
     }
 }

@@ -5,7 +5,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.client.ModelManager;
+import ru.craftlogic.api.model.ModelManager;
 
 public class ItemMultiTexture extends ItemBase {
     private final String prefix;
@@ -30,7 +30,7 @@ public class ItemMultiTexture extends ItemBase {
     @SideOnly(Side.CLIENT)
     public void registerModel(ModelManager modelManager) {
         for (int i = 0; i < this.names.length; i++) {
-            modelManager.registerItemModel(this, i, this.modid + ":" + this.prefix + "/" + this.names[i]);
+            modelManager.registerItemModel(this, i, this.prefix + "/" + this.names[i]);
         }
     }
 

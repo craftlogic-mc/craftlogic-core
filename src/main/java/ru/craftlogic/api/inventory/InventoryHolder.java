@@ -2,12 +2,14 @@ package ru.craftlogic.api.inventory;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import ru.craftlogic.api.inventory.manager.InventoryItemManager;
 import ru.craftlogic.api.util.ItemStackMatcher;
 import ru.craftlogic.api.util.WrappedInventoryHolder;
-import ru.craftlogic.api.world.Locateable;
+import ru.craftlogic.api.world.Locatable;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.api.world.WorldNameable;
 
@@ -16,6 +18,9 @@ import java.util.function.Predicate;
 
 public interface InventoryHolder extends IInventory, WorldNameable {
     InventoryItemManager getItemManager();
+
+    @Override
+    default void markDirty() {}
 
     @Override
     default int getInventoryStackLimit() {
@@ -27,8 +32,10 @@ public interface InventoryHolder extends IInventory, WorldNameable {
         if (this instanceof TileEntity && ((TileEntity) this).isInvalid()) {
             return false;
         }
-        if (this instanceof Locateable && player.getDistanceSqToCenter(((Locateable) this).getLocation()) <= this.getReachDistanceSq()) {
-            return false;
+        if (this instanceof Locatable) {
+            Location location = ((Locatable) this).getLocation();
+            double distance = player.getDistanceSqToCenter(location.getPos());
+            return distance <= this.getReachDistanceSq();
         }
         return true;
     }
@@ -39,8 +46,12 @@ public interface InventoryHolder extends IInventory, WorldNameable {
     @Override
     default void closeInventory(EntityPlayer player) {}
 
+    default boolean isItemValidForSlot(SlotIdentifier slot, ItemStack stack) {
+        return this.isItemValidForSlot(slot.id(), stack);
+    }
+
     @Override
-    default boolean isItemValidForSlot(int slotId, ItemStack stack) {
+    default boolean isItemValidForSlot(int slot, ItemStack stack) {
         return true;
     }
 
@@ -49,13 +60,25 @@ public interface InventoryHolder extends IInventory, WorldNameable {
         return null;
     }
 
+    @Deprecated
+    default int getField(FieldIdentifier field) {
+        return this.getField(field.id());
+    }
+
     @Override
+    @Deprecated
     default int getField(int id) {
         InventoryFieldHolder fieldHolder = getFieldHolder();
         return fieldHolder != null ? fieldHolder.getInvFieldValue(id) : 0;
     }
 
+    @Deprecated
+    default void setField(FieldIdentifier field, int value) {
+        this.setField(field.id(), value);
+    }
+
     @Override
+    @Deprecated
     default void setField(int id, int value) {
         InventoryFieldHolder fieldHolder = getFieldHolder();
         if (fieldHolder != null) {
@@ -64,6 +87,7 @@ public interface InventoryHolder extends IInventory, WorldNameable {
     }
 
     @Override
+    @Deprecated
     default int getFieldCount() {
         InventoryFieldHolder fieldHolder = getFieldHolder();
         if (fieldHolder != null) {
@@ -72,8 +96,8 @@ public interface InventoryHolder extends IInventory, WorldNameable {
         return 0;
     }
 
-    default int getReachDistanceSq() {
-        return 25;
+    default double getReachDistanceSq() {
+        return 25.0;
     }
 
     @Override
@@ -86,24 +110,40 @@ public interface InventoryHolder extends IInventory, WorldNameable {
         return this.getItemManager().isEmpty();
     }
 
-    @Override
-    default ItemStack getStackInSlot(int slotId) {
-        return this.getItemManager().get(slotId);
+    default ItemStack getStackInSlot(SlotIdentifier slot) {
+        return this.getStackInSlot(slot.id());
     }
 
     @Override
-    default ItemStack decrStackSize(int slotId, int amount) {
-        return this.getItemManager().split(slotId, amount);
+    default ItemStack getStackInSlot(int slot) {
+        return this.getItemManager().get(slot);
+    }
+
+    default ItemStack decrStackSize(SlotIdentifier slot, int amount) {
+        return this.decrStackSize(slot.id(), amount);
     }
 
     @Override
-    default ItemStack removeStackFromSlot(int slotId) {
-        return this.getItemManager().remove(slotId);
+    default ItemStack decrStackSize(int slot, int amount) {
+        return this.getItemManager().split(slot, amount);
+    }
+
+    default ItemStack removeStackFromSlot(SlotIdentifier slot) {
+        return this.removeStackFromSlot(slot.id());
     }
 
     @Override
-    default void setInventorySlotContents(int slotId, ItemStack stack) {
-        this.getItemManager().set(slotId, stack);
+    default ItemStack removeStackFromSlot(int slot) {
+        return this.getItemManager().remove(slot);
+    }
+
+    default void setInventorySlotContents(SlotIdentifier slot, ItemStack stack) {
+        this.setInventorySlotContents(slot.id(), stack);
+    }
+
+    @Override
+    default void setInventorySlotContents(int slot, ItemStack stack) {
+        this.getItemManager().set(slot, stack);
     }
 
     @Override
@@ -111,11 +151,39 @@ public interface InventoryHolder extends IInventory, WorldNameable {
         this.getItemManager().clear();
     }
 
-    default boolean hasItem(Predicate<ItemStack> predicate, int amount) {
-        return searchForItem(predicate) >= amount;
+    default boolean growSlotContents(SlotIdentifier slot, Item type, int amount) {
+        return growSlotContents(slot.id(), type, amount);
     }
 
-    default int searchForItem(Predicate<ItemStack> predicate) {
+    default boolean growSlotContents(int slot, Item type, int amount) {
+        return growSlotContents(slot, new ItemStack(type), amount);
+    }
+
+    default boolean growSlotContents(SlotIdentifier slot, ItemStack type, int amount) {
+        return growSlotContents(slot.id(), type, amount);
+    }
+
+    default boolean growSlotContents(int slot, ItemStack type, int amount) {
+        ItemStack s = getStackInSlot(slot);
+        if (s.isEmpty()) {
+            setInventorySlotContents(slot, type);
+            return true;
+        } else if (type.isItemEqual(s) && s.getCount() + amount < s.getMaxStackSize()) {
+            s.grow(amount);
+            return true;
+        }
+        return false;
+    }
+
+    default boolean containsItem(Predicate<ItemStack> predicate) {
+        return containsItem(predicate, 1);
+    }
+
+    default boolean containsItem(Predicate<ItemStack> predicate, int amount) {
+        return countItem(predicate) >= amount;
+    }
+
+    default int countItem(Predicate<ItemStack> predicate) {
         int counter = 0;
         for (int i = 0; i < this.getSizeInventory(); i++) {
             ItemStack s = this.getStackInSlot(i);
@@ -128,9 +196,9 @@ public interface InventoryHolder extends IInventory, WorldNameable {
         return counter;
     }
 
-    default int takeItem(ItemStack type, int amount, boolean allowPartialAmount) {
+    default int consumeItem(ItemStack type, int amount, boolean allowPartialAmount) {
         Predicate<ItemStack> matcher = ItemStackMatcher.typeAndTag(type);
-        int count = searchForItem(matcher);
+        int count = countItem(matcher);
         if (count == 0) {
             return 0;
         }
@@ -153,11 +221,11 @@ public interface InventoryHolder extends IInventory, WorldNameable {
         return amount - count;
     }
 
-    default boolean hasSpace(Predicate<ItemStack> predicate, int amount) {
-        return searchForSpace(predicate) >= amount;
+    default boolean canFitItem(Predicate<ItemStack> predicate, int amount) {
+        return searchForEmptySpace(predicate) >= amount;
     }
 
-    default int searchForSpace(Predicate<ItemStack> predicate) {
+    default int searchForEmptySpace(Predicate<ItemStack> predicate) {
         int counter = 0;
         for (int i = 0; i < this.getSizeInventory(); i++) {
             ItemStack s = this.getStackInSlot(i);
@@ -172,13 +240,13 @@ public interface InventoryHolder extends IInventory, WorldNameable {
         return counter;
     }
 
-    default int pushItem(ItemStack type, int amount, boolean allowPartialAmount) {
+    default int insertItem(ItemStack type, int amount, boolean allowPartialAmount) {
         Predicate<ItemStack> matcher = ItemStackMatcher.typeAndTag(type);
-        int count = searchForSpace(matcher);
-        if (count == 0) {
+        int space = searchForEmptySpace(matcher);
+        if (space == 0) {
             return 0;
         }
-        if (count >= amount || allowPartialAmount) {
+        if (space >= amount || allowPartialAmount) {
             int rest = amount;
             for (int i = 0; i < getSizeInventory(); i++) {
                 ItemStack slotItem = this.getStackInSlot(i);
@@ -198,7 +266,19 @@ public interface InventoryHolder extends IInventory, WorldNameable {
             }
             return rest;
         }
-        return amount - count;
+        return amount - space;
+    }
+
+    default void dropItems(boolean clear) {
+        if (this instanceof Locatable) {
+            Location location = ((Locatable) this).getLocation();
+            InventoryHelper.dropInventoryItems(location.getWorld(), location.getPos(), this);
+            if (clear) {
+                this.clear();
+            }
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 
     static InventoryHolder wrap(Location location) {
@@ -211,6 +291,18 @@ public interface InventoryHolder extends IInventory, WorldNameable {
             return (InventoryHolder) inventory;
         } else {
             return new WrappedInventoryHolder(inventory, location);
+        }
+    }
+
+    interface SlotIdentifier {
+        default int id() {
+            return ((Enum)this).ordinal();
+        }
+    }
+
+    interface FieldIdentifier {
+        default int id() {
+            return ((Enum)this).ordinal();
         }
     }
 }

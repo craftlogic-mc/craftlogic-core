@@ -22,20 +22,20 @@ public interface TileEntityHolder<T extends TileEntity> extends ITileEntityProvi
             if (this instanceof BlockBase) {
                 return (T) ((BlockBase)this).createTileEntity(world, state);
             } else {
-                TileEntityInfo<T> type = this.getAssociatedTileEntityType(state);
+                TileEntityInfo<T> type = this.getTileEntityInfo(state);
                 return type == null ? null : type.create(world, state);
             }
         }
         return null;
     }
 
-    TileEntityInfo<T> getAssociatedTileEntityType(IBlockState state);
+    TileEntityInfo<T> getTileEntityInfo(IBlockState state);
 
     default void registerTileEntity() {
         Block block = (Block)this;
         List<Class<? extends TileEntity>> tiles = new ArrayList<>();
         for (IBlockState state : block.getBlockState().getValidStates()) {
-            TileEntityInfo type = this.getAssociatedTileEntityType(state);
+            TileEntityInfo type = this.getTileEntityInfo(state);
             if (type != null && !tiles.contains(type.clazz)) {
                 tiles.add(type.clazz);
                 CraftLogic.registerTileEntity(block.getRegistryName().toString(), type);

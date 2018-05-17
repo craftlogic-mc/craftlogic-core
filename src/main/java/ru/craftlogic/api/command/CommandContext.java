@@ -1,37 +1,34 @@
 package ru.craftlogic.api.command;
 
+import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.CommandBlockBaseLogic;
+import net.minecraft.command.ICommand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
-import ru.craftlogic.api.Server;
-import ru.craftlogic.api.world.OnlinePlayer;
+import ru.craftlogic.api.server.Server;
+import ru.craftlogic.api.text.Text;
+import ru.craftlogic.api.world.CommandSender;
+import ru.craftlogic.api.world.OfflinePlayer;
 import ru.craftlogic.api.world.Player;
 import ru.craftlogic.api.world.World;
-import ru.craftlogic.common.permission.PermissionManager;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class CommandContext {
     private final Server server;
-    private final ICommandSender sender;
-    private final List<Argument> argList = new ArrayList<>();
-    private final HashMap<String, Argument> argMap = new HashMap<>();
+    private final CommandSender sender;
+    private final ICommand command;
+    private final List<Argument> indexToArg = new ArrayList<>();
+    private final Map<String, Argument> nameToArg = new HashMap<>();
 
-    public CommandContext(Server server, ICommandSender sender, List<Argument> args) {
+    public CommandContext(Server server, CommandSender sender, ICommand command, List<Argument> args) {
         this.server = server;
         this.sender = sender;
+        this.command = command;
         for (Argument arg : args) {
             arg.setContext(this);
-            this.argList.add(arg);
-            this.argMap.put(arg.name, arg);
+            this.indexToArg.add(arg);
+            this.nameToArg.put(arg.name, arg);
         }
     }
 
@@ -39,15 +36,15 @@ public class CommandContext {
         return this.server;
     }
 
-    public ICommandSender sender() {
+    public CommandSender sender() {
         return this.sender;
     }
 
-    public OnlinePlayer senderAsPlayer() throws CommandException {
-        if (!(this.sender instanceof EntityPlayerMP)) {
-            throw new CommandException("commands.generic.sender.playerOnly");
+    public Player senderAsPlayer() throws CommandException {
+        if (this.sender instanceof Player) {
+            return ((Player) this.sender);
         } else {
-            return new OnlinePlayer(this.server, (EntityPlayerMP) this.sender);
+            throw new CommandException("commands.generic.playerOnly");
         }
     }
 
@@ -68,21 +65,41 @@ public class CommandContext {
     }
 
     public boolean has(String name) {
-        return this.argMap.containsKey(name);
+        return this.nameToArg.containsKey(name);
+    }
+
+    public boolean hasAction() {
+        return this.hasAction(0);
+    }
+
+    public boolean hasAction(int id) {
+        return this.has("action_" + id);
+    }
+
+    public boolean hasConstant() {
+        return this.hasConstant(0);
+    }
+
+    public boolean hasConstant(int id) {
+        return this.has("const_" + id);
     }
 
     public Argument get(String name) {
-        if (!this.argMap.containsKey(name)) {
+        if (!this.nameToArg.containsKey(name)) {
             throw new IllegalStateException("No such argument: " + name);
         }
-        return this.argMap.get(name);
+        return this.nameToArg.get(name);
     }
 
     public Argument get(int index) {
-        if (index >= this.argList.size()) {
+        if (index >= this.indexToArg.size()) {
             throw new ArrayIndexOutOfBoundsException("Argument index out of bounds: " + index);
         }
-        return this.argList.get(index);
+        return this.indexToArg.get(index);
+    }
+
+    public void sendNotification(String message, Object... args) {
+        CommandBase.notifyCommandListener(this.sender.getHandle(), this.command, message, args);
     }
 
     public void sendMessage(String message, Object... args) {
@@ -93,19 +110,16 @@ public class CommandContext {
         this.sender.sendMessage(component);
     }
 
-    public boolean checkPermissions(String... permissions) throws CommandException {
-        if (this.server.isSinglePlayer()) {
+    public void sendMessage(Text<?, ?> text) {
+        this.sender.sendMessage(text.build());
+    }
+
+    public boolean checkPermissions(boolean panic, String... permissions) throws CommandException {
+        if (this.server.isSinglePlayer() || this.sender.hasPermissions(permissions)) {
             return true;
         }
-        if (this.sender instanceof MinecraftServer || this.sender instanceof CommandBlockBaseLogic) {
-            return true;
-        } else if (this.sender instanceof EntityPlayer) {
-            PermissionManager permissionManager = this.server.getPermissionManager();
-            if (permissionManager.hasPermissions(((EntityPlayer)this.sender).getGameProfile(), permissions)) {
-                return true;
-            } else {
-                throw new CommandException("commands.generic.noPermission", Arrays.toString(permissions));
-            }
+        if (panic) {
+            throw new CommandException("commands.generic.noPermission", Arrays.toString(permissions));
         }
         return false;
     }
@@ -140,16 +154,16 @@ public class CommandContext {
             return this.value;
         }
 
-        public Player asPlayer() throws CommandException {
-            Player player = this.context.server.getOfflinePlayerByName(this.value);
+        public OfflinePlayer asOfflinePlayer() throws CommandException {
+            OfflinePlayer player = this.context.server.getOfflinePlayerByName(this.value);
             if (player == null) {
-                throw new CommandException("commands.generic.player.notFound", this.value);
+                throw new CommandException("commands.generic.userNeverPlayed", this.value);
             }
             return player;
         }
 
-        public OnlinePlayer asOnlinePlayer() throws CommandException {
-            OnlinePlayer player = this.context.server.getPlayerByName(this.value);
+        public Player asPlayer() throws CommandException {
+            Player player = this.context.server.getPlayerByName(this.value);
             if (player == null) {
                 throw new CommandException("commands.generic.player.notFound", this.value);
             }
@@ -202,5 +216,22 @@ public class CommandContext {
             return value;
         }
 
+        public boolean asBoolean() throws CommandException {
+            String value = this.value.toLowerCase();
+            switch (value) {
+                case "0":
+                case "false":
+                case "no":
+                case "n":
+                    return false;
+                case "1":
+                case "true":
+                case "yes":
+                case "y":
+                    return true;
+                default:
+                    throw new CommandException("commands.generic.boolean.invalid", value);
+            }
+        }
     }
 }

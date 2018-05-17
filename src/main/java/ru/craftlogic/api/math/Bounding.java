@@ -11,7 +11,7 @@ public interface Bounding {
     double getEndZ();
 
     default boolean isOwning(Location location) {
-        return this.isOwning(location.getX(), location.getY(), location.getZ());
+        return this.isOwning(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     default boolean isOwning(double x, double y, double z) {

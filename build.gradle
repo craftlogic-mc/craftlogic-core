@@ -31,7 +31,7 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12.2-14.23.2.2634"
+    version = "1.12.2-14.23.2.2641"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
@@ -44,6 +44,8 @@ minecraft {
     useDepAts = true
 }
 
+def isBuilding = false
+
 runClient {
     jvmArgs '-Dfml.coreMods.load=ru.craftlogic.coremod.CraftLogicCoremod'
     args '--username', 'Radviger'
@@ -51,9 +53,10 @@ runClient {
 
 repositories {
     maven {
-        name 'spongepowered'
-        url 'https://repo.spongepowered.org/maven/'
+        name = 'spongepowered'
+        url = 'https://repo.spongepowered.org/maven/'
     }
+    mavenCentral()
 }
 
 configurations {
@@ -64,14 +67,31 @@ mixin {
     add sourceSets.main, "mixins.craftlogic.refmap.json"
 }
 
+task repack {
+    ext.unzipDir = "build/unzip-dependency"
+    outputs.file unzipDir
+
+    doLast {
+        for (dependencyFile in configurations.extend) {
+            ant.mkdir( dir: unzipDir )
+            ant.unzip( src: dependencyFile, dest: unzipDir )
+            ant.delete( file: "$unzipDir/META-INF/MANIFEST.MF")
+            ant.delete( file: "$unzipDir/META-INF/MUMFREY.SF")
+            ant.delete( file: "$unzipDir/META-INF/MUMFREY.RSA")
+        }
+    }
+}
+
 dependencies {
     // https://mvnrepository.com/artifact/org.spongepowered/mixin
     extend(group: 'org.spongepowered', name: 'mixin', version: '0.7.7-SNAPSHOT') {
         exclude module: 'launchwrapper'
         exclude module: 'guava'
+        exclude module: 'gson'
+        exclude module: 'commons-io'
     }
     // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy
-    extend group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.14'
+    compile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.4'
 
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
@@ -117,6 +137,10 @@ processResources {
     }
 }
 
+build {
+    isBuilding = true
+}
+
 jar {
     manifest {
         attributes (
@@ -124,13 +148,18 @@ jar {
             'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
             'TweakOrder': '0',
             'MixinConfigs': 'mixins.craftlogic.json',
-            'FMLCorePlugin': 'ru.craftlogic.coremod.CraftLogicCoremod',
-            'FMLCorePluginContainsFMLMod': 'true',
-            'ForceLoadAsMod': 'true',
+            'FMLCorePlugin': 'ru.craftlogic.coremod.CraftLogicCoremod'
         )
+        if (isBuilding) {
+            attributes('ForceLoadAsMod': 'true')
+        }
     }
 
-    into('.') {
-        from configurations.extend
-    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from 'build/unzip-dependency'
+
+    include '**/*'
 }
+
+jar.dependsOn(repack)

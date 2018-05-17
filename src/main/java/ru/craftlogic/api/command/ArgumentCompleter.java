@@ -5,6 +5,6 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ArgumentCompleter {
-    String type();
+    String[] type();
     boolean isEntityName() default false;
 }

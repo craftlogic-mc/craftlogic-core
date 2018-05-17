@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:wool",
+      "data": 0
+    },
+    {
+      "item": "craftlogic:wool_card",
+      "data": 32767
+    }
+  ],
+  "result": {
+    "item": "minecraft:carpet",
+    "data": 0,
+    "count": 4
+  }
+}

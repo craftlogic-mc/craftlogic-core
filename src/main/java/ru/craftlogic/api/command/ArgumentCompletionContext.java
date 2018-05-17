@@ -1,19 +1,21 @@
 package ru.craftlogic.api.command;
 
-import net.minecraft.command.ICommandSender;
-import net.minecraft.util.math.BlockPos;
-import ru.craftlogic.api.Server;
+import ru.craftlogic.api.server.Server;
+import ru.craftlogic.api.world.CommandSender;
+import ru.craftlogic.api.world.Location;
 
 import javax.annotation.Nullable;
 
 public class ArgumentCompletionContext {
     private final Server server;
-    private final ICommandSender sender;
+    private final String type;
+    private final CommandSender sender;
     private final String partialName;
-    private final BlockPos targetBlock;
+    private final Location targetBlock;
 
-    public ArgumentCompletionContext(Server server, ICommandSender sender, String partialName, @Nullable BlockPos targetBlock) {
+    public ArgumentCompletionContext(Server server, String type, CommandSender sender, String partialName, @Nullable Location targetBlock) {
         this.server = server;
+        this.type = type;
         this.sender = sender;
         this.partialName = partialName;
         this.targetBlock = targetBlock;
@@ -23,7 +25,11 @@ public class ArgumentCompletionContext {
         return this.server;
     }
 
-    public ICommandSender sender() {
+    public String type() {
+        return this.type;
+    }
+
+    public CommandSender sender() {
         return this.sender;
     }
 
@@ -32,11 +38,11 @@ public class ArgumentCompletionContext {
     }
 
     @Nullable
-    public BlockPos targetBlock() {
+    public Location targetBlock() {
         return this.targetBlock;
     }
 
-    public BlockPos targetBlockOrSelfLocation() {
-        return this.targetBlock() != null ? this.targetBlock() : this.sender().getPosition();
+    public Location targetBlockOrSelfLocation() {
+        return this.targetBlock() != null ? this.targetBlock() : this.sender().getLocation();
     }
 }

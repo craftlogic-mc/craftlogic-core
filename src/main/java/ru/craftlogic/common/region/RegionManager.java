@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.craftlogic.api.Server;
+import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.math.Bounding;
 import ru.craftlogic.api.util.ConfigurableManager;
 import ru.craftlogic.api.world.Location;
@@ -58,7 +58,7 @@ public class RegionManager extends ConfigurableManager {
                             flags.put(e.getKey(), e.getValue().getAsString());
                         }
                     }
-                    Location center = Location.fromJson(world.getHandle(), region.get("center").getAsJsonObject());
+                    Location center = Location.deserialize(world.getHandle(), region.get("center").getAsJsonObject());
                     int radius = region.get("radius").getAsInt();
                     this.regions.computeIfAbsent(center.getWorldName(), d -> new HashMap<>())
                                 .put(owner, new Region(owner, center, radius, members, flags));
@@ -90,7 +90,7 @@ public class RegionManager extends ConfigurableManager {
                     }
                     region.add("flags", flags);
                 }
-                region.add("center", r.center.toJson());
+                region.add("center", r.center.serialize());
                 region.addProperty("radius", r.radius);
                 worldRegions.add(_r.getKey().toString(), region);
             }
@@ -150,7 +150,7 @@ public class RegionManager extends ConfigurableManager {
 
         @Override
         public double getStartX() {
-            return this.center.getX() - this.radius;
+            return this.center.getBlockX() - this.radius;
         }
 
         @Override
@@ -160,12 +160,12 @@ public class RegionManager extends ConfigurableManager {
 
         @Override
         public double getStartZ() {
-            return this.center.getZ() - this.radius;
+            return this.center.getBlockZ() - this.radius;
         }
 
         @Override
         public double getEndX() {
-            return this.center.getX() + this.radius;
+            return this.center.getBlockX() + this.radius;
         }
 
         @Override
@@ -175,7 +175,7 @@ public class RegionManager extends ConfigurableManager {
 
         @Override
         public double getEndZ() {
-            return this.center.getZ() + this.radius;
+            return this.center.getBlockZ() + this.radius;
         }
     }
 }

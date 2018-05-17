@@ -7,9 +7,9 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.authlib.GameProfile;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.craftlogic.api.Server;
+import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.util.ConfigurableManager;
-import ru.craftlogic.api.world.Player;
+import ru.craftlogic.api.world.OfflinePlayer;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -68,7 +68,7 @@ public class PermissionManager extends ConfigurableManager {
                 if (g.has("parent") && !groupCache.containsKey(parentName = g.get("parent").getAsString())) {
                     LOGGER.error("Group '" + groupName + "' has undefined parent '" + parentName + "'! Ignoring it...");
                 }
-                if (parentName.equals(groupName)) {
+                if (parentName.equals(groupName) && !groupName.equals("default")) {
                     LOGGER.error("Group '" + groupName + "' cannot be a child of itself!");
                 }
                 List<String> permissions = new ArrayList<>();
@@ -232,7 +232,7 @@ public class PermissionManager extends ConfigurableManager {
         return this.users.get(id);
     }
 
-    public User getUser(Player player) {
+    public User getUser(OfflinePlayer player) {
         return this.getUser(player.getProfile().getId());
     }
 

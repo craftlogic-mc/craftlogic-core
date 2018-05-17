@@ -17,12 +17,12 @@ public class WrappedSidedInventoryHolder extends WrappedInventoryHolder implemen
     }
 
     @Override
-    public boolean canInsertItem(int slotId, ItemStack stack, EnumFacing side) {
-        return ((ISidedInventory)inventory).canInsertItem(slotId, stack, side);
+    public boolean canInsertItem(int slot, ItemStack stack, EnumFacing side) {
+        return ((ISidedInventory)inventory).canInsertItem(slot, stack, side);
     }
 
     @Override
-    public boolean canExtractItem(int slotId, ItemStack stack, EnumFacing side) {
-        return ((ISidedInventory)inventory).canExtractItem(slotId, stack, side);
+    public boolean canExtractItem(int slot, ItemStack stack, EnumFacing side) {
+        return ((ISidedInventory)inventory).canExtractItem(slot, stack, side);
     }
 }

@@ -1,13 +1,18 @@
 package ru.craftlogic;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.material.MapColor;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialLiquid;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -19,32 +24,38 @@ import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.*;
 import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.craftlogic.api.EventConverter;
-import ru.craftlogic.api.Server;
 import ru.craftlogic.api.block.BlockBase;
+import ru.craftlogic.api.block.BlockFluid;
 import ru.craftlogic.api.block.holders.ScreenHolder;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
+import ru.craftlogic.api.item.ItemBase;
 import ru.craftlogic.api.item.ItemBlockBase;
+import ru.craftlogic.api.item.ItemFoodBase;
+import ru.craftlogic.api.network.message.MessageShowScreen;
+import ru.craftlogic.api.server.EventConverter;
+import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.sound.SoundSource;
 import ru.craftlogic.api.util.TileEntityInfo;
-import ru.craftlogic.api.world.Location;
+import ru.craftlogic.api.world.DimensionData;
 import ru.craftlogic.client.sound.Sound;
 import ru.craftlogic.common.ProxyCommon;
-import ru.craftlogic.common.event.CraftEventListener;
-import ru.craftlogic.util.DimensionMap;
+import ru.craftlogic.common.block.*;
+import ru.craftlogic.common.item.*;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -59,22 +70,85 @@ public class CraftLogic {
     @SidedProxy(clientSide = "ru.craftlogic.client.ProxyClient", serverSide = "ru.craftlogic.common.ProxyCommon")
     public static ProxyCommon PROXY;
 
+    public static SimpleNetworkWrapper NET;
+
     private static final Logger LOGGER = LogManager.getLogger(MODID);
 
     private static Map<ResourceLocation, TileEntityInfo<?>> TILE_REGISTRY = new HashMap<>();
     private static Server SERVER;
 
+    public static Fluid FLUID_OIL = new Fluid("oil",
+            new ResourceLocation(MODID, "blocks/fluid/oil_still"),
+            new ResourceLocation(MODID, "blocks/fluid/oil_flow")
+    ).setViscosity(2000).setDensity(1000);
+
+    public static SoundEvent SOUND_FURNACE_VENT_OPEN, SOUND_FURNACE_VENT_CLOSE, SOUND_FURNACE_HOT_LOOP;
+
+    public static final Material MATERIAL_OIL = new MaterialLiquid(MapColor.BLACK);
+
+    public static Block BLOCK_FLUID_OIL;
+
+    public static Block BLOCK_FURNACE;
+    public static Block BLOCK_UNFIRED_POTTERY;
+    public static Block BLOCK_CAULDRON;
+    public static Block BLOCK_SMELTING_VAT;
+    public static Block BLOCK_MELON, BLOCK_PUMPKIN;
+
+    public static Item ITEM_ASH;
+    public static Item ITEM_THERMOMETER;
+    public static Item ITEM_ROCK;
+    public static Item ITEM_MOSS;
+    public static Item ITEM_STONE_BRICK;
+    public static Item ITEM_RAW_EGG;
+    public static Item ITEM_FRIED_EGG;
+    public static Item ITEM_WOOL_CARD;
+    public static Item ITEM_CROWBAR;
+
+    static {
+        FluidRegistry.enableUniversalBucket();
+    }
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(new CraftEventListener());
         MinecraftForge.EVENT_BUS.register(PROXY);
-        NetworkRegistry.INSTANCE.registerGuiHandler(this, PROXY);
+
+        SOUND_FURNACE_VENT_OPEN = registerSoundEvent("furnace.vent.open");
+        SOUND_FURNACE_VENT_CLOSE = registerSoundEvent("furnace.vent.close");
+        SOUND_FURNACE_HOT_LOOP = registerSoundEvent("furnace.hot.loop");
+
+        FluidRegistry.registerFluid(FLUID_OIL);
+
+        BLOCK_FLUID_OIL = registerBlock(new BlockFluid("oil", FLUID_OIL, MATERIAL_OIL));
+
+        BLOCK_FURNACE = registerBlockWithItem(new BlockFurnace());
+        BLOCK_UNFIRED_POTTERY = registerBlockWithItem(new BlockUnfiredPottery());
+        BLOCK_CAULDRON = registerBlockWithItem(new BlockCauldron());
+        BLOCK_SMELTING_VAT = registerBlockWithItem(new BlockSmeltingVat());
+        BLOCK_PUMPKIN = registerBlock(new BlockGourd(BlockGourd.GourdVariant.PUMPKIN));
+        BLOCK_MELON = registerBlock(new BlockGourd(BlockGourd.GourdVariant.MELON));
+
+        ITEM_ASH = registerItem(new ItemBase("ash", CreativeTabs.MATERIALS));
+        ITEM_THERMOMETER = registerItem(new ItemThermometer());
+        ITEM_ROCK = registerItem(new ItemRock());
+        ITEM_MOSS = registerItem(new ItemBase("moss", CreativeTabs.MATERIALS));
+        ITEM_STONE_BRICK = registerItem(new ItemStoneBrick());
+        ITEM_RAW_EGG = registerItem(new ItemFoodBase("egg_raw", CreativeTabs.FOOD, 4, 0.1F, false));
+        ITEM_FRIED_EGG = registerItem(new ItemFoodBase("egg_fried", CreativeTabs.FOOD, 5, 0.5F, false));
+        ITEM_WOOL_CARD = registerItem(new ItemWoolCard());
+        ITEM_CROWBAR = registerItem(new ItemCrowbar());
+
+        FluidRegistry.addBucketForFluid(FLUID_OIL);
+
         PROXY.preInit();
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
         PROXY.init();
+
+        NET = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
+        int pid = 0;
+        NET.registerMessage(new MessageShowScreen.Handler(), MessageShowScreen.class, pid++, Side.CLIENT);
     }
 
     @Mod.EventHandler
@@ -107,9 +181,9 @@ public class CraftLogic {
         SERVER.stop(Server.StopReason.CORE);
     }
 
-    public static DimensionMap getDimensionMap() {
+    public static DimensionData getDimensionData() {
         World world = getOrLoadDimension(0);
-        return getWorldData(world, DimensionMap.class, MODID + ":dimension_map");
+        return getWorldData(world, DimensionData.class, MODID + ":dimension_map");
     }
 
     public static <T extends WorldSavedData> T getWorldData(World world, Class<T> cls, String name) {
@@ -127,23 +201,37 @@ public class CraftLogic {
         return result;
     }
 
-    public static WorldServer getOrLoadDimension(int dimension) {
-        if (DimensionManager.isDimensionRegistered(dimension)) {
-            WorldServer ret = DimensionManager.getWorld(dimension);
-            if (ret == null) {
-                DimensionManager.initDimension(dimension);
-                ret = DimensionManager.getWorld(dimension);
+    public static World getOrLoadDimension(int dimension) {
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+            World world = getClientWorld();
+            if (world != null && world.provider.getDimension() == dimension) {
+                return world;
             }
+        } else if (SERVER != null) {
+            if (DimensionManager.isDimensionRegistered(dimension)) {
+                WorldServer ret = DimensionManager.getWorld(dimension);
+                if (ret == null) {
+                    DimensionManager.initDimension(dimension);
+                    ret = DimensionManager.getWorld(dimension);
+                }
 
-            return ret;
-        } else {
-            return null;
+                return ret;
+            }
         }
+        return null;
     }
 
     public static String getActiveModId() {
+        return getActiveModId(MODID);
+    }
+
+    public static String getActiveModId(String fallback) {
         ModContainer amc = Loader.instance().activeModContainer();
-        return (amc != null ? amc.getModId() : MODID);
+        return (amc != null ? amc.getModId() : fallback);
+    }
+
+    public static ResourceLocation wrapWithActiveModId(String id, String fallback) {
+        return !id.contains(":") ? new ResourceLocation(getActiveModId(fallback), id) : new ResourceLocation(id);
     }
 
     public static Server getServer() {
@@ -155,16 +243,33 @@ public class CraftLogic {
     }
 
     public static void showScreen(ScreenHolder screenHolder, EntityPlayer player, int subId) {
-        Location pos = screenHolder.getLocation();
-        player.openGui(MODID, subId, player.getEntityWorld(), pos.getX(), pos.getY(), pos.getZ());
+        Side side = FMLCommonHandler.instance().getSide();
+        if (!(player instanceof FakePlayer)) {
+            if (player instanceof EntityPlayerMP) {
+                Container container = screenHolder.createContainer(player, subId);
+                if (container != null) {
+                    EntityPlayerMP playerMP = (EntityPlayerMP) player;
+                    playerMP.getNextWindowId();
+                    playerMP.closeContainer();
+                    int windowId = playerMP.currentWindowId;
+
+                    NET.sendTo(new MessageShowScreen(screenHolder, windowId, subId), (EntityPlayerMP) player);
+
+                    container.windowId = windowId;
+                    container.addListener(playerMP);
+                    playerMP.openContainer = container;
+                }
+            } else if (side.isClient()) {
+                Object screen = screenHolder.createScreen(player, subId);
+                FMLCommonHandler.instance().showGuiScreen(screen);
+            }
+        }
     }
 
     public static void registerTileEntity(@Nonnull String name, TileEntityInfo<?> type) {
-        if (!name.contains(":")) {
-            name = getActiveModId() + name;
-        }
-        GameRegistry.registerTileEntity(type.clazz, name);
-        TILE_REGISTRY.put(new ResourceLocation(name), type);
+        ResourceLocation id = wrapWithActiveModId(name, MODID);
+        GameRegistry.registerTileEntity(type.clazz, id.toString());
+        TILE_REGISTRY.put(id, type);
     }
 
     public static <T extends TileEntity> TileEntityInfo<T> getTileEntityInfo(Class<T> clazz) {
@@ -179,19 +284,13 @@ public class CraftLogic {
     private static int nextEntityId;
 
     public static <E extends Entity> void registerEntity(Class<E> type, String name, int trackingRange, int updateFrequency, boolean sendsVelocityUpdates) {
-        String modid = getActiveModId();
-        if (!name.contains(":")) {
-            name = modid + ":" + name;
-        }
-        EntityRegistry.registerModEntity(new ResourceLocation(name), type, new ResourceLocation(name).getResourcePath(), nextEntityId++, modid, trackingRange, updateFrequency, sendsVelocityUpdates);
+        ResourceLocation id = wrapWithActiveModId(name, MODID);
+        EntityRegistry.registerModEntity(id, type, id.getResourcePath(), nextEntityId++, id.getResourceDomain(), trackingRange, updateFrequency, sendsVelocityUpdates);
     }
 
     public static <E extends Entity> void registerEntity(Class<E> type, String name, int trackingRange, int updateFrequency, boolean sendsVelocityUpdates, int eggPrimary, int eggSecondary) {
-        String modid = getActiveModId();
-        if (!name.contains(":")) {
-            name = modid + ":" + name;
-        }
-        EntityRegistry.registerModEntity(new ResourceLocation(name), type, new ResourceLocation(name).getResourcePath(), nextEntityId++, modid, trackingRange, updateFrequency, sendsVelocityUpdates, eggPrimary, eggSecondary);
+        ResourceLocation id = wrapWithActiveModId(name, MODID);
+        EntityRegistry.registerModEntity(id, type, id.getResourcePath(), nextEntityId++, id.getResourceDomain(), trackingRange, updateFrequency, sendsVelocityUpdates, eggPrimary, eggSecondary);
     }
 
     @SideOnly(Side.CLIENT)
@@ -199,20 +298,20 @@ public class CraftLogic {
         RenderingRegistry.registerEntityRenderingHandler(type, renderer::apply);
     }
 
-    public static IBlockState registerBlock(@Nonnull Block block) {
+    public static <B extends Block> B registerBlock(@Nonnull B block) {
         GameRegistry.findRegistry(Block.class).register(block);
-        return block.getDefaultState();
+        return block;
     }
 
-    public static IBlockState registerBlockWithItem(@Nonnull BlockBase block) {
+    public static <B extends BlockBase> B registerBlockWithItem(@Nonnull B block) {
         return registerBlockWithItem(block, ItemBlockBase::new);
     }
 
-    public static <B extends Block> IBlockState registerBlockWithItem(@Nonnull B block, Function<B, Item> itemBlockMaker) {
-        IBlockState state = registerBlock(block);
+    public static <B extends Block> B registerBlockWithItem(@Nonnull B block, Function<B, Item> itemBlockMaker) {
+        B result = registerBlock(block);
         Item itemBlock = itemBlockMaker.apply(block).setRegistryName(block.getRegistryName());
         registerItem(itemBlock);
-        return state;
+        return result;
     }
 
     public static Item registerItem(@Nonnull Item item) {
@@ -221,10 +320,8 @@ public class CraftLogic {
     }
 
     public static SoundEvent registerSoundEvent(@Nonnull String name) {
-        if (!name.contains(":")) {
-            name = getActiveModId() + ":" + name;
-        }
-        SoundEvent soundEvent = new SoundEvent(new ResourceLocation(name)).setRegistryName(name);
+        ResourceLocation id = wrapWithActiveModId(name, MODID);
+        SoundEvent soundEvent = new SoundEvent(id).setRegistryName(id);
         GameRegistry.findRegistry(SoundEvent.class).register(soundEvent);
         return soundEvent;
     }
@@ -243,5 +340,10 @@ public class CraftLogic {
     @SideOnly(Side.CLIENT)
     private static SoundHandler getSoundHandler() {
         return Minecraft.getMinecraft().getSoundHandler();
+    }
+
+    @SideOnly(Side.CLIENT)
+    private static World getClientWorld() {
+        return FMLClientHandler.instance().getWorldClient();
     }
 }

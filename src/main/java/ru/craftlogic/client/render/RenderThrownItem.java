@@ -7,7 +7,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.api.entity.EntityThrownItem;
+import ru.craftlogic.common.entity.EntityThrownItem;
 
 @SideOnly(Side.CLIENT)
 public class RenderThrownItem extends RenderSnowball<EntityThrownItem> {

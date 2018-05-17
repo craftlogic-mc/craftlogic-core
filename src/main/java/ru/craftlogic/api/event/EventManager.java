@@ -2,7 +2,7 @@ package ru.craftlogic.api.event;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.craftlogic.api.Server;
+import ru.craftlogic.api.server.Server;
 
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationTargetException;

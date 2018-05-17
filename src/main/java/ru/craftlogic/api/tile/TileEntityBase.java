@@ -1,5 +1,6 @@
 package ru.craftlogic.api.tile;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -8,26 +9,64 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.inventory.InventoryFieldHolder;
-import ru.craftlogic.api.world.Locateable;
+import ru.craftlogic.api.world.Locatable;
 import ru.craftlogic.api.world.Location;
+import ru.craftlogic.api.world.WorldNameable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class TileEntityBase extends TileEntity implements Locateable {
+public class TileEntityBase extends TileEntity implements Locatable, WorldNameable {
+    protected int ticksExisted;
     private boolean loaded;
     private InventoryFieldHolder fieldHolder = new InventoryFieldHolder(this::addInvSyncFields);
+    private int blockMeta;
 
-    protected TileEntityBase(World world) {
+    protected TileEntityBase(World world, IBlockState state) {
         this.setWorldCreate(world);
+        this.blockType = state.getBlock();
+        this.blockMeta = -1;
+        this.pos = null;
+    }
+
+    @Override
+    public Block getBlockType() {
+        return this.blockType;
+    }
+
+    @Override
+    public void markDirty() {
+        if (this.world != null) {
+            IBlockState state = this.world.getBlockState(this.pos);
+            this.blockMeta = state.getBlock().getMetaFromState(state);
+            this.world.markChunkDirty(this.pos, this);
+            if (this.getLocation().getBlock() == this.blockType) {
+                this.world.updateComparatorOutputLevel(this.pos, this.getBlockType());
+            }
+        }
+    }
+
+    @Override
+    public int getBlockMetadata() {
+        if (this.blockMeta == -1) {
+            IBlockState state = this.world.getBlockState(this.pos);
+            this.blockMeta = state.getBlock().getMetaFromState(state);
+        }
+
+        return this.blockMeta;
+    }
+
+    @Override
+    public void updateContainingBlockInfo() {
+        this.blockMeta = -1;
     }
 
     public void addInvSyncFields(InventoryFieldHolder fieldHolder) {}
@@ -57,20 +96,25 @@ public class TileEntityBase extends TileEntity implements Locateable {
         return this.getBlockType().getStateFromMeta(this.getBlockMetadata());
     }
 
-    public ItemStack getItemStack() {
+    public ItemStack getDroppedItem() {
         return new ItemStack(this.getBlockType(), 1, this.getBlockMetadata());
+    }
+
+    @Override
+    public String getName() {
+        if (this.getBlockType() instanceof BlockBase) {
+            BlockBase block = (BlockBase) this.getBlockType();
+            ItemStack stack = this.getDroppedItem();
+            return block.getUnlocalizedName(stack) + ".name";
+        } else {
+            return this.getBlockType().getUnlocalizedName() + ".name";
+        }
     }
 
     @Nonnull
     @Override
     public ITextComponent getDisplayName() {
-        if (!(this.getBlockType() instanceof BlockBase)) {
-            return new TextComponentTranslation(this.getBlockType().getUnlocalizedName() + ".name");
-        } else {
-            BlockBase block = (BlockBase) this.getBlockType();
-            ItemStack stack = this.getItemStack();
-            return new TextComponentTranslation(block.getUnlocalizedName(stack) + ".name");
-        }
+        return new TextComponentTranslation(this.getName());
     }
 
     @Override
@@ -96,6 +140,14 @@ public class TileEntityBase extends TileEntity implements Locateable {
         }
     }
 
+    @Override
+    public boolean isInvalid() {
+        if (this.world != null && this.pos != null && !this.getLocation().isSameBlock(this.blockType)) {
+            return true;
+        }
+        return super.isInvalid();
+    }
+
     @Deprecated
     @Override
     public final void onLoad() {}
@@ -108,7 +160,7 @@ public class TileEntityBase extends TileEntity implements Locateable {
 
     protected void onUnloaded() {}
 
-    public boolean onActivated(EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onActivated(EntityPlayer player, EnumHand hand, RayTraceResult target) {
         return false;
     }
 

@@ -25,11 +25,10 @@ public abstract class MixinVillageWell extends StructureVillagePieces.Village {
         }
 
         IBlockState cobble = this.getBiomeSpecificBlockState(Blocks.COBBLESTONE.getDefaultState());
-        IBlockState mossyCobble = this.getBiomeSpecificBlockState(Blocks.MOSSY_COBBLESTONE.getDefaultState());
         IBlockState slab = this.getBiomeSpecificBlockState(Blocks.STONE_SLAB.getDefaultState().withProperty(BlockStoneSlab.VARIANT, BlockStoneSlab.EnumType.COBBLESTONE));
         IBlockState bricks = this.getBiomeSpecificBlockState(Blocks.STONEBRICK.getDefaultState());
         IBlockState fence = this.getBiomeSpecificBlockState(Blocks.COBBLESTONE_WALL.getDefaultState());
-        this.fillWithBlocks(world, bounding, 1, 0, 1, 4, 12, 4, rand.nextBoolean() ? mossyCobble : cobble, Blocks.FLOWING_WATER.getDefaultState(), false);
+        this.fillWithBlocks(world, bounding, 1, 0, 1, 4, 12, 4, cobble, Blocks.FLOWING_WATER.getDefaultState(), false);
         this.setBlockState(world, Blocks.AIR.getDefaultState(), 2, 12, 2, bounding);
         this.setBlockState(world, Blocks.AIR.getDefaultState(), 3, 12, 2, bounding);
         this.setBlockState(world, Blocks.AIR.getDefaultState(), 2, 12, 3, bounding);

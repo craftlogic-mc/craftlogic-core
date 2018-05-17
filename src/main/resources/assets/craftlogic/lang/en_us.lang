@@ -1,16 +1,85 @@
-commands.generic.noPermission=You don't have required permissions: %s
+tooltip.temperature=Temperature: %d/%d °C
+tooltip.bird=Bird: %s
 
-commands.perm.usage=/perm group <name> [info|prefix|suffix|users] OR /perm group <name> [create|delete] OR /perm group <name> [addPerm|delPerm|setPrefix|setSuffix] <value>...
+fluid.oil=Oil
+entity.MinecartFruance.name=Minecart Furnace
+
+item.forge.bucketFilled.oil=Oil Bucket
+
+tile.unfired_cauldron.name=Unfired Cauldron
+tile.unfired_smelting_vat.name=Unfired Smelting Vat
+tile.unfired_flowerpot.name=Unfired Flower Pot
+
+tile.cauldron.name=Cauldron
+tile.smelting_vat.name=Smelting Vat
+
+item.wool.name=Wool
+item.crowbar.name=Crowbar
+item.wool_card.name=Wool Card
+item.ash.name=Ash
+item.rock.name=Rock
+item.stone_brick.name=Stone Brick
+item.moss.name=Moss
+item.thermometer.name=Thermometer
+item.egg_raw.name=Raw Egg
+item.egg_fried.name=Fried Egg
+
+commands.generic.unknownFailure=Unknown failure! See console for more details.
+commands.generic.noPermission=You don't have required permission: %s
+commands.generic.playerOnly=This command can only be used by a player!
+commands.generic.userNeverPlayed=Player '%s' have not played on this server yet
+commands.generic.list.entry=- %s
+
+commands.script.usage=/script <list|load|unload> [id] - Script management
+commands.script.disabled=Scripting system disabled!
+commands.script.list=Loaded scripts:
+commands.script.load.success=Successfully loaded script %s
+commands.script.unload.success=Successfully unloaded script %s
+commands.script.unload.fail=Error unloading script '%s': %s. See console for more details.
+commands.script.unload.fail.generic=Script unloading failed
+
+commands.time.usage=/time <day|night> OR /time set <value> OR /time add <value> [unit] OR /time query <day|daytime|gametime>
+commands.time.unknownUnit=Unknown time unit: %s
+commands.time.set=Time was set to %s in %s
+commands.time.set.day=day
+commands.time.set.night=night
+commands.time.ticks=%d tick(s)
+commands.time.query=Time in %s is %s
+commands.time.query.days=Total days in %s are %s
+commands.time.query.total=Total world time in %s is %s
+commands.time.added=Added %s to the total time in %s
+
+commands.inventory.usage=/inventory [player] - Open player's inventory
+commands.inventory.no_data=No data found for player %s
+
+commands.enderchest.usage=/enderchest [player] - Open player's enderchest
+
+commands.fly.usage=/fly [player] <on|off> - Enable/disable flight mode
+commands.fly.self=Flight mode %s
+commands.fly.off.other=Flight mode %s for %s
+commands.fly.on=enabled
+commands.fly.off=disabled
+
+commands.gamemode.usage=/gamemode <s|c|a|sp> [player] - Change player's game mode
+commands.gamemode.set.self=Gamemode set to %s
+commands.gamemode.set.other=Gamemode set to %s for %s
+commands.gamemode.toggle=Gamemode toggled from %s to %s
+commands.gamemode.creative=Creative
+commands.gamemode.survival=Survival
+commands.gamemode.spectator=Spectator
+commands.gamemode.adventure=Adventure
+
+commands.perm.usage=/perm group <name> <info|prefix|suffix|users|create|delete> OR /perm group <name> <addPerm|delPerm|setPrefix|setSuffix> <value>...
 commands.perm.group.create.exists=Group with name '%s' already exists!
 commands.perm.group.create.success=Successfully created new group named '%s'
 commands.perm.group.delete.unable=Unable to delete group '%s'!
 commands.perm.group.delete.success=Successfully deleted group '%s'
 commands.perm.group.notFound=Group '%s' doesn't exists!
-commands.perm.info.group.0=Information about group '%s':
-commands.perm.info.group.1=- Parent group: %s
-commands.perm.info.group.2=- Prefix: %s
-commands.perm.info.group.3=- Suffix: %s
-commands.perm.info.group.4=- Permissions:
+commands.perm.info.group.0=| Information about group '%s':
+commands.perm.info.group.1=|-> Parent group: %s
+commands.perm.info.group.2=|-> Prefix: %s
+commands.perm.info.group.3=|-> Suffix: %s
+commands.perm.info.group.4=|-> Permissions:
 commands.perm.info.prefix.set=Prefix of group '%s' was set to '%s'
 commands.perm.info.prefix=Prefix of group '%s' is '%s'
 commands.perm.info.suffix.set=Suffix of group '%s' was set to '%s'
@@ -21,8 +90,8 @@ commands.perm.permadd.success=Successfully added permission '%s' to group '%s'
 commands.perm.permadd.unable=Permission '%s' is already granted to group '%s'
 commands.perm.permdel.success=Successfully removed permission '%s' from group '%s'
 commands.perm.permdel.unable=Permission '%s' is missing for group '%s'
-commands.perm.user.notfound=Player '%s' did not played on this server yet
 
+commands.home.usage=/home <create|delete|invite|expel|ban> [player]
 commands.home.player.yourself=You cannot point at yourself!
 commands.home.invite.success=You have invited player '%s' to your home!
 commands.home.invite.already=Player '%s' is already invited to your home!

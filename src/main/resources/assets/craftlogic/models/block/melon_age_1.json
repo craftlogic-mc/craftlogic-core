@@ -1,0 +1,32 @@
+{
+	"textures": {
+		"side": "blocks/melon_side",
+		"top": "blocks/melon_top",
+		"stem": "blocks/melon_stem_connected",
+		"particle": "blocks/melon_side"
+	},
+	"elements": [
+		{
+			"name": "melon",
+			"from": [2, 0, 2],
+			"to": [14, 12, 14],
+			"faces": {
+				"north": {"uv": [1, 1, 15, 15], "texture": "#side"},
+				"east": {"uv": [1, 1, 15, 15], "texture": "#side"},
+				"south": {"uv": [1, 1, 15, 15], "texture": "#side"},
+				"west": {"uv": [1, 1, 15, 15], "texture": "#side"},
+				"up": {"uv": [1, 1, 15, 15], "texture": "#top"},
+				"down": {"uv": [1, 1, 15, 15], "texture": "#top"}
+			}
+		},
+		{
+			"name": "stem",
+			"from": [8, 1, 0],
+			"to": [8, 10, 16],
+			"faces": {
+				"east": {"uv": [0, 0, 9, 16],"texture": "#stem","rotation": 270,"tintindex": 0},
+				"west": {"uv": [9, 0, 0, 16],"texture": "#stem","rotation": 90,"tintindex": 0}
+			}
+		}
+	]
+}

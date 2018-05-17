@@ -27,41 +27,45 @@ public class Sound extends PositionedSound implements ITickableSound {
 
     @Override
     public boolean canRepeat() {
-        return this.source.isSoundRepeatable(this.positionedSoundLocation);
+        return this.source.isSoundRepeatable(this.getEvent());
     }
 
     @Override
     public boolean isDonePlaying() {
-        return !getLocation().isBlockLoaded() || !this.source.isSoundActive(this.positionedSoundLocation);
+        return !getLocation().isBlockLoaded() || !this.source.isSoundActive(this.getEvent());
     }
 
     @Override
     public void update() {
-        this.source.updateSound(this.positionedSoundLocation);
+        this.source.updateSound(this.getEvent());
     }
 
     @Override
     public float getXPosF() {
-        return (float) getLocation().getDX();
+        return (float) getLocation().getX();
     }
 
     @Override
     public float getYPosF() {
-        return (float) getLocation().getDY();
+        return (float) getLocation().getY();
     }
 
     @Override
     public float getZPosF() {
-        return (float) getLocation().getDZ();
+        return (float) getLocation().getZ();
     }
 
     @Override
     public float getPitch() {
-        return this.source.getSoundPitch(this.positionedSoundLocation) * this.sound.getPitch();
+        return this.source.getSoundPitch(this.getEvent()) * this.sound.getPitch();
     }
 
     @Override
     public float getVolume() {
-        return this.source.getSoundVolume(this.positionedSoundLocation) * this.sound.getVolume();
+        return this.source.getSoundVolume(this.getEvent()) * this.sound.getVolume();
+    }
+
+    public SoundEvent getEvent() {
+        return SoundEvent.REGISTRY.getObject(this.positionedSoundLocation);
     }
 }

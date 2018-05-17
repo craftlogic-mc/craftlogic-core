@@ -2,23 +2,20 @@ package ru.craftlogic.api.util;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
 import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.api.inventory.manager.InventoryItemManager;
-import ru.craftlogic.api.inventory.manager.WrappedInventoryItemManager;
-import ru.craftlogic.api.world.OnlinePlayer;
+import ru.craftlogic.api.inventory.manager.SizeCheckedItemManager;
+import ru.craftlogic.api.world.OfflinePlayer;
 import ru.craftlogic.api.world.Player;
-
-import java.util.function.IntConsumer;
 
 public class WrappedPlayerInventory implements InventoryHolder {
     private final InventoryPlayer inventory;
-    private final OnlinePlayer viewer;
-    private final Player player;
+    private final Player viewer;
+    private final OfflinePlayer player;
 
-    public WrappedPlayerInventory(InventoryPlayer inventory, OnlinePlayer viewer, Player player) {
+    public WrappedPlayerInventory(InventoryPlayer inventory, Player viewer, OfflinePlayer player) {
         this.inventory = inventory;
         this.viewer = viewer;
         this.player = player;
@@ -64,7 +61,12 @@ public class WrappedPlayerInventory implements InventoryHolder {
 
     @Override
     public boolean isUsableByPlayer(EntityPlayer player) {
-        return !this.getInventory().player.isDead;
+        return !this.player.isOnline() || !this.player.asOnline().isDead();
+    }
+
+    @Override
+    public void openInventory(EntityPlayer player) {
+        this.viewer.playSound(SoundEvents.BLOCK_CHEST_OPEN, 1F, 1F);
     }
 
     @Override
@@ -72,49 +74,6 @@ public class WrappedPlayerInventory implements InventoryHolder {
         if (!this.player.isOnline()) {
             this.player.saveData(this.viewer.getWorld(), true);
         }
-    }
-
-    static class SizeCheckedItemManager extends WrappedInventoryItemManager {
-        public SizeCheckedItemManager(IInventory inventory) {
-            super(inventory);
-        }
-
-        public SizeCheckedItemManager(IInventory inventory, IntConsumer updateListener) {
-            super(inventory, updateListener);
-        }
-
-        @Override
-        public ItemStack get(int slot) {
-            if (slot < this.size()) {
-                return super.get(slot);
-            } else {
-                return ItemStack.EMPTY;
-            }
-        }
-
-        @Override
-        public ItemStack split(int slot, int amount) {
-            if (slot < this.size()) {
-                return super.split(slot, amount);
-            } else {
-                return ItemStack.EMPTY;
-            }
-        }
-
-        @Override
-        public void set(int slot, ItemStack item) {
-            if (slot < this.size()) {
-                super.set(slot, item);
-            }
-        }
-
-        @Override
-        public ItemStack remove(int slot) {
-            if (slot < this.size()) {
-                return super.remove(slot);
-            } else {
-                return ItemStack.EMPTY;
-            }
-        }
+        this.viewer.playSound(SoundEvents.BLOCK_CHEST_CLOSE, 1F, 1F);
     }
 }

@@ -7,10 +7,10 @@ import net.minecraft.util.text.ITextComponent;
 import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.api.inventory.manager.InventoryItemManager;
 import ru.craftlogic.api.inventory.manager.WrappedInventoryItemManager;
-import ru.craftlogic.api.world.Locateable;
+import ru.craftlogic.api.world.Locatable;
 import ru.craftlogic.api.world.Location;
 
-public class WrappedInventoryHolder implements InventoryHolder, Locateable {
+public class WrappedInventoryHolder implements InventoryHolder, Locatable {
     protected final IInventory inventory;
     protected final Location location;
 
@@ -40,23 +40,23 @@ public class WrappedInventoryHolder implements InventoryHolder, Locateable {
     }
 
     @Override
-    public ItemStack getStackInSlot(int slotId) {
-        return inventory.getStackInSlot(slotId);
+    public ItemStack getStackInSlot(int slot) {
+        return inventory.getStackInSlot(slot);
     }
 
     @Override
-    public ItemStack decrStackSize(int slotId, int amount) {
-        return inventory.decrStackSize(slotId, amount);
+    public ItemStack decrStackSize(int slot, int amount) {
+        return inventory.decrStackSize(slot, amount);
     }
 
     @Override
-    public ItemStack removeStackFromSlot(int slotId) {
-        return inventory.removeStackFromSlot(slotId);
+    public ItemStack removeStackFromSlot(int slot) {
+        return inventory.removeStackFromSlot(slot);
     }
 
     @Override
-    public void setInventorySlotContents(int slotId, ItemStack stack) {
-        inventory.setInventorySlotContents(slotId, stack);
+    public void setInventorySlotContents(int slot, ItemStack stack) {
+        inventory.setInventorySlotContents(slot, stack);
     }
 
     @Override
@@ -110,8 +110,8 @@ public class WrappedInventoryHolder implements InventoryHolder, Locateable {
     }
 
     @Override
-    public boolean isItemValidForSlot(int slotId, ItemStack stack) {
-        return inventory.isItemValidForSlot(slotId, stack);
+    public boolean isItemValidForSlot(int slot, ItemStack stack) {
+        return inventory.isItemValidForSlot(slot, stack);
     }
 
     @Override

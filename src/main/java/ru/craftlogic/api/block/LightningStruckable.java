@@ -1,10 +1,8 @@
 package ru.craftlogic.api.block;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.effect.EntityLightningBolt;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import ru.craftlogic.api.world.Location;
 
 public interface LightningStruckable {
-    void onStruckByLightning(World world, BlockPos pos, IBlockState state, EntityLightningBolt lightningBolt);
+    void onStruckByLightning(Location location, EntityLightningBolt bolt, boolean effectOnly);
 }

@@ -1,82 +1,128 @@
 package ru.craftlogic.api.world;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.InventoryEnderChest;
+import net.minecraft.network.play.server.SPacketPlayerPosLook;
+import net.minecraft.network.play.server.SPacketSoundEffect;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.FakePlayerFactory;
-import ru.craftlogic.api.Permissible;
-import ru.craftlogic.api.Server;
+import net.minecraft.world.GameType;
+import ru.craftlogic.CraftLogic;
+import ru.craftlogic.api.block.holders.ScreenHolder;
+import ru.craftlogic.api.inventory.InventoryHolder;
+import ru.craftlogic.api.server.Server;
 
-public class Player implements Permissible {
-    protected final Server server;
-    protected final GameProfile profile;
-    protected FakePlayer fakeEntity;
+import java.util.EnumSet;
+import java.util.Set;
+
+public class Player extends OfflinePlayer implements CommandSender {
 
     public Player(Server server, GameProfile profile) {
-        this.server = server;
-        this.profile = profile;
+        super(server, profile);
+    }
+
+    public InventoryPlayer getInventory() {
+        return getEntity().inventory;
+    }
+
+    public InventoryEnderChest getEnderInventory() {
+        return getEntity().getInventoryEnderChest();
     }
 
     @Override
-    public boolean hasPermissions(String... permissions) {
-        return this.server.getPermissionManager().hasPermissions(this.profile, permissions);
+    public Location getLocation() {
+        return new Location(getEntity());
+    }
+
+    @Override
+    public ICommandSender getHandle() {
+        return getEntity();
+    }
+
+    public World getWorld() {
+        return this.server.getWorld(Dimension.fromVanilla(getEntity().world.provider.getDimensionType()));
+    }
+
+    public void openChestInventory(InventoryHolder holder) {
+        getEntity().displayGUIChest(holder);
+    }
+
+    public void showScreen(ScreenHolder holder) {
+        this.showScreen(holder, 0);
+    }
+
+    public void showScreen(ScreenHolder holder, int subId) {
+        CraftLogic.showScreen(holder, getEntity(), subId);
+    }
+
+    public boolean teleport(Location location) {
+        return this.teleport(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getYaw(), location.getPitch());
+    }
+
+    public boolean teleport(double x, double y, double z, float yaw, float pitch) {
+        EntityPlayerMP entity = getEntity();
+        Set<SPacketPlayerPosLook.EnumFlags> lookFlags = EnumSet.noneOf(SPacketPlayerPosLook.EnumFlags.class);
+        yaw = MathHelper.wrapDegrees(yaw);
+        pitch = MathHelper.wrapDegrees(pitch);
+
+        entity.dismountRidingEntity();
+        entity.connection.setPlayerLocation(x, y, z, yaw, pitch, lookFlags);
+        entity.setRotationYawHead(yaw);
+
+        if (!entity.isElytraFlying()) {
+            entity.motionY = 0.0D;
+            entity.onGround = true;
+        }
+
+        return true;
+    }
+
+    public void setGameMode(GameType mode) {
+        getEntity().setGameType(mode);
+    }
+
+    public GameType getGameMode() {
+        return getEntity().interactionManager.getGameType();
+    }
+
+    public Container getOpenContainer() {
+        return getEntity().openContainer;
+    }
+
+    public boolean isFlyingAllowed() {
+        return getEntity().capabilities.allowFlying;
+    }
+
+    public void setFlyingAllowed(boolean fly) {
+        EntityPlayerMP entity = getEntity();
+        entity.capabilities.allowFlying = fly;
+        if (!fly) {
+            entity.capabilities.isFlying = false;
+        }
+        entity.sendPlayerAbilities();
+    }
+
+    public boolean isDead() {
+        return getEntity().isDead;
     }
 
     @Override
     public ITextComponent getDisplayName() {
-        return new TextComponentString(this.profile.getName());
+        return getEntity().getDisplayName();
     }
 
-    public int isOperator() {
-        return this.server.isPlayerOperator(this.profile);
+    public EntityPlayerMP getEntity() {
+        return this.server.getHandle().getPlayerList().getPlayerByUUID(this.profile.getId());
     }
 
-    public boolean isBypassesPlayerLimit() {
-        return this.server.isBypassesPlayerLimit(this.profile);
-    }
-
-    public boolean isWhitelisted() {
-        return this.server.isPlayerWhitelisted(this.profile);
-    }
-
-    public boolean isOnline() {
-        return this.server.isPlayerOnline(this.profile);
-    }
-
-    public GameProfile getProfile() {
-        return this.profile;
-    }
-
-    public boolean loadData(World world, boolean reload) {
-        if (this.fakeEntity == null || reload) {
-            NBTTagCompound data = this.server.loadOfflinePlayerData(this.asFake(world));
-            return data != null;
-        }
-        return false;
-    }
-
-    public boolean saveData(World world, boolean unload) {
-        if (this.fakeEntity != null) {
-            this.server.saveOfflinePlayerData(this.fakeEntity);
-            if (unload) {
-                this.fakeEntity = null;
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public FakePlayer asFake(World world) {
-        if (this.fakeEntity == null) {
-            this.fakeEntity = FakePlayerFactory.get(world.getHandle(), this.profile);
-        }
-        return this.fakeEntity;
-    }
-
-    public OnlinePlayer asOnline() {
-        return this.server.getPlayer(this.profile);
+    public void playSound(SoundEvent sound, float volume, float pitch) {
+        EntityPlayerMP player = getEntity();
+        SPacketSoundEffect packet = new SPacketSoundEffect(sound, player.getSoundCategory(), player.posX, player.posY, player.posZ, volume, pitch);
+        player.connection.sendPacket(packet);
     }
 }

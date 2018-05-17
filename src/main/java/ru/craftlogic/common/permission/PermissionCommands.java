@@ -2,26 +2,24 @@ package ru.craftlogic.common.permission;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.CommandException;
+import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.management.PlayerProfileCache;
 import ru.craftlogic.api.command.*;
-import ru.craftlogic.api.world.Player;
-import ru.craftlogic.api.world.World;
+import ru.craftlogic.api.text.Text;
+import ru.craftlogic.api.text.TextTranslation;
+import ru.craftlogic.api.world.OfflinePlayer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
-
-public class PermissionCommands implements CommandContainer {
-    @Command(name = "permissions", syntax = {
+public class PermissionCommands implements CommandRegisterer {
+    @Command(name = "perm", syntax = {
         "group <group:PermissionGroup> [create|prefix|suffix|addPerm|delPerm] <value>...",
         "group <group:PermissionGroup> [create|delete|info|prefix|suffix|users]",
         "user <username:CachedUsername> [addGroup|delGroup|prefix|suffix] <value>...",
         "user <username:CachedUsername> [info|groups|prefix|suffix]"
-    }, aliases = "perm")
+    }, aliases = "permissions")
     public static void commandPerm(CommandContext ctx) throws Exception {
         String firstConst = ctx.constant();
         PermissionManager permissionManager = ctx.server().getPermissionManager();
@@ -47,7 +45,7 @@ public class PermissionCommands implements CommandContainer {
                                     parent = vals[0];
                                     break;
                                 default:
-                                    throw new CommandException("commands.perm.usage");
+                                    throw new WrongUsageException("commands.perm.usage");
                             }
                         }
                     }
@@ -62,13 +60,32 @@ public class PermissionCommands implements CommandContainer {
                         switch (ctx.action()) {
                             case "info":
                                 PermissionManager.Group parent = group.parent();
-                                ctx.sendMessage("commands.perm.info.group.0", groupName);
-                                ctx.sendMessage("commands.perm.info.group.1", parent == null ? "~not set~" : parent.name());
-                                ctx.sendMessage("commands.perm.info.group.2", group.prefix());
-                                ctx.sendMessage("commands.perm.info.group.3", group.suffix());
+                                ctx.sendMessage(
+                                    new TextTranslation("commands.perm.info.group.0")
+                                        .gray()
+                                        .argText(groupName, Text::darkGray)
+                                );
+                                ctx.sendMessage(
+                                    new TextTranslation("commands.perm.info.group.1")
+                                        .argText(parent == null ? "~not set~" : parent.name(), Text::darkGray)
+                                );
+                                ctx.sendMessage(
+                                    new TextTranslation("commands.perm.info.group.2")
+                                        .argText(group.prefix())
+                                );
+                                ctx.sendMessage(
+                                    new TextTranslation("commands.perm.info.group.3")
+                                        .argText(group.suffix())
+                                );
                                 ctx.sendMessage("commands.perm.info.group.4");
+
                                 for (String s : group.permissions()) {
-                                    ctx.sendMessage(s);
+                                    ctx.sendMessage(
+                                        new TextTranslation("commands.generic.list.entry")
+                                            .argText(s, d ->
+                                                d.darkGray().suggestCommand("/perm group " + groupName + " delPerm " + s)
+                                            )
+                                    );
                                 }
                                 break;
                             case "delete":
@@ -138,12 +155,12 @@ public class PermissionCommands implements CommandContainer {
                 break;
             case "user":
                 String username = ctx.get("username").asString();
-                Player player = ctx.server().getOfflinePlayerByName(username);
+                OfflinePlayer player = ctx.server().getOfflinePlayerByName(username);
                 if (player != null) {
                     PermissionManager.User user = permissionManager.getUser(player);
 
                 } else {
-                    throw new CommandException("commands.perm.user.notfound");
+                    throw new CommandException("commands.generic.userNeverPlayed", username);
                 }
         }
     }
@@ -158,66 +175,5 @@ public class PermissionCommands implements CommandContainer {
             }
         }
         return variants;
-    }
-
-    @ArgumentCompleter(type = "World")
-    public static List<String> completerWorld(ArgumentCompletionContext ctx) {
-        Set<World> worlds = ctx.server().getLoadedWorlds();
-        List<String> variants = ctx.partialName().isEmpty() ? new ArrayList<>(worlds.size()) : new ArrayList<>();
-        for (World world : worlds) {
-            String worldName = world.getName();
-            if (worldName.startsWith(ctx.partialName())) {
-                variants.add(worldName);
-            }
-        }
-        return variants;
-    }
-
-    @ArgumentCompleter(type = "Player", isEntityName = true)
-    public static List<String> completerPlayer(ArgumentCompletionContext ctx) {
-        String[] onlinePlayerNames = ctx.server().getOnlinePlayerNames();
-        List<String> variants = ctx.partialName().isEmpty() ? new ArrayList<>(onlinePlayerNames.length) : new ArrayList<>();
-        for (String playerName : onlinePlayerNames) {
-            if (playerName.startsWith(ctx.partialName())) {
-                variants.add(playerName);
-            }
-        }
-        return variants;
-    }
-
-    @ArgumentCompleter(type = "CachedUsername", isEntityName = true)
-    public static List<String> completerUsername(ArgumentCompletionContext ctx) {
-        String[] usernames = ctx.server().getProfileCache().getUsernames();
-        List<String> variants = ctx.partialName().isEmpty() ? new ArrayList<>(usernames.length) : new ArrayList<>();
-        for (String username : usernames) {
-            if (username.startsWith(ctx.partialName())) {
-                variants.add(username);
-            }
-        }
-        return variants;
-    }
-
-    @ArgumentCompleter(type = "XCoord")
-    public static List<String> completerXCoord(ArgumentCompletionContext ctx) {
-        if (ctx.partialName().isEmpty()) {
-            return singletonList(String.valueOf(ctx.targetBlockOrSelfLocation().getX()));
-        }
-        return emptyList();
-    }
-
-    @ArgumentCompleter(type = "YCoord")
-    public static List<String> completerYCoord(ArgumentCompletionContext ctx) {
-        if (ctx.partialName().isEmpty()) {
-            return singletonList(String.valueOf(ctx.targetBlockOrSelfLocation().getY()));
-        }
-        return emptyList();
-    }
-
-    @ArgumentCompleter(type = "ZCoord")
-    public static List<String> completerZCoord(ArgumentCompletionContext ctx) {
-        if (ctx.partialName().isEmpty()) {
-            return singletonList(String.valueOf(ctx.targetBlockOrSelfLocation().getZ()));
-        }
-        return emptyList();
     }
 }

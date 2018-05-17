@@ -37,7 +37,20 @@ public abstract class Screen extends GuiScreen implements ElementContainer {
 
     @Override
     public Minecraft getClient() {
-        return this.mc != null ? this.mc : Minecraft.getMinecraft();
+        if (this.mc == null) {
+            this.mc = Minecraft.getMinecraft();
+        }
+        return this.mc;
+    }
+
+    @Override
+    public void drawWorldBackground(int index) {
+        Minecraft client = this.getClient();
+        if (client.world != null) {
+            this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
+        } else {
+            this.drawBackground(index);
+        }
     }
 
     @Override
@@ -89,6 +102,7 @@ public abstract class Screen extends GuiScreen implements ElementContainer {
     @Override
     public final void initGui() {
         super.initGui();
+        this.getClient().setIngameNotInFocus();
         this.init();
     }
 

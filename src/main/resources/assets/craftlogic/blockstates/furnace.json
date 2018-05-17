@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "facing=north,open=false": {"model": "craftlogic:furnace"},
+    "facing=north,open=true": {"model": "craftlogic:furnace_open"},
+    "facing=south,open=false": {"model": "craftlogic:furnace", "y": 180},
+    "facing=south,open=true": {"model": "craftlogic:furnace_open", "y": 180},
+    "facing=west,open=false": {"model": "craftlogic:furnace", "y": 270},
+    "facing=west,open=true": {"model": "craftlogic:furnace_open", "y": 270},
+    "facing=east,open=false": {"model": "craftlogic:furnace", "y": 90},
+    "facing=east,open=true": {"model": "craftlogic:furnace_open", "y": 90}
+  }
+}

@@ -1,17 +1,18 @@
 package ru.craftlogic.common.command;
 
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommand;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.WrongUsageException;
+import net.minecraft.command.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.CommandBlockBaseLogic;
 import net.minecraft.util.math.BlockPos;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.craftlogic.CraftLogic;
-import ru.craftlogic.api.Server;
 import ru.craftlogic.api.command.*;
+import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.util.CheckedFunction;
+import ru.craftlogic.api.world.CommandSender;
+import ru.craftlogic.api.world.Location;
 import ru.craftlogic.common.permission.PermissionManager;
 
 import javax.annotation.Nullable;
@@ -24,33 +25,25 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CommandRegistry {
+    private static final Logger LOGGER = LogManager.getLogger("CommandRegistry");
+
     private final Server server;
-    private final AdvancedCommandManager commandManager;
+    private final CommandHandler commandManager;
     private Map<String, Map<String, CommandContainer>> commands = new HashMap<>();
     private Map<String, TypedArgCompleter> completers = new HashMap<>();
-    private Map<Class<? extends ru.craftlogic.api.command.CommandContainer>, List<ICommand>> typedCommands = new HashMap<>();
+    private Map<Class<? extends CommandRegisterer>, List<ICommand>> typedCommands = new HashMap<>();
     private boolean loaded;
 
-    public CommandRegistry(Server server, AdvancedCommandManager commandManager) {
+    public CommandRegistry(Server server, CommandHandler commandManager) {
         this.server = server;
         this.commandManager = commandManager;
-    }
-
-    public static void main(String[] args) {
-        CommandRegistry reg = new CommandRegistry(null, null);
-        Scanner scanner = new Scanner(System.in);
-        while (true) {
-            String pattern = scanner.nextLine();
-            ArgumentsPattern p1 = reg.new ArgumentsPattern(pattern);
-            String value = scanner.nextLine();
-            System.out.println(p1.matches(value.split(" ")));
-        }
     }
 
     public void load() {
         for (Map<String, CommandContainer> entry : commands.values()) {
             for (Map.Entry<String, CommandContainer> e : entry.entrySet()) {
-                this.commandManager.registerCommand(e.getValue().command);
+                CommandContainer container = e.getValue();
+                this.commandManager.registerCommand(container.command);
             }
         }
         this.loaded = true;
@@ -58,18 +51,9 @@ public class CommandRegistry {
 
     public ICommand registerCommand(String name, List<String> syntax, List<String> aliases, List<String> permissions, CommandExecutor executor) {
         String modId = CraftLogic.getActiveModId();
-        List<ArgumentsPattern> patterns = new ArrayList<>();
-
-        for (String a : syntax) {
-            patterns.add(new ArgumentsPattern(a));
-        }
-
-        if (permissions.isEmpty()) {
-            permissions = Collections.singletonList("commands." + name);
-        }
 
         CommandExtended cmd = new CommandExtended(
-            patterns,
+            syntax,
             name,
             aliases,
             permissions,
@@ -86,10 +70,10 @@ public class CommandRegistry {
     }
 
     public boolean unregisterCommand(ICommand command) {
-        return this.commandManager.unregisterCommand(command);
+        return ((AdvancedCommandManager)this.commandManager).unregisterCommand(command);
     }
 
-    public void registerCommandContainer(Class<? extends ru.craftlogic.api.command.CommandContainer> objClass) {
+    public void registerCommandContainer(Class<? extends CommandRegisterer> objClass) {
         for (Method method : objClass.getDeclaredMethods()) {
             if ((method.getModifiers() & Modifier.STATIC) > 0) {
                 if (method.isAnnotationPresent(Command.class)) {
@@ -98,6 +82,10 @@ public class CommandRegistry {
                         && method.getReturnType() == void.class) {
 
                         Command annotation = method.getAnnotation(Command.class);
+
+                        if (annotation.serverOnly() && !this.server.isDedicated()) {
+                            continue;
+                        }
 
                         try {
                             MethodHandle mh = MethodHandles.lookup().unreflect(method);
@@ -112,7 +100,7 @@ public class CommandRegistry {
                                     .getOrDefault(objClass, new ArrayList<>())
                                     .add(cmd);
                         } catch (IllegalAccessException e) {
-                            e.printStackTrace();
+                            LOGGER.error("Error occurred while registering command container " + objClass, e);
                         }
                     }
                 } else if (method.isAnnotationPresent(ArgumentCompleter.class)) {
@@ -124,13 +112,15 @@ public class CommandRegistry {
 
                         try {
                             MethodHandle mh = MethodHandles.lookup().unreflect(method);
-                            this.completers.put(annotation.type(), new TypedArgCompleter(
-                                annotation.type(),
-                                annotation.isEntityName(),
-                                ctx -> (List<String>) mh.invoke(ctx)
-                            ));
+                            for (String type : annotation.type()) {
+                                this.completers.put(type, new TypedArgCompleter(
+                                    type,
+                                    annotation.isEntityName(),
+                                    ctx -> (List<String>) mh.invoke(ctx)
+                                ));
+                            }
                         } catch (IllegalAccessException e) {
-                            e.printStackTrace();
+                            LOGGER.error("Error occurred while registering argument completer " + objClass, e);
                         }
                     }
                 }
@@ -138,14 +128,17 @@ public class CommandRegistry {
         }
     }
 
-    public boolean unregisterCommandContainer(Class<? extends ru.craftlogic.api.command.CommandContainer> objClass) {
+    public boolean unregisterCommandContainer(Class<? extends CommandRegisterer> objClass) {
         List<ICommand> cmds = this.typedCommands.get(objClass);
         boolean any = false;
         if (cmds != null) {
             for (ICommand cmd : cmds) {
-                if (this.commandManager.unregisterCommand(cmd)) {
+                if (((AdvancedCommandManager)this.commandManager).unregisterCommand(cmd)) {
                     any = true;
                 }
+            }
+            if (cmds.isEmpty()) {
+                this.typedCommands.remove(objClass);
             }
         }
         return any;
@@ -185,10 +178,21 @@ public class CommandRegistry {
         private final List<String> permissions;
         private final CommandExecutor executor;
 
-        public CommandExtended(List<ArgumentsPattern> patterns, String name, List<String> aliases, List<String> permissions, CommandExecutor executor) {
+        public CommandExtended(List<String> syntax, String name, List<String> aliases, List<String> permissions, CommandExecutor executor) {
+            List<ArgumentsPattern> patterns = new ArrayList<>();
+
+            for (String a : syntax) {
+                patterns.add(new ArgumentsPattern(a));
+            }
+
             this.patterns = patterns;
             this.name = name;
             this.aliases = aliases;
+
+            if (permissions.isEmpty()) {
+                permissions = Collections.singletonList("commands." + name);
+            }
+
             this.permissions = permissions;
             this.executor = executor;
         }
@@ -212,13 +216,13 @@ public class CommandRegistry {
         public void execute(MinecraftServer _s, ICommandSender sender, String[] rawArgs) throws CommandException {
             for (ArgumentsPattern pattern : this.patterns) {
                 if (pattern.matches(rawArgs) == MatchLevel.FULL) {
-                    CommandContext ctx = pattern.parse(CommandRegistry.this.server, sender, rawArgs);
+                    CommandContext ctx = pattern.parse(CommandRegistry.this.server, sender, this, rawArgs);
                     try {
                         this.executor.execute(ctx);
                     } catch (CommandException e) {
                         throw e;
                     } catch (Throwable t) {
-                        t.printStackTrace();
+                        LOGGER.error("Error occurred while executing command '" + this.getName() + "'", t);
                         throw new CommandException("commands.generic.unknownFailure", t.getMessage());
                     }
                     return;
@@ -232,6 +236,9 @@ public class CommandRegistry {
             if (_s == sender || sender instanceof CommandBlockBaseLogic) {
                 return true;
             } else if (sender instanceof EntityPlayer) {
+                if (_s.getPlayerList().getOppedPlayers().isLanServer()) {
+                    return true;
+                }
                 PermissionManager permissionManager = CommandRegistry.this.server.getPermissionManager();
                 return permissionManager.hasPermissions(((EntityPlayer)sender).getGameProfile(), this.permissions.toArray(new String[0]));
             }
@@ -252,7 +259,7 @@ public class CommandRegistry {
         @Override
         public boolean isUsernameIndex(String[] rawArgs, int index) {
             for (ArgumentsPattern pattern : this.patterns) {
-                if (pattern.args.size() > index && pattern.args.get(index).isEntityName) {
+                if (pattern.args.size() > index && pattern.args.get(index).isEntityName()) {
                     return true;
                 }
             }
@@ -302,7 +309,8 @@ public class CommandRegistry {
                                 TypedArgCompleter c = CommandRegistry.this.completers.get(type);
                                 if (c != null) {
                                     try {
-                                        return c.completer.apply(new ArgumentCompletionContext(server, sender, partialValue, targetBlock));
+                                        Location l = targetBlock != null ? new Location(sender.getEntityWorld(), targetBlock) : null;
+                                        return c.completer.apply(new ArgumentCompletionContext(server, type, CommandSender.from(server, sender), partialValue, l));
                                     } catch (Throwable throwable) {
                                         throwable.printStackTrace();
                                     }
@@ -412,7 +420,7 @@ public class CommandRegistry {
             return MatchLevel.FULL;
         }
 
-        public CommandContext parse(Server server, ICommandSender sender, String[] rawArgs) {
+        public CommandContext parse(Server server, ICommandSender sender, ICommand command, String[] rawArgs) {
             List<CommandContext.Argument> args = new ArrayList<>();
 
             for (int i = 0; i < this.args.size(); i++) {
@@ -426,7 +434,7 @@ public class CommandRegistry {
                 args.add(arg.parse(value));
             }
 
-            return new CommandContext(server, sender, args);
+            return new CommandContext(server, CommandSender.from(server, sender), command, args);
         }
 
         public List<String> complete(Server server, ICommandSender sender, String[] rawArgs, @Nullable BlockPos targetPos) {
@@ -444,7 +452,6 @@ public class CommandRegistry {
         public abstract class Argument {
             private final String name;
             private final boolean isVararg;
-            public boolean isEntityName;
 
             public Argument(String name, boolean isVararg) {
                 this.name = name;

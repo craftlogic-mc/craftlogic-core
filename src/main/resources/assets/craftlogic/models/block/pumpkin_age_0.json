@@ -1,0 +1,32 @@
+{
+	"textures": {
+		"side": "blocks/pumpkin_side",
+		"top": "blocks/pumpkin_top",
+		"stem": "blocks/pumpkin_stem_connected",
+		"particle": "blocks/pumpkin_side"
+	},
+	"elements": [
+		{
+			"name": "pumpkin",
+			"from": [3, 0, 3],
+			"to": [13, 10, 13],
+			"faces": {
+				"north": {"uv": [2, 2, 14, 14], "texture": "#side"},
+				"east": {"uv": [2, 2, 14, 14], "texture": "#side"},
+				"south": {"uv": [2, 2, 14, 14], "texture": "#side"},
+				"west": {"uv": [2, 2, 14, 14], "texture": "#side"},
+				"up": {"uv": [2, 2, 14, 14], "texture": "#top"},
+				"down": {"uv": [2, 2, 14, 14], "texture": "#top"}
+			}
+		},
+		{
+			"name": "stem",
+			"from": [8, 1, 0],
+			"to": [8, 10, 16],
+			"faces": {
+				"east": {"uv": [0, 0, 9, 16],"texture": "#stem","rotation": 270,"tintindex": 0},
+				"west": {"uv": [9, 0, 0, 16],"texture": "#stem","rotation": 90,"tintindex": 0}
+			}
+		}
+	]
+}

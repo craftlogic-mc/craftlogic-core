@@ -2,23 +2,18 @@ package ru.craftlogic.client;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import ru.craftlogic.api.block.Colored;
-import ru.craftlogic.api.block.holders.ScreenHolder;
-import ru.craftlogic.api.entity.EntityThrownItem;
 import ru.craftlogic.api.item.ItemBlockBase;
-import ru.craftlogic.api.world.TileEntities;
+import ru.craftlogic.api.model.ModelManager;
+import ru.craftlogic.client.render.RenderChicken;
 import ru.craftlogic.client.render.RenderThrownItem;
 import ru.craftlogic.common.ProxyCommon;
-
-import javax.annotation.Nullable;
+import ru.craftlogic.common.entity.EntityThrownItem;
 
 import static ru.craftlogic.CraftLogic.registerEntityRenderer;
 
@@ -29,6 +24,8 @@ public class ProxyClient extends ProxyCommon {
     @Override
     public void preInit() {
         super.preInit();
+        registerEntityRenderer(EntityThrownItem.class, rm -> new RenderThrownItem(rm, client.getRenderItem()));
+        registerEntityRenderer(EntityChicken.class, RenderChicken::new);
     }
 
     @Override
@@ -53,19 +50,10 @@ public class ProxyClient extends ProxyCommon {
     @Override
     public void postInit() {
         super.postInit();
-        registerEntityRenderer(EntityThrownItem.class, rm -> new RenderThrownItem(rm, client.getRenderItem()));
     }
 
     @SubscribeEvent
     public void onModelsRegister(ModelRegistryEvent event) {
         this.modelManager.init();
-    }
-
-    @Nullable
-    @Override
-    public GuiScreen getClientGuiElement(int subId, EntityPlayer player, World world, int x, int y, int z) {
-        BlockPos pos = new BlockPos(x, y, z);
-        ScreenHolder screenHolder = TileEntities.getTileEntity(world, pos, ScreenHolder.class);
-        return screenHolder != null ? screenHolder.createScreen(player, subId) : null;
     }
 }

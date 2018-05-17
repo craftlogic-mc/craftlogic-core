@@ -1,0 +1,17 @@
+{
+  "furnace.vent.open": {
+    "category": "block",
+    "subtitle": "craftlogic.subtitle.furnace_vent_open",
+    "sounds": [ "craftlogic:furnace/vent_open" ]
+  },
+  "furnace.vent.close": {
+    "category": "block",
+    "subtitle": "craftlogic.subtitle.furnace_vent_close",
+    "sounds": [ "craftlogic:furnace/vent_close" ]
+  },
+  "furnace.hot.loop": {
+    "category": "block",
+    "subtitle": "craftlogic.subtitle.furnace_hot_loop",
+    "sounds": [ "craftlogic:furnace/hot_loop" ]
+  }
+}

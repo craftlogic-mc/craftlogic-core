@@ -31,8 +31,8 @@ public class MixinTileEntity {
         try {
             type = REGISTRY.getObject(new ResourceLocation(s));
             if (type != null) {
+                TileEntityInfo<?> i = CraftLogic.getTileEntityInfo(type);
                 if (TileEntityBase.class.isAssignableFrom(type)) {
-                    TileEntityInfo<?> i = CraftLogic.getTileEntityInfo(type);
                     tile = i != null ? i.create(world) : null;
                 } else {
                     tile = (TileEntity)type.newInstance();

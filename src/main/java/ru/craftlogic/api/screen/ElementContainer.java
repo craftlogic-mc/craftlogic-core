@@ -79,7 +79,7 @@ public interface ElementContainer {
     }
 
     default void drawText(ITextComponent text, int x, int y, int color) {
-        drawText(text.getUnformattedText(), x, y, color);
+        drawText(text.getFormattedText(), x, y, color);
     }
 
     default void drawText(String text, int x, int y, int color) {
@@ -87,7 +87,7 @@ public interface ElementContainer {
     }
 
     default void drawCenteredText(ITextComponent text, int x, int y, int color) {
-        drawCenteredText(text.getUnformattedText(), x, y, color);
+        drawCenteredText(text.getFormattedText(), x, y, color);
     }
 
     default void drawCenteredText(String text, int x, int y, int color) {
@@ -95,7 +95,7 @@ public interface ElementContainer {
     }
 
     default void drawTooltip(ITextComponent text, int x, int y) {
-        drawTooltip(text.getUnformattedText(), x, y);
+        drawTooltip(text.getFormattedText(), x, y);
     }
 
     default void drawTooltip(String text, int x, int y) {
@@ -107,7 +107,7 @@ public interface ElementContainer {
     }
 
     default void drawTooltip(ITextComponent text, int x, int y, int maxTextWidth) {
-        drawTooltip(text.getUnformattedText(), x, y, maxTextWidth);
+        drawTooltip(text.getFormattedText(), x, y, maxTextWidth);
     }
 
     default void drawTooltip(String text, int x, int y, int maxTextWidth) {

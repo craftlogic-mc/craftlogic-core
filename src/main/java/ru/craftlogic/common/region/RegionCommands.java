@@ -4,11 +4,11 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.command.CommandException;
 import ru.craftlogic.api.command.*;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.api.world.OnlinePlayer;
+import ru.craftlogic.api.world.Player;
 
 import java.util.*;
 
-public class RegionCommands implements CommandContainer {
+public class RegionCommands implements CommandRegisterer {
     @Command(name = "home", syntax = {
         "[create|delete]",
         "[invite|expel|ban] <player:Player>",
@@ -18,10 +18,10 @@ public class RegionCommands implements CommandContainer {
         ""
     })
     public static void commandHome(CommandContext ctx) throws Exception {
-        OnlinePlayer sender = ctx.senderAsPlayer();
+        Player sender = ctx.senderAsPlayer();
         RegionManager regionManager = ctx.server().getRegionManager();
         Location location = sender.getLocation();
-        if (ctx.has("player") & ctx.has("action_0")) {
+        if (ctx.has("player") & ctx.hasAction()) {
             String player = ctx.get("player").asString();
             GameProfile targetProfile = ctx.server().getOfflinePlayerByName(player).getProfile();
             if (targetProfile != null && targetProfile.getId() != null) {
@@ -58,14 +58,14 @@ public class RegionCommands implements CommandContainer {
             } else {
                 throw new CommandException("commands.home.player.notFound", player);
             }
-        } else if (ctx.has("const_0") && ctx.constant().equals("flag")) {
+        } else if (ctx.hasConstant() && ctx.constant().equals("flag")) {
             String flag = ctx.get("flag").asString();
             if (ctx.has("value")) {
                 String value = ctx.get("value").asString();
             } else {
 
             }
-        } else if (ctx.has("action_0")) {
+        } else if (ctx.hasAction()) {
             RegionManager.Region region = regionManager.getRegion(sender.getWorld().getName(), sender.getProfile().getId());
             if (ctx.action().equals("create")) {
                 if (region != null) {
@@ -99,7 +99,7 @@ public class RegionCommands implements CommandContainer {
                 GameProfile targetPlayer = ctx.server().getOfflinePlayerByName(targetPlayerName).getProfile();
                 if (targetPlayer != null && targetPlayer.getId() != null) {
                     region = regionManager.getRegion(location.getWorldName(), targetPlayer.getId());
-                    if (!region.members.contains(sender.getProfile().getId())) {
+                    if (region != null && !region.members.contains(sender.getProfile().getId())) {
                         throw new CommandException("commands.home.accessDenied", targetPlayerName);
                     }
                 } else {

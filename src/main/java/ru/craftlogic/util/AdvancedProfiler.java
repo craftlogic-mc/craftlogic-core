@@ -58,7 +58,7 @@ public class AdvancedProfiler {
             }
 
             if (k > this.warnTime) {
-                LOGGER.warn("Something's taking too long! '{}' took aprox {} ms", this.currentSection, (double)k / 1000000D);
+                LOGGER.warn("Something's taking too long! '{}' took approx {} ms", this.currentSection, (double)k / 1000000D);
             }
 
             this.currentSection = this.sections.isEmpty() ? "" : this.sections.get(this.sections.size() - 1);
@@ -139,7 +139,7 @@ public class AdvancedProfiler {
         }
     }
 
-    public static final class Result implements Comparable<AdvancedProfiler.Result> {
+    public static final class Result implements Comparable<Result> {
         public double usePercentage, totalUsePercentage;
         public String profilerName;
 
@@ -150,7 +150,7 @@ public class AdvancedProfiler {
         }
 
         @Override
-        public int compareTo(AdvancedProfiler.Result other) {
+        public int compareTo(Result other) {
             if (other.usePercentage < this.usePercentage) {
                 return -1;
             } else {

@@ -7,30 +7,32 @@ import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import ru.craftlogic.api.command.AdvancedCommandManager;
+import ru.craftlogic.api.text.TextTranslation;
 import ru.craftlogic.common.command.CommandRegistry.CommandContainer;
 
 import javax.annotation.Nullable;
 import java.util.*;
+
+import static ru.craftlogic.CraftLogic.wrapWithActiveModId;
 
 @Mixin(CommandHandler.class)
 public abstract class MixinCommandHandler implements AdvancedCommandManager {
     @Shadow @Final
     private static Logger LOGGER;
 
-    private final Map<String, ResourceLocation> aliases = new HashMap<>();
-    private final Map<String, List<CommandContainer>> registry = new HashMap<>();
+    private final Map<String, List<ResourceLocation>> aliases = new HashMap<>();
+    private final Map<ResourceLocation, CommandContainer> registry = new HashMap<>();
 
     @Overwrite
     public int executeCommand(ICommandSender sender, String rawString) {
@@ -40,35 +42,16 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
         }
 
         String[] args = rawString.split(" ");
-        String modId = null;
         String commandName = args[0];
-        if (commandName.contains(":")) {
-            modId = commandName.substring(0, commandName.indexOf(":"));
-        }
         args = dropFirstString(args);
 
-        List<CommandContainer> matchedCommands = this.registry.get(commandName);
-        CommandContainer container = null;
-        if (matchedCommands != null && !matchedCommands.isEmpty()) {
-            if (modId == null) {
-                container = matchedCommands.get(matchedCommands.size() - 1);
-            } else {
-                for (CommandContainer c : matchedCommands) {
-                    if (c.modId.equalsIgnoreCase(modId)) {
-                        container = c;
-                        break;
-                    }
-                }
-            }
-        }
+        CommandContainer container = this.getCommand(commandName);
 
         int i = 0;
 
         try {
             if (container == null) {
-                TextComponentTranslation msg = new TextComponentTranslation("commands.generic.notFound");
-                msg.getStyle().setColor(TextFormatting.RED);
-                sender.sendMessage(msg);
+                sender.sendMessage(new TextTranslation("commands.generic.notFound").red().build());
             } else if (container.command.checkPermission(this.getServer(), sender)) {
                 ICommand command = container.command;
                 int usernameIndex = this.getUsernameIndex(command, args);
@@ -85,7 +68,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
                     args = event.getParameters();
                 }
 
-                if (usernameIndex > -1) {
+                if (usernameIndex >= 0) {
                     List<Entity> entities = EntitySelector.matchEntities(sender, args[usernameIndex], Entity.class);
                     String s1 = args[usernameIndex];
                     sender.setCommandStat(Type.AFFECTED_ENTITIES, entities.size() - 1);
@@ -108,9 +91,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
                     }
                 }
             } else {
-                TextComponentTranslation msg = new TextComponentTranslation("commands.generic.permission");
-                msg.getStyle().setColor(TextFormatting.RED);
-                sender.sendMessage(msg);
+                sender.sendMessage(new TextTranslation("commands.generic.permission").red().build());
             }
         } catch (CommandException exc) {
             TextComponentTranslation msg = new TextComponentTranslation(exc.getMessage(), exc.getErrorObjects());
@@ -123,13 +104,15 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
     }
 
     @Overwrite
-    protected boolean tryExecute(ICommandSender sender, String[] args, ICommand command, String commandName) {
+    protected boolean tryExecute(ICommandSender sender, String[] args, ICommand command, String rawCommand) {
         try {
             command.execute(this.getServer(), sender, args);
             return true;
         } catch (WrongUsageException exc) {
-            TextComponentTranslation msg = new TextComponentTranslation("commands.generic.usage", new TextComponentTranslation(exc.getMessage(), exc.getErrorObjects()));
-            msg.getStyle().setColor(TextFormatting.RED);
+            ITextComponent u = new TextComponentTranslation(exc.getMessage(), exc.getErrorObjects());
+            u.getStyle().setColor(TextFormatting.RED);
+            ITextComponent msg = new TextComponentTranslation("commands.generic.usage", u);
+            msg.getStyle().setColor(TextFormatting.DARK_RED);
             sender.sendMessage(msg);
         } catch (CommandException exc) {
             TextComponentTranslation msg = new TextComponentTranslation(exc.getMessage(), exc.getErrorObjects());
@@ -139,96 +122,95 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
             TextComponentTranslation msg = new TextComponentTranslation("commands.generic.exception");
             msg.getStyle().setColor(TextFormatting.RED);
             sender.sendMessage(msg);
-            LOGGER.warn("Couldn't process command: " + commandName, t);
+            LOGGER.warn("Couldn't process command: " + rawCommand, t);
         }
 
         return false;
     }
 
     @Overwrite
-    protected abstract MinecraftServer getServer();
-
-    @Overwrite
     public ICommand registerCommand(ICommand command) {
-        ResourceLocation commandName;
-        if (command.getName().contains(":")) {
-            commandName = new ResourceLocation(command.getName());
-        } else {
-            ModContainer amc = Loader.instance().activeModContainer();
-            commandName = new ResourceLocation((amc != null ? amc.getModId() : "minecraft"), command.getName());
-        }
-        this.registry
-            .computeIfAbsent(commandName.getResourcePath(), k -> new ArrayList<>())
-            .add(new CommandContainer(commandName.getResourceDomain(), command));
+        ResourceLocation commandName = wrapWithActiveModId(command.getName(), "minecraft");
+        CommandContainer container = new CommandContainer(commandName.getResourceDomain(), command);
+
+        this.registry.put(commandName, container);
+        this.aliases.computeIfAbsent(commandName.getResourcePath(), k -> new ArrayList<>()).add(commandName);
 
         for (String alias : command.getAliases()) {
-            this.aliases.put(alias, commandName);
+            this.registry.put(new ResourceLocation(commandName.getResourceDomain(), alias), container);
+            this.aliases.computeIfAbsent(alias, k -> new ArrayList<>()).add(commandName);
         }
 
-        System.out.println("Registered command " + commandName);
+        LOGGER.info("Registered command " + commandName);
 
         return command;
     }
 
     @Override
     public boolean unregisterCommand(ICommand command) {
-        for (Iterator<Map.Entry<String, List<CommandContainer>>> iterator = this.registry.entrySet().iterator(); iterator.hasNext(); ) {
-            Map.Entry<String, List<CommandContainer>> entry = iterator.next();
-            entry.getValue().removeIf(container -> container.command == command);
-            if (entry.getValue().isEmpty()) {
-                iterator.remove();
+        boolean dirty = false;
+        Iterator<Map.Entry<ResourceLocation, CommandContainer>> reg = this.registry.entrySet().iterator();
+        while (reg.hasNext()) {
+            Map.Entry<ResourceLocation, CommandContainer> entry = reg.next();
+            CommandContainer container = entry.getValue();
+            if (container.command == command) {
+                Iterator<List<ResourceLocation>> als = this.aliases.values().iterator();
+                while (als.hasNext()) {
+                    List<ResourceLocation> aliases = als.next();
+                    dirty |= aliases.removeIf(name -> name.equals(entry.getKey()));
+                    if (aliases.isEmpty()) {
+                        als.remove();
+                    }
+                }
+                reg.remove();
             }
         }
-        return false;
+        if (dirty) {
+            this.refreshAliases();
+        }
+        return dirty;
     }
 
     @Overwrite
     public List<String> getTabCompletions(ICommandSender sender, String rawString, @Nullable BlockPos targetBlockPos) {
         String[] args = rawString.split(" ", -1);
-        String commandName = args[0];
+        String rawCommandName = args[0];
         String modId = null;
-        if (commandName.contains(":")) {
-            modId = commandName.substring(0, commandName.indexOf(":"));
+        String commandName = rawCommandName;
+        if (rawCommandName.contains(":")) {
+            int colonIdx = rawCommandName.indexOf(":");
+            modId = rawCommandName.substring(0, colonIdx);
+            commandName = rawCommandName.substring(colonIdx);
         }
         if (args.length == 1) {
-            List<String> result = new ArrayList<>();
+            Set<String> result = new HashSet<>();
 
-            for (String s : this.registry.keySet()) {
-                List<CommandContainer> cmds = this.registry.get(s);
-                CommandContainer container = null;
-                if (modId == null) {
-                    container = cmds.get(cmds.size() - 1);
-                } else {
-                    for (CommandContainer c : cmds) {
-                        if (c.modId.equalsIgnoreCase(modId)) {
-                            container = c;
+            for (Map.Entry<String, List<ResourceLocation>> entry : this.aliases.entrySet()) {
+                String s = entry.getKey();
+                List<ResourceLocation> cmds = entry.getValue();
+                if (CommandBase.doesStringStartWith(commandName, s) && cmds != null && !cmds.isEmpty()) {
+                    CommandContainer container = null;
+                    if (modId == null) {
+                        container = this.getCommand(cmds.get(cmds.size() - 1));
+                    } else {
+                        for (ResourceLocation c : cmds) {
+                            if (c.getResourceDomain().equalsIgnoreCase(modId)) {
+                                container = this.getCommand(c);
+                                break;
+                            }
                         }
                     }
-                }
-                if (container != null) {
-                    if (CommandBase.doesStringStartWith(commandName, s) && container.command.checkPermission(this.getServer(), sender)) {
+                    if (container != null && container.command.checkPermission(this.getServer(), sender)) {
                         result.add(s);
                     }
                 }
             }
 
-            return result;
+            return new ArrayList<>(result);
         } else {
-            List<CommandContainer> cmds = this.registry.get(commandName);
-            if (cmds != null && !cmds.isEmpty()) {
-                CommandContainer container = null;
-                if (modId == null) {
-                    container = cmds.get(cmds.size() - 1);
-                } else {
-                    for (CommandContainer c : cmds) {
-                        if (c.modId.equalsIgnoreCase(modId)) {
-                            container = c;
-                        }
-                    }
-                }
-                if (container != null && container.command.checkPermission(this.getServer(), sender)) {
-                    return container.command.getTabCompletions(this.getServer(), sender, dropFirstString(args), targetBlockPos);
-                }
+            CommandContainer container = this.getCommand(rawCommandName);
+            if (container != null && container.command.checkPermission(this.getServer(), sender)) {
+                return container.command.getTabCompletions(this.getServer(), sender, dropFirstString(args), targetBlockPos);
             }
 
             return Collections.emptyList();
@@ -237,33 +219,60 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
 
     @Overwrite
     public List<ICommand> getPossibleCommands(ICommandSender sender) {
-        List<ICommand> result = new ArrayList<>();
+        Set<ICommand> result = new HashSet<>();
 
-        for (List<CommandContainer> containers : this.registry.values()) {
-            CommandContainer container = containers.get(containers.size() - 1);
-            if (container.command.checkPermission(this.getServer(), sender)) {
+        for (CommandContainer container : this.registry.values()) {
+            if (!result.contains(container.command) && container.command.checkPermission(this.getServer(), sender)) {
                 result.add(container.command);
             }
         }
 
-        return result;
+        return new ArrayList<>(result);
     }
 
-    @Override
+    @Overwrite
     public Map<String, ICommand> getCommands() {
         Map<String, ICommand> result = new HashMap<>();
-        for (Map.Entry<String, List<CommandContainer>> entry : this.registry.entrySet()) {
-            List<CommandContainer> cmds = entry.getValue();
-            CommandContainer container = cmds.get(cmds.size() - 1);
-            result.put(entry.getKey(), container.command);
-            result.put(container.modId + ":" + entry.getKey(), container.command);
+        for (Map.Entry<ResourceLocation, CommandContainer> entry : this.registry.entrySet()) {
+            CommandContainer container = entry.getValue();
+            result.put(entry.getKey().toString(), container.command);
         }
         return result;
     }
 
+    private CommandContainer getCommand(ResourceLocation name) {
+        return this.registry.get(name);
+    }
+
+    private CommandContainer getCommand(String name) {
+        if (name.contains(":")) {
+            return this.getCommand(new ResourceLocation(name));
+        }
+        List<ResourceLocation> aliases = this.aliases.get(name);
+        if (aliases != null && !aliases.isEmpty()) {
+            return this.getCommand(aliases.get(aliases.size() - 1));
+        }
+        return null;
+    }
+
+    private void refreshAliases() {
+        this.aliases.clear();
+        for (Map.Entry<ResourceLocation, CommandContainer> entry : this.registry.entrySet()) {
+            ResourceLocation commandName = entry.getKey();
+            CommandContainer container = entry.getValue();
+            this.aliases.computeIfAbsent(commandName.getResourcePath(), k -> new ArrayList<>()).add(commandName);
+            for (String alias : container.command.getAliases()) {
+                this.aliases.computeIfAbsent(alias, k -> new ArrayList<>()).add(commandName);
+            }
+        }
+    }
+
     @Shadow
-    private static String[] dropFirstString(String[] arr) { return arr; }
+    protected abstract MinecraftServer getServer();
 
     @Shadow
     private int getUsernameIndex(ICommand cmd, String[] args) throws CommandException { return -1; }
+
+    @Shadow
+    private static String[] dropFirstString(String[] arr) { return arr; }
 }

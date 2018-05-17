@@ -16,7 +16,8 @@ public final class TileEntities {
         if (world instanceof World) {
             Chunk chunk = ((World) world).getChunkFromBlockCoords(pos);
             if (!chunk.isEmpty()) {
-                tile = chunk.getTileEntity(pos, ((World) world).isRemote ? Chunk.EnumCreateEntityType.QUEUED : Chunk.EnumCreateEntityType.IMMEDIATE);
+                tile = chunk.getTileEntity(pos, ((World) world).isRemote ?
+                        Chunk.EnumCreateEntityType.QUEUED : Chunk.EnumCreateEntityType.IMMEDIATE);
             }
         } else {
             tile = world.getTileEntity(pos);
