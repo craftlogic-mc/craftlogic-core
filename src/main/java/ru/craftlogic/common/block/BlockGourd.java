@@ -23,12 +23,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.CraftLogic;
 import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.block.Colored;
 import ru.craftlogic.api.block.Growable;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.api.world.WorldNameable;
+import ru.craftlogic.common.CraftBlocks;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -175,19 +175,19 @@ public class BlockGourd extends BlockBase implements Colored, Growable {
             switch (this.variant) {
                 case MELON:
                     location.setBlockState(Blocks.MELON_BLOCK.getDefaultState()
-                            .withProperty(BlockPumpkin.FACING, state.getValue(FACING)));
+                            .withProperty(BlockPumpkin.FACING, state.getValue(FACING).getOpposite()));
                     break;
                 case PUMPKIN:
                     location.setBlockState(Blocks.PUMPKIN.getDefaultState()
-                            .withProperty(BlockPumpkin.FACING, state.getValue(FACING)));
+                            .withProperty(BlockPumpkin.FACING, state.getValue(FACING).getOpposite()));
                     break;
             }
         }
     }
 
     public enum GourdVariant implements WorldNameable {
-        MELON(() -> (BlockGourd) CraftLogic.BLOCK_MELON),
-        PUMPKIN(() -> (BlockGourd) CraftLogic.BLOCK_PUMPKIN);
+        MELON(() -> CraftBlocks.MELON),
+        PUMPKIN(() -> CraftBlocks.PUMPKIN);
 
         public final Supplier<BlockGourd> crop;
 

@@ -45,9 +45,9 @@ public class MixinTileEntityChestRenderer extends TileEntitySpecialRenderer<Tile
                 return;
             }
             part = state.getValue(PART);
-            /*if (part == ChestPart.RIGHT) {
+            if (part == ChestPart.RIGHT) {
                 return;
-            }*/
+            }
             if (part == ChestPart.SINGLE) {
                 ((BlockChest)state.getBlock()).checkForSurroundingChests(chest.getWorld(), chest.getPos(), state);
                 state = chest.getWorld().getBlockState(chest.getPos());

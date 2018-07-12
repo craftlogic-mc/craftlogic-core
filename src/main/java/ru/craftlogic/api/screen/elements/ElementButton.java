@@ -18,6 +18,7 @@ public abstract class ElementButton extends InteractiveElement {
     private int width;
     private ButtonSize size;
     private ButtonState state = ButtonState.NORMAL;
+    private int color = 0xFF_FFFFFF;
 
     public ElementButton(ElementContainer container, int x, int y, String title) {
         this(container, x, y, title, MAXIMAL_WIDTH);
@@ -40,6 +41,15 @@ public abstract class ElementButton extends InteractiveElement {
 
     public int getHeight() {
         return size.height;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public ElementButton withColor(int color) {
+        this.color = color;
+        return this;
     }
 
     @Override
@@ -92,8 +102,8 @@ public abstract class ElementButton extends InteractiveElement {
             GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
             GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 
-            drawTexturedRect(x, y, w / 2, h, 0, ty);
-            drawTexturedRect(x + w / 2, y, w / 2, h, w / 2, ty);
+            drawTexturedRect(x, y, w / 2, h, 0, ty, this.color);
+            drawTexturedRect(x + w / 2, y, w / 2, h, 200 - w / 2, ty, this.color);
 
             int textColor = 0xe0e0e0;
             if (!this.isEnabled()) {
@@ -102,7 +112,7 @@ public abstract class ElementButton extends InteractiveElement {
                 textColor = 0xffffa0;
             }
 
-            drawCenteredText(title, x + getWidth() / 2, y + getHeight() / 2, textColor);
+            drawCenteredText(title, x + getWidth() / 2, y + getHeight() / 2, textColor, true);
         }
     }
 

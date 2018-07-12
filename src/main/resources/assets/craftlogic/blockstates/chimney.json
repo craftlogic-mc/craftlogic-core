@@ -1,0 +1,9 @@
+{
+    "variants": {
+        "facing=down": { "model": "craftlogic:chimney" },
+        "facing=north": { "model": "craftlogic:chimney_knee" },
+        "facing=south": { "model": "craftlogic:chimney_knee", "y": 180 },
+        "facing=west": { "model": "craftlogic:chimney_knee", "y": 270 },
+        "facing=east": { "model": "craftlogic:chimney_knee", "y": 90 }
+    }
+}

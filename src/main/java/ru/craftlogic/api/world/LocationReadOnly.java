@@ -1,6 +1,5 @@
 package ru.craftlogic.api.world;
 
-import com.google.gson.JsonObject;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -51,11 +50,6 @@ public class LocationReadOnly extends Location {
 
     @Override
     public boolean setBlockState(IBlockState state) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public JsonObject serialize() {
         throw new UnsupportedOperationException();
     }
 }

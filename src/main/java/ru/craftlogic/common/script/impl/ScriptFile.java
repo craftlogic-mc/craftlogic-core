@@ -39,10 +39,10 @@ public abstract class ScriptFile extends ScriptBase {
         this.command(new LinkedHashMap<>(), name, handler);
     }
 
-    protected void command(Map<String, Object> data, String name, Closure<Void> handler) {
-        List<String> permissions = (List<String>)data.getOrDefault("permissions", singletonList("commands." + name));
-        List<String> aliases = (List<String>)data.getOrDefault("aliases", new ArrayList<>());
-        List<String> syntax = (List<String>)data.getOrDefault("syntax", singletonList(""));
+    protected void command(Map<String, List<String>> data, String name, Closure<Void> handler) {
+        List<String> permissions = data.getOrDefault("permissions", singletonList("commands." + name));
+        List<String> aliases = data.getOrDefault("aliases", new ArrayList<>());
+        List<String> syntax = data.getOrDefault("syntax", singletonList(""));
         if (syntax.isEmpty()) {
             syntax.add("");
         }

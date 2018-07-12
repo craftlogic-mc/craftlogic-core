@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import groovy.lang.Closure;
 import net.minecraft.command.ICommand;
+import net.minecraft.util.JsonUtils;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import ru.craftlogic.api.command.CommandExecutor;
 import ru.craftlogic.api.server.Server;
@@ -26,7 +27,7 @@ public class ScriptContainer implements Runnable {
     public ScriptContainer(ScriptManager manager, String id, JsonObject info, ScriptBase script) {
         this.manager = manager;
         this.id = id;
-        this.name = info.has("name") ? info.get("name").getAsString() : id;
+        this.name = JsonUtils.getString(info, "name", id);
         if (info.has("authors")) {
             for (JsonElement e : info.get("authors").getAsJsonArray()) {
                 this.authors.add(e.getAsString());

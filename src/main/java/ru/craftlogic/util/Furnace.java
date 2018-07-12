@@ -17,8 +17,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import ru.craftlogic.api.block.HeatConductor;
 import ru.craftlogic.api.block.holders.ScreenHolder;
+import ru.craftlogic.api.inventory.InventoryFieldHolder;
+import ru.craftlogic.api.inventory.InventoryFieldHolder.InventoryFieldAdder;
 import ru.craftlogic.api.inventory.InventoryHolder;
+import ru.craftlogic.api.item.Tool;
 import ru.craftlogic.api.sound.LoopingSoundSource;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.client.screen.ScreenFurnace;
@@ -26,13 +30,18 @@ import ru.craftlogic.common.inventory.ContainerFurnace;
 
 import static java.lang.Math.random;
 
-public interface Furnace extends InventoryHolder, LoopingSoundSource, ScreenHolder {
-    int getTemperature();
-    void setTemperature(int temperature);
-    int getHotTemperature();
-    int getMaxTemperature();
+public interface Furnace extends InventoryHolder, LoopingSoundSource, ScreenHolder, HeatConductor, InventoryFieldAdder  {
     int getFuel();
     int getMaxFuel();
+
+    @Override
+    default void addSyncFields(InventoryFieldHolder fieldHolder) {
+        fieldHolder.addReadOnlyField(FurnaceField.FUEL, this::getFuel);
+        fieldHolder.addReadOnlyField(FurnaceField.MAX_FUEL, this::getMaxFuel);
+        fieldHolder.addReadOnlyField(FurnaceField.TEMPERATURE, this::getTemperature);
+        fieldHolder.addReadOnlyField(FurnaceField.HOT_TEMPERATURE, this::getHotTemperature);
+        fieldHolder.addReadOnlyField(FurnaceField.MAX_TEMPERATURE, this::getMaxTemperature);
+    }
 
     @Override
     default ContainerFurnace createContainer(EntityPlayer player, int subId) {
@@ -69,7 +78,6 @@ public interface Furnace extends InventoryHolder, LoopingSoundSource, ScreenHold
         return slot == 0 && isItemFuel(stack);
     }
 
-
     default void dropTemperature(int amount) {
         Location location = getLocation();
         World world = location.getWorld();
@@ -90,7 +98,7 @@ public interface Furnace extends InventoryHolder, LoopingSoundSource, ScreenHold
             if (block != Blocks.AIR) {
                 IBlockState state = block.getStateFromMeta(stack.getMetadata());
                 Material material = state.getMaterial();
-                if (material == Material.WOOD || block == Blocks.WOODEN_BUTTON) {
+                if (material == Material.WOOD) {
                     return 270;
                 } else if (material == Material.CLOTH || material == Material.CARPET) {
                     return 120;
@@ -99,11 +107,7 @@ public interface Furnace extends InventoryHolder, LoopingSoundSource, ScreenHold
                 } else if (block == Blocks.COAL_BLOCK) {
                     return 470;
                 }
-            } else if (item instanceof ItemTool && "WOOD".equals(((ItemTool) item).getToolMaterialName())) {
-                return 270;
-            } else if (item instanceof ItemSword && "WOOD".equals(((ItemSword) item).getToolMaterialName())) {
-                return 270;
-            } else if (item instanceof ItemHoe && "WOOD".equals(((ItemHoe) item).getMaterialName())) {
+            } else if (item instanceof Tool && ((Tool)item).getToolMaterial(stack) == Item.ToolMaterial.WOOD) {
                 return 270;
             } else if (item == Items.STICK || item == Items.BOW || item == Items.FISHING_ROD || item == Items.SIGN
                     || item == Items.BOWL || item instanceof ItemDoor && item != Items.IRON_DOOR || item instanceof ItemBoat) {
@@ -169,7 +173,10 @@ public interface Furnace extends InventoryHolder, LoopingSoundSource, ScreenHold
     }
 
     enum FurnaceSlot implements SlotIdentifier {
-        FUEL,
-        ASH
+        FUEL, ASH
+    }
+
+    enum FurnaceField implements InventoryHolder.FieldIdentifier {
+        FUEL, MAX_FUEL, TEMPERATURE, HOT_TEMPERATURE, MAX_TEMPERATURE
     }
 }

@@ -122,7 +122,7 @@ public class ModelChicken extends ModelBase {
             GL11.glPushMatrix();
             this.setRotationAngles(limbSwing, limbSingMod, rotation, deltaYaw, pitch, scale, chicken);
             GL11.glScalef(1.3F, 1.3F, 1.3F);
-            GL11.glTranslatef(0F, -0.45F, 0F);
+            GL11.glTranslatef(0F, -0.6F, 0F);
             this.rightLeg.render(scale);
             this.leftLeg.render(scale);
             this.head.render(scale);

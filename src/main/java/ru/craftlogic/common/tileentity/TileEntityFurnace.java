@@ -1,6 +1,5 @@
 package ru.craftlogic.common.tileentity;
 
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -23,6 +22,8 @@ import ru.craftlogic.api.inventory.manager.ListInventoryItemManager;
 import ru.craftlogic.api.sound.LoopingSoundSource;
 import ru.craftlogic.api.tile.TileEntityBase;
 import ru.craftlogic.api.world.Location;
+import ru.craftlogic.common.CraftItems;
+import ru.craftlogic.common.CraftSounds;
 import ru.craftlogic.util.Furnace;
 
 import java.util.Random;
@@ -31,8 +32,8 @@ import static ru.craftlogic.common.block.BlockFurnace.*;
 import static ru.craftlogic.util.Furnace.getItemBurnTemperature;
 import static ru.craftlogic.util.Furnace.getItemBurnTime;
 
-public class TileEntityFurnace extends TileEntityBase implements Updatable, Furnace,
-        LoopingSoundSource, ScreenHolder, HeatAcceptor {
+public class TileEntityFurnace extends TileEntityBase implements Updatable, Furnace, LoopingSoundSource, ScreenHolder,
+        HeatAcceptor {
     private int hotTemperature = 2000;
     private int maxTemperature = hotTemperature + 200;
     private int temperature = 0;
@@ -64,9 +65,7 @@ public class TileEntityFurnace extends TileEntityBase implements Updatable, Furn
                     if (rand.nextInt(10) == 0) {
                         for (int i = 0; i < 4; ++i) {
                             Location offsetLocation = location.randomize(rand, 3);
-                            if (offsetLocation.isSameBlockMaterial(Material.AIR) && offsetLocation.canBlockBePlaced(Blocks.FIRE)) {
-                                offsetLocation.setBlock(Blocks.FIRE);
-                            }
+                            offsetLocation.setBlockIfPossible(Blocks.FIRE);
                         }
                     }
                 }
@@ -75,7 +74,8 @@ public class TileEntityFurnace extends TileEntityBase implements Updatable, Furn
                     if (heatAcceptor != null) {
                         float targetTemperature = heatAcceptor.getTemperature();
                         if (this.temperature > envTemperature && this.temperature > targetTemperature) {
-                            this.temperature -= heatAcceptor.acceptHeat(EnumFacing.DOWN, Math.min(this.temperature, 2));
+                            int output = Math.min(this.temperature, 2);
+                            this.temperature -= heatAcceptor.acceptHeat(EnumFacing.DOWN, output) / 2;
                         }
                     } else if (this.fuel <= 0) {
                         this.temperature = Math.max(envTemperature, (this.temperature - (closed ? 4 : 8)));
@@ -93,7 +93,7 @@ public class TileEntityFurnace extends TileEntityBase implements Updatable, Furn
                         this.fuel = Math.max(0, this.fuel - (closed ? 4 : 8));
                     }
                     if (this.fuel == 0 && this.maxFuel > 0 && this.world.rand.nextInt(this.maxFuel) >= 100) {
-                        growSlotContents(FurnaceSlot.ASH, CraftLogic.ITEM_ASH, 1);
+                        growSlotContents(FurnaceSlot.ASH, CraftItems.ASH, 1);
                     }
                 } else {
                     ItemStack fuelItem = this.getStackInSlot(FurnaceSlot.FUEL);
@@ -200,7 +200,7 @@ public class TileEntityFurnace extends TileEntityBase implements Updatable, Furn
         this.maxTemperature = compound.getInteger("maxTemperature");
         if (this.world != null && this.pos != null
                 && this.temperature >= this.hotTemperature / 2 && oldTemperature < this.hotTemperature / 2) {
-            CraftLogic.playSound(this, CraftLogic.SOUND_FURNACE_HOT_LOOP);
+            CraftLogic.playSound(this, CraftSounds.FURNACE_HOT_LOOP);
         }
     }
 

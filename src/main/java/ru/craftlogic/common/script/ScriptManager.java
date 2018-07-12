@@ -10,6 +10,7 @@ import groovy.lang.GroovySystem;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.GameType;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -135,6 +136,11 @@ public class ScriptManager extends ConfigurableManager {
         }
         for (TextFormatting formatting : TextFormatting.values()) {
             binding.setVariable(formatting.getFriendlyName().toUpperCase(), formatting);
+        }
+        for (GameType mode : GameType.values()) {
+            if (mode != GameType.NOT_SET) {
+                binding.setVariable(mode.getName().toUpperCase(), mode);
+            }
         }
     }
 

@@ -54,6 +54,7 @@ public class ModelManager {
     public void registerItemModel(@Nonnull Item item, String model) {
         this.registerItemModel(item, 0, model);
     }
+    
     public void registerItemModel(@Nonnull Item item, @Nonnull ResourceLocation model) {
         this.registerItemModel(item, 0, new ModelResourceLocation(model, "#inventory"));
     }

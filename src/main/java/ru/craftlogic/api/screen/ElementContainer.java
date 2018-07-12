@@ -54,6 +54,14 @@ public interface ElementContainer {
         drawTexturedRect(x, y, w, h, tx, ty, 1F, 1F, 1F, 1F);
     }
 
+    default void drawTexturedRect(double x, double y, double w, double h, double tx, double ty, int rgba) {
+        float r = (float)((rgba >> 16) & 0xFF) / 255F;
+        float g = (float)((rgba >> 8) & 0xFF) / 255F;
+        float b = (float)((rgba >> 0) & 0xFF) / 255F;
+        float a = rgba < 0 /*DIRTY HOOKS, YOU ARE WELCOME!*/ ? (float)((rgba >> 24) & 0xFF) / 255F : 1F;
+        drawTexturedRect(x, y, w, h, tx, ty, r, g, b, a);
+    }
+
     default void drawTexturedRect(double x, double y, double w, double h, double tx, double ty, float r, float g, float b, float a) {
         this.drawTexturedRect(x, y, w, h, tx, ty, w, h, r, g, b, a);
     }
@@ -79,19 +87,35 @@ public interface ElementContainer {
     }
 
     default void drawText(ITextComponent text, int x, int y, int color) {
-        drawText(text.getFormattedText(), x, y, color);
+        drawText(text, x, y, color, false);
+    }
+
+    default void drawText(ITextComponent text, int x, int y, int color, boolean shadow) {
+        drawText(text.getFormattedText(), x, y, color, shadow);
     }
 
     default void drawText(String text, int x, int y, int color) {
-        getFontRenderer().drawString(text, x, y, color);
+        drawText(text, x, y, color, false);
+    }
+
+    default void drawText(String text, int x, int y, int color, boolean shadow) {
+        getFontRenderer().drawString(text, x, y, color, shadow);
     }
 
     default void drawCenteredText(ITextComponent text, int x, int y, int color) {
-        drawCenteredText(text.getFormattedText(), x, y, color);
+        drawCenteredText(text, x, y, color, false);
+    }
+
+    default void drawCenteredText(ITextComponent text, int x, int y, int color, boolean shadow) {
+        drawCenteredText(text.getFormattedText(), x, y, color, shadow);
     }
 
     default void drawCenteredText(String text, int x, int y, int color) {
-        getFontRenderer().drawString(text, (x - getFontRenderer().getStringWidth(text) / 2), (y - getFontRenderer().FONT_HEIGHT / 2), color);
+        drawCenteredText(text, x, y, color, false);
+    }
+
+    default void drawCenteredText(String text, int x, int y, int color, boolean shadow) {
+        getFontRenderer().drawString(text, (x - getFontRenderer().getStringWidth(text) / 2), (y - getFontRenderer().FONT_HEIGHT / 2), color, shadow);
     }
 
     default void drawTooltip(ITextComponent text, int x, int y) {

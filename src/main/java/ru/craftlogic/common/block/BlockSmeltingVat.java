@@ -5,11 +5,11 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
-import ru.craftlogic.CraftLogic;
 import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
 import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.api.world.Location;
+import ru.craftlogic.common.CraftBlocks;
 import ru.craftlogic.common.tileentity.TileEntitySmeltingVat;
 
 public class BlockSmeltingVat extends BlockBase implements TileEntityHolder<TileEntitySmeltingVat> {
@@ -44,7 +44,7 @@ public class BlockSmeltingVat extends BlockBase implements TileEntityHolder<Tile
 
     @Override
     public boolean canPlaceBlockAt(Location location) {
-        return location.offset(EnumFacing.DOWN).isSameBlock(CraftLogic.BLOCK_FURNACE);
+        return location.offset(EnumFacing.DOWN).isSameBlock(CraftBlocks.FURNACE);
     }
 
     @Override

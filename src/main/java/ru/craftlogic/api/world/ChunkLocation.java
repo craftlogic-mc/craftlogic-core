@@ -1,5 +1,6 @@
 package ru.craftlogic.api.world;
 
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -65,6 +66,10 @@ public class ChunkLocation {
 
     public boolean isDimensionLoaded() {
         return DimensionManager.getWorld(this.getDimension()) != null;
+    }
+
+    public boolean isWithinWorldBorder() {
+        return getWorld().getWorldBorder().contains(new ChunkPos(this.x, this.z));
     }
 
     @Override

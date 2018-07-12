@@ -17,17 +17,19 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.inventory.InventoryFieldHolder;
+import ru.craftlogic.api.inventory.InventoryFieldHolder.InventoryFieldAdder;
 import ru.craftlogic.api.world.Locatable;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.api.world.WorldNameable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Random;
 
-public class TileEntityBase extends TileEntity implements Locatable, WorldNameable {
+public class TileEntityBase extends TileEntity implements Locatable, WorldNameable, InventoryFieldAdder {
     protected int ticksExisted;
     private boolean loaded;
-    private InventoryFieldHolder fieldHolder = new InventoryFieldHolder(this::addInvSyncFields);
+    private InventoryFieldHolder fieldHolder = new InventoryFieldHolder(this);
     private int blockMeta;
 
     protected TileEntityBase(World world, IBlockState state) {
@@ -69,7 +71,8 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
         this.blockMeta = -1;
     }
 
-    public void addInvSyncFields(InventoryFieldHolder fieldHolder) {}
+    @Override
+    public void addSyncFields(InventoryFieldHolder fieldHolder) {}
 
     public InventoryFieldHolder getFieldHolder() {
         return this.fieldHolder;
@@ -84,6 +87,8 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
     public Location getLocation() {
         return new Location(this.getWorld(), this.getPos());
     }
+
+    public void randomTick(Random random) {}
 
     public void markForUpdate() {
         if (this.world != null && !this.world.isRemote) {

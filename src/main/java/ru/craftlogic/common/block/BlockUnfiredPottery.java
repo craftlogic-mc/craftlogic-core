@@ -27,13 +27,13 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.CraftLogic;
 import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
 import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.util.Nameable;
 import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.api.world.Location;
+import ru.craftlogic.common.CraftBlocks;
 import ru.craftlogic.common.tileentity.TileEntityUnfiredPottery;
 
 import java.util.HashMap;
@@ -146,7 +146,7 @@ public class BlockUnfiredPottery extends BlockBase implements TileEntityHolder<T
 
     @Override
     public boolean canPlaceBlockAt(World world, BlockPos pos) {
-        return world.getBlockState(pos.down()).getBlock() == CraftLogic.BLOCK_FURNACE;
+        return world.getBlockState(pos.down()).getBlock() == CraftBlocks.FURNACE;
     }
 
     @Override
@@ -202,10 +202,10 @@ public class BlockUnfiredPottery extends BlockBase implements TileEntityHolder<T
         if (done) {
             switch (variant) {
                 case CAULDRON:
-                    drops.add(new ItemStack(CraftLogic.BLOCK_CAULDRON));
+                    drops.add(new ItemStack(CraftBlocks.CAULDRON));
                     break;
                 case SMELTING_VAT:
-                    drops.add(new ItemStack(CraftLogic.BLOCK_SMELTING_VAT));
+                    drops.add(new ItemStack(CraftBlocks.SMELTING_VAT));
                     break;
                 case FLOWERPOT:
                     drops.add(new ItemStack(Items.FLOWER_POT));

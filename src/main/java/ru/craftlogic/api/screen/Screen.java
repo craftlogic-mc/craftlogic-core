@@ -7,7 +7,9 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -121,9 +123,13 @@ public abstract class Screen extends GuiScreen implements ElementContainer {
         throw new UnsupportedOperationException();
     }
 
+    protected boolean isEscKeyClosingScreen() {
+        return true;
+    }
+
     @Override
     protected final void keyTyped(char symbol, int key) {
-        if (key == Keyboard.KEY_ESCAPE) {
+        if (key == Keyboard.KEY_ESCAPE && isEscKeyClosingScreen()) {
             this.close();
         } else {
             this.onKeyPressed(symbol, key);
@@ -136,6 +142,17 @@ public abstract class Screen extends GuiScreen implements ElementContainer {
     }
 
     protected void onKeyPressed(char symbol, int key) {}
+
+    @Override
+    public void handleMouseInput() throws IOException {
+        super.handleMouseInput();
+        int dw = Integer.signum(Mouse.getDWheel());
+        if (dw != 0) {
+            this.onMouseScroll(dw);
+        }
+    }
+
+    protected void onMouseScroll(int dw) {}
 
     @Override
     protected final void mouseClicked(int x, int y, int button) {

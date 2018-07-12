@@ -1,0 +1,40 @@
+{
+  "multipart": [
+    {"when": { "north": "false", "east": "false", "south": "false", "west": "false", "age": "0"},
+      "apply": { "model": "melon_stem_growth0" }
+    },
+    {"when": { "north": "false", "east": "false", "south": "false", "west": "false", "age": "1"},
+      "apply": { "model": "melon_stem_growth1" }
+    },
+    {"when": { "north": "false", "east": "false", "south": "false", "west": "false", "age": "2"},
+      "apply": { "model": "melon_stem_growth2" }
+    },
+    {"when": { "north": "false", "east": "false", "south": "false", "west": "false", "age": "3"},
+      "apply": { "model": "melon_stem_growth3" }
+    },
+    {"when": { "north": "false", "east": "false", "south": "false", "west": "false", "age": "4"},
+      "apply": { "model": "melon_stem_growth4" }
+    },
+    {"when": { "north": "false", "east": "false", "south": "false", "west": "false", "age": "5"},
+      "apply": { "model": "melon_stem_growth5" }
+    },
+    {"when": { "north": "false", "east": "false", "south": "false", "west": "false", "age": "6"},
+      "apply": { "model": "melon_stem_growth6" }
+    },
+    {"when": { "north": "false", "east": "false", "south": "false", "west": "false", "age": "7"},
+      "apply": { "model": "melon_stem_growth7" }
+    },
+    {"when": { "north": "true" },
+      "apply": { "model": "melon_stem_fruit", "y": 90 }
+    },
+    {"when": { "east": "true" },
+      "apply": { "model": "melon_stem_fruit", "y": 180 }
+    },
+    {"when": { "south": "true" },
+      "apply": { "model": "melon_stem_fruit", "y": 270 }
+    },
+    {"when": { "west": "true" },
+      "apply": { "model": "melon_stem_fruit" }
+    }
+  ]
+}

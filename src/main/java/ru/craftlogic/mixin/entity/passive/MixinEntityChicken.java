@@ -1,6 +1,6 @@
 package ru.craftlogic.mixin.entity.passive;
 
-import net.minecraft.entity.EntityLivingBase;
+import com.google.common.base.Optional;
 import net.minecraft.entity.ai.EntityAIAvoidEntity;
 import net.minecraft.entity.ai.EntityAIMate;
 import net.minecraft.entity.ai.EntityAITasks;
@@ -8,7 +8,6 @@ import net.minecraft.entity.ai.EntityAITempt;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.passive.EntityOcelot;
-import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
@@ -18,7 +17,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.MathHelper;
@@ -27,11 +25,15 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.craftlogic.api.entity.Bird;
+import ru.craftlogic.api.entity.Tameable;
 import ru.craftlogic.api.entity.ai.EntityAIMateBird;
 import ru.craftlogic.common.entity.ChickenVariant;
 import ru.craftlogic.util.ReflectiveUsage;
@@ -39,10 +41,13 @@ import ru.craftlogic.util.ReflectiveUsage;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Mixin(EntityChicken.class)
-public abstract class MixinEntityChicken extends EntityAnimal implements Bird<ChickenVariant> {
+public abstract class MixinEntityChicken extends EntityAnimal implements Bird<ChickenVariant>, Tameable {
     private static final DataParameter<Integer> VARIANT = EntityDataManager.createKey(EntityChicken.class, DataSerializers.VARINT);
+    private static final DataParameter<Byte> TAMED = EntityDataManager.createKey(EntityChicken.class, DataSerializers.BYTE);
+    private static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.createKey(EntityChicken.class, DataSerializers.OPTIONAL_UNIQUE_ID);
     @Shadow @Final
     private static Set<Item> TEMPTATION_ITEMS;
     private EntityAITempt aiTempt;
@@ -72,7 +77,7 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Bird<Ch
         }
 
         this.tasks.removeTask(this.aiAvoidPlayer);
-        if (!((EntityTameable)(Object)this).isTamed()) {
+        if (!this.isTamed()) {
             this.tasks.addTask(9, this.aiAvoidPlayer);
         }
         this.dataManager.set(VARIANT, this.rand.nextInt(ChickenVariant.values().length));
@@ -83,6 +88,8 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Bird<Ch
     protected void entityInit() {
         super.entityInit();
         this.dataManager.register(VARIANT, 0);
+        this.dataManager.register(TAMED, (byte)0);
+        this.dataManager.register(OWNER_UNIQUE_ID, Optional.absent());
     }
 
     @Inject(method = "initEntityAI", at = @At("TAIL"))
@@ -98,6 +105,9 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Bird<Ch
         this.tasks.addTask(8, new EntityAIAvoidEntity<>(this, EntityOcelot.class, 16F, 0.6, 1.33));
     }
 
+    /**
+     * @author Radviger
+     */
     @Override
     @Overwrite
     public void onLivingUpdate() {
@@ -144,30 +154,40 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Bird<Ch
     public void onNBTWrite(NBTTagCompound compound, CallbackInfo info) {
         compound.setInteger("possibleEggs", this.possibleEggs);
         compound.setInteger("variant", this.getVariant().ordinal());
+        compound.setString("owner", this.getOwnerId() == null ? "" : this.getOwnerId().toString());
     }
 
     @Inject(method = "readEntityFromNBT", at = @At("TAIL"))
     public void onNBTRead(NBTTagCompound compound, CallbackInfo info) {
         this.possibleEggs = compound.getInteger("possibleEggs");
         this.dataManager.set(VARIANT, compound.getInteger("variant"));
+
+        String owner = compound.getString("owner");
+
+        if (!owner.isEmpty()) {
+            try {
+                this.setOwnerId(UUID.fromString(owner));
+                this.setTamed(true);
+            } catch (Throwable exc) {
+                this.setTamed(false);
+            }
+        }
     }
 
     @Override
     public boolean processInteract(EntityPlayer player, EnumHand hand) {
         ItemStack heldItem = player.getHeldItem(hand);
-        if (!((EntityTameable)(Object)this).isTamed() && (this.aiTempt == null || this.aiTempt.isRunning()) && TEMPTATION_ITEMS.contains(heldItem.getItem()) && player.getDistanceSq(this) < 9.0) {
+        if (!this.isTamed() && (this.aiTempt == null || this.aiTempt.isRunning()) && TEMPTATION_ITEMS.contains(heldItem.getItem()) && player.getDistanceSq(this) < 9.0) {
             if (!player.capabilities.isCreativeMode) {
                 heldItem.shrink(1);
             }
 
             if (!this.world.isRemote) {
                 if (this.rand.nextInt(3) == 0 && !ForgeEventFactory.onAnimalTame(this, player)) {
-                    ((EntityTameable)(Object)this).setTamedBy(player);
+                    this.setTamedBy(player);
                     this.playTameEffect(true);
-                    this.world.setEntityState(this, (byte) 7);
                 } else {
                     this.playTameEffect(false);
-                    this.world.setEntityState(this, (byte) 6);
                 }
                 if (this.possibleEggs > 0 && this.timeUntilNextEgg > 0 && this.world.rand.nextInt(3) == 0) {
                     this.timeUntilNextEgg = Math.max(0, this.timeUntilNextEgg - this.world.rand.nextInt(500) + 500);
@@ -253,5 +273,27 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Bird<Ch
     @Override
     public int getPossibleEggsCount() {
         return this.possibleEggs;
+    }
+
+    public boolean isTamed() {
+        return (this.getDataManager().get(TAMED) & 4) != 0;
+    }
+
+    public void setTamed(boolean tamed) {
+        byte b = this.getDataManager().get(TAMED);
+        if (tamed) {
+            this.getDataManager().set(TAMED, (byte)(b | 4));
+        } else {
+            this.getDataManager().set(TAMED, (byte)(b & -5));
+        }
+    }
+
+    @Nullable
+    public UUID getOwnerId() {
+        return this.getDataManager().get(OWNER_UNIQUE_ID).orNull();
+    }
+
+    public void setOwnerId(@Nullable UUID id) {
+        this.getDataManager().set(OWNER_UNIQUE_ID, Optional.fromNullable(id));
     }
 }

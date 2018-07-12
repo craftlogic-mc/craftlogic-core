@@ -5,15 +5,13 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
-import ru.craftlogic.CraftLogic;
 import ru.craftlogic.api.block.HeatAcceptor;
 import ru.craftlogic.api.tile.TileEntityBase;
 import ru.craftlogic.api.world.Location;
+import ru.craftlogic.common.CraftBlocks;
 import ru.craftlogic.common.block.BlockUnfiredPottery;
 
-import static ru.craftlogic.common.block.BlockUnfiredPottery.COVERED;
-import static ru.craftlogic.common.block.BlockUnfiredPottery.DONE;
-import static ru.craftlogic.common.block.BlockUnfiredPottery.VARIANT;
+import static ru.craftlogic.common.block.BlockUnfiredPottery.*;
 
 public class TileEntityUnfiredPottery extends TileEntityBase implements HeatAcceptor {
     private int temperature;
@@ -33,7 +31,7 @@ public class TileEntityUnfiredPottery extends TileEntityBase implements HeatAcce
             if (!covered) {
                 switch (variant) {
                     case CAULDRON:
-                        location.setBlock(CraftLogic.BLOCK_CAULDRON);
+                        location.setBlock(CraftBlocks.CAULDRON);
                         break;
                     case SMELTING_VAT:
                     case FLOWERPOT:
@@ -52,6 +50,16 @@ public class TileEntityUnfiredPottery extends TileEntityBase implements HeatAcce
     @Override
     public int getTemperature() {
         return temperature;
+    }
+
+    @Override
+    public void setTemperature(int temperature) {
+        this.temperature = temperature;
+    }
+
+    @Override
+    public int getHotTemperature() {
+        return getMaxTemperature();
     }
 
     @Override

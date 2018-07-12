@@ -21,6 +21,7 @@ import ru.craftlogic.api.command.CommandExecutor;
 import ru.craftlogic.api.command.CommandRegisterer;
 import ru.craftlogic.api.event.EventManager;
 import ru.craftlogic.api.event.Listener;
+import ru.craftlogic.api.util.ConfigurableManager;
 import ru.craftlogic.api.world.*;
 import ru.craftlogic.common.command.CommandRegistry;
 import ru.craftlogic.common.command.GameplayCommands;
@@ -39,6 +40,7 @@ import java.util.Set;
 
 public class Server implements CommandSender, Listener {
     final MinecraftServer server;
+    final Set<ConfigurableManager> managers = new HashSet<>();
     final PermissionManager permissionManager;
     final CommandRegistry commandRegistry;
     final RegionManager regionManager;

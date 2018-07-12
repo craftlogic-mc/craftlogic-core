@@ -15,6 +15,8 @@ import ru.craftlogic.CraftLogic;
 import ru.craftlogic.api.tile.TileEntityBase;
 import ru.craftlogic.api.util.TileEntityInfo;
 
+import javax.annotation.Nullable;
+
 @Mixin(TileEntity.class)
 public class MixinTileEntity {
     @Shadow @Final
@@ -22,6 +24,8 @@ public class MixinTileEntity {
     @Shadow @Final
     private static RegistryNamespaced<ResourceLocation, Class<? extends TileEntity>> REGISTRY;
 
+    /**@author Radviger*/
+    @Nullable
     @Overwrite
     public static TileEntity create(World world, NBTTagCompound compound) {
         TileEntity tile = null;

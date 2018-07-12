@@ -8,7 +8,7 @@ import ru.craftlogic.api.block.Updatable;
 import ru.craftlogic.api.tile.TileEntityBase;
 
 public class TileEntityCauldron extends TileEntityBase implements HeatAcceptor, Updatable {
-    private int temperature, maxTemperature = 1200;
+    private int temperature, hotTemperature = 100, maxTemperature = 100;
     private int fluidColor;
 
     public TileEntityCauldron(World world, IBlockState state) {
@@ -23,6 +23,16 @@ public class TileEntityCauldron extends TileEntityBase implements HeatAcceptor, 
     @Override
     public int getTemperature() {
         return temperature;
+    }
+
+    @Override
+    public void setTemperature(int temperature) {
+        this.temperature = temperature;
+    }
+
+    @Override
+    public int getHotTemperature() {
+        return hotTemperature;
     }
 
     @Override

@@ -23,6 +23,8 @@ public class TransformerEntityAnimals implements ObfuscatedClassTransformer {
         }
         switch (transformedName) {
             case "net.minecraft.entity.passive.EntityChicken": {
+                System.out.println("Patching EntityChicken");
+
                 ClassReader reader = new ClassReader(basicClass);
                 ClassNode classNode = new ClassNode();
                 reader.accept(classNode, 0);

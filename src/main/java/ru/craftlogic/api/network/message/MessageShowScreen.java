@@ -3,7 +3,6 @@ package ru.craftlogic.api.network.message;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import ru.craftlogic.CraftLogic;
 import ru.craftlogic.api.block.holders.ScreenHolder;
@@ -72,13 +71,13 @@ public class MessageShowScreen extends AdvancedMessage {
         ENTITY
     }
 
-    public static class Handler extends AdvancedMessageHandler<MessageShowScreen, IMessage> {
+    public static class Handler extends AdvancedMessageHandler<MessageShowScreen, AdvancedMessage> {
         @Override
-        protected IMessage handle(MessageShowScreen message, MessageContext context) {
+        protected AdvancedMessage handle(MessageShowScreen message, MessageContext context) {
             EntityPlayer player = getPlayer(context);
             switch (message.type) {
                 case TILE: {
-                    scheduleTask(context, () -> {
+                    syncTask(context, () -> {
                         ScreenHolder screenHolder = message.location.getTileEntity(ScreenHolder.class);
                         CraftLogic.showScreen(screenHolder, player, message.extraData);
                         player.openContainer.windowId = message.windowId;
@@ -88,7 +87,7 @@ public class MessageShowScreen extends AdvancedMessage {
                 case ENTITY: {
                     Entity entity = player.world.getEntityByID(message.entityId);
                     if (entity instanceof ScreenHolder) {
-                        scheduleTask(context, () -> {
+                        syncTask(context, () -> {
                             CraftLogic.showScreen((ScreenHolder) entity, player, message.extraData);
                             player.openContainer.windowId = message.windowId;
                         });

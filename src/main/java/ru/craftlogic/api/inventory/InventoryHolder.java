@@ -3,6 +3,7 @@ package ru.craftlogic.api.inventory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -297,6 +298,10 @@ public interface InventoryHolder extends IInventory, WorldNameable {
     interface SlotIdentifier {
         default int id() {
             return ((Enum)this).ordinal();
+        }
+
+        default boolean matches(Slot slot) {
+            return slot.slotNumber == this.id();
         }
     }
 

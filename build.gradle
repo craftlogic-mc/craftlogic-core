@@ -31,7 +31,7 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12.2-14.23.2.2641"
+    version = "1.12.2-14.23.4.2703"
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
@@ -43,8 +43,6 @@ minecraft {
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     useDepAts = true
 }
-
-def isBuilding = false
 
 runClient {
     jvmArgs '-Dfml.coreMods.load=ru.craftlogic.coremod.CraftLogicCoremod'
@@ -137,8 +135,12 @@ processResources {
     }
 }
 
-build {
-    isBuilding = true
+def runClient = false
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'runClient') {
+        runClient = true
+    }
 }
 
 jar {
@@ -148,10 +150,13 @@ jar {
             'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
             'TweakOrder': '0',
             'MixinConfigs': 'mixins.craftlogic.json',
-            'FMLCorePlugin': 'ru.craftlogic.coremod.CraftLogicCoremod'
+            'FMLCorePlugin': 'ru.craftlogic.coremod.CraftLogicCoremod',
+            'ForceLoadAsMod': 'true'
         )
-        if (isBuilding) {
-            attributes('ForceLoadAsMod': 'true')
+        if (!runClient) {
+            attributes (
+                'FMLCorePluginContainsFMLMod': 'true'
+            )
         }
     }
 

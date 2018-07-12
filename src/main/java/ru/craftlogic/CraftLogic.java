@@ -1,14 +1,11 @@
 package ru.craftlogic;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialLiquid;
+import net.minecraft.block.BlockGrass;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -25,7 +22,6 @@ import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -40,13 +36,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.craftlogic.api.block.BlockBase;
-import ru.craftlogic.api.block.BlockFluid;
 import ru.craftlogic.api.block.holders.ScreenHolder;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
-import ru.craftlogic.api.item.ItemBase;
 import ru.craftlogic.api.item.ItemBlockBase;
-import ru.craftlogic.api.item.ItemFoodBase;
+import ru.craftlogic.api.network.AdvancedMessage;
+import ru.craftlogic.api.network.AdvancedMessageHandler;
 import ru.craftlogic.api.network.message.MessageShowScreen;
+import ru.craftlogic.api.plants.PlantType;
 import ru.craftlogic.api.server.EventConverter;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.sound.SoundSource;
@@ -54,8 +50,6 @@ import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.api.world.DimensionData;
 import ru.craftlogic.client.sound.Sound;
 import ru.craftlogic.common.ProxyCommon;
-import ru.craftlogic.common.block.*;
-import ru.craftlogic.common.item.*;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -77,33 +71,6 @@ public class CraftLogic {
     private static Map<ResourceLocation, TileEntityInfo<?>> TILE_REGISTRY = new HashMap<>();
     private static Server SERVER;
 
-    public static Fluid FLUID_OIL = new Fluid("oil",
-            new ResourceLocation(MODID, "blocks/fluid/oil_still"),
-            new ResourceLocation(MODID, "blocks/fluid/oil_flow")
-    ).setViscosity(2000).setDensity(1000);
-
-    public static SoundEvent SOUND_FURNACE_VENT_OPEN, SOUND_FURNACE_VENT_CLOSE, SOUND_FURNACE_HOT_LOOP;
-
-    public static final Material MATERIAL_OIL = new MaterialLiquid(MapColor.BLACK);
-
-    public static Block BLOCK_FLUID_OIL;
-
-    public static Block BLOCK_FURNACE;
-    public static Block BLOCK_UNFIRED_POTTERY;
-    public static Block BLOCK_CAULDRON;
-    public static Block BLOCK_SMELTING_VAT;
-    public static Block BLOCK_MELON, BLOCK_PUMPKIN;
-
-    public static Item ITEM_ASH;
-    public static Item ITEM_THERMOMETER;
-    public static Item ITEM_ROCK;
-    public static Item ITEM_MOSS;
-    public static Item ITEM_STONE_BRICK;
-    public static Item ITEM_RAW_EGG;
-    public static Item ITEM_FRIED_EGG;
-    public static Item ITEM_WOOL_CARD;
-    public static Item ITEM_CROWBAR;
-
     static {
         FluidRegistry.enableUniversalBucket();
     }
@@ -111,50 +78,29 @@ public class CraftLogic {
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(PROXY);
-
-        SOUND_FURNACE_VENT_OPEN = registerSoundEvent("furnace.vent.open");
-        SOUND_FURNACE_VENT_CLOSE = registerSoundEvent("furnace.vent.close");
-        SOUND_FURNACE_HOT_LOOP = registerSoundEvent("furnace.hot.loop");
-
-        FluidRegistry.registerFluid(FLUID_OIL);
-
-        BLOCK_FLUID_OIL = registerBlock(new BlockFluid("oil", FLUID_OIL, MATERIAL_OIL));
-
-        BLOCK_FURNACE = registerBlockWithItem(new BlockFurnace());
-        BLOCK_UNFIRED_POTTERY = registerBlockWithItem(new BlockUnfiredPottery());
-        BLOCK_CAULDRON = registerBlockWithItem(new BlockCauldron());
-        BLOCK_SMELTING_VAT = registerBlockWithItem(new BlockSmeltingVat());
-        BLOCK_PUMPKIN = registerBlock(new BlockGourd(BlockGourd.GourdVariant.PUMPKIN));
-        BLOCK_MELON = registerBlock(new BlockGourd(BlockGourd.GourdVariant.MELON));
-
-        ITEM_ASH = registerItem(new ItemBase("ash", CreativeTabs.MATERIALS));
-        ITEM_THERMOMETER = registerItem(new ItemThermometer());
-        ITEM_ROCK = registerItem(new ItemRock());
-        ITEM_MOSS = registerItem(new ItemBase("moss", CreativeTabs.MATERIALS));
-        ITEM_STONE_BRICK = registerItem(new ItemStoneBrick());
-        ITEM_RAW_EGG = registerItem(new ItemFoodBase("egg_raw", CreativeTabs.FOOD, 4, 0.1F, false));
-        ITEM_FRIED_EGG = registerItem(new ItemFoodBase("egg_fried", CreativeTabs.FOOD, 5, 0.5F, false));
-        ITEM_WOOL_CARD = registerItem(new ItemWoolCard());
-        ITEM_CROWBAR = registerItem(new ItemCrowbar());
-
-        FluidRegistry.addBucketForFluid(FLUID_OIL);
-
         PROXY.preInit();
     }
 
     @Mod.EventHandler
     public void init(FMLInitializationEvent event) {
-        PROXY.init();
-
         NET = NetworkRegistry.INSTANCE.newSimpleChannel(MODID);
-        int pid = 0;
-        NET.registerMessage(new MessageShowScreen.Handler(), MessageShowScreen.class, pid++, Side.CLIENT);
+        PROXY.init();
+    }
+
+    private static int packetId;
+
+    public static <IN extends AdvancedMessage, OUT extends AdvancedMessage>
+    void registerMessage(AdvancedMessageHandler<? super IN, ? extends OUT> handler, Class<IN> type, Side side) {
+        NET.registerMessage(handler, type, packetId++, side);
     }
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         for (Block block : Block.REGISTRY) {
             if (block instanceof TileEntityHolder) {
+                if (block instanceof BlockGrass) {
+                    System.out.println("Registering tile for grass");
+                }
                 ((TileEntityHolder) block).registerTileEntity();
             }
         }
@@ -296,6 +242,11 @@ public class CraftLogic {
     @SideOnly(Side.CLIENT)
     public static <E extends Entity> void registerEntityRenderer(Class<E> type, Function<RenderManager, Render<E>> renderer) {
         RenderingRegistry.registerEntityRenderingHandler(type, renderer::apply);
+    }
+
+    public static <P extends PlantType> P registerPlant(@Nonnull P plant) {
+        GameRegistry.findRegistry(PlantType.class).register(plant);
+        return plant;
     }
 
     public static <B extends Block> B registerBlock(@Nonnull B block) {

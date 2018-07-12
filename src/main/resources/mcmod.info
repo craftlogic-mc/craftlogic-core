@@ -1,5 +1,4 @@
-[
-{
+[{
   "modid": "craftlogic",
   "name": "CraftLogic",
   "description": "Shared dependency mod.",
@@ -12,5 +11,4 @@
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
-}
-]
+}]

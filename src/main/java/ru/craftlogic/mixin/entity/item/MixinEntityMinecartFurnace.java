@@ -1,6 +1,5 @@
 package ru.craftlogic.mixin.entity.item;
 
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.item.EntityMinecartFurnace;
@@ -31,14 +30,17 @@ import ru.craftlogic.CraftLogic;
 import ru.craftlogic.api.inventory.manager.InventoryItemManager;
 import ru.craftlogic.api.inventory.manager.ListInventoryItemManager;
 import ru.craftlogic.api.world.Location;
+import ru.craftlogic.common.CraftBlocks;
+import ru.craftlogic.common.CraftItems;
+import ru.craftlogic.common.CraftSounds;
 import ru.craftlogic.common.block.BlockFurnace;
 import ru.craftlogic.common.item.ItemCrowbar;
 import ru.craftlogic.util.Furnace;
 
 import java.util.Random;
 
-import static ru.craftlogic.CraftLogic.SOUND_FURNACE_VENT_CLOSE;
-import static ru.craftlogic.CraftLogic.SOUND_FURNACE_VENT_OPEN;
+import static ru.craftlogic.common.CraftSounds.FURNACE_VENT_CLOSE;
+import static ru.craftlogic.common.CraftSounds.FURNACE_VENT_OPEN;
 import static ru.craftlogic.util.Furnace.getItemBurnTemperature;
 import static ru.craftlogic.util.Furnace.getItemBurnTime;
 
@@ -119,7 +121,7 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
 
     @Overwrite
     public IBlockState getDefaultDisplayTile() {
-        return CraftLogic.BLOCK_FURNACE.getDefaultState()
+        return CraftBlocks.FURNACE.getDefaultState()
                 .withProperty(BlockFurnace.ACTIVE, this.isMinecartPowered())
                 .withProperty(BlockFurnace.OPEN, this.isFurnaceOpen());
     }
@@ -143,9 +145,7 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
                     if (rand.nextInt(10) == 0) {
                         for (int i = 0; i < 4; ++i) {
                             Location offsetLocation = location.randomize(rand, 3);
-                            if (offsetLocation.isSameBlockMaterial(Material.AIR) && offsetLocation.canBlockBePlaced(Blocks.FIRE)) {
-                                offsetLocation.setBlock(Blocks.FIRE);
-                            }
+                            offsetLocation.setBlockIfPossible(Blocks.FIRE);
                         }
                     }
                 }
@@ -170,7 +170,7 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
                     this.fuel = Math.max(0, this.fuel - (closed ? 4 : 8) * Math.max(1, mod));
                 }
                 if (this.fuel == 0 && this.maxFuel > 0 && this.world.rand.nextInt(this.maxFuel) >= 100) {
-                    growSlotContents(FurnaceSlot.ASH, CraftLogic.ITEM_ASH, 1);
+                    growSlotContents(FurnaceSlot.ASH, CraftItems.ASH, 1);
                 }
             } else {
                 ItemStack fuelItem = this.getStackInSlot(FurnaceSlot.FUEL);
@@ -195,7 +195,7 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
     public void notifyDataManagerChange(DataParameter<?> parameter) {
         if (parameter == TEMPERATURE && this.world.isRemote) {
             if (this.getTemperature() >= this.getHotTemperature() / 2 && prevTemperature < this.getHotTemperature() / 2) {
-                CraftLogic.playSound(this, CraftLogic.SOUND_FURNACE_HOT_LOOP);
+                CraftLogic.playSound(this, CraftSounds.FURNACE_HOT_LOOP);
             }
             prevTemperature = this.getTemperature();
         }
@@ -247,7 +247,7 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
             if (player.isSneaking()) {
                 boolean opened = this.isFurnaceOpen();
                 this.setFurnaceOpen(!opened);
-                location.playSound(opened ? SOUND_FURNACE_VENT_CLOSE : SOUND_FURNACE_VENT_OPEN, SoundCategory.BLOCKS, 1F, 1F);
+                location.playSound(opened ? FURNACE_VENT_CLOSE : FURNACE_VENT_OPEN, SoundCategory.BLOCKS, 1F, 1F);
                 return true;
             }
             Item itemType = heldItem.getItem();
@@ -292,7 +292,7 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
     public void killMinecart(DamageSource damageSource) {
         super.killMinecart(damageSource);
         if (!damageSource.isExplosion() && this.world.getGameRules().getBoolean("doEntityDrops")) {
-            this.entityDropItem(new ItemStack(CraftLogic.BLOCK_FURNACE), 0F);
+            this.entityDropItem(new ItemStack(CraftBlocks.FURNACE), 0F);
         }
     }
 }

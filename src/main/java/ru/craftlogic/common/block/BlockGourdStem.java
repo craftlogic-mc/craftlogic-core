@@ -1,10 +1,11 @@
 package ru.craftlogic.common.block;
 
 import net.minecraft.block.*;
-import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -20,13 +21,24 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IPlantable;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import ru.craftlogic.api.block.Growable;
+import ru.craftlogic.api.model.ModelAutoReg;
+import ru.craftlogic.api.model.ModelManager;
+import ru.craftlogic.api.world.Location;
 
 import javax.annotation.Nullable;
 import java.util.Random;
 
-public class BlockGourdStem extends BlockBush implements IGrowable {
+import static ru.craftlogic.CraftLogic.MODID;
+
+public class BlockGourdStem extends BlockBush implements Growable {
     private static final PropertyInteger AGE = BlockStem.AGE;
-    private static final PropertyDirection FACING = BlockStem.FACING;
+    private static final PropertyBool NORTH = PropertyBool.create("north");
+    private static final PropertyBool SOUTH = PropertyBool.create("south");
+    private static final PropertyBool WEST = PropertyBool.create("west");
+    private static final PropertyBool EAST = PropertyBool.create("east");
     private static final AxisAlignedBB[] BOUNDS = new AxisAlignedBB[]{
         new AxisAlignedBB(0.375, 0, 0.375, 0.625, 0.125, 0.625),
         new AxisAlignedBB(0.375, 0, 0.375, 0.625, 0.25, 0.625),
@@ -41,7 +53,13 @@ public class BlockGourdStem extends BlockBush implements IGrowable {
 
     public BlockGourdStem(BlockGourd.GourdVariant variant) {
         this.variant = variant;
-        this.setDefaultState(this.blockState.getBaseState().withProperty(AGE, 0).withProperty(FACING, EnumFacing.UP));
+        this.setDefaultState(this.blockState.getBaseState()
+            .withProperty(AGE, 0)
+            .withProperty(NORTH, false)
+            .withProperty(SOUTH, false)
+            .withProperty(WEST, false)
+            .withProperty(EAST, false)
+        );
         this.setTickRandomly(true);
         this.setSoundType(SoundType.WOOD);
         this.setCreativeTab(null);
@@ -129,20 +147,32 @@ public class BlockGourdStem extends BlockBush implements IGrowable {
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess blockAccessor, BlockPos pos) {
         state = this.getActualState(state, blockAccessor, pos);
-        return BOUNDS[state.getValue(FACING) != EnumFacing.UP ? 3 : state.getValue(AGE)];
+        boolean up = !state.getValue(NORTH) && !state.getValue(SOUTH) && !state.getValue(WEST) && !state.getValue(EAST);
+        return BOUNDS[up ? state.getValue(AGE) : 3];
     }
 
     @Override
     public IBlockState getActualState(IBlockState state, IBlockAccess blockAccessor, BlockPos pos) {
         int age = state.getValue(AGE);
-        state = state.withProperty(FACING, EnumFacing.UP);
 
         for (EnumFacing side : EnumFacing.Plane.HORIZONTAL) {
             BlockPos offsetPos = pos.offset(side);
             IBlockState offsetState = blockAccessor.getBlockState(offsetPos);
             if (age == 7 && this.canConnectTo(side, offsetState)) {
-                state = state.withProperty(FACING, side);
-                break;
+                switch (side) {
+                    case NORTH:
+                        state = state.withProperty(NORTH, true);
+                        break;
+                    case SOUTH:
+                        state = state.withProperty(SOUTH, true);
+                        break;
+                    case WEST:
+                        state = state.withProperty(WEST, true);
+                        break;
+                    case EAST:
+                        state = state.withProperty(EAST, true);
+                        break;
+                }
             }
         }
 
@@ -171,11 +201,6 @@ public class BlockGourdStem extends BlockBush implements IGrowable {
     @Override
     protected boolean canSustainBush(IBlockState state) {
         return state.getBlock() == Blocks.FARMLAND;
-    }
-
-    public void growStem(World world, BlockPos pos, IBlockState state) {
-        int i = state.getValue(AGE) + MathHelper.getInt(world.rand, 2, 5);
-        world.setBlockState(pos, state.withProperty(AGE, Math.min(7, i)), 2);
     }
 
     @Override
@@ -219,18 +244,19 @@ public class BlockGourdStem extends BlockBush implements IGrowable {
     }
 
     @Override
-    public boolean canGrow(World world, BlockPos pos, IBlockState state, boolean p_canGrow_4_) {
-        return state.getValue(AGE) != 7;
+    public boolean canGrow(Location location, boolean remoteWorld) {
+        return location.getBlockProperty(AGE) != 7;
     }
 
     @Override
-    public boolean canUseBonemeal(World world, Random rand, BlockPos pos, IBlockState state) {
+    public boolean canUseBonemeal(Location location, Random random) {
         return true;
     }
 
     @Override
-    public void grow(World world, Random rand, BlockPos pos, IBlockState state) {
-        this.growStem(world, pos, state);
+    public void grow(Location location, Random random) {
+        int i = location.getBlockProperty(AGE) + MathHelper.getInt(random, 2, 5);
+        location.setBlockProperty(AGE, Math.min(7, i), 2);
     }
 
     @Override
@@ -245,8 +271,6 @@ public class BlockGourdStem extends BlockBush implements IGrowable {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, AGE, FACING);
+        return new BlockStateContainer(this, AGE, NORTH, SOUTH, WEST, EAST);
     }
-
-
 }

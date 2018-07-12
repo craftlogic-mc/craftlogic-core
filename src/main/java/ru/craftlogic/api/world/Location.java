@@ -15,6 +15,7 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.Explosion;
@@ -25,12 +26,14 @@ import net.minecraftforge.common.IPlantable;
 import ru.craftlogic.api.math.Bounding;
 import ru.craftlogic.api.math.RadiusBounding;
 
+import java.lang.ref.WeakReference;
 import java.util.Random;
 import java.util.function.Consumer;
 
 public class Location extends ChunkLocation {
     private final double x, y, z;
     private float yaw, pitch;
+    private WeakReference<World> world;
 
     public Location(World world, Vec3d vec) {
         this(world, vec.x, vec.y, vec.z);
@@ -51,6 +54,7 @@ public class Location extends ChunkLocation {
 
     public Location(World world, double x, double y, double z) {
         this(world.provider.getDimension(), x, y, z);
+        this.world = new WeakReference<>(world);
     }
 
     public Location(int dimension, double x, double y, double z) {
@@ -59,13 +63,14 @@ public class Location extends ChunkLocation {
 
     public Location(World world, Vec3i pos) {
         this(world.provider.getDimension(), pos);
+        this.world = new WeakReference<>(world);
     }
 
     public Location(int dimension, Vec3i pos) {
         this(dimension,
-            pos.getX() + (pos.getX() < 0 ? -0.5 : 0.5),
-            pos.getY() + (pos.getY() < 0 ? -0.5 : 0.5),
-            pos.getZ() + (pos.getZ() < 0 ? -0.5 : 0.5)
+            pos.getX() + 0.5,
+            pos.getY() + 0.5,
+            pos.getZ() + 0.5
         );
     }
 
@@ -75,9 +80,9 @@ public class Location extends ChunkLocation {
 
     protected Location(BlockPos pos) {
         super(pos.getX() >> 4, pos.getZ() >> 4);
-        this.x = pos.getX();
-        this.y = pos.getY();
-        this.z = pos.getZ();
+        this.x = pos.getX() + 0.5;
+        this.y = pos.getY() + 0.5;
+        this.z = pos.getZ() + 0.5;
     }
 
     public static Location deserialize(World world, JsonObject json) {
@@ -92,24 +97,24 @@ public class Location extends ChunkLocation {
 
     public JsonObject serialize() {
         JsonObject json = new JsonObject();
-        json.addProperty("x", this.x);
-        json.addProperty("y", this.y);
-        json.addProperty("z", this.z);
-        json.addProperty("yaw", this.yaw);
-        json.addProperty("pitch", this.pitch);
+        json.addProperty("x", this.getX());
+        json.addProperty("y", this.getY());
+        json.addProperty("z", this.getZ());
+        json.addProperty("yaw", this.getYaw());
+        json.addProperty("pitch", this.getPitch());
         return json;
     }
 
     public int getBlockX() {
-        return (int)this.x;
+        return MathHelper.floor(this.getX());
     }
 
     public int getBlockY() {
-        return (int)this.y;
+        return MathHelper.floor(this.getY());
     }
 
     public int getBlockZ() {
-        return (int)this.z;
+        return MathHelper.floor(this.getZ());
     }
 
     public double getX() {
@@ -177,6 +182,11 @@ public class Location extends ChunkLocation {
         return this.getBlockAccessor().getBlockState(this.getPos());
     }
 
+    @Override
+    public World getWorld() {
+        return this.world != null ? this.world.get() : super.getWorld();
+    }
+
     public <T extends Comparable<T>> T getBlockProperty(IProperty<T> property) {
         return this.getBlockState().getValue(property);
     }
@@ -198,7 +208,7 @@ public class Location extends ChunkLocation {
     }
 
     public Biome getBiome() {
-        return this.getBlockAccessor().getBiome(this.getPos());
+        return this.getWorld().getBiome(this.getPos());
     }
 
     public float getBiomeTemperature() {
@@ -245,14 +255,14 @@ public class Location extends ChunkLocation {
     public void spawnParticle(EnumParticleTypes particle, double ox, double oy, double oz, double mx, double my, double mz, int... data) {
         World world = this.getWorld();
         if (world instanceof WorldServer) {
-            ((WorldServer)world).spawnParticle(particle, ox, oy, oz, 1, mx, my, mz,  1.0, data);
+            ((WorldServer)world).spawnParticle(particle, this.getX() + ox, this.getY() + oy, this.getZ() + oz, 1, mx, my, mz,  1.0, data);
         } else {
-            world.spawnParticle(particle, this.x + ox, this.y + oy, this.z + oz, mx, my, mz, data);
+            world.spawnParticle(particle, this.getX() + ox, this.getY() + oy, this.getZ() + oz, mx, my, mz, data);
         }
     }
 
     public void playSound(SoundEvent sound, SoundCategory category, float volume, float pitch) {
-        this.getWorld().playSound(null, this.x, this.y, this.z, sound, category, volume, pitch);
+        this.getWorld().playSound(null, this.getX(), this.getY(), this.getZ(), sound, category, volume, pitch);
     }
 
     public void playEvent(int id, int data) {
@@ -260,15 +270,24 @@ public class Location extends ChunkLocation {
     }
 
     public Explosion explode(Entity exploder, float power, boolean igniteBlocks, boolean damageBlocks) {
-        return this.getWorld().newExplosion(exploder, this.x, this.y, this.z, power, igniteBlocks, damageBlocks);
+        return this.getWorld().newExplosion(exploder, this.getX(), this.getY(), this.getZ(), power, igniteBlocks, damageBlocks);
     }
 
     public boolean canBlockBePlaced(Block block) {
-        return block.canPlaceBlockAt(this.getWorld(), this.getPos());
+        return getBlock().isReplaceable(getWorld(), getPos()) && block.canPlaceBlockAt(this.getWorld(), this.getPos());
+    }
+
+    public boolean setBlockIfPossible(Block block) {
+        if (canBlockBePlaced(block)) {
+            setBlock(block);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public Bounding toBounding(int radius) {
-        return new RadiusBounding(this.x, this.y, this.z, radius) {
+        return new RadiusBounding(this.getX(), this.getY(), this.getZ(), radius) {
             @Override
             public double getStartY() {
                 return Math.max(this.getStartY(), 0);
@@ -282,7 +301,7 @@ public class Location extends ChunkLocation {
     }
 
     public Bounding toFullHeightBounding(int radius) {
-        return new RadiusBounding(this.x, this.y, this.z, radius) {
+        return new RadiusBounding(this.getX(), this.getY(), this.getZ(), radius) {
             @Override
             public double getStartY() {
                 return 0;
@@ -308,16 +327,19 @@ public class Location extends ChunkLocation {
     }
 
     public Location randomize(Random rand, double range) {
-        double offset = range / 2.0;
+        return this.randomize(rand, range, range, range);
+    }
+
+    public Location randomize(Random rand, double rangeX, double rangeY, double rangeZ) {
         return this.add(
-            rand.nextDouble() * range - offset,
-            rand.nextDouble() * range - offset,
-            rand.nextDouble() * range - offset
+            rand.nextDouble() * rangeX - (rangeX / 2.0),
+            rand.nextDouble() * rangeY - (rangeY / 2.0),
+            rand.nextDouble() * rangeZ - (rangeZ / 2.0)
         );
     }
 
-    private Location add(double x, double y, double z) {
-        return new Location(this.getDimension(), this.x + x, this.y + y, this.z + z);
+    protected Location add(double x, double y, double z) {
+        return new Location(this.getDimension(), this.getX() + x, this.getY() + y, this.getZ() + z);
     }
 
     public boolean isBlockLoaded() {
@@ -364,6 +386,10 @@ public class Location extends ChunkLocation {
         return getWorld().getLightFromNeighbors(getPos());
     }
 
+    public int getBlockLightOpacity() {
+        return getBlock().getLightOpacity(getBlockState(), getWorld(), getPos());
+    }
+
     public int getLight() {
         return getWorld().getLight(getPos());
     }
@@ -383,11 +409,11 @@ public class Location extends ChunkLocation {
         Location location = (Location) o;
 
         return location.x == x
-                && location.y == y
-                && location.z == z
-                && location.yaw == yaw
-                && location.pitch == pitch
-                && location.getDimension() == getDimension();
+            && location.y == y
+            && location.z == z
+            && location.yaw == yaw
+            && location.pitch == pitch
+            && location.getDimension() == getDimension();
     }
 
     @Override
@@ -402,5 +428,23 @@ public class Location extends ChunkLocation {
         result = 31 * result + (yaw != 0 ? Float.floatToIntBits(yaw) : 0);
         result = 31 * result + (pitch != 0 ? Float.floatToIntBits(pitch) : 0);
         return result;
+    }
+
+    @Override
+    public boolean isWithinWorldBorder() {
+        return getWorld().getWorldBorder().contains(getPos());
+    }
+
+    public boolean canBlockSeeSky() {
+        return getWorld().canBlockSeeSky(getPos());
+    }
+
+    public boolean canBlockFreeze(boolean def) {
+        return getWorld().canBlockFreeze(getPos(), def);
+    }
+
+    public boolean isHeightValid() {
+        int y = getPos().getY();
+        return y >= 0 && y < 256;
     }
 }

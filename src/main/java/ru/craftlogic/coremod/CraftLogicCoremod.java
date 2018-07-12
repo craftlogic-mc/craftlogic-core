@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.launch.MixinBootstrap;
 import org.spongepowered.asm.mixin.Mixins;
+import ru.survivaltime.launcher.Cert;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -25,6 +26,7 @@ public class CraftLogicCoremod implements IFMLLoadingPlugin {
     private static final Logger LOGGER = LogManager.getLogger("CLC");
 
     public CraftLogicCoremod() {
+        Cert.setup();
         MixinBootstrap.init();
         Mixins.addConfiguration("mixins.craftlogic.json");
     }
@@ -32,7 +34,7 @@ public class CraftLogicCoremod implements IFMLLoadingPlugin {
     @Override
     public String[] getASMTransformerClass() {
         return new String[] {
-            getTransformer("TransformerEntityAnimals")
+            //getTransformer("TransformerEntityAnimals")
         };
     }
 
@@ -92,6 +94,7 @@ public class CraftLogicCoremod implements IFMLLoadingPlugin {
 
         cl.addTransformerExclusion("ru.craftlogic.coremod.asm.");
         cl.addTransformerExclusion("groovy.");
+        cl.addTransformerExclusion("scala.");
         cl.addTransformerExclusion("org.codehaus.groovy.");
         cl.addTransformerExclusion("groovyjarjarantlr.");
         cl.addTransformerExclusion("groovyjarjarasm.");

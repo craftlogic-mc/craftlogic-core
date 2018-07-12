@@ -3,19 +3,20 @@ package ru.craftlogic.api.util;
 import java.util.Arrays;
 
 public class Reflection {
-    public static Class getCallerClass(int level) throws ClassNotFoundException {
-        StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
-        String rawFQN = stElements[level+1].toString().split("\\(")[0];
-        return Class.forName(rawFQN.substring(0, rawFQN.lastIndexOf('.')));
+    public static Class getCallerClass(int level) {
+        StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+        String rawFQN = trace[level+1].toString().split("\\(")[0];
+        try {
+            return Class.forName(rawFQN.substring(0, rawFQN.lastIndexOf('.')));
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static void assertCallerClass(int level, Class<?>... allowedClasses) {
-        Class callerClass = null;
-        try {
-            callerClass = getCallerClass(level);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        Class callerClass = getCallerClass(level);
+
         for (Class<?> allowedClass : allowedClasses) {
             if (allowedClass == callerClass) {
                 return;

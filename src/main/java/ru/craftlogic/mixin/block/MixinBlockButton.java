@@ -1,8 +1,10 @@
 package ru.craftlogic.mixin.block;
 
 import net.minecraft.block.BlockButton;
+import net.minecraft.block.BlockButtonWood;
 import net.minecraft.block.BlockDirectional;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
@@ -26,5 +28,10 @@ public class MixinBlockButton extends BlockDirectional {
         } else {
             items.add(new ItemStack(this));
         }
+    }
+
+    @Override
+    public Material getMaterial(IBlockState state) {
+        return (Object) this instanceof BlockButtonWood ? Material.WOOD : super.getMaterial(state);
     }
 }

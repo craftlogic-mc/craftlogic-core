@@ -144,14 +144,19 @@ public class BlockBase extends Block implements ModelAutoReg {
 
     @Override final
     public void randomTick(World world, BlockPos pos, IBlockState state, Random rand) {
-        this.randomTick(new Location(world, pos), rand);
+        Location location = new Location(world, pos);
+        this.randomTick(location, rand);
+        TileEntityBase tile = location.getTileEntity(TileEntityBase.class);
+        if (tile != null) {
+            tile.randomTick(rand);
+        }
     }
 
     protected void randomTick(Location location, Random rand) {}
 
     @Override
     public boolean canPlaceBlockAt(World world, BlockPos pos) {
-        return this.canPlaceBlockAt(new Location(world, pos));
+        return this.canPlaceBlockAt(new LocationReadOnly(world, pos, null));
     }
 
     public boolean canPlaceBlockAt(Location location) {

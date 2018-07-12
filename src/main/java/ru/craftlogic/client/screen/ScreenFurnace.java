@@ -1,9 +1,10 @@
 package ru.craftlogic.client.screen;
 
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import ru.craftlogic.api.screen.ScreenWithInventory;
 import ru.craftlogic.common.inventory.ContainerFurnace;
 import ru.craftlogic.util.Furnace;
@@ -33,11 +34,11 @@ public class ScreenFurnace extends ScreenWithInventory {
         int x = (this.width - this.xSize) / 2;
         int y = (this.height - this.ySize) / 2;
         this.drawTexturedRect(x, y, this.xSize, this.ySize, 0, 0);
-        if (this.container.fuel > 0) {
+        if (this.container.getFuel() > 0) {
             int fuel = this.getFuelScaled(12);
             this.drawTexturedRect(x + 84, y + 48 - fuel, 14, fuel + 2, 176, 12 - fuel);
         }
-        if (this.container.temperature > 0) {
+        if (this.container.getTemperature() > 0) {
             int tmp = this.getTemperatureScaled(50);
             this.drawTexturedRect(x + 15, y + 67 - tmp, 2, tmp, 200, 50 - tmp);
         }
@@ -50,15 +51,20 @@ public class ScreenFurnace extends ScreenWithInventory {
         this.drawCenteredText(this.furnace.getDisplayName(), this.xSize / 2, 9, 0x404040);
         this.drawText(this.playerInv.getDisplayName(), 8, this.ySize - 94, 0x404040);
         if (mouseX - x >= 6 && mouseX - x <= 17 && mouseY - y >= 17 && mouseY - y <= 67) {
-            this.drawTooltip(I18n.format("tooltip.temperature", this.container.temperature, this.container.maxTemperature), mouseX - x, mouseY - y);
+            int temperature = this.container.getTemperature();
+            int maxTemperature = this.container.getMaxTemperature();
+            ITextComponent tooltip = new TextComponentTranslation("tooltip.temperature", temperature, maxTemperature);
+            this.drawTooltip(tooltip, mouseX - x, mouseY - y);
         }
     }
 
     public int getFuelScaled(int i) {
-        return this.container.maxFuel == 0 ? 0 : this.container.fuel * i / this.container.maxFuel;
+        return this.container.getFuel() == 0
+                ? 0 : this.container.getFuel() * i / this.container.getMaxFuel();
     }
 
     private int getTemperatureScaled(int i) {
-        return this.container.maxTemperature == 0 ? 0 : this.container.temperature * i / this.container.maxTemperature;
+        return this.container.getMaxFuel() == 0
+                ? 0 : this.container.getTemperature() * i / this.container.getMaxTemperature();
     }
 }

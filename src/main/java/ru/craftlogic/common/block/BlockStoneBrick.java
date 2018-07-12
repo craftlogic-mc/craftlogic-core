@@ -17,7 +17,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.CraftLogic;
+import ru.craftlogic.common.CraftItems;
 
 import java.util.Random;
 
@@ -141,7 +141,7 @@ public class BlockStoneBrick extends BlockFalling {
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        return CraftLogic.ITEM_STONE_BRICK;
+        return CraftItems.STONE_BRICK;
     }
 
     @Override
@@ -163,7 +163,7 @@ public class BlockStoneBrick extends BlockFalling {
         Random rand = blockAccessor instanceof World ? ((World)blockAccessor).rand : RANDOM;
         super.getDrops(drops, blockAccessor, pos, state, fortune);
         if (state.getValue(VARIANT) == EnumType.MOSSY && rand.nextInt(4) == 0) {
-            drops.add(new ItemStack(CraftLogic.ITEM_MOSS));
+            drops.add(new ItemStack(CraftItems.MOSS));
         }
     }
 }

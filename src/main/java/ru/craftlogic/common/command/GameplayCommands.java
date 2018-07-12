@@ -5,6 +5,7 @@ import net.minecraft.world.GameType;
 import net.minecraftforge.common.util.FakePlayer;
 import org.apache.commons.lang3.StringUtils;
 import ru.craftlogic.api.command.*;
+import ru.craftlogic.api.command.CommandContext.Argument;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.text.TextTranslation;
@@ -71,18 +72,8 @@ public class GameplayCommands implements CommandRegisterer {
         "<player:Player> [off|on]"
     })
     public static void commandFly(CommandContext ctx) throws CommandException {
-        Player target;
-        if (ctx.has("player")) {
-            target = ctx.get("player").asPlayer();
-        } else {
-            target = ctx.senderAsPlayer();
-        }
-        boolean fly;
-        if (ctx.hasAction()) {
-            fly = ctx.action().equals("on");
-        } else {
-            fly = !target.isFlyingAllowed();
-        }
+        Player target = ctx.getIfPresent("player", Argument::asPlayer).orElse(ctx.senderAsPlayer());
+        boolean fly = ctx.hasAction() ? ctx.action().equals("on") : !target.isFlyingAllowed();
         target.setFlyingAllowed(fly);
         String mode = "commands.fly." + (fly ? "on" : "off");
         if (!ctx.has("player") || ctx.senderAsPlayer().equals(target)) {

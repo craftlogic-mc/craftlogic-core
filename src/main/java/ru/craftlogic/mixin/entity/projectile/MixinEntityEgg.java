@@ -7,7 +7,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-import ru.craftlogic.CraftLogic;
+import ru.craftlogic.common.CraftItems;
 
 @Mixin(EntityEgg.class)
 public abstract class MixinEntityEgg extends EntityThrowable {
@@ -25,7 +25,7 @@ public abstract class MixinEntityEgg extends EntityThrowable {
             int amount = this.rand.nextInt(32) == 0 ? 2 : 1;
 
             for(int i = 0; i < amount; ++i) {
-                this.dropItem(CraftLogic.ITEM_RAW_EGG, 1);
+                this.dropItem(CraftItems.RAW_EGG, 1);
             }
 
             this.world.setEntityState(this, (byte)3);

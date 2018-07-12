@@ -15,7 +15,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.CraftLogic;
+import ru.craftlogic.common.CraftItems;
 
 import java.util.Random;
 
@@ -39,6 +39,8 @@ public class BlockCobblestone extends BlockFalling {
         return this.mossy;
     }
 
+    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {}
+
     @Override
     public void randomTick(World world, BlockPos pos, IBlockState state, Random rand) {
         if (!world.isRemote) {
@@ -61,10 +63,11 @@ public class BlockCobblestone extends BlockFalling {
                     }
                 }
             }
+            boolean loaded = world.isAreaLoaded(pos, 32);
             if (humidity > heat) {
                 if (!this.mossy) {
                     if (rand.nextInt(30) == 0) {
-                        world.setBlockState(pos, Blocks.MOSSY_COBBLESTONE.getDefaultState());
+                        world.setBlockState(pos, Blocks.MOSSY_COBBLESTONE.getDefaultState(), loaded ? 3 : 2);
                     }
                 } else {
                     for (int x = -1; x <= 1; x++) {
@@ -75,9 +78,9 @@ public class BlockCobblestone extends BlockFalling {
                                     IBlockState s = world.getBlockState(offsetPos);
                                     if (rand.nextInt(4) == 0) {
                                         if (s.getBlock() == Blocks.COBBLESTONE) {
-                                            world.setBlockState(offsetPos, Blocks.MOSSY_COBBLESTONE.getDefaultState());
+                                            world.setBlockState(offsetPos, Blocks.MOSSY_COBBLESTONE.getDefaultState(), loaded ? 3 : 2);
                                         } else if (s.getBlock() == Blocks.STONEBRICK && s.getValue(VARIANT) == EnumType.DEFAULT) {
-                                            world.setBlockState(offsetPos, s.withProperty(VARIANT, EnumType.MOSSY));
+                                            world.setBlockState(offsetPos, s.withProperty(VARIANT, EnumType.MOSSY), loaded ? 3 : 2);
                                         }
                                     }
                                 }
@@ -87,7 +90,7 @@ public class BlockCobblestone extends BlockFalling {
                 }
             } else {
                 if (this.mossy && rand.nextInt(3) == 0) {
-                    world.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState());
+                    world.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState(), loaded ? 3 : 2);
                     world.playEvent(1009, pos, 0);
                     world.playEvent(2000, pos, 0);
                 }
@@ -103,7 +106,7 @@ public class BlockCobblestone extends BlockFalling {
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        return CraftLogic.ITEM_ROCK;
+        return CraftItems.ROCK;
     }
 
     @Override
@@ -116,7 +119,7 @@ public class BlockCobblestone extends BlockFalling {
         Random rand = blockAccessor instanceof World ? ((World)blockAccessor).rand : RANDOM;
         super.getDrops(drops, blockAccessor, pos, state, fortune);
         if (this.mossy && rand.nextInt(4) == 0) {
-            drops.add(new ItemStack(CraftLogic.ITEM_MOSS));
+            drops.add(new ItemStack(CraftItems.MOSS));
         }
     }
 }

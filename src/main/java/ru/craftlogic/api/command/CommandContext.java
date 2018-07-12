@@ -7,6 +7,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.text.Text;
+import ru.craftlogic.api.util.CheckedFunction;
 import ru.craftlogic.api.world.CommandSender;
 import ru.craftlogic.api.world.OfflinePlayer;
 import ru.craftlogic.api.world.Player;
@@ -82,6 +83,14 @@ public class CommandContext {
 
     public boolean hasConstant(int id) {
         return this.has("const_" + id);
+    }
+
+    public Optional<Argument> getIfPresent(String name) {
+        return this.has(name) ? Optional.of(this.get(name)) : Optional.empty();
+    }
+
+    public <T> Optional<T> getIfPresent(String name, CheckedFunction<Argument, T, CommandException> mapper) {
+        return this.getIfPresent(name).map(mapper.unwrap());
     }
 
     public Argument get(String name) {
