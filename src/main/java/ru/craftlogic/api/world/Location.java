@@ -153,6 +153,10 @@ public class Location extends ChunkLocation {
         return this.setBlockState(block.getDefaultState());
     }
 
+    public boolean setBlock(Block block, int flag) {
+        return this.setBlockState(block.getDefaultState(), flag);
+    }
+
     public boolean setBlockState(IBlockState state) {
         return this.getWorld().setBlockState(this.getPos(), state);
     }
@@ -354,6 +358,10 @@ public class Location extends ChunkLocation {
         return this.getBlockAccessor().isSideSolid(this.getPos(), facing, def);
     }
 
+    public boolean spawnEntity(Entity entity) {
+        return this.getWorld().spawnEntity(entity);
+    }
+
     public void spawnItem(ItemStack item) {
         Block.spawnAsEntity(this.getWorld(), this.getPos(), item);
     }
@@ -446,5 +454,18 @@ public class Location extends ChunkLocation {
     public boolean isHeightValid() {
         int y = getPos().getY();
         return y >= 0 && y < 256;
+    }
+
+    public boolean isAir() {
+        return this.getBlockMaterial() == Material.AIR;
+    }
+
+    public double distance(Location other) {
+        double sq = this.distanceSq(other);
+        return Math.sqrt(sq);
+    }
+
+    public double distanceSq(Location other) {
+        return this.getDimension() != other.getDimension() ? Double.POSITIVE_INFINITY : this.getPos().distanceSq(other.getPos());
     }
 }

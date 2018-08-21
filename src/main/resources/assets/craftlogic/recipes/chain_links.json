@@ -1,0 +1,23 @@
+{
+  "conditions": [
+    {
+      "type": "minecraft:item_exists",
+      "item": "craftlogic:chain_links"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " A ",
+    "A A",
+    " A "
+  ],
+  "key": {
+    "A": {
+      "item": "minecraft:iron_nugget"
+    }
+  },
+  "result": {
+    "item": "craftlogic:chain_links",
+    "count": 3
+  }
+}

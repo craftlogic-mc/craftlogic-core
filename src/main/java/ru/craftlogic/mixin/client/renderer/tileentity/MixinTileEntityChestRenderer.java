@@ -31,6 +31,10 @@ public class MixinTileEntityChestRenderer extends TileEntitySpecialRenderer<Tile
     @Shadow
     private boolean isChristmas;
 
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
     @Overwrite
     public void render(TileEntityChest chest, double x, double y, double z, float deltaTime, int destroyStage, float alpha) {
         GlStateManager.enableDepth();

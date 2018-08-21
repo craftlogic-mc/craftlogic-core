@@ -6,40 +6,36 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.craftlogic.api.server.Server;
+import ru.craftlogic.api.Server;
 import ru.craftlogic.api.math.Bounding;
 import ru.craftlogic.api.util.ConfigurableManager;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.api.world.World;
+import ru.craftlogic.common.command.CommandManager;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 
 public class RegionManager extends ConfigurableManager {
     private static final Logger LOGGER = LogManager.getLogger("RegionManager");
 
-    private final Server server;
-    private final Path regionsFile;
     final Map<String, Map<UUID, Region>> regions = new HashMap<>();
+    final HomeManager homeManager;
 
-    public RegionManager(Server server) {
-        this.server = server;
-        this.regionsFile = server.getDataDirectory().resolve("regions.json");
+    public RegionManager(Server server, Path settingsDirectory) {
+        super(server, settingsDirectory.resolve("regions.json"), LOGGER);
+        this.homeManager = new HomeManager(this, settingsDirectory.resolve("homes.json"), LOGGER);
     }
 
     @Override
-    public Path getConfigFile() {
-        return this.regionsFile;
+    public void registerCommands(CommandManager commandManager) {
+        commandManager.registerCommandContainer(RegionCommands.class);
     }
 
     @Override
-    public Logger getLogger() {
-        return LOGGER;
-    }
-
-    @Override
-    public void load(JsonObject root) {
-        for (Map.Entry<String, JsonElement> entry : root.entrySet()) {
+    public void load(JsonObject regions) {
+        for (Map.Entry<String, JsonElement> entry : regions.entrySet()) {
             World world = this.server.getWorld(entry.getKey());
             if (world != null) {
                 JsonObject worldRegions = entry.getValue().getAsJsonObject();
@@ -67,10 +63,16 @@ public class RegionManager extends ConfigurableManager {
                 LOGGER.warn("Ignoring unknown world '" + entry.getKey());
             }
         }
+
+        try {
+            this.homeManager.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
-    public void save(JsonObject root) {
+    public void save(JsonObject regions) {
         for (Map.Entry<String, Map<UUID, Region>> entry : this.regions.entrySet()) {
             JsonObject worldRegions = new JsonObject();
             for (Map.Entry<UUID, Region> _r : entry.getValue().entrySet()) {
@@ -94,7 +96,13 @@ public class RegionManager extends ConfigurableManager {
                 region.addProperty("radius", r.radius);
                 worldRegions.add(_r.getKey().toString(), region);
             }
-            root.add(entry.getKey(), worldRegions);
+            regions.add(entry.getKey(), worldRegions);
+        }
+
+        try {
+            this.homeManager.save(true);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

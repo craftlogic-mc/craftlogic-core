@@ -11,12 +11,15 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.api.inventory.InventoryHolder.FieldIdentifier;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public abstract class ContainerBase extends Container {
+public abstract class ContainerBase<I extends InventoryHolder> extends Container {
     private int localSlots;
-    private final Map<Integer, Integer> cachedFields = new HashMap<>();
+    private int[] cachedFields;
+    protected I inventory;
+
+    public ContainerBase(I inventory) {
+        this.cachedFields = new int[inventory.getFieldCount()];
+        this.inventory = inventory;
+    }
 
     protected boolean isOutputSlot(Slot slot) {
         return false;
@@ -36,7 +39,9 @@ public abstract class ContainerBase extends Container {
         return false;
     }
 
-    protected abstract InventoryHolder getInventoryHolder();
+    protected InventoryHolder getInventoryHolder() {
+        return this.inventory;
+    }
 
     @Override
     public void addListener(IContainerListener listener) {
@@ -56,9 +61,9 @@ public abstract class ContainerBase extends Container {
             for (IContainerListener listener : this.listeners) {
                 for (int i = 0; i < inventoryHolder.getFieldCount(); i++) {
                     int newValue = inventoryHolder.getField(i);
-                    if (!this.cachedFields.containsKey(i) || this.cachedFields.get(i) != newValue) {
+                    if (this.cachedFields[i] != newValue) {
                         listener.sendWindowProperty(this, i, newValue);
-                        this.cachedFields.put(i, newValue);
+                        this.cachedFields[i] = newValue;
                     }
                 }
             }
@@ -70,13 +75,13 @@ public abstract class ContainerBase extends Container {
     }
 
     protected int getFieldValue(int id) {
-        return this.cachedFields.getOrDefault(id, 0);
+        return this.cachedFields[id];
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     public void updateProgressBar(int id, int value) {
-        this.cachedFields.put(id, value);
+        this.cachedFields[id] = value;
     }
 
     @Override

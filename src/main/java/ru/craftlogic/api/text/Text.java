@@ -1,18 +1,64 @@
 package ru.craftlogic.api.text;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.event.ClickEvent;
 import net.minecraft.util.text.event.HoverEvent;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
 public abstract class Text<C extends ITextComponent, B extends Text<C, B>> {
     protected final List<ITextComponent> children = new ArrayList<>();
-    protected final Style style = new Style();
+    protected Style style = new Style();
+
+    public static TextString string() {
+        return string("");
+    }
+
+    public static TextString string(String text) {
+        return new TextString(text);
+    }
+
+    public static TextTranslation translation(CommandException exc) {
+        TextTranslation text = translation(exc.getMessage());
+        for (Object o : exc.getErrorObjects()) {
+            if (o instanceof ITextComponent) {
+                text.arg((ITextComponent)o);
+            } else if (o instanceof Text){
+                text.arg((Text)o);
+            } else if (o instanceof String) {
+                text.arg((String) o);
+            } else if (o instanceof Number) {
+                text.arg((Number)o);
+            } else {
+                text.arg(String.valueOf(o));
+            }
+        }
+        return text;
+    }
+
+    public static TextTranslation translation(String format) {
+        return new TextTranslation(format);
+    }
+
+    public static TextWrapped wrapped(ITextComponent component) {
+        return new TextWrapped(component);
+    }
+
+    public static TextDate date(Date date, SimpleDateFormat format) {
+        return new TextDate(date, format);
+    }
+
+    public B append(Text<?, ?> child) {
+        this.children.add(child.build());
+        return (B) this;
+    }
 
     public B append(ITextComponent child) {
         this.children.add(child);
@@ -24,7 +70,7 @@ public abstract class Text<C extends ITextComponent, B extends Text<C, B>> {
     }
 
     public B appendText(String arg, Consumer<TextString> decorator) {
-        TextString text = new TextString(arg);
+        TextString text = Text.string(arg);
         if (decorator != null) {
             decorator.accept(text);
         }
@@ -37,7 +83,7 @@ public abstract class Text<C extends ITextComponent, B extends Text<C, B>> {
     }
 
     public B appendTranslate(String format, Consumer<TextTranslation> decorator) {
-        TextTranslation text = new TextTranslation(format);
+        TextTranslation text = Text.translation(format);
         if (decorator != null) {
             decorator.accept(text);
         }
@@ -155,6 +201,11 @@ public abstract class Text<C extends ITextComponent, B extends Text<C, B>> {
         return (B) this;
     }
 
+    public B reset() {
+        this.style = new Style();
+        return (B) this;
+    }
+
     public B suggestCommand(String command) {
         this.style.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, command));
         return (B) this;
@@ -180,8 +231,12 @@ public abstract class Text<C extends ITextComponent, B extends Text<C, B>> {
         return (B) this;
     }
 
+    public B hoverText(String arg) {
+        return this.hoverText(arg, null);
+    }
+
     public B hoverText(String arg, Consumer<TextString> decorator) {
-        TextString text = new TextString(arg);
+        TextString text = Text.string(arg);
         if (decorator != null) {
             decorator.accept(text);
         }
@@ -189,8 +244,12 @@ public abstract class Text<C extends ITextComponent, B extends Text<C, B>> {
         return (B) this;
     }
 
+    public B hoverTextTranslate(String arg) {
+        return this.hoverTextTranslate(arg, null);
+    }
+
     public B hoverTextTranslate(String arg, Consumer<TextTranslation> decorator) {
-        TextTranslation text = new TextTranslation(arg);
+        TextTranslation text = Text.translation(arg);
         if (decorator != null) {
             decorator.accept(text);
         }

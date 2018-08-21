@@ -11,20 +11,23 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import ru.craftlogic.CraftLogic;
+import ru.craftlogic.api.CraftTileEntities;
 import ru.craftlogic.api.tile.TileEntityBase;
 import ru.craftlogic.api.util.TileEntityInfo;
 
 import javax.annotation.Nullable;
 
 @Mixin(TileEntity.class)
-public class MixinTileEntity {
+public abstract class MixinTileEntity {
     @Shadow @Final
     private static Logger LOGGER;
     @Shadow @Final
     private static RegistryNamespaced<ResourceLocation, Class<? extends TileEntity>> REGISTRY;
 
-    /**@author Radviger*/
+    /**
+     * @author Radviger
+     * @reason Custom TileEntity constructors
+     */
     @Nullable
     @Overwrite
     public static TileEntity create(World world, NBTTagCompound compound) {
@@ -35,7 +38,7 @@ public class MixinTileEntity {
         try {
             type = REGISTRY.getObject(new ResourceLocation(s));
             if (type != null) {
-                TileEntityInfo<?> i = CraftLogic.getTileEntityInfo(type);
+                TileEntityInfo<?> i = CraftTileEntities.getTileEntityInfo(type);
                 if (TileEntityBase.class.isAssignableFrom(type)) {
                     tile = i != null ? i.create(world) : null;
                 } else {
@@ -64,5 +67,5 @@ public class MixinTileEntity {
     }
 
     @Shadow
-    protected void setWorldCreate(World world) {}
+    protected abstract void setWorldCreate(World world);
 }

@@ -5,7 +5,6 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -20,18 +19,11 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.IPlantable;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.api.block.Growable;
-import ru.craftlogic.api.model.ModelAutoReg;
-import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.world.Location;
 
 import javax.annotation.Nullable;
 import java.util.Random;
-
-import static ru.craftlogic.CraftLogic.MODID;
 
 public class BlockGourdStem extends BlockBush implements Growable {
     private static final PropertyInteger AGE = BlockStem.AGE;
@@ -70,22 +62,22 @@ public class BlockGourdStem extends BlockBush implements Growable {
     }
 
     protected static float getGrowthChance(Block block, World world, BlockPos pos) {
-        float f = 1.0F;
+        float f = 1F;
         BlockPos soilPos = pos.down();
 
         for(int dx = -1; dx <= 1; ++dx) {
             for(int dy = -1; dy <= 1; ++dy) {
-                float f1 = 0.0F;
+                float f1 = 0F;
                 IBlockState s = world.getBlockState(soilPos.add(dx, 0, dy));
-                if (s.getBlock().canSustainPlant(s, world, soilPos.add(dx, 0, dy), EnumFacing.UP, (IPlantable)block)) {
-                    f1 = 1.0F;
+                if (s.isSideSolid(world, soilPos.add(dx, 0, dy), EnumFacing.UP)) {
+                    f1 = 1F;
                     if (s.getBlock().isFertile(world, soilPos.add(dx, 0, dy))) {
-                        f1 = 3.0F;
+                        f1 = 3F;
                     }
                 }
 
                 if (dx != 0 || dy != 0) {
-                    f1 /= 4.0F;
+                    f1 /= 4F;
                 }
 
                 f += f1;
@@ -99,11 +91,11 @@ public class BlockGourdStem extends BlockBush implements Growable {
         boolean xLine = block == world.getBlockState(westPos).getBlock() || block == world.getBlockState(eastPos).getBlock();
         boolean zLine = block == world.getBlockState(northPos).getBlock() || block == world.getBlockState(southPos).getBlock();
         if (xLine && zLine) {
-            f /= 2.0F;
+            f /= 2F;
         } else {
             boolean flag2 = block == world.getBlockState(westPos.north()).getBlock() || block == world.getBlockState(eastPos.north()).getBlock() || block == world.getBlockState(eastPos.south()).getBlock() || block == world.getBlockState(westPos.south()).getBlock();
             if (flag2) {
-                f /= 2.0F;
+                f /= 2F;
             }
         }
 
@@ -116,19 +108,13 @@ public class BlockGourdStem extends BlockBush implements Growable {
         if (world.isAreaLoaded(pos, 1)) {
             if (world.getLightFromNeighbors(pos.up()) >= 9) {
                 float f = getGrowthChance(this, world, pos);
-                if (ForgeHooks.onCropsGrowPre(world, pos, state, rand.nextInt((int)(25.0F / f) + 1) == 0)) {
+                if (ForgeHooks.onCropsGrowPre(world, pos, state, rand.nextInt((int)(25F / f) + 1) == 0)) {
                     int i = state.getValue(AGE);
                     IBlockState soil;
                     if (i < 7) {
                         soil = state.withProperty(AGE, i + 1);
                         world.setBlockState(pos, soil, 2);
                     } else {
-                        for (EnumFacing side : EnumFacing.Plane.HORIZONTAL) {
-                            if (world.getBlockState(pos.offset(side)).getBlock() == this.getCrop()) {
-                                return;
-                            }
-                        }
-
                         EnumFacing s = EnumFacing.Plane.HORIZONTAL.random(rand);
                         pos = pos.offset(s);
                         soil = world.getBlockState(pos.down());
@@ -189,13 +175,7 @@ public class BlockGourdStem extends BlockBush implements Growable {
 
     @Override
     public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-        switch (this.variant) {
-            case MELON:
-                return new ItemStack(Items.MELON_SEEDS);
-            case PUMPKIN:
-                return new ItemStack(Items.PUMPKIN_SEEDS);
-        }
-        return super.getPickBlock(state, target, world, pos, player);
+        return new ItemStack(this.variant.seed.get());
     }
 
     @Override
@@ -225,11 +205,7 @@ public class BlockGourdStem extends BlockBush implements Growable {
 
     @Nullable
     protected Item getSeedItem() {
-        if (this.getCrop() == Blocks.PUMPKIN) {
-            return Items.PUMPKIN_SEEDS;
-        } else {
-            return this.getCrop() == Blocks.MELON_BLOCK ? Items.MELON_SEEDS : null;
-        }
+        return this.variant.seed.get();
     }
 
     @Override

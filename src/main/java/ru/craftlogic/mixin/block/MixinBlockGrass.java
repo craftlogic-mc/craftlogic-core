@@ -8,13 +8,10 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.statemap.StateMap;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -26,12 +23,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
 import ru.craftlogic.api.model.ModelAutoReg;
 import ru.craftlogic.api.model.ModelManager;
-import ru.craftlogic.api.plants.Plant;
 import ru.craftlogic.api.plants.PlantSoil;
 import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.api.world.TileEntities;
-import ru.craftlogic.common.CraftPlants;
 import ru.craftlogic.common.tileentity.TileEntityGrass;
 
 import javax.annotation.Nullable;
@@ -64,7 +59,7 @@ public class MixinBlockGrass extends Block implements TileEntityHolder<TileEntit
         }
     }
 
-    @Override
+    /*@Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float dx, float dy, float dz) {
         if (!world.isRemote) {
             world.setBlockState(pos, state.withProperty(HAS_PLANT, true));
@@ -82,9 +77,12 @@ public class MixinBlockGrass extends Block implements TileEntityHolder<TileEntit
             }
         }
         return true;
-    }
+    }*/
 
-    /**@author Radviger*/
+    /**
+     * @author Radviger
+     * @reason In-grass plants
+     */
     @Overwrite
     public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
         if (!world.isRemote) {
@@ -132,7 +130,10 @@ public class MixinBlockGrass extends Block implements TileEntityHolder<TileEntit
         return state.getValue(HAS_PLANT) ? 1 : 0;
     }
 
-    /**@author Radviger*/
+    /**
+     * @author Radviger
+     * @reason In-grass plants
+     */
     @Overwrite
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, SNOWY, HAS_PLANT);

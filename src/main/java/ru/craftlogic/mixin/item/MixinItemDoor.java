@@ -29,6 +29,7 @@ public class MixinItemDoor extends Item {
             if (id.startsWith("minecraft:") && id.endsWith("door")) {
                 if (this == Items.OAK_DOOR) {
                     items.add(new ItemStack(Items.IRON_DOOR));
+                    items.add(new ItemStack(Items.OAK_DOOR));
                     items.add(new ItemStack(Items.SPRUCE_DOOR));
                     items.add(new ItemStack(Items.BIRCH_DOOR));
                     items.add(new ItemStack(Items.JUNGLE_DOOR));
@@ -41,6 +42,10 @@ public class MixinItemDoor extends Item {
         }
     }
 
+    /**
+     * @author Radviger
+     * @reason Extended doors' features
+     */
     @Overwrite
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (side != EnumFacing.UP) {

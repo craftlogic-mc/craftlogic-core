@@ -10,8 +10,6 @@ import ru.craftlogic.api.block.Colored;
 import ru.craftlogic.api.model.ModelAutoReg;
 import ru.craftlogic.api.model.ModelManager;
 
-import static ru.craftlogic.CraftLogic.MODID;
-
 public class ItemWool extends ItemBlock implements Colored, ModelAutoReg {
     public ItemWool(Block block) {
         super(block);
@@ -48,9 +46,9 @@ public class ItemWool extends ItemBlock implements Colored, ModelAutoReg {
 
     @Override
     public void registerModel(ModelManager modelManager) {
-        modelManager.registerItemVariants(this, MODID + ":wool");
+        modelManager.registerItemVariants(this, "minecraft:wool");
         modelManager.registerCustomMeshDefinition(this, item ->
-            new ModelResourceLocation(MODID + ":wool", "inventory")
+            new ModelResourceLocation("wool", "inventory")
         );
     }
 }

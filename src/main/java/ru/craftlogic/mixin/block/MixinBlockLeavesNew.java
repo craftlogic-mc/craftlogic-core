@@ -15,6 +15,10 @@ public class MixinBlockLeavesNew extends Block {
         super(material);
     }
 
+    /**
+     * @author Radviger
+     * @reason Sorted CreativeTab items
+     */
     @Overwrite
     public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> items) {}
 }

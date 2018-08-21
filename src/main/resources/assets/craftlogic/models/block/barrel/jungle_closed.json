@@ -1,0 +1,6 @@
+{
+    "parent": "craftlogic:block/barrel/_closed",
+    "textures": {
+        "all": "blocks/planks_jungle"
+    }
+}

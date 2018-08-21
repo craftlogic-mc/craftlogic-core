@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.apache.logging.log4j.Logger;
+import ru.craftlogic.api.Server;
+import ru.craftlogic.common.command.CommandManager;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -13,11 +15,30 @@ import java.nio.file.Path;
 public abstract class ConfigurableManager {
     protected static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
+    protected final Server server;
+    protected final Path configFile;
+    protected final Logger logger;
+
     private boolean needsSave = false;
     private JsonObject config;
 
-    protected abstract Path getConfigFile();
-    protected abstract Logger getLogger();
+    public ConfigurableManager(Server server, Path configFile, Logger logger) {
+        this.server = server;
+        this.configFile = configFile;
+        this.logger = logger;
+    }
+
+    public final Server getServer() {
+        return server;
+    }
+
+    protected Path getConfigFile() {
+        return this.configFile;
+    }
+
+    protected Logger getLogger() {
+        return this.logger;
+    }
 
     protected String getDefaultConfig() {
         return "/assets/craftlogic/config/" + getConfigFile().getFileName().toString();
@@ -35,6 +56,9 @@ public abstract class ConfigurableManager {
         Path configFile = this.getConfigFile();
         JsonObject root = null;
         if (!Files.exists(configFile)) {
+            if (!Files.exists(configFile.getParent())) {
+                Files.createDirectories(configFile.getParent());
+            }
             Files.createFile(configFile);
             getLogger().warn("Configuration file is missing! Creating empty one...");
             String defaultConfig = getDefaultConfig();
@@ -71,7 +95,7 @@ public abstract class ConfigurableManager {
         }
     }
 
-    protected abstract void load(JsonObject root);
+    protected abstract void load(JsonObject config);
 
     public final void save() throws IOException {
         this.save(false);
@@ -85,9 +109,15 @@ public abstract class ConfigurableManager {
             }
             this.save(root);
             this.config = root;
-            Files.write(this.getConfigFile(), GSON.toJson(root).getBytes(StandardCharsets.UTF_8));
+            Path configFile = this.getConfigFile();
+            if (!Files.exists(configFile.getParent())) {
+                Files.createDirectories(configFile.getParent());
+            }
+            Files.write(configFile, GSON.toJson(root).getBytes(StandardCharsets.UTF_8));
         }
     }
 
-    protected abstract void save(JsonObject root);
+    protected abstract void save(JsonObject config);
+
+    public void registerCommands(CommandManager commandManager) {}
 }

@@ -9,6 +9,7 @@ import groovy.lang.GroovyShell;
 import groovy.lang.GroovySystem;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.JsonUtils;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.GameType;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -18,40 +19,38 @@ import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.control.ErrorCollector;
 import org.codehaus.groovy.control.MultipleCompilationErrorsException;
 import org.codehaus.groovy.control.customizers.ImportCustomizer;
-import ru.craftlogic.api.server.Server;
+import ru.craftlogic.api.Server;
 import ru.craftlogic.api.util.ConfigurableManager;
 import ru.craftlogic.api.world.Dimension;
-import ru.craftlogic.common.script.impl.ScriptFile;
+import ru.craftlogic.common.command.CommandManager;
 import ru.craftlogic.common.script.impl.ScriptContainer;
+import ru.craftlogic.common.script.impl.ScriptContainerFile;
+import ru.craftlogic.common.script.impl.ScriptFile;
 import ru.craftlogic.common.script.impl.ScriptShell;
 import ru.craftlogic.common.script.internal.CustomMetaClassCreationHandle;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ScriptManager extends ConfigurableManager {
     private static final Logger LOGGER = LogManager.getLogger("ScriptManager");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    private final Server server;
-    private final Path scriptsFile;
     private final Path scriptsDir;
 
     private boolean enabled;
 
     private GroovyShell compiler, shell;
-    private Map<String, ScriptContainer> loadedScripts = new HashMap<>();
+    private Map<String, ScriptContainerFile> loadedScripts = new HashMap<>();
 
-    public ScriptManager(Server server) {
-        this.server = server;
-        this.scriptsFile = server.getDataDirectory().resolve("scripts.json");
+    public ScriptManager(Server server, Path settingsDirectory) {
+        super(server, settingsDirectory.resolve("scripts.json"), LOGGER);
+
         this.scriptsDir = server.getDataDirectory().resolve("scripts/");
         if (!Files.exists(this.scriptsDir)) {
             try {
@@ -67,18 +66,13 @@ public class ScriptManager extends ConfigurableManager {
     }
 
     @Override
-    public Path getConfigFile() {
-        return this.scriptsFile;
+    public void registerCommands(CommandManager commandManager) {
+        commandManager.registerCommandContainer(ScriptCommands.class);
     }
 
     @Override
-    public Logger getLogger() {
-        return LOGGER;
-    }
-
-    @Override
-    public void load(JsonObject root) {
-        this.enabled = root.has("enabled") && root.get("enabled").getAsBoolean();
+    public void load(JsonObject config) {
+        this.enabled = JsonUtils.getBoolean(config, "enabled", false);
         if (this.enabled) {
             boolean obfuscated = false;
             try {
@@ -88,21 +82,26 @@ public class ScriptManager extends ConfigurableManager {
             }
             GroovySystem.getMetaClassRegistry().setMetaClassCreationHandle(new CustomMetaClassCreationHandle(obfuscated));
 
+            Events.init();
+
             CompilerConfiguration shellConfig = new CompilerConfiguration();
             shellConfig.setScriptBaseClass(ScriptShell.class.getName());
 
-            this.shell = this.makeShell(new Binding(), shellConfig);
+            this.shell = makeShell(new Binding(), shellConfig);
 
             try {
                 Set<Path> scriptCandidates = Files
                     .list(this.scriptsDir)
-                    .filter(f -> f.endsWith(".gs"))
+                    .filter(f -> f.toString().endsWith(".gs"))
                     .collect(Collectors.toSet());
 
                 CompilerConfiguration compilerConfig = new CompilerConfiguration();
                 compilerConfig.setScriptBaseClass(ScriptFile.class.getName());
 
-                this.compiler = this.makeShell(new Binding(), compilerConfig);
+                Binding binding = new Binding();
+                binding.setProperty("$server", this.server);
+
+                this.compiler = makeShell(binding, compilerConfig);
 
                 for (Path candidate : scriptCandidates) {
                     this.loadScript(candidate, false, true);
@@ -113,8 +112,8 @@ public class ScriptManager extends ConfigurableManager {
         }
     }
 
-    private GroovyShell makeShell(Binding scriptProperties, CompilerConfiguration compilerConfig) {
-        this.bind(scriptProperties);
+    public static GroovyShell makeShell(Binding scriptProperties, CompilerConfiguration compilerConfig) {
+        bind(scriptProperties);
 
         compilerConfig.setSourceEncoding("UTF-8");
 
@@ -130,7 +129,7 @@ public class ScriptManager extends ConfigurableManager {
         return new GroovyShell(scriptProperties, compilerConfig);
     }
 
-    private void bind(Binding binding) {
+    private static void bind(Binding binding) {
         for (EnumFacing facing : EnumFacing.values()) {
             binding.setVariable(facing.getName().toUpperCase(), facing);
         }
@@ -145,17 +144,16 @@ public class ScriptManager extends ConfigurableManager {
     }
 
     @Override
-    public void save(JsonObject root) {
-
-
+    public void save(JsonObject config) {
+        config.addProperty("enabled", this.enabled);
     }
 
     public void unload() {
-        Iterator<Map.Entry<String, ScriptContainer>> iterator = this.loadedScripts.entrySet().iterator();
+        Iterator<Map.Entry<String, ScriptContainerFile>> iterator = this.loadedScripts.entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<String, ScriptContainer> entry = iterator.next();
+            Map.Entry<String, ScriptContainerFile> entry = iterator.next();
             String id = entry.getKey();
-            ScriptContainer container = entry.getValue();
+            ScriptContainerFile container = entry.getValue();
             iterator.remove();
             long start = System.currentTimeMillis();
             container.unload();
@@ -183,7 +181,7 @@ public class ScriptManager extends ConfigurableManager {
             }
         }
         if (!Files.exists(path)) {
-            return null;
+            throw new FileNotFoundException(id + ".gs");
         }
 
         JsonObject info;
@@ -197,7 +195,7 @@ public class ScriptManager extends ConfigurableManager {
         ScriptFile script = this.compile(id, Files.newBufferedReader(path));
         if (script != null) {
             LOGGER.info("Successfully compiled script '{}' (Took {} ms)", id, System.currentTimeMillis() - start);
-            ScriptContainer container = new ScriptContainer(this, id, info, script);
+            ScriptContainerFile container = new ScriptContainerFile(this, id, info, script);
             if (run) {
                 container.run();
             }
@@ -210,7 +208,7 @@ public class ScriptManager extends ConfigurableManager {
     }
 
     public boolean unloadScript(String id) {
-        ScriptContainer container = this.loadedScripts.remove(id);
+        ScriptContainerFile container = this.loadedScripts.remove(id);
         if (container != null) {
             container.unload();
             return true;
@@ -238,8 +236,8 @@ public class ScriptManager extends ConfigurableManager {
         return null;
     }
 
-    public Set<String> getAllLoadedScripts() {
-        return this.loadedScripts.keySet();
+    public Collection<ScriptContainerFile> getAllLoadedScripts() {
+        return this.loadedScripts.values();
     }
 
     public boolean isLoaded(String id) {
@@ -252,9 +250,5 @@ public class ScriptManager extends ConfigurableManager {
 
     public GroovyShell getShell() {
         return shell;
-    }
-
-    public Server getServer() {
-        return server;
     }
 }

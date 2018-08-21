@@ -1,4 +1,4 @@
 package ru.craftlogic.api.entity;
 
-public interface Predator {
+public interface Predator extends Animal {
 }

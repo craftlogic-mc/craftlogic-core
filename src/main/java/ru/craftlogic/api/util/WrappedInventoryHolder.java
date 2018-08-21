@@ -4,11 +4,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
+import ru.craftlogic.api.inventory.InventoryFieldHolder;
 import ru.craftlogic.api.inventory.InventoryHolder;
-import ru.craftlogic.api.inventory.manager.InventoryItemManager;
-import ru.craftlogic.api.inventory.manager.WrappedInventoryItemManager;
+import ru.craftlogic.api.inventory.WrappedInventoryFieldHolder;
+import ru.craftlogic.api.inventory.manager.InventoryManager;
+import ru.craftlogic.api.inventory.manager.WrappedInventoryManager;
 import ru.craftlogic.api.world.Locatable;
 import ru.craftlogic.api.world.Location;
+
+import javax.annotation.Nullable;
 
 public class WrappedInventoryHolder implements InventoryHolder, Locatable {
     protected final IInventory inventory;
@@ -25,8 +29,8 @@ public class WrappedInventoryHolder implements InventoryHolder, Locatable {
     }
 
     @Override
-    public InventoryItemManager getItemManager() {
-        return new WrappedInventoryItemManager(this.inventory);
+    public InventoryManager getInventoryManager() {
+        return new WrappedInventoryManager(this.inventory);
     }
 
     @Override
@@ -112,6 +116,12 @@ public class WrappedInventoryHolder implements InventoryHolder, Locatable {
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         return inventory.isItemValidForSlot(slot, stack);
+    }
+
+    @Nullable
+    @Override
+    public InventoryFieldHolder getFieldHolder() {
+        return new WrappedInventoryFieldHolder(inventory);
     }
 
     @Override

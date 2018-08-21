@@ -5,7 +5,7 @@ import net.minecraft.util.text.ITextComponent;
 public class TextWrapped extends Text<ITextComponent, TextWrapped> {
     private final ITextComponent text;
 
-    public TextWrapped(ITextComponent text) {
+    TextWrapped(ITextComponent text) {
         this.text = text;
     }
 

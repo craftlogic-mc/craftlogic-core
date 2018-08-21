@@ -9,15 +9,24 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.CapabilityItemHandler;
 import ru.craftlogic.api.block.BlockBase;
+import ru.craftlogic.api.fluid.FluidHolder;
 import ru.craftlogic.api.inventory.InventoryFieldHolder;
 import ru.craftlogic.api.inventory.InventoryFieldHolder.InventoryFieldAdder;
+import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.api.world.Locatable;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.api.world.WorldNameable;
@@ -89,6 +98,9 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
     }
 
     public void randomTick(Random random) {}
+
+    @SideOnly(Side.CLIENT)
+    public void randomDisplayTick(Random random) {}
 
     public void markForUpdate() {
         if (this.world != null && !this.world.isRemote) {
@@ -176,18 +188,18 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
         return metaState;
     }
 
+    public void fillWithRain(Fluid fluid) {}
+
     @Override
     public final NBTTagCompound getUpdateTag() {
-        NBTTagCompound compound = new NBTTagCompound();
-        this.writeToPacket(compound);
-        return compound;
+        return this.writeToPacket(new NBTTagCompound());
     }
 
     @Nullable
     @Override
     public final SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound compound = this.getUpdateTag();
-        return compound.getSize() > 0 ? new SPacketUpdateTileEntity(this.pos, 0, compound) : super.getUpdatePacket();
+        return compound != null ? new SPacketUpdateTileEntity(this.pos, 0, compound) : super.getUpdatePacket();
     }
 
     @Override
@@ -195,7 +207,32 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
         this.readFromPacket(packet.getNbtCompound());
     }
 
-    protected void writeToPacket(NBTTagCompound compound) {}
+    protected NBTTagCompound writeToPacket(NBTTagCompound compound) {
+        return null;
+    }
 
     protected void readFromPacket(NBTTagCompound compound) {}
+
+    @Override
+    public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing side) {
+        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY) {
+            return this instanceof FluidHolder;
+        }
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
+            return this instanceof InventoryHolder;
+        }
+        return super.hasCapability(capability, side);
+    }
+
+    @Nullable
+    @Override
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing side) {
+        if (capability == CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY && this instanceof FluidHolder) {
+            return (T) this;
+        }
+        if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && this instanceof InventoryHolder) {
+            return (T) this;
+        }
+        return super.getCapability(capability, side);
+    }
 }

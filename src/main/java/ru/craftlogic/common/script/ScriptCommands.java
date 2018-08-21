@@ -4,18 +4,22 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyRuntimeException;
 import groovy.lang.GroovyShell;
 import net.minecraft.command.CommandException;
-import org.codehaus.groovy.control.MultipleCompilationErrorsException;
+import ru.craftlogic.CraftLogic;
 import ru.craftlogic.api.command.*;
+import ru.craftlogic.api.command.CommandContext.Argument;
 import ru.craftlogic.api.text.Text;
+import ru.craftlogic.api.text.TextString;
 import ru.craftlogic.api.text.TextTranslation;
 import ru.craftlogic.api.world.Player;
 import ru.craftlogic.common.script.impl.ScriptContainer;
+import ru.craftlogic.common.script.impl.ScriptContainerFile;
 import ru.craftlogic.common.script.impl.ScriptShell;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-public class ScriptCommands implements CommandRegisterer {
+public class ScriptCommands implements CommandRegistrar {
     @Command(
         name = "script",
         syntax = {
@@ -31,19 +35,24 @@ public class ScriptCommands implements CommandRegisterer {
         }
         switch (ctx.constant()) {
             case "list": {
-                ctx.sendMessage("commands.script.list");
-                ctx.sendMessage(
-                    new TextTranslation("commands.generic.list.entry")
-                );
-                TextTranslation msg = new TextTranslation("commands.script.list");
-                for (String script : scriptManager.getAllLoadedScripts()) {
-                    msg.appendTranslate("commands.script.list.entry", sub ->
-                        sub.argText(script, arg ->
-                            arg.gray().suggestCommand("/script unload " + script)
-                        )
-                    );
+                Collection<ScriptContainerFile> loadedScripts = scriptManager.getAllLoadedScripts();
+                if (loadedScripts.isEmpty()) {
+                    ctx.sendMessage(Text.translation("commands.script.list.empty").gray());
+                } else {
+                    TextTranslation msg = Text.translation("commands.script.list").yellow();
+                    boolean first = true;
+                    TextString entries = Text.string();
+                    for (ScriptContainerFile script : loadedScripts) {
+                        if (first) first = false;
+                        else entries.appendText(", ", Text::yellow);
+                        String id = script.getId();
+                        entries.appendText(script.getName(), arg ->
+                            arg.gold().hoverTextTranslate("commands.script.entry.click", a -> a.arg(id + ".gs"))
+                                      .runCommand("/script unload " + id)
+                        );
+                    }
+                    ctx.sendMessage(msg.arg(entries));
                 }
-                ctx.sendMessage(msg);
                 break;
             }
             case "load": {
@@ -53,15 +62,20 @@ public class ScriptCommands implements CommandRegisterer {
                     ScriptContainer container = scriptManager.loadScript(id, reload, true);
                     if (container != null) {
                         ctx.sendMessage(
-                            new TextTranslation("commands.script.load.success")
-                                .argText(id, Text::darkGreen)
+                            Text.translation("commands.script.load.success")
+                                .arg(id, Text::darkGreen)
                                 .green()
                         );
                     } else {
-                        ctx.sendMessage("Script loading failed");
+                        ctx.sendMessage(Text.translation("commands.script.unload.failed.generic").red());
                     }
                 } catch (Exception e) {
-                    ctx.sendMessage("Error loading script '%s': %s. See console for more details.", id, e.getMessage());
+                    ctx.sendMessage(
+                        Text.translation("commands.script.unload.failed")
+                            .arg(id)
+                            .arg(e.getMessage())
+                            .red()
+                    );
                     throw e;
                 }
                 break;
@@ -71,19 +85,19 @@ public class ScriptCommands implements CommandRegisterer {
                 try {
                     if (scriptManager.unloadScript(id)) {
                         ctx.sendMessage(
-                            new TextTranslation("commands.script.unload.success")
+                            Text.translation("commands.script.unload.success")
                                 .green()
-                                .argText(id, arg -> arg.darkGreen().suggestCommand("/script load " + id))
+                                .arg(id, arg -> arg.darkGreen().suggestCommand("/script load " + id))
                         );
                     } else {
                         ctx.sendMessage("commands.script.unload.fail.generic");
                     }
                 } catch (Exception e) {
                     ctx.sendMessage(
-                        new TextTranslation("commands.script.unload.fail")
+                        Text.translation("commands.script.unload.fail")
                             .red()
-                            .argText(id, Text::darkRed)
-                            .argText(e.getMessage(), null)
+                            .arg(id, Text::darkRed)
+                            .arg(e.getMessage(), null)
                     );
                     e.printStackTrace();
                 }
@@ -94,7 +108,7 @@ public class ScriptCommands implements CommandRegisterer {
 
     @Command(
         name = "shell>",
-        aliases = "s>",
+        aliases = {"s>", ">"},
         syntax = "<value>..."
     )
     public static void commandShell(CommandContext ctx) throws CommandException {
@@ -106,7 +120,7 @@ public class ScriptCommands implements CommandRegisterer {
         ScriptShell script;
         try {
             script = (ScriptShell) shell.parse(ctx.get("value").asString(), "@Shell");
-        } catch (MultipleCompilationErrorsException exc) {
+        } catch (GroovyRuntimeException exc) {
             String msg = exc.getMessageWithoutLocationText();
             if (msg != null) {
                 ctx.sendMessage(msg);
@@ -116,15 +130,15 @@ public class ScriptCommands implements CommandRegisterer {
             return;
         }
         Binding binding = script.getBinding();
-        binding.setVariable("server", ctx.server());
-        binding.setVariable("me", ctx.sender());
+        binding.setProperty("$server", ctx.server());
+        binding.setProperty("$me", ctx.sender());
         for (Player player : ctx.server().getOnlinePlayers()) {
-            binding.setVariable(player.getProfile().getName(), player);
+            binding.setProperty("$" + player.getProfile().getName(), player);
         }
         script.setBinding(binding);
         try {
             Object result = script.run();
-            ctx.sendMessage("[S>]: %s", result);
+            ctx.sendMessage("Returned: %s", result);
         } catch (GroovyRuntimeException exc) {
             String msg = exc.getMessageWithoutLocationText();
             if (msg != null) {
@@ -135,13 +149,29 @@ public class ScriptCommands implements CommandRegisterer {
         }
     }
 
+    @Command(
+        name = "screen",
+        syntax = {
+            "<id> <player:Player> <args>...",
+            "<id> <player:Player>",
+            "<id>"
+        }
+    )
+    public static void commandScreen(CommandContext ctx) throws CommandException {
+        String id = ctx.get("id").asString();
+        String args = ctx.getIfPresent("args", Argument::asString).orElse("");
+        Player player = ctx.getIfPresent("player", Argument::asPlayer).orElse(ctx.senderAsPlayer());
+        CraftLogic.showScreen(id, player.getEntity(), args);
+    }
+
     @ArgumentCompleter(
         type = "ScriptId"
     )
     public static List<String> completerScriptId(ArgumentCompletionContext ctx) {
         ScriptManager scriptManager = ctx.server().getScriptManager();
         List<String> result = new ArrayList<>();
-        for (String id : scriptManager.getAllLoadedScripts()) {
+        for (ScriptContainerFile script : scriptManager.getAllLoadedScripts()) {
+            String id = script.getId();
             if (id.startsWith(ctx.partialName())) {
                 result.add(id);
             }

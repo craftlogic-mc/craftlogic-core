@@ -8,7 +8,7 @@ import net.minecraft.world.World;
 import ru.craftlogic.api.block.HeatAcceptor;
 import ru.craftlogic.api.tile.TileEntityBase;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.common.CraftBlocks;
+import ru.craftlogic.api.CraftBlocks;
 import ru.craftlogic.common.block.BlockUnfiredPottery;
 
 import static ru.craftlogic.common.block.BlockUnfiredPottery.*;
@@ -50,16 +50,6 @@ public class TileEntityUnfiredPottery extends TileEntityBase implements HeatAcce
     @Override
     public int getTemperature() {
         return temperature;
-    }
-
-    @Override
-    public void setTemperature(int temperature) {
-        this.temperature = temperature;
-    }
-
-    @Override
-    public int getHotTemperature() {
-        return getMaxTemperature();
     }
 
     @Override

@@ -1,5 +1,6 @@
 package ru.craftlogic.common.block;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.BlockStoneBrick.EnumType;
 import net.minecraft.block.SoundType;
@@ -15,13 +16,15 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.common.CraftItems;
+import ru.craftlogic.api.block.Mossable;
+import ru.craftlogic.api.world.Location;
+import ru.craftlogic.api.CraftItems;
 
 import java.util.Random;
 
 import static net.minecraft.block.BlockStoneBrick.VARIANT;
 
-public class BlockCobblestone extends BlockFalling {
+public class BlockCobblestone extends BlockFalling implements Mossable {
     private final boolean mossy;
 
     public BlockCobblestone(boolean mossy) {
@@ -34,12 +37,6 @@ public class BlockCobblestone extends BlockFalling {
         this.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
         this.setTickRandomly(true);
     }
-
-    public boolean isMossy() {
-        return this.mossy;
-    }
-
-    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {}
 
     @Override
     public void randomTick(World world, BlockPos pos, IBlockState state, Random rand) {
@@ -77,9 +74,17 @@ public class BlockCobblestone extends BlockFalling {
                                     BlockPos offsetPos = pos.add(x, y, z);
                                     IBlockState s = world.getBlockState(offsetPos);
                                     if (rand.nextInt(4) == 0) {
-                                        if (s.getBlock() == Blocks.COBBLESTONE) {
+                                        Block b = s.getBlock();
+                                        if (b instanceof Mossable) {
+                                            Mossable mossable = ((Mossable) b);
+                                            Location l = new Location(world, offsetPos);
+                                            if (!mossable.isMossy(l)) {
+                                                mossable.growMoss(l);
+                                            }
+                                        }
+                                        if (b == Blocks.COBBLESTONE) {
                                             world.setBlockState(offsetPos, Blocks.MOSSY_COBBLESTONE.getDefaultState(), loaded ? 3 : 2);
-                                        } else if (s.getBlock() == Blocks.STONEBRICK && s.getValue(VARIANT) == EnumType.DEFAULT) {
+                                        } else if (b == Blocks.STONEBRICK && s.getValue(VARIANT) == EnumType.DEFAULT) {
                                             world.setBlockState(offsetPos, s.withProperty(VARIANT, EnumType.MOSSY), loaded ? 3 : 2);
                                         }
                                     }
@@ -111,7 +116,7 @@ public class BlockCobblestone extends BlockFalling {
 
     @Override
     public int quantityDropped(Random random) {
-        return random.nextInt(4) + 1;
+        return 1 + random.nextInt(4);
     }
 
     @Override
@@ -121,5 +126,20 @@ public class BlockCobblestone extends BlockFalling {
         if (this.mossy && rand.nextInt(4) == 0) {
             drops.add(new ItemStack(CraftItems.MOSS));
         }
+    }
+
+    @Override
+    public boolean isMossy(Location location) {
+        return this.mossy;
+    }
+
+    @Override
+    public boolean growMoss(Location location) {
+        if (!this.mossy) {
+            boolean loaded = location.isAreaLoaded(32);
+            location.setBlock(Blocks.MOSSY_COBBLESTONE, loaded ? 3 : 2);
+            return true;
+        }
+        return false;
     }
 }

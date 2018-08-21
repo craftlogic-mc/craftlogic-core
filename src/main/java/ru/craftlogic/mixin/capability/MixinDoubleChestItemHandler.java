@@ -22,14 +22,18 @@ import static ru.craftlogic.common.block.ChestProperties.PART;
 
 @Mixin(VanillaDoubleChestItemHandler.class)
 public abstract class MixinDoubleChestItemHandler extends WeakReference<TileEntityChest> implements IItemHandlerModifiable {
-    @Shadow @Final
+    @Shadow(remap = false) @Final
     public static VanillaDoubleChestItemHandler NO_ADJACENT_CHESTS_INSTANCE;
 
     public MixinDoubleChestItemHandler(TileEntityChest referent) {
         super(referent);
     }
 
-    @Overwrite
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
+    @Overwrite(remap = false)
     @Nullable
     public static VanillaDoubleChestItemHandler get(TileEntityChest chest) {
         World world = chest.getWorld();

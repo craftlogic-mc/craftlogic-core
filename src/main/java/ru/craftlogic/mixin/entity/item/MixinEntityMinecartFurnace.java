@@ -27,44 +27,55 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.craftlogic.CraftLogic;
-import ru.craftlogic.api.inventory.manager.InventoryItemManager;
-import ru.craftlogic.api.inventory.manager.ListInventoryItemManager;
+import ru.craftlogic.api.inventory.InventoryFieldHolder;
+import ru.craftlogic.api.inventory.manager.InventoryManager;
+import ru.craftlogic.api.inventory.manager.ListInventoryManager;
+import ru.craftlogic.api.sound.EntitySoundSource;
+import ru.craftlogic.api.util.TemperatureBuffer;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.common.CraftBlocks;
-import ru.craftlogic.common.CraftItems;
-import ru.craftlogic.common.CraftSounds;
+import ru.craftlogic.api.CraftBlocks;
+import ru.craftlogic.api.CraftItems;
+import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.common.block.BlockFurnace;
 import ru.craftlogic.common.item.ItemCrowbar;
 import ru.craftlogic.util.Furnace;
 
 import java.util.Random;
 
-import static ru.craftlogic.common.CraftSounds.FURNACE_VENT_CLOSE;
-import static ru.craftlogic.common.CraftSounds.FURNACE_VENT_OPEN;
+import static ru.craftlogic.api.CraftSounds.FURNACE_VENT_CLOSE;
+import static ru.craftlogic.api.CraftSounds.FURNACE_VENT_OPEN;
 import static ru.craftlogic.util.Furnace.getItemBurnTemperature;
 import static ru.craftlogic.util.Furnace.getItemBurnTime;
 
 @Mixin(EntityMinecartFurnace.class)
 public abstract class MixinEntityMinecartFurnace extends EntityMinecart implements Furnace {
     private static final DataParameter<Boolean> OPEN = EntityDataManager.createKey(EntityMinecartFurnace.class, DataSerializers.BOOLEAN);
-    private static final DataParameter<Integer> TEMPERATURE = EntityDataManager.createKey(EntityMinecartFurnace.class, DataSerializers.VARINT);
-    private static final DataParameter<Integer> HOT_TEMPERATURE = EntityDataManager.createKey(EntityMinecartFurnace.class, DataSerializers.VARINT);
-    private static final DataParameter<Integer> MAX_TEMPERATURE = EntityDataManager.createKey(EntityMinecartFurnace.class, DataSerializers.VARINT);
 
     private int maxFuel;
     @SideOnly(Side.CLIENT) private int prevTemperature;
     @Shadow private int fuel;
     @Shadow public double pushX, pushZ;
+    private TemperatureBuffer temperature = new TemperatureBuffer(2000);
 
     private NonNullList<ItemStack> inventory = NonNullList.withSize(2, ItemStack.EMPTY);
+    @SideOnly(Side.CLIENT)
+    private boolean soundPlaying;
 
     public MixinEntityMinecartFurnace(World world) {
         super(world);
     }
 
     @Override
-    public InventoryItemManager getItemManager() {
-        return new ListInventoryItemManager(this.inventory);
+    public InventoryManager getInventoryManager() {
+        return new ListInventoryManager(this.inventory);
+    }
+
+    @Override
+    public void addSyncFields(InventoryFieldHolder fieldHolder) {
+        fieldHolder.addReadOnlyField(FurnaceField.FUEL, this::getFuel);
+        fieldHolder.addReadOnlyField(FurnaceField.MAX_FUEL, this::getMaxFuel);
+        fieldHolder.addReadOnlyField(FurnaceField.TEMPERATURE, this::getTemperature);
+        fieldHolder.addReadOnlyField(FurnaceField.MAX_TEMPERATURE, this::getMaxTemperature);
     }
 
     @Override
@@ -88,26 +99,19 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
     @Inject(method = "entityInit", at = @At("RETURN"))
     protected void entityInit(CallbackInfo info) {
         this.dataManager.register(OPEN, true);
-        this.dataManager.register(TEMPERATURE, 0);
-        this.dataManager.register(HOT_TEMPERATURE, 2000);
-        this.dataManager.register(MAX_TEMPERATURE, 2200);
     }
 
     @Inject(method = "writeEntityToNBT", at = @At("RETURN"))
     protected void writeEntityToNBT(NBTTagCompound compound, CallbackInfo info) {
         compound.setBoolean("Open", this.isFurnaceOpen());
-        compound.setInteger("Temperature", this.getTemperature());
-        compound.setInteger("HotTemperature", this.getHotTemperature());
-        compound.setInteger("MaxTemperature", this.getMaxTemperature());
+        this.temperature.writeToNBT(compound, "Temperature");
         ItemStackHelper.saveAllItems(compound, this.inventory);
     }
 
     @Inject(method = "readEntityFromNBT", at = @At("RETURN"))
     protected void readEntityFromNBT(NBTTagCompound compound, CallbackInfo info) {
         this.setFurnaceOpen(compound.getBoolean("Open"));
-        this.setTemperature(compound.getInteger("Temperature"));
-        this.setHotTemperature(compound.getInteger("HotTemperature"));
-        this.setMaxTemperature(compound.getInteger("MaxTemperature"));
+        this.temperature.readFromNBT(compound, "Temperature");
         ItemStackHelper.loadAllItems(compound, this.inventory);
     }
 
@@ -119,6 +123,10 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
         this.dataManager.set(OPEN, open);
     }
 
+    /**
+     * @author Radviger
+     * @reason Better furnace minecarts
+     */
     @Overwrite
     public IBlockState getDefaultDisplayTile() {
         return CraftBlocks.FURNACE.getDefaultState()
@@ -126,20 +134,20 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
                 .withProperty(BlockFurnace.OPEN, this.isFurnaceOpen());
     }
 
+    /**
+     * @author Radviger
+     * @reason Better furnace minecarts
+     */
     @Overwrite
     public void onUpdate() {
         super.onUpdate();
         if (!this.world.isRemote) {
             Location location = this.getLocation();
             boolean closed = !this.isFurnaceOpen();
-            int envTemperature = this.getEnvironmentTemperature();
-            if (envTemperature > this.getTemperature()) {
-                this.setTemperature(this.getTemperature() + Math.max(1, (envTemperature - this.getTemperature()) / 4));
-            }
             if (this.getTemperature() >= this.getMaxTemperature()) {
                 location.explode(null, 1F, true, false);
             } else {
-                if (this.getTemperature() >= this.getHotTemperature()) {
+                if (this.getTemperature() >= this.getMaxTemperature()) {
                     Random rand = this.world.rand;
 
                     if (rand.nextInt(10) == 0) {
@@ -150,7 +158,7 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
                     }
                 }
                 if (this.fuel <= 0 && this.ticksExisted % (closed ? 4 : 8) == 0) {
-                    this.setTemperature(Math.max(envTemperature, (this.getTemperature() - (closed ? 1 : 2))));
+                    this.temperature.drain(closed ? 1 : 2, false);
                 }
                 boolean active = this.fuel > 0;
                 if (this.isMinecartPowered() != active) {
@@ -165,7 +173,7 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
 
             if (this.fuel > 0) {
                 if (this.ticksExisted % 4 == 0) {
-                    this.setTemperature(this.getTemperature() + 1);
+                    this.temperature.accept(1, false);
                     int mod = (int) (10F * getScaledTemperature());
                     this.fuel = Math.max(0, this.fuel - (closed ? 4 : 8) * Math.max(1, mod));
                 }
@@ -188,45 +196,34 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
             if (this.isMinecartPowered() && this.rand.nextInt(4) == 0) {
                 this.world.spawnParticle(EnumParticleTypes.SMOKE_LARGE, this.posX, this.posY + 0.8, this.posZ, 0.0, 0.0, 0.0);
             }
-        }
-    }
-
-    @Override
-    public void notifyDataManagerChange(DataParameter<?> parameter) {
-        if (parameter == TEMPERATURE && this.world.isRemote) {
-            if (this.getTemperature() >= this.getHotTemperature() / 2 && prevTemperature < this.getHotTemperature() / 2) {
-                CraftLogic.playSound(this, CraftSounds.FURNACE_HOT_LOOP);
+            if (this.getTemperature() >= this.getMaxTemperature() / 3 && prevTemperature < this.getMaxTemperature() / 3) {
+                this.world.setEntityState(this, (byte) 1);
+            } else if (this.getTemperature() < this.getMaxTemperature() / 3 && prevTemperature >= this.getMaxTemperature() / 3) {
+                this.world.setEntityState(this, (byte) 0);
             }
             prevTemperature = this.getTemperature();
         }
     }
 
     @Override
+    public void notifyDataManagerChange(DataParameter<?> parameter) {
+
+    }
+
+
+    @Override
+    public void dropTemperature(int amount, boolean simulate) {
+        this.temperature.drain(amount, simulate);
+    }
+
+    @Override
     public int getTemperature() {
-        return this.dataManager.get(TEMPERATURE);
-    }
-
-    @Override
-    public void setTemperature(int temperature) {
-        this.dataManager.set(TEMPERATURE, temperature);
-    }
-
-    @Override
-    public int getHotTemperature() {
-        return this.dataManager.get(HOT_TEMPERATURE);
-    }
-
-    private void setHotTemperature(int hotTemperature) {
-        this.dataManager.set(HOT_TEMPERATURE, hotTemperature);
+        return this.temperature.getStored();
     }
 
     @Override
     public int getMaxTemperature() {
-        return this.dataManager.get(MAX_TEMPERATURE);
-    }
-
-    public void setMaxTemperature(int maxTemperature) {
-        this.dataManager.set(MAX_TEMPERATURE, maxTemperature);
+        return this.temperature.getCapacity();
     }
 
     @Override
@@ -239,6 +236,10 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
         return maxFuel;
     }
 
+    /**
+     * @author Radviger
+     * @reason Better furnace minecarts
+     */
     @Overwrite
     public boolean processInitialInteract(EntityPlayer player, EnumHand hand) {
         ItemStack heldItem = player.getHeldItem(hand);
@@ -268,7 +269,7 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
                     player.setHeldItem(hand, itemType.getContainerItem(heldItem));
                     player.openContainer.detectAndSendChanges();
                 }
-                this.dropTemperature(100);
+                this.dropTemperatureWithEffect(100);
             } else if (itemType == Items.POTIONITEM && PotionUtils.getPotionFromItem(heldItem) == PotionTypes.WATER) {
                 if (!player.capabilities.isCreativeMode) {
                     heldItem.shrink(1);
@@ -277,7 +278,7 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
                     }
                     player.openContainer.detectAndSendChanges();
                 }
-                this.dropTemperature(10);
+                this.dropTemperatureWithEffect(10);
             } else if (itemType instanceof ItemCrowbar) {
                 this.pushX = (this.posX - player.posX) / 500.0;
                 this.pushZ = (this.posZ - player.posZ) / 500.0;
@@ -288,11 +289,33 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
         return true;
     }
 
+    /**
+     * @author Radviger
+     * @reason Better furnace minecarts
+     */
     @Overwrite
     public void killMinecart(DamageSource damageSource) {
         super.killMinecart(damageSource);
         if (!damageSource.isExplosion() && this.world.getGameRules().getBoolean("doEntityDrops")) {
             this.entityDropItem(new ItemStack(CraftBlocks.FURNACE), 0F);
+        }
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void handleStatusUpdate(byte status) {
+        if (status == 1 && !this.soundPlaying) {
+            CraftSounds.playSound(new EntitySoundSource(this, e -> {
+                if (!this.soundPlaying || this.isDead) {
+                    this.soundPlaying = false;
+                    return false;
+                } else {
+                    return true;
+                }
+            }, null), CraftSounds.FURNACE_HOT_LOOP);
+            this.soundPlaying = true;
+        } else if (status == 0 && this.soundPlaying) {
+            this.soundPlaying = false;
         }
     }
 }

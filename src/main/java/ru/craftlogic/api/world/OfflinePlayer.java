@@ -6,8 +6,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
-import ru.craftlogic.api.entity.Permissible;
-import ru.craftlogic.api.server.Server;
+import ru.craftlogic.api.Server;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -16,6 +15,7 @@ public class OfflinePlayer implements Permissible {
     protected final Server server;
     protected final GameProfile profile;
     protected FakePlayer fakeEntity;
+    protected boolean loadedData;
 
     public OfflinePlayer(Server server, GameProfile profile) {
         this.server = server;
@@ -45,7 +45,7 @@ public class OfflinePlayer implements Permissible {
     }
 
     public boolean isBypassesPlayerLimit() {
-        return this.server.isBypassesPlayerLimit(this.profile);
+        return this.server.isPlayerBypassesPlayerLimit(this.profile);
     }
 
     public boolean isWhitelisted() {
@@ -60,6 +60,24 @@ public class OfflinePlayer implements Permissible {
         return this.server.isPlayerOnline(this.profile);
     }
 
+    public long getLastPlayed(World world) {
+        if (this.loadData(world, true)) {
+            return this.asFake(world).getLastActiveTime();
+        } else {
+            return 0;
+        }
+    }
+
+    public Location getLastLocation(World world) {
+        if (this.loadData(world, true)) {
+            FakePlayer data = this.asFake(world);
+            return new Location(world.getHandle(), data.posX, data.posY, data.posZ, data.rotationYaw, data.rotationPitch);
+        } else {
+            return null;
+        }
+    }
+
+
     public GameProfile getProfile() {
         return this.profile;
     }
@@ -73,9 +91,12 @@ public class OfflinePlayer implements Permissible {
     }
 
     public boolean loadData(World world, boolean reload) {
-        if (this.fakeEntity == null || reload) {
+        if ((this.fakeEntity == null || reload) && !this.loadedData) {
             NBTTagCompound data = this.server.loadOfflinePlayerData(this.asFake(world));
-            return data != null;
+            if (data != null) {
+                this.loadedData = true;
+                return true;
+            }
         }
         return false;
     }

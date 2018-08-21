@@ -1,0 +1,6 @@
+{
+    "parent": "craftlogic:block/barrel/_normal",
+    "textures": {
+        "all": "blocks/planks_spruce"
+    }
+}

@@ -7,7 +7,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import org.spongepowered.asm.mixin.Mixin;
-import ru.craftlogic.common.CraftBlocks;
+import ru.craftlogic.api.CraftBlocks;
 
 @Mixin(BlockFurnace.class)
 public class MixinBlockFurnace extends Block {

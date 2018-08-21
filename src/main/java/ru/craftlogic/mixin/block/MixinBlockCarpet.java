@@ -17,6 +17,10 @@ public abstract class MixinBlockCarpet extends Block {
         super(Material.CLOTH);
     }
 
+    /**
+     * @author Radviger
+     * @reason Place carpets over solid blocks only (and glass)
+     */
     @Overwrite
     private boolean canBlockStay(World world, BlockPos pos) {
         IBlockState state = world.getBlockState(pos.down());

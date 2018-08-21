@@ -1,0 +1,25 @@
+{
+  "conditions": [
+    {
+      "type": "minecraft:item_exists",
+      "item": "minecraft:chainmail_boots"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "A A",
+    "B B"
+  ],
+  "key": {
+    "A": {
+      "item": "craftlogic:chain_mesh"
+    },
+    "B": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "item": "minecraft:chainmail_boots",
+    "count": 1
+  }
+}

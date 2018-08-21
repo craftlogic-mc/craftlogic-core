@@ -21,9 +21,7 @@ apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'idea'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-version = "0.0.1-ALPHA"
-group = "ru.craftlogic" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "craftlogic"
+archivesBaseName = project.modid
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileJava {
@@ -31,7 +29,7 @@ compileJava {
 }
 
 minecraft {
-    version = "1.12.2-14.23.4.2703"
+    version = project.forge_version
     runDir = "run"
     
     // the mappings can be changed at any time, and must be in the following format.
@@ -39,14 +37,15 @@ minecraft {
     // stable_#            stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20180324"
+    mappings = project.mappings
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     useDepAts = true
+    replace '{@mod:version}': project.version, '{@mod:id}': project.modid, '{@mc:version}': project.minecraft_version
 }
 
 runClient {
     jvmArgs '-Dfml.coreMods.load=ru.craftlogic.coremod.CraftLogicCoremod'
-    args '--username', 'Radviger'
+    args '--username', project.username
 }
 
 repositories {
@@ -80,9 +79,19 @@ task repack {
     }
 }
 
+task sourcesJar(type: Jar) {
+    from(sourceSets.main.allSource)
+    classifier = 'sources'
+}
+
+task deobfJar(type: Jar) {
+    from(sourceSets.main.output)
+    classifier = 'dev'
+}
+
 dependencies {
     // https://mvnrepository.com/artifact/org.spongepowered/mixin
-    extend(group: 'org.spongepowered', name: 'mixin', version: '0.7.7-SNAPSHOT') {
+    extend (group: 'org.spongepowered', name: 'mixin', version: '0.7.7-SNAPSHOT') {
         exclude module: 'launchwrapper'
         exclude module: 'guava'
         exclude module: 'gson'
@@ -135,29 +144,21 @@ processResources {
     }
 }
 
-def runClient = false
-
-tasks.whenTaskAdded { task ->
-    if (task.name == 'runClient') {
-        runClient = true
-    }
-}
-
 jar {
     manifest {
-        attributes (
+        def a = [
             'FMLAT': 'craftlogic_at.cfg',
             'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
             'TweakOrder': '0',
             'MixinConfigs': 'mixins.craftlogic.json',
-            'FMLCorePlugin': 'ru.craftlogic.coremod.CraftLogicCoremod',
-            'ForceLoadAsMod': 'true'
-        )
-        if (!runClient) {
-            attributes (
-                'FMLCorePluginContainsFMLMod': 'true'
-            )
+            'FMLCorePlugin': 'ru.craftlogic.coremod.CraftLogicCoremod'
+        ]
+        if (!gradle.startParameter.taskNames.contains('runClient')) {
+            println 'Not running'
+            a['FMLCorePluginContainsFMLMod'] = 'true'
+            a['ForceLoadAsMod'] = 'true'
         }
+        attributes (a)
     }
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -168,3 +169,8 @@ jar {
 }
 
 jar.dependsOn(repack)
+
+artifacts {
+    archives sourcesJar
+    archives deobfJar
+}

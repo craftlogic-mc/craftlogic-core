@@ -11,6 +11,11 @@ public class WrappedCommandSender implements CommandSender {
     }
 
     @Override
+    public String getName() {
+        return sender.getName();
+    }
+
+    @Override
     public ICommandSender getHandle() {
         return sender;
     }

@@ -41,15 +41,27 @@ public interface ThrowableItem {
         return 0F;
     }
 
+    default float getProjectileGravityVelocity(EntityThrownItem item) {
+        return 0.06F;
+    }
+
+    default int getProjectileCooldown(EntityPlayer player, ItemStack item) {
+        return 20;
+    }
+
     default ActionResult<ItemStack> shoot(World world, EntityPlayer player, ItemStack item) {
         Location playerLocation = new Location(player);
         playerLocation.playSound(SoundEvents.ENTITY_EGG_THROW, SoundCategory.PLAYERS, 0.5F, 0.4F / (world.rand.nextFloat() * 0.4F + 0.8F));
+        int cooldown = this.getProjectileCooldown(player, item);
+        if (cooldown > 0) {
+            player.getCooldownTracker().setCooldown(item.getItem(), cooldown);
+        }
         if (!player.capabilities.isCreativeMode) {
             item.shrink(1);
         }
         if (!world.isRemote) {
-            EntityThrownItem entity = new EntityThrownItem(world, player, item);
-            entity.shoot(player, player.rotationPitch, player.rotationYaw, 0F, 1.5F, 1F);
+            EntityThrownItem entity = new EntityThrownItem(world, player, item, !player.capabilities.isCreativeMode);
+            entity.shoot(player, player.rotationPitch, player.rotationYaw, -20F, 0.5F, 1F);
             world.spawnEntity(entity);
             player.addStat(StatList.getObjectUseStats(item.getItem()));
         }

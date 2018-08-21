@@ -31,6 +31,10 @@ public class MixinCraftingManager {
     @Shadow @Final
     private static Logger LOGGER;
 
+    /**
+     * @author Radviger
+     * @reason Dirty hook //FIXME!
+     */
     @Overwrite
     private static boolean parseJsonRecipes() {
         FileSystem filesystem = null;

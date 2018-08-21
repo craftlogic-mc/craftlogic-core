@@ -6,7 +6,6 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemMinecart;
 import net.minecraft.item.ItemStack;
@@ -17,12 +16,17 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import ru.craftlogic.api.CraftSounds;
 
 @Mixin(ItemMinecart.class)
 public class MixinItemMinecart extends Item {
     @Shadow @Final
     private EntityMinecart.Type minecartType;
 
+    /**
+     * @author Radviger
+     * @reason Custom minecart sounds
+     */
     @Overwrite
     public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         IBlockState state = world.getBlockState(pos);
@@ -43,7 +47,7 @@ public class MixinItemMinecart extends Item {
                     cart.setCustomNameTag(heldItem.getDisplayName());
                 }
 
-                world.playSound(null, pos, SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.BLOCKS, 1F, 1F);
+                world.playSound(null, pos, CraftSounds.CART_PLACE, SoundCategory.PLAYERS, 1F, 0.7F + world.rand.nextFloat() * 0.3F);
                 world.spawnEntity(cart);
             }
 

@@ -8,22 +8,26 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.common.CraftItems;
+import ru.craftlogic.api.block.Mossable;
+import ru.craftlogic.api.world.Location;
+import ru.craftlogic.api.CraftItems;
 
 import java.util.Random;
 
 import static net.minecraft.block.BlockStoneBrick.VARIANT;
 
-public class BlockStoneBrick extends BlockFalling {
+public class BlockStoneBrick extends BlockFalling implements Mossable {
     public BlockStoneBrick() {
         super(Material.ROCK);
         this.setTickRandomly(true);
@@ -108,7 +112,7 @@ public class BlockStoneBrick extends BlockFalling {
             } else if (humidity > heat) {
                 if (state.getValue(VARIANT) == EnumType.DEFAULT) {
                     if (rand.nextInt(30) == 0) {
-                        world.setBlockState(pos, state.withProperty(VARIANT, EnumType.MOSSY));
+                        this.growMoss(new Location(world, pos));
                     }
                 } else {
                     for (int x = -1; x <= 1; x++) {
@@ -116,12 +120,15 @@ public class BlockStoneBrick extends BlockFalling {
                             for (int z = -1; z <= 1; z++) {
                                 if (x != 0 && y != 0 && z != 0) {
                                     BlockPos offsetPos = pos.add(x, y, z);
-                                    IBlockState s = world.getBlockState(offsetPos);
                                     if (rand.nextInt(4) == 0) {
-                                        if (s.getBlock() == Blocks.COBBLESTONE) {
-                                            world.setBlockState(offsetPos, Blocks.MOSSY_COBBLESTONE.getDefaultState());
-                                        } else if (s.getBlock() == Blocks.STONEBRICK && s.getValue(VARIANT) == EnumType.DEFAULT) {
-                                            world.setBlockState(offsetPos, s.withProperty(VARIANT, EnumType.MOSSY));
+                                        IBlockState s = world.getBlockState(offsetPos);
+                                        Block block = s.getBlock();
+                                        if (block instanceof Mossable) {
+                                            Mossable mossable = (Mossable) block;
+                                            Location l = new Location(world, offsetPos);
+                                            if (!mossable.isMossy(l)) {
+                                                mossable.growMoss(l);
+                                            }
                                         }
                                     }
                                 }
@@ -165,5 +172,25 @@ public class BlockStoneBrick extends BlockFalling {
         if (state.getValue(VARIANT) == EnumType.MOSSY && rand.nextInt(4) == 0) {
             drops.add(new ItemStack(CraftItems.MOSS));
         }
+    }
+
+    @Override
+    public boolean isMossy(Location location) {
+        return location.getBlockProperty(VARIANT) == EnumType.MOSSY;
+    }
+
+    @Override
+    public boolean growMoss(Location location) {
+        if (location.getBlockProperty(VARIANT) == EnumType.DEFAULT) {
+            boolean loaded = location.isAreaLoaded(32);
+            location.setBlockProperty(VARIANT, EnumType.MOSSY, loaded ? 3 : 2);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer p_getPickBlock_5_) {
+        return super.getPickBlock(state, target, world, pos, p_getPickBlock_5_);
     }
 }

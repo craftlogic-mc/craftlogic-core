@@ -2,7 +2,6 @@ package ru.craftlogic.common.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
-import net.minecraft.block.BlockPumpkin;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
@@ -28,7 +27,7 @@ import ru.craftlogic.api.block.Colored;
 import ru.craftlogic.api.block.Growable;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.api.world.WorldNameable;
-import ru.craftlogic.common.CraftBlocks;
+import ru.craftlogic.api.CraftBlocks;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -96,7 +95,7 @@ public class BlockGourd extends BlockBase implements Colored, Growable {
     }
 
     @Override
-    protected void updateTick(Location location, Random rand) {
+    protected void randomTick(Location location, Random rand) {
         if (location.isAreaLoaded(1)) {
             if (location.offset(EnumFacing.UP).getLightFromNeighbors() >= 9) {
                 BlockPos pos = location.getPos();
@@ -140,24 +139,12 @@ public class BlockGourd extends BlockBase implements Colored, Growable {
 
     @Override
     public Item getItemDropped(IBlockState state, Random random, int fortune) {
-        switch (this.variant) {
-            case MELON:
-                return Items.MELON_SEEDS;
-            case PUMPKIN:
-                return Items.PUMPKIN_SEEDS;
-        }
-        return super.getItemDropped(state, random, fortune);
+        return Items.AIR;
     }
 
     @Override
     public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-        switch (this.variant) {
-            case MELON:
-                return new ItemStack(Items.MELON_SEEDS);
-            case PUMPKIN:
-                return new ItemStack(Items.PUMPKIN_SEEDS);
-        }
-        return super.getPickBlock(state, target, world, pos, player);
+        return new ItemStack(this.variant.seed.get());
     }
 
     @Override
@@ -175,24 +162,26 @@ public class BlockGourd extends BlockBase implements Colored, Growable {
             switch (this.variant) {
                 case MELON:
                     location.setBlockState(Blocks.MELON_BLOCK.getDefaultState()
-                            .withProperty(BlockPumpkin.FACING, state.getValue(FACING).getOpposite()));
+                            .withProperty(BlockHorizontal.FACING, state.getValue(FACING).getOpposite()));
                     break;
                 case PUMPKIN:
                     location.setBlockState(Blocks.PUMPKIN.getDefaultState()
-                            .withProperty(BlockPumpkin.FACING, state.getValue(FACING).getOpposite()));
+                            .withProperty(BlockHorizontal.FACING, state.getValue(FACING).getOpposite()));
                     break;
             }
         }
     }
 
     public enum GourdVariant implements WorldNameable {
-        MELON(() -> CraftBlocks.MELON),
-        PUMPKIN(() -> CraftBlocks.PUMPKIN);
+        MELON(() -> CraftBlocks.MELON, () -> Items.MELON_SEEDS),
+        PUMPKIN(() -> CraftBlocks.PUMPKIN, () -> Items.PUMPKIN_SEEDS);
 
         public final Supplier<BlockGourd> crop;
+        public final Supplier<Item> seed;
 
-        GourdVariant(Supplier<BlockGourd> crop) {
+        GourdVariant(Supplier<BlockGourd> crop, Supplier<Item> seed) {
             this.crop = crop;
+            this.seed = seed;
         }
     }
 }

@@ -4,6 +4,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.GlStateManager.DestFactor;
+import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,8 +30,12 @@ public interface ElementContainer {
     Tessellator getTessellator();
     Minecraft getClient();
     double getZLevel();
+    int getWindowWidth();
+    int getWindowHeight();
     int getWidth();
     int getHeight();
+    int getLocalX();
+    int getLocalY();
 
     void drawBackground(int mouseX, int mouseY, float deltaTime);
     void drawForeground(int mouseX, int mouseY, float deltaTime);
@@ -46,6 +53,39 @@ public interface ElementContainer {
 
     void bindTexture(ResourceLocation texture, int width, int height);
 
+    default void drawColoredRect(double x, double y, double w, double h, int color) {
+        this.drawGradientRect(x, y, w, h, color, color);
+    }
+
+    default void drawGradientRect(double x, double y, double w, double h, int from, int to) {
+        float fa = from < 0 || from > 0xFFFFF ? (float)(from >> 24 & 255) / 255.0F : 1F;
+        float fr = (float)(from >> 16 & 255) / 255.0F;
+        float fg = (float)(from >> 8 & 255) / 255.0F;
+        float fb = (float)(from & 255) / 255.0F;
+        float ta = to < 0 || to > 0xFFFFF ? (float)(to >> 24 & 255) / 255.0F : 1F;
+        float tr = (float)(to >> 16 & 255) / 255.0F;
+        float tg = (float)(to >> 8 & 255) / 255.0F;
+        float tb = (float)(to & 255) / 255.0F;
+        double z = getZLevel();
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
+        GlStateManager.shadeModel(7425);
+        Tessellator tess = Tessellator.getInstance();
+        BufferBuilder buffer = tess.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+        buffer.pos(x + w, y, z).color(fr, fg, fb, fa).endVertex();
+        buffer.pos(x, y, z).color(fr, fg, fb, fa).endVertex();
+        buffer.pos(x, y + h, z).color(tr, tg, tb, ta).endVertex();
+        buffer.pos(x + w, y + h, z).color(tr, tg, tb, ta).endVertex();
+        tess.draw();
+        GlStateManager.shadeModel(7424);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
+    }
+    
     default void drawTexturedRect(double x, double y, double w, double h) {
         drawTexturedRect(x, y, w, h, 0, 0);
     }
@@ -58,12 +98,20 @@ public interface ElementContainer {
         float r = (float)((rgba >> 16) & 0xFF) / 255F;
         float g = (float)((rgba >> 8) & 0xFF) / 255F;
         float b = (float)((rgba >> 0) & 0xFF) / 255F;
-        float a = rgba < 0 /*DIRTY HOOKS, YOU ARE WELCOME!*/ ? (float)((rgba >> 24) & 0xFF) / 255F : 1F;
+        float a = rgba < 0 || rgba > 0xFFFFFF ? (float)((rgba >> 24) & 0xFF) / 255F : 1F;
         drawTexturedRect(x, y, w, h, tx, ty, r, g, b, a);
     }
-
+    
     default void drawTexturedRect(double x, double y, double w, double h, double tx, double ty, float r, float g, float b, float a) {
         this.drawTexturedRect(x, y, w, h, tx, ty, w, h, r, g, b, a);
+    }
+
+    default void drawTexturedRect(double x, double y, double w, double h, double tx, double ty, double tw, double th, int rgba) {
+        float r = (float)((rgba >> 16) & 0xFF) / 255F;
+        float g = (float)((rgba >> 8) & 0xFF) / 255F;
+        float b = (float)((rgba >> 0) & 0xFF) / 255F;
+        float a = rgba < 0 || rgba > 0xFFFFF ? (float)((rgba >> 24) & 0xFF) / 255F : 1F;
+        this.drawTexturedRect(x, y, w, h, tx, ty, tw, th, r, g, b, a);
     }
 
     default void drawTexturedRect(double x, double y, double w, double h, double tx, double ty, double tw, double th, float r, float g, float b, float a) {
@@ -139,7 +187,9 @@ public interface ElementContainer {
     }
 
     default void drawTooltip(List<String> lines, int x, int y, int maxTextWidth) {
-        GuiUtils.drawHoveringText(lines, x, y, getWidth(), getHeight(), maxTextWidth, getFontRenderer());
+        x -= getLocalX();
+        y -= getLocalY();
+        GuiUtils.drawHoveringText(lines, x, y, getWindowWidth(), getWindowHeight(), maxTextWidth, getFontRenderer());
     }
 
     default void playSound(SoundEvent sound) {

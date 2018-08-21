@@ -9,7 +9,7 @@ import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
 import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.common.CraftBlocks;
+import ru.craftlogic.api.CraftBlocks;
 import ru.craftlogic.common.tileentity.TileEntitySmeltingVat;
 
 public class BlockSmeltingVat extends BlockBase implements TileEntityHolder<TileEntitySmeltingVat> {

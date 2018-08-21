@@ -13,5 +13,80 @@
     "category": "block",
     "subtitle": "craftlogic.subtitle.furnace_hot_loop",
     "sounds": [ "craftlogic:furnace/hot_loop" ]
+  },
+  "balance.add": {
+  	"category": "player",
+    "subtitle": "craftlogic.subtitle.balance_add",
+    "sounds": [ "craftlogic:balance/add" ]
+  },
+  "balance.subtract": {
+  	"category": "player",
+    "subtitle": "craftlogic.subtitle.balance_subtract",
+    "sounds": [ "craftlogic:balance/subtract" ]
+  },
+  "countdown.tick": {
+    "category": "ambient",
+    "subtitle": "craftlogic.subtitle.countdown_tick",
+    "sounds": [ "craftlogic:tick" ]
+  },
+  "cart.place": {
+    "category": "player",
+    "subtitle": "craftlogic.subtitle.cart_place",
+    "sounds": [ "craftlogic:cart/place" ]
+  },
+  "cart.loading": {
+    "category": "player",
+    "subtitle": "craftlogic.subtitle.cart_loading",
+    "sounds": [ "craftlogic:cart/loading" ]
+  },
+  "heal": {
+    "category": "player",
+    "subtitle": "craftlogic.subtitle.heal",
+    "sounds": [ "craftlogic:heal" ]
+  },
+  "hint": {
+    "category": "player",
+    "subtitle": "craftlogic.subtitle.hint",
+    "sounds": [ "craftlogic:hint" ]
+  },
+  "warning": {
+    "category": "player",
+    "subtitle": "craftlogic.subtitle.warning",
+    "sounds": [ "craftlogic:warning" ]
+  },
+  "level_up": {
+    "category": "player",
+    "subtitle": "craftlogic.subtitle.level_up",
+    "sounds": [ "craftlogic:level_up" ]
+  },
+  "spell": {
+    "category": "player",
+    "subtitle": "craftlogic.subtitle.spell",
+    "sounds": [ "craftlogic:spell" ]
+  },
+  "slow": {
+    "category": "player",
+    "subtitle": "craftlogic.subtitle.slow",
+    "sounds": [ "craftlogic:slow" ]
+  },
+  "hide": {
+    "category": "player",
+    "subtitle": "craftlogic.subtitle.hide",
+    "sounds": [ "craftlogic:hide" ]
+  },
+  "kick": {
+    "category": "player",
+    "subtitle": "craftlogic.subtitle.kick",
+    "sounds": [ "craftlogic:kick" ]
+  },
+  "ban": {
+    "category": "player",
+    "subtitle": "craftlogic.subtitle.ban",
+    "sounds": [ "craftlogic:ban" ]
+  },
+  "tomes": {
+    "category": "player",
+    "subtitle": "craftlogic.subtitle.tomes",
+    "sounds": [ "craftlogic:tomes" ]
   }
 }

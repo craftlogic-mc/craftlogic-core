@@ -21,10 +21,17 @@ import javax.annotation.Nullable;
 @Mixin(targets = "net/minecraft/item/ItemCompass$1")
 public abstract class MixinItemCompass$1 implements IItemPropertyGetter {
     @SideOnly(Side.CLIENT)
-    private BlockPos lastOre;
+    private int updateCountdown;
     @SideOnly(Side.CLIENT)
-    private int updateCountdown, interference;
+    private double interference;
+    @SideOnly(Side.CLIENT)
+    @Shadow
+    long lastUpdateTick;
 
+    /**
+     * @author Radviger
+     * @reason Extended compass features
+     */
     @Overwrite
     @SideOnly(Side.CLIENT)
     public float apply(ItemStack item, @Nullable World world, @Nullable EntityLivingBase entity) {
@@ -37,39 +44,40 @@ public abstract class MixinItemCompass$1 implements IItemPropertyGetter {
                 world = holder.world;
             }
 
-            if (updateCountdown++ >= 10) {
-                updateCountdown = 0;
-                interference = 0;
-                lastOre = null;
-                BlockPos pos = new BlockPos(holder);
+            BlockPos targetPos = world.getSpawnPoint();
 
-                for (BlockPos.MutableBlockPos p : BlockPos.getAllInBoxMutable(pos.add(-10, -10, -10), pos.add(10, 10, 10))) {
-                    if (world.isBlockLoaded(p)) {
-                        IBlockState state = world.getBlockState(p);
-                        if (state.getBlock() == Blocks.IRON_ORE) {
-                            ++interference;
-                        }
-                        if (interference > 0 && world.rand.nextDouble() >= (1.0 / (double)interference)) {
-                            lastOre = p.toImmutable();
+            double sensitivityDistanceSq = 8.0 * 8.0;
+            double angle = this.getAngleToPos(targetPos, holder);
+
+            if (!world.provider.isSurfaceWorld()) {
+                angle = Math.random();
+            } else {
+                if (updateCountdown++ >= 15) {
+                    updateCountdown = 0;
+                    interference = 0;
+                    BlockPos pos = new BlockPos(holder);
+
+                    for (BlockPos.MutableBlockPos p : BlockPos.getAllInBoxMutable(pos.add(-15, -15, -15), pos.add(15, 15, 15))) {
+                        if (world.isBlockLoaded(p)) {
+                            double distance = pos.distanceSq(p);
+                            IBlockState state = world.getBlockState(p);
+                            if (state.getBlock() == Blocks.IRON_ORE) {
+                                interference += Math.sqrt(distance > 0 ? sensitivityDistanceSq / distance : sensitivityDistanceSq);
+                            }
                         }
                     }
                 }
-            }
-
-            double angle;
-            if (world.rand.nextDouble() >= (1.0 / (double)interference) && lastOre != null) {
-                angle = this.getPosToAngle(lastOre, holder);
-            } else if (world.provider.isSurfaceWorld() && interference < 15) {
-                angle = this.getPosToAngle(world.getSpawnPoint(), holder);
-            } else {
-                angle = Math.random();
+                if (interference > 0) {
+                    double sin = Math.sin((double)this.lastUpdateTick) / 50.0;
+                    angle += sin * interference;
+                }
             }
 
             if (handheld) {
                 angle = this.wobble(world, angle);
             }
 
-            return MathHelper.positiveModulo((float)angle, 1F);
+            return MathHelper.positiveModulo((float)angle, 1);
         }
     }
 
@@ -82,10 +90,9 @@ public abstract class MixinItemCompass$1 implements IItemPropertyGetter {
     private double getFrameRotation(EntityItemFrame frame) { return 0; }
 
     @SideOnly(Side.CLIENT)
-    private double getPosToAngle(BlockPos pos, Entity holder) {
+    private double getAngleToPos(BlockPos pos, Entity holder) {
         double yaw = holder instanceof EntityItemFrame ? this.getFrameRotation((EntityItemFrame) holder) : (double) holder.rotationYaw;
-        yaw = MathHelper.positiveModulo(yaw / 360, 1);
-        double targetAngle = Math.atan2((double)pos.getZ() - holder.posZ, (double)pos.getX() - holder.posX) / (Math.PI * 2);
-        return 0.5 - (yaw - 0.25 - targetAngle);
+        double target = Math.atan2(pos.getZ() - holder.posZ, pos.getX() - holder.posX) / (Math.PI * 2); /*[-0.5, 0.5]*/
+        return 0.5 - (yaw / 360 - 0.25 - target);
     }
 }

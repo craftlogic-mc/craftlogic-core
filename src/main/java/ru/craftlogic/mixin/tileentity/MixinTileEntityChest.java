@@ -24,6 +24,10 @@ public abstract class MixinTileEntityChest extends TileEntityLockableLoot implem
     @Shadow
     public TileEntityChest adjacentChestZNeg, adjacentChestXPos, adjacentChestXNeg, adjacentChestZPos;
 
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
     @Overwrite
     public void checkForAdjacentChests() {
         if (!this.adjacentChestChecked) {
@@ -58,6 +62,10 @@ public abstract class MixinTileEntityChest extends TileEntityLockableLoot implem
         }
     }
 
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
     @Overwrite
     @Nullable
     protected TileEntityChest getAdjacentChest(EnumFacing side) {

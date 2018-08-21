@@ -7,7 +7,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import ru.craftlogic.api.inventory.manager.InventoryItemManager;
+import ru.craftlogic.api.inventory.manager.InventoryManager;
 import ru.craftlogic.api.util.ItemStackMatcher;
 import ru.craftlogic.api.util.WrappedInventoryHolder;
 import ru.craftlogic.api.world.Locatable;
@@ -18,7 +18,7 @@ import javax.annotation.Nullable;
 import java.util.function.Predicate;
 
 public interface InventoryHolder extends IInventory, WorldNameable {
-    InventoryItemManager getItemManager();
+    InventoryManager getInventoryManager();
 
     @Override
     default void markDirty() {}
@@ -57,9 +57,7 @@ public interface InventoryHolder extends IInventory, WorldNameable {
     }
 
     @Nullable
-    default InventoryFieldHolder getFieldHolder() {
-        return null;
-    }
+    InventoryFieldHolder getFieldHolder();
 
     @Deprecated
     default int getField(FieldIdentifier field) {
@@ -103,12 +101,12 @@ public interface InventoryHolder extends IInventory, WorldNameable {
 
     @Override
     default int getSizeInventory() {
-        return this.getItemManager().size();
+        return this.getInventoryManager().size();
     }
 
     @Override
     default boolean isEmpty() {
-        return this.getItemManager().isEmpty();
+        return this.getInventoryManager().isEmpty();
     }
 
     default ItemStack getStackInSlot(SlotIdentifier slot) {
@@ -117,7 +115,7 @@ public interface InventoryHolder extends IInventory, WorldNameable {
 
     @Override
     default ItemStack getStackInSlot(int slot) {
-        return this.getItemManager().get(slot);
+        return this.getInventoryManager().get(slot);
     }
 
     default ItemStack decrStackSize(SlotIdentifier slot, int amount) {
@@ -126,7 +124,7 @@ public interface InventoryHolder extends IInventory, WorldNameable {
 
     @Override
     default ItemStack decrStackSize(int slot, int amount) {
-        return this.getItemManager().split(slot, amount);
+        return this.getInventoryManager().split(slot, amount);
     }
 
     default ItemStack removeStackFromSlot(SlotIdentifier slot) {
@@ -135,7 +133,7 @@ public interface InventoryHolder extends IInventory, WorldNameable {
 
     @Override
     default ItemStack removeStackFromSlot(int slot) {
-        return this.getItemManager().remove(slot);
+        return this.getInventoryManager().remove(slot);
     }
 
     default void setInventorySlotContents(SlotIdentifier slot, ItemStack stack) {
@@ -144,12 +142,12 @@ public interface InventoryHolder extends IInventory, WorldNameable {
 
     @Override
     default void setInventorySlotContents(int slot, ItemStack stack) {
-        this.getItemManager().set(slot, stack);
+        this.getInventoryManager().set(slot, stack);
     }
 
     @Override
     default void clear() {
-        this.getItemManager().clear();
+        this.getInventoryManager().clear();
     }
 
     default boolean growSlotContents(SlotIdentifier slot, Item type, int amount) {

@@ -7,7 +7,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-import ru.craftlogic.common.CraftItems;
+import ru.craftlogic.api.CraftItems;
 
 @Mixin(EntityEgg.class)
 public abstract class MixinEntityEgg extends EntityThrowable {
@@ -15,6 +15,10 @@ public abstract class MixinEntityEgg extends EntityThrowable {
         super(world);
     }
 
+    /**
+     * @author Radviger
+     * @reason Broken eggs
+     */
     @Overwrite
     protected void onImpact(RayTraceResult target) {
         if (target.entityHit != null) {

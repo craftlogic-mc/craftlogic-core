@@ -19,7 +19,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.api.block.HeatConductor;
 import ru.craftlogic.api.block.holders.ScreenHolder;
-import ru.craftlogic.api.inventory.InventoryFieldHolder;
 import ru.craftlogic.api.inventory.InventoryFieldHolder.InventoryFieldAdder;
 import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.api.item.Tool;
@@ -35,15 +34,6 @@ public interface Furnace extends InventoryHolder, LoopingSoundSource, ScreenHold
     int getMaxFuel();
 
     @Override
-    default void addSyncFields(InventoryFieldHolder fieldHolder) {
-        fieldHolder.addReadOnlyField(FurnaceField.FUEL, this::getFuel);
-        fieldHolder.addReadOnlyField(FurnaceField.MAX_FUEL, this::getMaxFuel);
-        fieldHolder.addReadOnlyField(FurnaceField.TEMPERATURE, this::getTemperature);
-        fieldHolder.addReadOnlyField(FurnaceField.HOT_TEMPERATURE, this::getHotTemperature);
-        fieldHolder.addReadOnlyField(FurnaceField.MAX_TEMPERATURE, this::getMaxTemperature);
-    }
-
-    @Override
     default ContainerFurnace createContainer(EntityPlayer player, int subId) {
         return new ContainerFurnace(player.inventory, this);
     }
@@ -56,7 +46,7 @@ public interface Furnace extends InventoryHolder, LoopingSoundSource, ScreenHold
 
     @Override
     default boolean isSoundActive(SoundEvent sound) {
-        return this.getTemperature() >= this.getHotTemperature() / 2;
+        return this.getTemperature() >= this.getMaxTemperature() / 3;
     }
 
     default float getScaledTemperature() {
@@ -68,17 +58,12 @@ public interface Furnace extends InventoryHolder, LoopingSoundSource, ScreenHold
         return getScaledTemperature();
     }
 
-    default int getEnvironmentTemperature() {
-        Location location = this.getLocation();
-        return (int)(location.getBiomeTemperature() * 30F);
-    }
-
     @Override
     default boolean isItemValidForSlot(int slot, ItemStack stack) {
         return slot == 0 && isItemFuel(stack);
     }
 
-    default void dropTemperature(int amount) {
+    default void dropTemperatureWithEffect(int amount) {
         Location location = getLocation();
         World world = location.getWorld();
         Location upperLocation = location.offset(EnumFacing.UP);
@@ -88,8 +73,10 @@ public interface Furnace extends InventoryHolder, LoopingSoundSource, ScreenHold
         for (int i = 0; i < 8; ++i) {
             upperLocation.spawnParticle(EnumParticleTypes.SMOKE_LARGE, random(), random(), random(), 0.0, 0.0, 0.0);
         }
-        this.setTemperature(Math.max(0, this.getTemperature() - amount));
+        this.dropTemperature(amount, false);
     }
+
+    void dropTemperature(int amount, boolean simulate);
 
     static int getItemBurnTemperature(ItemStack stack) {
         if (!stack.isEmpty()) {
@@ -177,6 +164,6 @@ public interface Furnace extends InventoryHolder, LoopingSoundSource, ScreenHold
     }
 
     enum FurnaceField implements InventoryHolder.FieldIdentifier {
-        FUEL, MAX_FUEL, TEMPERATURE, HOT_TEMPERATURE, MAX_TEMPERATURE
+        FUEL, MAX_FUEL, TEMPERATURE, MAX_TEMPERATURE
     }
 }

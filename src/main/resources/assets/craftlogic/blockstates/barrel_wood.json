@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "closed=false,variant=oak": {"model": "craftlogic:barrel/oak"},
+    "closed=true,variant=oak": {"model": "craftlogic:barrel/oak_closed"},
+    "closed=false,variant=spruce": {"model": "craftlogic:barrel/spruce"},
+    "closed=true,variant=spruce": {"model": "craftlogic:barrel/spruce_closed"},
+    "closed=false,variant=birch": {"model": "craftlogic:barrel/birch"},
+    "closed=true,variant=birch": {"model": "craftlogic:barrel/birch_closed"},
+    "closed=false,variant=jungle": {"model": "craftlogic:barrel/jungle"},
+    "closed=true,variant=jungle": {"model": "craftlogic:barrel/jungle_closed"},
+    "closed=false,variant=acacia": {"model": "craftlogic:barrel/acacia"},
+    "closed=true,variant=acacia": {"model": "craftlogic:barrel/acacia_closed"},
+    "closed=false,variant=dark_oak": {"model": "craftlogic:barrel/dark_oak"},
+    "closed=true,variant=dark_oak": {"model": "craftlogic:barrel/dark_oak_closed"}
+  }
+}

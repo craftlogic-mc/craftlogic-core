@@ -1,5 +1,6 @@
 package ru.craftlogic.api.text;
 
+import net.minecraft.command.CommandException;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 
@@ -12,7 +13,7 @@ public final class TextTranslation extends Text<TextComponentTranslation, TextTr
     private final String format;
     private final List<Object> args = new ArrayList<>();
 
-    public TextTranslation(String format) {
+    TextTranslation(String format) {
         this.format = format;
     }
 
@@ -22,16 +23,41 @@ public final class TextTranslation extends Text<TextComponentTranslation, TextTr
     }
 
     public TextTranslation arg(ITextComponent arg) {
+        return this.arg(arg, null);
+    }
+
+    public TextTranslation arg(ITextComponent arg, Consumer<TextWrapped> decorator) {
+        if (decorator != null) {
+            decorator.accept(new TextWrapped(arg));
+        }
         this.args.add(arg);
         return this;
     }
 
-    public TextTranslation argText(String arg) {
-        return this.argText(arg, null);
+    public TextTranslation arg(Text<?, ?> arg) {
+        this.args.add(arg.build());
+        return this;
     }
 
-    public TextTranslation argText(String arg, Consumer<TextString> decorator) {
-        TextString text = new TextString(arg);
+    public TextTranslation arg(String arg) {
+        return this.arg(arg, null);
+    }
+
+    public TextTranslation arg(String arg, Consumer<TextString> decorator) {
+        TextString text = Text.string(arg);
+        if (decorator != null) {
+            decorator.accept(text);
+        }
+        this.args.add(text.build());
+        return this;
+    }
+
+    public TextTranslation argTranslate(CommandException exc) {
+        return this.argTranslate(exc, null);
+    }
+
+    public TextTranslation argTranslate(CommandException exc, Consumer<TextTranslation> decorator) {
+        TextTranslation text = Text.translation(exc);
         if (decorator != null) {
             decorator.accept(text);
         }
@@ -44,7 +70,7 @@ public final class TextTranslation extends Text<TextComponentTranslation, TextTr
     }
 
     public TextTranslation argTranslate(String format, Consumer<TextTranslation> decorator) {
-        TextTranslation text = new TextTranslation(format);
+        TextTranslation text = Text.translation(format);
         if (decorator != null) {
             decorator.accept(text);
         }

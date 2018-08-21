@@ -10,6 +10,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.InventoryLargeChest;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntityChest;
@@ -45,9 +46,14 @@ public abstract class MixinBlockChest extends BlockContainer {
         super(Material.WOOD);
     }
 
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
     @Overwrite
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (side == EnumFacing.UP || side == state.getValue(FACING)) {
+        ItemStack heldItem = player.getHeldItem(hand);
+        if (heldItem.getItem() != Item.getItemFromBlock(this) || !side.getAxis().isHorizontal() || side == state.getValue(FACING)) {
             if (!world.isRemote) {
                 ILockableContainer container = this.getLockableContainer(world, pos);
                 if (container != null) {
@@ -68,14 +74,12 @@ public abstract class MixinBlockChest extends BlockContainer {
     }
 
     @Shadow
-    public ILockableContainer getLockableContainer(World world, BlockPos pos) { return null; }
+    public abstract ILockableContainer getLockableContainer(World world, BlockPos pos);
 
-    /*@Overwrite
-    public EnumBlockRenderType getRenderType(IBlockState state) {
-        return state.getValue(PART) == ChestPart.RIGHT ?
-                EnumBlockRenderType.INVISIBLE : EnumBlockRenderType.ENTITYBLOCK_ANIMATED;
-    }*/
-
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
     @Overwrite
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess blockAccessor, BlockPos pos) {
         ChestPart part = state.getValue(PART);
@@ -94,6 +98,19 @@ public abstract class MixinBlockChest extends BlockContainer {
         return NOT_CONNECTED_AABB;
     }
 
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
+    @Overwrite
+    private boolean isDoubleChest(World world, BlockPos pos) {
+        return world.getBlockState(pos).getValue(PART) != ChestPart.SINGLE;
+    }
+
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
     @Overwrite
     public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
         if (state.getValue(PART) != ChestPart.SINGLE) {
@@ -109,6 +126,10 @@ public abstract class MixinBlockChest extends BlockContainer {
         }
     }
 
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
     @Overwrite
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack item) {
         EnumFacing facing = EnumFacing.getHorizontal(MathHelper.floor((double)(placer.rotationYaw * 4F / 360F) + 0.5D) & 3).getOpposite();
@@ -155,6 +176,10 @@ public abstract class MixinBlockChest extends BlockContainer {
         }
     }
 
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
     @Overwrite
     public IBlockState checkForSurroundingChests(World world, BlockPos pos, IBlockState state) {
         if (!world.isRemote) {
@@ -211,6 +236,10 @@ public abstract class MixinBlockChest extends BlockContainer {
         return state;
     }
 
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
     @Overwrite
     public IBlockState correctFacing(World world, BlockPos pos, IBlockState state) {
         EnumFacing enumfacing = null;
@@ -251,11 +280,19 @@ public abstract class MixinBlockChest extends BlockContainer {
         }
     }
 
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
     @Overwrite
     public boolean canPlaceBlockAt(World world, BlockPos pos) {
         return true;
     }
 
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
     @Overwrite
     public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos) {
         super.neighborChanged(state, world, pos, neighborBlock, neighborPos);
@@ -273,6 +310,10 @@ public abstract class MixinBlockChest extends BlockContainer {
         }
     }
 
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
     @Overwrite
     @Nullable
     public ILockableContainer getContainer(World world, BlockPos pos, boolean ignoreIfBlocked) {
@@ -303,6 +344,10 @@ public abstract class MixinBlockChest extends BlockContainer {
         return null;
     }
 
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
     @Overwrite
     public IBlockState getStateFromMeta(int meta) {
         ChestPart part = meta >= 8 ? ChestPart.RIGHT : (meta >= 4 ? ChestPart.LEFT : ChestPart.SINGLE);
@@ -310,17 +355,25 @@ public abstract class MixinBlockChest extends BlockContainer {
         return this.getDefaultState().withProperty(FACING, side).withProperty(PART, part);
     }
 
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
     @Overwrite
     public int getMetaFromState(IBlockState state) {
         return state.getValue(FACING).getHorizontalIndex() + state.getValue(PART).ordinal() * 4;
     }
 
+    /**
+     * @author Radviger
+     * @reason Separable chests
+     */
     @Overwrite
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, FACING, PART);
     }
 
     @Shadow
-    private boolean isBlocked(World world, BlockPos pos) { return false; }
+    protected abstract boolean isBlocked(World world, BlockPos pos);
 
 }

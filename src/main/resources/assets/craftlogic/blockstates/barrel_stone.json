@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "closed=false,variant=stone": {"model": "craftlogic:barrel/stone"},
+    "closed=true,variant=stone": {"model": "craftlogic:barrel/stone_closed"},
+    "closed=false,variant=andesite": {"model": "craftlogic:barrel/andesite"},
+    "closed=true,variant=andesite": {"model": "craftlogic:barrel/andesite_closed"},
+    "closed=false,variant=granite": {"model": "craftlogic:barrel/granite"},
+    "closed=true,variant=granite": {"model": "craftlogic:barrel/granite_closed"},
+    "closed=false,variant=diorite": {"model": "craftlogic:barrel/diorite"},
+    "closed=true,variant=diorite": {"model": "craftlogic:barrel/diorite_closed"}
+  }
+}

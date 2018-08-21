@@ -1,19 +1,21 @@
 package ru.craftlogic.api.command;
 
-import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
-import ru.craftlogic.api.server.Server;
+import ru.craftlogic.api.Server;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.util.CheckedFunction;
 import ru.craftlogic.api.world.CommandSender;
 import ru.craftlogic.api.world.OfflinePlayer;
 import ru.craftlogic.api.world.Player;
 import ru.craftlogic.api.world.World;
+import ru.craftlogic.api.CraftMessages;
 
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class CommandContext {
     private final Server server;
@@ -21,6 +23,7 @@ public class CommandContext {
     private final ICommand command;
     private final List<Argument> indexToArg = new ArrayList<>();
     private final Map<String, Argument> nameToArg = new HashMap<>();
+    private final Random random = new Random();
 
     public CommandContext(Server server, CommandSender sender, ICommand command, List<Argument> args) {
         this.server = server;
@@ -31,6 +34,22 @@ public class CommandContext {
             this.indexToArg.add(arg);
             this.nameToArg.put(arg.name, arg);
         }
+    }
+
+    public float randomFloat() {
+        return random().nextFloat();
+    }
+
+    public float randomFloat(float min) {
+        return randomFloat(min, 1F);
+    }
+
+    public float randomFloat(float min, float max) {
+        return min + (max - min) * randomFloat();
+    }
+
+    public Random random() {
+        return this.random;
     }
 
     public Server server() {
@@ -53,16 +72,16 @@ public class CommandContext {
         return this.action(0);
     }
 
-    public String action(int id) {
-        return this.get("action_" + id).asString();
+    public String action(int index) {
+        return this.get("action_" + index).asString();
     }
 
     public String constant() {
         return this.constant(0);
     }
 
-    public String constant(int id) {
-        return this.get("const_" + id).asString();
+    public String constant(int index) {
+        return this.get("const_" + index).asString();
     }
 
     public boolean has(String name) {
@@ -73,16 +92,16 @@ public class CommandContext {
         return this.hasAction(0);
     }
 
-    public boolean hasAction(int id) {
-        return this.has("action_" + id);
+    public boolean hasAction(int index) {
+        return this.has("action_" + index);
     }
 
     public boolean hasConstant() {
         return this.hasConstant(0);
     }
 
-    public boolean hasConstant(int id) {
-        return this.has("const_" + id);
+    public boolean hasConstant(int index) {
+        return this.has("const_" + index);
     }
 
     public Optional<Argument> getIfPresent(String name) {
@@ -107,8 +126,28 @@ public class CommandContext {
         return this.indexToArg.get(index);
     }
 
+    public void sendNotification(Text<?, ?> message) {
+        this.sendNotification(0, message);
+    }
+
+    public void sendNotification(int flags, Text<?, ?> message) {
+        this.sendNotification(flags, message.build());
+    }
+
     public void sendNotification(String message, Object... args) {
-        CommandBase.notifyCommandListener(this.sender.getHandle(), this.command, message, args);
+        this.sendNotification(0, message, args);
+    }
+
+    public void sendNotification(int flags, String message, Object... args) {
+        this.sendNotification(flags, new TextComponentTranslation(message, args));
+    }
+
+    public void sendNotification(ITextComponent message) {
+        this.sendNotification(0, message);
+    }
+
+    public void sendNotification(int flags, ITextComponent message) {
+        CraftMessages.notifyCommandListener(this.server.getHandle(), this.sender.getHandle(), this.command, flags, message);
     }
 
     public void sendMessage(String message, Object... args) {
@@ -134,6 +173,8 @@ public class CommandContext {
     }
 
     public static class Argument {
+        public static final Pattern IP_PATTERN = Pattern.compile("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+
         private CommandContext context;
         private final String name, value;
         private final boolean vararg;
@@ -179,6 +220,13 @@ public class CommandContext {
             return player;
         }
 
+        public String asIP() throws CommandException {
+            if (!IP_PATTERN.matcher(this.value).matches()) {
+                throw new CommandException("commands.generic.ip.invalid", this.value);
+            }
+            return this.value;
+        }
+
         public World asWorld() throws CommandException {
             World world = this.context.server.getWorld(this.value);
             if (world == null) {
@@ -191,7 +239,7 @@ public class CommandContext {
             try {
                 return Integer.parseInt(this.value);
             } catch (NumberFormatException exc) {
-                throw new CommandException("commands.generic.integer.invalid", this.value);
+                throw new CommandException("commands.generic.num.invalid", this.value);
             }
         }
 
@@ -200,8 +248,11 @@ public class CommandContext {
                 throw new IllegalStateException("Maximal bound less than minimal");
             }
             int value = this.asInt();
-            if (value < min || value > max) {
-                throw new CommandException("commands.generic.integer.bounds", value, min, max);
+            if (value < min) {
+                throw new CommandException("commands.generic.num.tooSmall", value, min);
+            }
+            if (value > max) {
+                throw new CommandException("commands.generic.num.tooBig", value, max);
             }
             return value;
         }
@@ -210,7 +261,7 @@ public class CommandContext {
             try {
                 return Float.parseFloat(this.value);
             } catch (NumberFormatException exc) {
-                throw new CommandException("commands.generic.float.invalid", this.value);
+                throw new CommandException("commands.generic.num.invalid", this.value);
             }
         }
 
@@ -219,8 +270,11 @@ public class CommandContext {
                 throw new IllegalStateException("Maximal bound less than minimal");
             }
             float value = this.asFloat();
-            if (value < min || value > max) {
-                throw new CommandException("commands.generic.float.bounds", value, min, max);
+            if (value < min) {
+                throw new CommandException("commands.generic.num.tooSmall", value, min);
+            }
+            if (value > max) {
+                throw new CommandException("commands.generic.num.tooBig", value, max);
             }
             return value;
         }
@@ -242,5 +296,19 @@ public class CommandContext {
                     throw new CommandException("commands.generic.boolean.invalid", value);
             }
         }
+
+        @Override
+        public String toString() {
+            return "Argument{" +
+                    "name='" + name + '\'' +
+                    ", value='" + value + '\'' +
+                    ", vararg=" + vararg +
+                    '}';
+        }
+    }
+
+    @Override
+    public String toString() {
+        return indexToArg.stream().map(a -> a.name + " = " + a.value).collect(Collectors.joining(", "));
     }
 }

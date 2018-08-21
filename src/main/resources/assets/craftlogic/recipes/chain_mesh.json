@@ -1,0 +1,22 @@
+{
+  "conditions": [
+    {
+      "type": "minecraft:item_exists",
+      "item": "craftlogic:chain_mesh"
+    }
+  ],
+  "key": {
+    "A": {
+      "item": "craftlogic:chain_links"
+    }
+  },
+  "pattern": [
+    "AA",
+    "AA"
+  ],
+  "result": {
+    "count": 1,
+    "item": "craftlogic:chain_mesh"
+  },
+  "type": "minecraft:crafting_shaped"
+}

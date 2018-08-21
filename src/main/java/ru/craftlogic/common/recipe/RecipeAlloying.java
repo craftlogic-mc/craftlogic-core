@@ -2,8 +2,8 @@ package ru.craftlogic.common.recipe;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import ru.craftlogic.api.inventory.manager.InventoryItemManager;
-import ru.craftlogic.api.recipe.OreStack;
+import ru.craftlogic.api.inventory.manager.InventoryManager;
+import ru.craftlogic.api.recipe.DictStack;
 import ru.craftlogic.api.recipe.Recipe;
 
 import java.util.List;
@@ -61,9 +61,9 @@ public class RecipeAlloying implements Recipe<RecipeGridAlloying> {
                     if (rc > 0) {
                         return false;
                     }
-                } else if (ingredient instanceof OreStack) {
-                    OreStack inputStack = (OreStack) ingredient;
-                    int rc = inputStack.amount;
+                } else if (ingredient instanceof DictStack) {
+                    DictStack inputStack = (DictStack) ingredient;
+                    int rc = inputStack.getCount();
 
                     for (int i = 0; i < gridSize; ++i) {
                         ItemStack ic = inventory.get(i);
@@ -91,7 +91,7 @@ public class RecipeAlloying implements Recipe<RecipeGridAlloying> {
 
     @Override
     public void consume(RecipeGridAlloying grid) {
-        InventoryItemManager inventory = grid.getItemManager();
+        InventoryManager inventory = grid.getInventoryManager();
         int gridSize = grid.getGridSize();
 
         for (Object ingredient : input) {
@@ -116,9 +116,9 @@ public class RecipeAlloying implements Recipe<RecipeGridAlloying> {
                         }
                     }
                 }
-            } else if (ingredient instanceof OreStack) {
-                OreStack inputStack = (OreStack) ingredient;
-                int rc = inputStack.amount;
+            } else if (ingredient instanceof DictStack) {
+                DictStack inputStack = (DictStack) ingredient;
+                int rc = inputStack.getCount();
 
                 for (int i = 0; i < gridSize; ++i) {
                     ItemStack ic = inventory.get(i);

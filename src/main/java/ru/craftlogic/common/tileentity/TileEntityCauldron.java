@@ -6,9 +6,10 @@ import net.minecraft.world.World;
 import ru.craftlogic.api.block.HeatAcceptor;
 import ru.craftlogic.api.block.Updatable;
 import ru.craftlogic.api.tile.TileEntityBase;
+import ru.craftlogic.api.util.TemperatureBuffer;
 
 public class TileEntityCauldron extends TileEntityBase implements HeatAcceptor, Updatable {
-    private int temperature, hotTemperature = 100, maxTemperature = 100;
+    private final TemperatureBuffer temperature = new TemperatureBuffer(200);
     private int fluidColor;
 
     public TileEntityCauldron(World world, IBlockState state) {
@@ -22,28 +23,18 @@ public class TileEntityCauldron extends TileEntityBase implements HeatAcceptor, 
 
     @Override
     public int getTemperature() {
-        return temperature;
-    }
-
-    @Override
-    public void setTemperature(int temperature) {
-        this.temperature = temperature;
-    }
-
-    @Override
-    public int getHotTemperature() {
-        return hotTemperature;
+        return temperature.getStored();
     }
 
     @Override
     public int getMaxTemperature() {
-        return maxTemperature;
+        return temperature.getCapacity();
     }
 
     @Override
     public int acceptHeat(EnumFacing side, int amount) {
         if (this.world.getWorldTime() % 4 == 0) {
-            this.temperature += amount;
+            this.temperature.accept(amount, false);
         }
         return amount;
     }

@@ -41,4 +41,9 @@ public class Pair<A, B> {
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "(" + this.first + ", " + this.second + ")";
+    }
 }

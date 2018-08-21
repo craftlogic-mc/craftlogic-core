@@ -6,12 +6,39 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
+import ru.craftlogic.api.text.Text;
 
-public abstract class ScriptBase extends Script {
-    protected ScriptContainer container;
+public abstract class ScriptBase<C extends ScriptContainer> extends Script {
+    protected C container;
 
-    void setContainer(ScriptContainer container) {
+    void setContainer(C container) {
         this.container = container;
+    }
+
+    protected abstract void showChatMessage(ITextComponent message);
+
+    protected ITextComponent getPrefix() {
+        ITextComponent prefix = new TextComponentString("[>] ");
+        prefix.getStyle().setColor(TextFormatting.RED);
+        return prefix;
+    }
+
+    public void print(Text<?, ?> value) {
+        this.print(value.build());
+    }
+
+    public void print(ITextComponent value) {
+        ITextComponent message = getPrefix();
+        message.appendSibling(value);
+        showChatMessage(message);
+    }
+
+    @Override
+    public void print(Object value) {
+        this.print(new TextComponentString(String.valueOf(value)));
     }
 
     @Override

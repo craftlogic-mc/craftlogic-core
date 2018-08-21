@@ -3,29 +3,21 @@ package ru.craftlogic.common.script.impl;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import groovy.lang.Closure;
-import net.minecraft.command.ICommand;
 import net.minecraft.util.JsonUtils;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import ru.craftlogic.api.command.CommandExecutor;
-import ru.craftlogic.api.server.Server;
-import ru.craftlogic.api.util.Pair;
-import ru.craftlogic.common.script.ScriptManager;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ScriptContainer implements Runnable {
-    private final ScriptManager manager;
-    private final String id;
-    private final String name;
-    private final Set<String> authors = new HashSet<>();
-    private final ScriptBase script;
-    Closure<Void> loadingHandler, unloadingHandler;
-    Map<String, Pair<EventPriority, Closure<Void>>> eventHandlers = new HashMap<>();
-    List<ICommand> commands = new ArrayList<>();
+    protected final String id;
+    protected final String name;
+    protected final Set<String> authors = new HashSet<>();
+    protected final ScriptBase script;
 
-    public ScriptContainer(ScriptManager manager, String id, JsonObject info, ScriptBase script) {
-        this.manager = manager;
+    public ScriptContainer(String id, JsonObject info, ScriptBase script) {
         this.id = id;
         this.name = JsonUtils.getString(info, "name", id);
         if (info.has("authors")) {
@@ -45,36 +37,19 @@ public class ScriptContainer implements Runnable {
         return name;
     }
 
-    public ScriptManager getManager() {
-        return manager;
-    }
-
     public Set<String> getAuthors() {
         return ImmutableSet.copyOf(this.authors);
     }
 
-    public void print(Object value) {
-        System.out.printf("[SCRIPT] %s: %s", this.name, value);
-    }
-
-    public void load() {
-        if (this.loadingHandler != null) {
-            this.loadingHandler.call();
+    public ITextComponent getPrefix() {
+        ITextComponent prefix;
+        if (!this.id.equalsIgnoreCase(this.name)) {
+            prefix = new TextComponentString("[" + this.name + " (" + this.id + ".gs)]");
+        } else {
+            prefix = new TextComponentString("[" + this.name + "]");
         }
-    }
-
-    public void unload() {
-        if (this.unloadingHandler != null) {
-            this.unloadingHandler.call();
-        }
-        for (ICommand cmd : this.commands) {
-            this.manager.getServer().unregisterCommand(cmd);
-        }
-    }
-
-    public ICommand registerCommand(String name, List<String> syntax, List<String> aliases, List<String> permissions, CommandExecutor executor) {
-        Server server = this.manager.getServer();
-        return server.registerCommand(name, syntax, aliases, permissions, executor);
+        prefix.getStyle().setColor(TextFormatting.RED);
+        return prefix;
     }
 
     @Override

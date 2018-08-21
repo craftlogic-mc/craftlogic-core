@@ -6,7 +6,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.DimensionManager;
-import ru.craftlogic.CraftLogic;
+import ru.craftlogic.api.CraftWorlds;
 
 import java.util.Objects;
 
@@ -37,7 +37,7 @@ public class ChunkLocation {
     }
 
     public World getWorld() {
-        return CraftLogic.getOrLoadDimension(this.getDimension());
+        return CraftWorlds.getOrLoadWorld(this.getDimension());
     }
 
     public String getWorldName() {

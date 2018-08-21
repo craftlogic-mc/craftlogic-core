@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.block.statemap.StateMapperBase;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
-import ru.craftlogic.CraftLogic;
+import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.item.ItemBlockBase;
 
 import javax.annotation.Nonnull;
@@ -31,7 +31,7 @@ public class ModelManager {
                 ((ModelAutoReg) item).registerModel(this);
             }
         }
-        this.activeDomain = CraftLogic.MODID;
+        this.activeDomain = CraftAPI.MOD_ID;
     }
 
     public void registerStateMapper(@Nonnull Block block, BiFunction<IBlockState, StateMapperBase, ModelResourceLocation> stateMapper) {

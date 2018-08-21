@@ -1,27 +1,35 @@
 package ru.craftlogic.common.block;
 
+import net.minecraft.block.BlockHopper;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.block.statemap.DefaultStateMapper;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.Item;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
+import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.util.Nameable;
 import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.common.tileentity.TileEntityChimney;
 
 public class BlockChimney extends BlockBase implements TileEntityHolder<TileEntityChimney> {
-    public static final PropertyDirection FACING = PropertyDirection.create("facing", f -> f != EnumFacing.UP);
+    public static final PropertyDirection FACING = BlockHopper.FACING;
     public static final PropertyEnum<ChimneyType> VARIANT = PropertyEnum.create("variant", ChimneyType.class);
 
     public BlockChimney() {
         super(Material.ROCK, "chimney", 1.5F, null);
+        this.setHasSubtypes(true);
         this.setDefaultState(this.blockState.getBaseState()
             .withProperty(FACING, EnumFacing.DOWN)
             .withProperty(VARIANT, ChimneyType.STONE)
@@ -35,7 +43,7 @@ public class BlockChimney extends BlockBase implements TileEntityHolder<TileEnti
             facing = EnumFacing.DOWN;
         }
 
-        return this.getDefaultState().withProperty(FACING, facing);
+        return this.getDefaultState().withProperty(FACING, facing).withProperty(VARIANT, ChimneyType.values()[meta /5]);
     }
 
     @Override
@@ -68,8 +76,27 @@ public class BlockChimney extends BlockBase implements TileEntityHolder<TileEnti
         return new BlockStateContainer(this, FACING, VARIANT);
     }
 
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void registerModel(ModelManager modelManager) {
+        modelManager.registerStateMapper(this, new DefaultStateMapper());
+        Item item = this.asItem();
+        modelManager.registerItemModel(item, 0, CraftAPI.MOD_ID + ":chimney/stone");
+        modelManager.registerItemModel(item, 5, CraftAPI.MOD_ID + ":chimney/brick");
+    }
+
     public enum ChimneyType implements Nameable {
-        STONE,
-        BRICK
+        STONE(1000),
+        BRICK(3000);
+
+        private int capacity;
+
+        ChimneyType(int capacity) {
+            this.capacity = capacity;
+        }
+
+        public int getCapacity() {
+            return this.capacity;
+        }
     }
 }

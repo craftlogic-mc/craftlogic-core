@@ -5,16 +5,13 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.inventory.SlotFurnaceFuel;
 import net.minecraft.inventory.SlotFurnaceOutput;
 import ru.craftlogic.api.inventory.ContainerBase;
-import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.util.Furnace;
 import ru.craftlogic.util.Furnace.FurnaceField;
 import ru.craftlogic.util.Furnace.FurnaceSlot;
 
-public class ContainerFurnace extends ContainerBase {
-    private final Furnace furnace;
-
+public class ContainerFurnace extends ContainerBase<Furnace> {
     public ContainerFurnace(InventoryPlayer playerInv, Furnace furnace) {
-        this.furnace = furnace;
+        super(furnace);
 
         this.addSlotToContainer(new SlotFurnaceFuel(furnace, 0, 56, 35));
         this.addSlotToContainer(new SlotFurnaceOutput(playerInv.player, furnace, 1, 116, 35));
@@ -23,17 +20,14 @@ public class ContainerFurnace extends ContainerBase {
     }
 
     @Override
-    protected InventoryHolder getInventoryHolder() {
-        return this.furnace;
-    }
-
-    @Override
     protected boolean isOutputSlot(Slot slot) {
         return FurnaceSlot.ASH.matches(slot);
     }
 
-    public int getFuel() {
-        return this.getFieldValue(FurnaceField.FUEL);
+    public float getFuel() {
+        int fuel = this.getFieldValue(FurnaceField.FUEL);
+        int maxFuel = this.getFieldValue(FurnaceField.MAX_FUEL);
+        return maxFuel > 0 ? (float)fuel/maxFuel : 0;
     }
 
     public int getMaxFuel() {
@@ -42,10 +36,6 @@ public class ContainerFurnace extends ContainerBase {
 
     public int getTemperature() {
         return this.getFieldValue(FurnaceField.TEMPERATURE);
-    }
-
-    public int getHotTemperature() {
-        return this.getFieldValue(FurnaceField.HOT_TEMPERATURE);
     }
 
     public int getMaxTemperature() {

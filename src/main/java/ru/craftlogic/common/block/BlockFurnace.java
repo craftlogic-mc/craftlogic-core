@@ -1,5 +1,6 @@
 package ru.craftlogic.common.block;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
@@ -20,9 +21,13 @@ import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
 import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.api.world.Location;
+import ru.craftlogic.api.CraftBlocks;
 import ru.craftlogic.common.tileentity.TileEntityFurnace;
 
 import java.util.Random;
+
+import static ru.craftlogic.api.CraftSounds.FURNACE_VENT_CLOSE;
+import static ru.craftlogic.api.CraftSounds.FURNACE_VENT_OPEN;
 
 public class BlockFurnace extends BlockBase implements TileEntityHolder<TileEntityFurnace> {
     public static final PropertyDirection FACING = BlockHorizontal.FACING;
@@ -42,25 +47,24 @@ public class BlockFurnace extends BlockBase implements TileEntityHolder<TileEnti
     public int getLightValue(IBlockState state) {
         return state.getValue(ACTIVE) ? (state.getValue(OPEN) ? 13 : 5) : 0;
     }
-/*
+
+    public boolean hasChimney(Location location) {
+        EnumFacing furnaceFacing = location.getBlockProperty(FACING);
+        Location back = location.offset(furnaceFacing.getOpposite());
+        return back.isSameBlock(CraftBlocks.CHIMNEY) && back.getBlockProperty(BlockChimney.FACING) == furnaceFacing;
+    }
 
     @Override
-    protected boolean onBlockActivated(Location location, EntityPlayer player, EnumHand hand, RayTraceResult target) {
-        if (player.isSneaking()) {
-            if (target.sideHit == location.getBlockProperty(FACING)) {
-                if (!location.isWorldRemote()) {
-                    boolean opened = location.getBlockProperty(OPEN);
-                    location.playSound(opened ? FURNACE_VENT_CLOSE : FURNACE_VENT_OPEN, SoundCategory.BLOCKS, 1F, 1F);
-                    location.cycleBlockProperty(OPEN);
-                }
-                return true;
+    public void neighborChanged(Location selfLocation, Location neighborLocation, Block neighborBlock) {
+        if (!selfLocation.isWorldRemote()) {
+            boolean chimney = this.hasChimney(selfLocation);
+            boolean open = selfLocation.getBlockProperty(OPEN);
+            if (chimney == open) {
+                selfLocation.playSound(open ? FURNACE_VENT_CLOSE : FURNACE_VENT_OPEN, SoundCategory.BLOCKS, 1F, 1F);
+                selfLocation.setBlockProperty(OPEN, !chimney);
             }
-            return false;
-        } else {
-            return super.onBlockActivated(location, player, hand, target);
         }
     }
-*/
 
     @Override
     public IBlockState getStateForPlacement(Location location, RayTraceResult target, int meta, EntityLivingBase placer) {

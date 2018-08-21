@@ -2,69 +2,43 @@ package ru.craftlogic.client.screen;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.fluids.FluidRegistry;
 import ru.craftlogic.api.screen.ScreenWithInventory;
+import ru.craftlogic.api.screen.element.widget.WidgetFlame;
+import ru.craftlogic.api.screen.element.widget.WidgetFluid;
+import ru.craftlogic.api.screen.element.widget.WidgetTemperature;
 import ru.craftlogic.common.inventory.ContainerFurnace;
 import ru.craftlogic.util.Furnace;
 
-import static ru.craftlogic.CraftLogic.MODID;
-
-public class ScreenFurnace extends ScreenWithInventory {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "textures/gui/furnace.png");
+public class ScreenFurnace extends ScreenWithInventory<ContainerFurnace> {
     private final InventoryPlayer playerInv;
     private final Furnace furnace;
-    private final ContainerFurnace container;
 
     public ScreenFurnace(InventoryPlayer playerInv, Furnace furnace, ContainerFurnace container) {
         super(container);
-        this.container = container;
         this.playerInv = playerInv;
         this.furnace = furnace;
     }
 
     @Override
-    protected void init() {}
+    protected void init() {
+        int x = getLocalX();
+        int y = getLocalY();
+        this.addElement(new WidgetFluid(this, x + 150, y + 17, () -> FluidRegistry.WATER, () -> 5700, () -> 10_000));
+        this.addElement(new WidgetFlame(this, x + 79, y + 35, this.furnace::getFuel));
+        this.addElement(new WidgetTemperature(this, x + 6, y + 17, this.furnace::getTemperature, this.furnace::getMaxTemperature));
+    }
 
     @Override
     public void drawBackground(int mouseX, int mouseY, float deltaTime) {
         GlStateManager.color(1F, 1F, 1F, 1F);
-        this.bindTexture(TEXTURE);
-        int x = (this.width - this.xSize) / 2;
-        int y = (this.height - this.ySize) / 2;
-        this.drawTexturedRect(x, y, this.xSize, this.ySize, 0, 0);
-        if (this.container.getFuel() > 0) {
-            int fuel = this.getFuelScaled(12);
-            this.drawTexturedRect(x + 84, y + 48 - fuel, 14, fuel + 2, 176, 12 - fuel);
-        }
-        if (this.container.getTemperature() > 0) {
-            int tmp = this.getTemperatureScaled(50);
-            this.drawTexturedRect(x + 15, y + 67 - tmp, 2, tmp, 200, 50 - tmp);
-        }
+        this.bindTexture(BLANK_TEXTURE);
+        this.drawTexturedRect(getLocalX(), getLocalY(), getWidth(), getHeight());
     }
 
     @Override
     public void drawForeground(int mouseX, int mouseY, float deltaTime) {
-        int x = (this.width - this.xSize) / 2;
-        int y = (this.height - this.ySize) / 2;
-        this.drawCenteredText(this.furnace.getDisplayName(), this.xSize / 2, 9, 0x404040);
-        this.drawText(this.playerInv.getDisplayName(), 8, this.ySize - 94, 0x404040);
-        if (mouseX - x >= 6 && mouseX - x <= 17 && mouseY - y >= 17 && mouseY - y <= 67) {
-            int temperature = this.container.getTemperature();
-            int maxTemperature = this.container.getMaxTemperature();
-            ITextComponent tooltip = new TextComponentTranslation("tooltip.temperature", temperature, maxTemperature);
-            this.drawTooltip(tooltip, mouseX - x, mouseY - y);
-        }
-    }
-
-    public int getFuelScaled(int i) {
-        return this.container.getFuel() == 0
-                ? 0 : this.container.getFuel() * i / this.container.getMaxFuel();
-    }
-
-    private int getTemperatureScaled(int i) {
-        return this.container.getMaxFuel() == 0
-                ? 0 : this.container.getTemperature() * i / this.container.getMaxTemperature();
+        this.drawCenteredText(this.furnace.getDisplayName(), getWidth() / 2, 9, 0x404040);
+        this.drawText(this.playerInv.getDisplayName(), 8, getHeight() - 94, 0x404040);
     }
 }

@@ -33,13 +33,13 @@ import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.util.Nameable;
 import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.common.CraftBlocks;
+import ru.craftlogic.api.CraftBlocks;
 import ru.craftlogic.common.tileentity.TileEntityUnfiredPottery;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static ru.craftlogic.CraftLogic.MODID;
+import static ru.craftlogic.api.CraftAPI.MOD_ID;
 
 public class BlockUnfiredPottery extends BlockBase implements TileEntityHolder<TileEntityUnfiredPottery> {
     public static final PropertyEnum<PotteryType> VARIANT = PropertyEnum.create("variant", PotteryType.class);
@@ -188,7 +188,7 @@ public class BlockUnfiredPottery extends BlockBase implements TileEntityHolder<T
                 return new ModelResourceLocation("minecraft:" + (done ? "coarse_dirt" : "dirt"));
             } else {
                 String propString = mapper.getPropertyString(props);
-                return new ModelResourceLocation(MODID + ":unfired_pottery", propString);
+                return new ModelResourceLocation(MOD_ID + ":unfired_pottery", propString);
             }
         });
     }

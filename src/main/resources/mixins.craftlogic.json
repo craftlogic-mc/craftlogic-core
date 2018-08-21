@@ -9,7 +9,6 @@
     "block.MixinBlockTrapDoor",
     "block.MixinBlockButton",
     "block.MixinBlockFurnace",
-    "block.MixinBlockFence",
     "block.MixinBlockFenceGate",
     "block.MixinBlockWeb",
     "block.MixinBlockGrass",
@@ -49,8 +48,9 @@
     "entity.effect.MixinEntityLightningBolt",
     "entity.projectile.MixinEntityExpBottle",
     "entity.projectile.MixinEntityEgg",
-    "entity.item.MixinEntityMinecartFurnace",
+    "entity.item.MixinEntityMinecartEmpty",
     "entity.item.MixinEntityTNTPrimed",
+    "entity.monster.MixinEntityZombie",
     "world.gen.structure.MixinVillageHouseLibrary",
     "world.gen.structure.MixinVillageHouseGardener",
     "world.gen.structure.MixinVillageHouseBlacksmith",
@@ -58,12 +58,15 @@
     "world.gen.structure.MixinVillageHouseButcher",
     "world.gen.structure.MixinVillageWell",
     "world.gen.structure.MixinVillageHall",
-    "world.storage.loot.MixinLootTableManager",
-    "world.storage.loot.MixinLootTableList",
     "advancement.MixinAdvancementManager",
     "capability.MixinDoubleChestItemHandler",
     "server.management.MixinPlayerList",
+    "server.management.MixinPlayerProfileCache",
+    "server.network.MixinNetHandlerLoginServer",
+    "server.MixinMinecraftServer",
     "network.MixinNetHandlerPlayServer",
+    "util.text.MixinITextComponent$Serializer",
+    "forge.MixinUsernameCache",
     "MixinCommandHandler"
   ],
   "client": [
@@ -71,7 +74,15 @@
     "client.renderer.MixinRenderItem",
     "client.renderer.MixinBlockModelShapes$3",
     "client.renderer.MixinBlockModelShapes$4",
-    "client.renderer.tileentity.MixinTileEntityChestRenderer"
+    "client.renderer.tileentity.MixinTileEntityChestRenderer",
+    "client.renderer.entity.MixinRenderZombie",
+    "client.renderer.model.MixinModelZombie",
+    "client.gui.MixinGuiLanguage$List",
+    "client.gui.inventory.MixinGuiInventory",
+    "client.gui.inventory.MixinGuiCrafting"
+  ],
+  "server": [
+    "server.MixinServerEula"
   ],
   "injectors": {
     "defaultRequire": 1

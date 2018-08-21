@@ -8,12 +8,16 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import ru.craftlogic.api.block.Updatable;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import static ru.craftlogic.api.CraftAPI.MOD_ID;
+
 public abstract class Screen extends GuiScreen implements ElementContainer {
+    protected static final ResourceLocation BLANK_TEXTURE = new ResourceLocation(MOD_ID, "textures/gui/empty.png");
     private float textureScaleX = 1, textureScaleY = 1;
     private Set<Element> elements = new HashSet<>();
 
@@ -46,18 +50,28 @@ public abstract class Screen extends GuiScreen implements ElementContainer {
     }
 
     @Override
-    public void drawWorldBackground(int index) {
+    public void drawWorldBackground(int yScroll) {
         Minecraft client = this.getClient();
         if (client.world != null) {
-            this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
+            this.drawGradientRect(0, 0, this.width, this.height, 0xC0101010, 0xD0101010);
         } else {
-            this.drawBackground(index);
+            this.drawBackground(yScroll);
         }
     }
 
     @Override
     public Tessellator getTessellator() {
         return Tessellator.getInstance();
+    }
+
+    @Override
+    public int getWindowWidth() {
+        return this.width;
+    }
+
+    @Override
+    public int getWindowHeight() {
+        return this.height;
     }
 
     @Override
@@ -68,6 +82,16 @@ public abstract class Screen extends GuiScreen implements ElementContainer {
     @Override
     public int getHeight() {
         return this.height;
+    }
+
+    @Override
+    public int getLocalX() {
+        return 0;
+    }
+
+    @Override
+    public int getLocalY() {
+        return 0;
     }
 
     @Override
@@ -86,6 +110,16 @@ public abstract class Screen extends GuiScreen implements ElementContainer {
     }
 
     @Override
+    public void updateScreen() {
+        super.updateScreen();
+        for (Element element : this.elements) {
+            if (element instanceof Updatable) {
+                ((Updatable) element).update();
+            }
+        }
+    }
+
+    @Override
     public void bindTexture(ResourceLocation texture, int width, int height) {
         getClient().getTextureManager().bindTexture(texture);
         this.textureScaleX = 1F / width;
@@ -96,15 +130,19 @@ public abstract class Screen extends GuiScreen implements ElementContainer {
     public final void drawScreen(int mouseX, int mouseY, float deltaTime) {
         this.drawBackground(mouseX, mouseY, deltaTime);
         for (Element element : this.elements) {
-            element.draw(mouseX, mouseY, deltaTime);
+            element.drawBackground(mouseX, mouseY, deltaTime);
         }
         this.drawForeground(mouseX, mouseY, deltaTime);
+        for (Element element : this.elements) {
+            element.drawForeground(mouseX, mouseY, deltaTime);
+        }
     }
 
     @Override
     public final void initGui() {
         super.initGui();
         this.getClient().setIngameNotInFocus();
+        this.elements.clear();
         this.init();
     }
 

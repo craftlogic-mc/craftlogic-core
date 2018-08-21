@@ -9,10 +9,10 @@ import ru.craftlogic.api.screen.ScreenWithInventory;
 import ru.craftlogic.common.inventory.ContainerSmeltingVat;
 import ru.craftlogic.common.tileentity.TileEntitySmeltingVat;
 
-import static ru.craftlogic.CraftLogic.MODID;
+import static ru.craftlogic.api.CraftAPI.MOD_ID;
 
 public class ScreenSmeltingVat extends ScreenWithInventory<ContainerSmeltingVat> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(MODID, "textures/gui/smelter.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(MOD_ID, "textures/gui/smelter.png");
     private final InventoryPlayer playerInv;
     private final TileEntitySmeltingVat smeltingVat;
     private final ContainerSmeltingVat container;

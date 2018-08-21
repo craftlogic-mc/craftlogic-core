@@ -23,6 +23,10 @@ public class MixinNetHandlerPlayServer {
     @Shadow
     public EntityPlayerMP player;
 
+    /**
+     * @author Radviger
+     * @reason Ability to edit/disable player leaving messages
+     */
     @Overwrite
     public void onDisconnect(ITextComponent reason) {
         LOGGER.info("{} lost connection: {}", this.player.getName(), reason.getUnformattedText());

@@ -34,6 +34,10 @@ public class MixinAdvancementManager {
     @Shadow
     private boolean hasErrored;
 
+    /**
+     * @author Radviger
+     * @reason Dirty hook
+     */
     @Overwrite
     private void loadBuiltInAdvancements(Map<ResourceLocation, Advancement.Builder> registry) {
         FileSystem filesystem = null;

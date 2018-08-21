@@ -1,23 +1,18 @@
 package ru.craftlogic.common.block;
 
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import ru.craftlogic.api.block.BlockBase;
-import ru.craftlogic.api.block.Colored;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
 import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.common.CraftBlocks;
+import ru.craftlogic.api.CraftBlocks;
 import ru.craftlogic.common.tileentity.TileEntityCauldron;
 
-import javax.annotation.Nullable;
-
-public class BlockCauldron extends BlockBase implements TileEntityHolder<TileEntityCauldron>, Colored {
-    public static final PropertyInteger FLUID_LEVEL = PropertyInteger.create("fluid_level", 0, 3);
+public class BlockCauldron extends BlockBase implements TileEntityHolder<TileEntityCauldron> {
 
     public BlockCauldron() {
         super(Material.ROCK, "cauldron", 1.5F, CreativeTabs.DECORATIONS);
@@ -56,15 +51,5 @@ public class BlockCauldron extends BlockBase implements TileEntityHolder<TileEnt
     @Override
     public TileEntityInfo<TileEntityCauldron> getTileEntityInfo(IBlockState state) {
         return new TileEntityInfo<>(TileEntityCauldron.class, state, TileEntityCauldron::new);
-    }
-
-    @Override
-    public int getBlockColor(@Nullable Location location, IBlockState state, int tint) {
-        if (location != null && tint == 1) {
-            TileEntityCauldron cauldron = location.getTileEntity(TileEntityCauldron.class);
-            return cauldron != null ? cauldron.getFluidColor() : 0;
-        } else {
-            return 0xFFFFFF;
-        }
     }
 }

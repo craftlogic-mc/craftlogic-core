@@ -3,12 +3,13 @@ package ru.craftlogic.coremod;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.fml.relauncher.CoreModManager;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import net.minecraftforge.fml.relauncher.libraries.LibraryManager;
+import net.minecraftforge.fml.relauncher.libraries.Repository;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.spongepowered.asm.launch.MixinBootstrap;
 import org.spongepowered.asm.mixin.Mixins;
-import ru.survivaltime.launcher.Cert;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -19,27 +20,27 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-@IFMLLoadingPlugin.MCVersion("1.12.2")
-@IFMLLoadingPlugin.Name("craftlogic-coremod")
+@IFMLLoadingPlugin.MCVersion("{@mc:version}")
+@IFMLLoadingPlugin.Name("{@mod:id}-coremod")
 @IFMLLoadingPlugin.SortingIndex(1002)
 public class CraftLogicCoremod implements IFMLLoadingPlugin {
     private static final Logger LOGGER = LogManager.getLogger("CLC");
 
+    private static final String GROOVY_VERSION = "2.4.4";
+    private static final String MIXIN_VERSION = "0.7.7-SNAPSHOT";
+
     public CraftLogicCoremod() {
-        Cert.setup();
+        if (!MIXIN_VERSION.startsWith(MixinBootstrap.VERSION)) {
+            LOGGER.warn("Your classpath contains different version of sponge-mixin. Things may go wrong!");
+        }
+
         MixinBootstrap.init();
         Mixins.addConfiguration("mixins.craftlogic.json");
     }
 
     @Override
     public String[] getASMTransformerClass() {
-        return new String[] {
-            //getTransformer("TransformerEntityAnimals")
-        };
-    }
-
-    private String getTransformer(String name) {
-        return "ru.craftlogic.coremod.asm." + name;
+        return new String[0];
     }
 
     @Override
@@ -55,23 +56,20 @@ public class CraftLogicCoremod implements IFMLLoadingPlugin {
 
     @Override
     public void injectData(Map<String, Object> data) {
-        String groovyVersion = "2.4.4";
-
         List<String> ignoredMods = CoreModManager.getIgnoredMods();
-        ignoredMods.add("groovy-"+groovyVersion+".jar");
-        ignoredMods.add("groovy-all-"+groovyVersion+".jar");
+        ignoredMods.add("groovy-"+GROOVY_VERSION+".jar");
+        ignoredMods.add("groovy-all-"+GROOVY_VERSION+".jar");
 
-        File mcDataDir = (File) data.get("mcLocation");
+        Repository repo = LibraryManager.getDefaultRepo();
 
+        String path = "/org/codehaus/groovy/groovy-all/"+GROOVY_VERSION+"/groovy-all-"+GROOVY_VERSION+".jar";
+        File lib = repo.getFile(path);
 
-        String filename = "org/codehaus/groovy/groovy-all/"+groovyVersion+"/groovy-all-"+groovyVersion+".jar";
-
-        File lib = new File(mcDataDir, "libraries/" + filename);
         if (!lib.exists()) {
-            LOGGER.info("Downloading groovy runtime library v"+groovyVersion);
+            LOGGER.info("Downloading groovy runtime library v"+GROOVY_VERSION);
             lib.getParentFile().mkdirs();
             try {
-                URL url = new URL("http://central.maven.org/maven2/" + filename);
+                URL url = new URL("http://central.maven.org/maven2" + path);
                 try(InputStream is = url.openConnection().getInputStream();
                     FileOutputStream out = new FileOutputStream(lib)){
 
@@ -105,4 +103,5 @@ public class CraftLogicCoremod implements IFMLLoadingPlugin {
     public String getAccessTransformerClass() {
         return null;
     }
+
 }

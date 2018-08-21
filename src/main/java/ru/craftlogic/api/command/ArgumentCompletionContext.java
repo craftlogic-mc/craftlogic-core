@@ -1,6 +1,6 @@
 package ru.craftlogic.api.command;
 
-import ru.craftlogic.api.server.Server;
+import ru.craftlogic.api.Server;
 import ru.craftlogic.api.world.CommandSender;
 import ru.craftlogic.api.world.Location;
 

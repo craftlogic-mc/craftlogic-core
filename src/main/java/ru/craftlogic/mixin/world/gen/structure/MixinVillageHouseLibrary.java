@@ -15,6 +15,10 @@ import java.util.Random;
 
 @Mixin(StructureVillagePieces.House1.class)
 public abstract class MixinVillageHouseLibrary extends StructureVillagePieces.Village {
+    /**
+     * @author Radviger
+     * @reason Fallable cobblestone
+     */
     @Overwrite
     public boolean addComponentParts(World world, Random rand, StructureBoundingBox bounding) {
         if (this.averageGroundLvl < 0) {

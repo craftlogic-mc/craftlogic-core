@@ -6,17 +6,16 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.CommandBlockBaseLogic;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
-import ru.craftlogic.CraftLogic;
-import ru.craftlogic.api.entity.Permissible;
-import ru.craftlogic.api.server.Server;
+import ru.craftlogic.api.CraftAPI;
+import ru.craftlogic.api.Server;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.util.WrappedCommandSender;
 
 public interface CommandSender extends Permissible, Locatable {
     default Server getServer() {
         ICommandSender handle = getHandle();
-        if (handle.getServer() == CraftLogic.getServer().getHandle()) {
-            return CraftLogic.getServer();
+        if (handle.getServer() == CraftAPI.getServer().getHandle()) {
+            return CraftAPI.getServer();
         } else {
             throw new IllegalStateException("Unknown server instance: " + handle.getServer());
         }
@@ -26,6 +25,8 @@ public interface CommandSender extends Permissible, Locatable {
     default ITextComponent getDisplayName() {
         return getHandle().getDisplayName();
     }
+
+    String getName();
 
     @Override
     default Location getLocation() {
@@ -51,8 +52,8 @@ public interface CommandSender extends Permissible, Locatable {
         if (sender instanceof EntityPlayerMP) {
             return server.getPlayer(((EntityPlayerMP) sender).getGameProfile());
         } else if (sender instanceof MinecraftServer) {
-            if (CraftLogic.getServer().getHandle() == sender) {
-                return CraftLogic.getServer();
+            if (CraftAPI.getServer().getHandle() == sender) {
+                return CraftAPI.getServer();
             }
         } else if (sender instanceof CommandBlockBaseLogic) {
             return new WrappedCommandSender(sender) {

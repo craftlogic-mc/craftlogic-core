@@ -20,6 +20,8 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
@@ -144,15 +146,15 @@ public class BlockBase extends Block implements ModelAutoReg {
 
     @Override final
     public void randomTick(World world, BlockPos pos, IBlockState state, Random rand) {
-        Location location = new Location(world, pos);
-        this.randomTick(location, rand);
+        this.randomTick(new Location(world, pos), rand);
+    }
+
+    protected void randomTick(Location location, Random rand) {
         TileEntityBase tile = location.getTileEntity(TileEntityBase.class);
         if (tile != null) {
             tile.randomTick(rand);
         }
     }
-
-    protected void randomTick(Location location, Random rand) {}
 
     @Override
     public boolean canPlaceBlockAt(World world, BlockPos pos) {
@@ -244,13 +246,20 @@ public class BlockBase extends Block implements ModelAutoReg {
     public int damageDropped(IBlockState state) {
         return this.hasSubtypes ? this.getMetaFromState(state) : 0;
     }
+
+    @Override
     @SideOnly(Side.CLIENT)
     public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
         this.randomDisplayTick(new LocationReadOnly(world, pos, state), rand);
     }
 
     @SideOnly(Side.CLIENT)
-    public void randomDisplayTick(Location location, Random rand) {}
+    public void randomDisplayTick(Location location, Random rand) {
+        TileEntityBase tile = location.getTileEntity(TileEntityBase.class);
+        if (tile != null) {
+            tile.randomDisplayTick(rand);
+        }
+    }
 
     @Override final
     public int getFlammability(IBlockAccess blockAccessor, BlockPos pos, EnumFacing side) {
@@ -275,8 +284,34 @@ public class BlockBase extends Block implements ModelAutoReg {
         return this.getFireSpreadSpeed(new LocationReadOnly(blockAccessor, pos, null), side);
     }
 
+    @Override final
+    public void fillWithRain(World world, BlockPos pos) {
+        this.fillWithRain(world, pos, FluidRegistry.WATER);
+    }
+
+    final
+    public void fillWithRain(World world, BlockPos pos, Fluid fluid) {
+        this.fillWithRain(new Location(world, pos), fluid);
+    }
+
+    protected void fillWithRain(Location location, Fluid fluid) {
+        TileEntityBase tile = location.getTileEntity(TileEntityBase.class);
+        if (tile != null) {
+            tile.fillWithRain(fluid);
+        }
+    }
+
     public int getFireSpreadSpeed(Location location, EnumFacing side) {
         return Blocks.FIRE.getEncouragement(this);
+    }
+
+    @Override final
+    public int getLightValue(IBlockState state, IBlockAccess blockAccessor, BlockPos pos) {
+        return this.getLightValue(new LocationReadOnly(blockAccessor, pos, state));
+    }
+
+    protected int getLightValue(Location location) {
+        return location.getBlockState().getLightValue();
     }
 
     protected Item asItem() {

@@ -32,10 +32,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import ru.craftlogic.api.entity.Bird;
-import ru.craftlogic.api.entity.Tameable;
+import ru.craftlogic.api.entity.Chicken;
 import ru.craftlogic.api.entity.ai.EntityAIMateBird;
-import ru.craftlogic.common.entity.ChickenVariant;
 import ru.craftlogic.util.ReflectiveUsage;
 
 import javax.annotation.Nullable;
@@ -44,7 +42,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Mixin(EntityChicken.class)
-public abstract class MixinEntityChicken extends EntityAnimal implements Bird<ChickenVariant>, Tameable {
+public abstract class MixinEntityChicken extends EntityAnimal implements Chicken {
     private static final DataParameter<Integer> VARIANT = EntityDataManager.createKey(EntityChicken.class, DataSerializers.VARINT);
     private static final DataParameter<Byte> TAMED = EntityDataManager.createKey(EntityChicken.class, DataSerializers.BYTE);
     private static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.createKey(EntityChicken.class, DataSerializers.OPTIONAL_UNIQUE_ID);
@@ -107,6 +105,7 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Bird<Ch
 
     /**
      * @author Radviger
+     * @reason Egg laying only when fed
      */
     @Override
     @Overwrite

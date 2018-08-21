@@ -8,10 +8,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import ru.craftlogic.common.item.ItemBowl;
-import ru.craftlogic.common.item.ItemBrick;
-import ru.craftlogic.common.item.ItemString;
-import ru.craftlogic.common.item.ItemWool;
+import ru.craftlogic.common.item.*;
 
 import java.util.Map;
 
@@ -22,6 +19,10 @@ public class MixinItem {
     @Shadow @Final
     private static Map<Block, Item> BLOCK_TO_ITEM;
 
+    /**
+     * @author Radviger
+     * @reason Custom vanilla items
+     */
     @Overwrite
     private static void registerItem(int id, ResourceLocation name, Item item) {
         switch (name.toString()) {
@@ -55,12 +56,29 @@ public class MixinItem {
         REGISTRY.register(id, name, item);
     }
 
+    /**
+     * @author Radviger
+     * @reason Custom vanilla items
+     */
     @Overwrite
     protected static void registerItemBlock(Block block, Item item) {
         ResourceLocation name = Block.REGISTRY.getNameForObject(block);
         switch (name.toString()) {
-            case "minecraft:carpet": {
+            case "minecraft:wool": {
                 item = new ItemWool(block);
+                break;
+            }
+            case "minecraft:carpet": {
+                item = new ItemCarpet(block);
+                break;
+            }
+            case "minecraft:brown_mushroom":
+            case "minecraft:red_mushroom": {
+                item = new ItemMushroom(block);
+                break;
+            }
+            case "minecraft:torch": {
+                item = new ItemBurningTorch(block);
                 break;
             }
         }

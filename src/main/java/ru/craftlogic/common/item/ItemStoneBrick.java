@@ -23,6 +23,11 @@ public class ItemStoneBrick extends ItemBase implements ThrowableItem {
     }
 
     @Override
+    public float getProjectileGravityVelocity(EntityThrownItem item) {
+        return 0.1F;
+    }
+
+    @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         return !player.isSneaking()
                 ? this.shoot(world, player, player.getHeldItem(hand))

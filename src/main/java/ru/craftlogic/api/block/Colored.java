@@ -10,6 +10,7 @@ import ru.craftlogic.api.world.LocationReadOnly;
 import javax.annotation.Nullable;
 
 public interface Colored {
+    @Deprecated
     default int getBlockColor(IBlockState state, @Nullable IBlockAccess blockAccessor, @Nullable BlockPos pos, int tint) {
         Location location = blockAccessor != null && pos != null ? new LocationReadOnly(blockAccessor, pos, state) : null;
         return this.getBlockColor(location, state, tint);

@@ -4,11 +4,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
+import ru.craftlogic.api.inventory.InventoryFieldHolder;
 import ru.craftlogic.api.inventory.InventoryHolder;
-import ru.craftlogic.api.inventory.manager.InventoryItemManager;
-import ru.craftlogic.api.inventory.manager.SizeCheckedItemManager;
+import ru.craftlogic.api.inventory.WrappedInventoryFieldHolder;
+import ru.craftlogic.api.inventory.manager.InventoryManager;
+import ru.craftlogic.api.inventory.manager.SizeCheckedInventoryManager;
 import ru.craftlogic.api.world.OfflinePlayer;
 import ru.craftlogic.api.world.Player;
+
+import javax.annotation.Nullable;
 
 public class WrappedPlayerInventory implements InventoryHolder {
     private final InventoryPlayer inventory;
@@ -32,8 +36,8 @@ public class WrappedPlayerInventory implements InventoryHolder {
     }
 
     @Override
-    public InventoryItemManager getItemManager() {
-        return new SizeCheckedItemManager(this.getInventory(), slot -> this.markDirty());
+    public InventoryManager getInventoryManager() {
+        return new SizeCheckedInventoryManager(this.getInventory(), slot -> this.markDirty());
     }
 
     private InventoryPlayer getInventory() {
@@ -75,5 +79,11 @@ public class WrappedPlayerInventory implements InventoryHolder {
             this.player.saveData(this.viewer.getWorld(), true);
         }
         this.viewer.playSound(SoundEvents.BLOCK_CHEST_CLOSE, 1F, 1F);
+    }
+
+    @Nullable
+    @Override
+    public InventoryFieldHolder getFieldHolder() {
+        return new WrappedInventoryFieldHolder(inventory);
     }
 }

@@ -1,17 +1,19 @@
 package ru.craftlogic.common.command;
 
+import net.minecraft.block.BlockWorkbench;
 import net.minecraft.command.CommandException;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.world.GameType;
 import net.minecraftforge.common.util.FakePlayer;
 import org.apache.commons.lang3.StringUtils;
 import ru.craftlogic.api.command.*;
 import ru.craftlogic.api.command.CommandContext.Argument;
-import ru.craftlogic.api.server.Server;
+import ru.craftlogic.api.Server;
 import ru.craftlogic.api.text.Text;
-import ru.craftlogic.api.text.TextTranslation;
 import ru.craftlogic.api.util.WrappedPlayerEnderchest;
 import ru.craftlogic.api.util.WrappedPlayerInventory;
 import ru.craftlogic.api.world.*;
+import ru.craftlogic.api.CraftSounds;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +23,7 @@ import java.util.Set;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
-public class GameplayCommands implements CommandRegisterer {
+public class GameplayCommands implements CommandRegistrar {
     @Command(name = "gamemode", aliases = "gm", syntax = {
         "<mode:GameMode>",
         "<mode:GameMode> <player:Player>",
@@ -35,9 +37,8 @@ public class GameplayCommands implements CommandRegisterer {
                 if (ctx.checkPermissions(true, "commands.gamemode.others")) {
                     Player target = ctx.get("player").asPlayer();
                     target.setGameMode(mode);
-                    ctx.sendMessage(
-                        new TextTranslation("commands.gamemode.set.other")
-                            .gray()
+                    ctx.sendNotification(
+                        Text.translation("commands.gamemode.set.other").gray()
                             .arg(target.getDisplayName())
                             .argTranslate("commands.gamemode." + modeName, Text::darkGray)
                     );
@@ -45,9 +46,8 @@ public class GameplayCommands implements CommandRegisterer {
             } else {
                 Player sender = ctx.senderAsPlayer();
                 sender.setGameMode(mode);
-                ctx.sendMessage(
-                    new TextTranslation("commands.gamemode.set.self")
-                        .gray()
+                ctx.sendNotification(
+                    Text.translation("commands.gamemode.set.self").gray()
                         .argTranslate("commands.gamemode." + modeName, Text::darkGray)
                 );
             }
@@ -57,8 +57,7 @@ public class GameplayCommands implements CommandRegisterer {
             GameType newMode = GameType.getByID((sender.getGameMode().getID() + 1) % (GameType.values().length - 1));
             sender.setGameMode(newMode);
             ctx.sendMessage(
-                new TextTranslation("commands.gamemode.toggle")
-                    .gray()
+                Text.translation("commands.gamemode.toggle").gray()
                     .argTranslate("commands.gamemode." + oldMode.getName(), Text::darkGray)
                     .argTranslate("commands.gamemode." + newMode.getName(), Text::darkGray)
             );
@@ -77,49 +76,111 @@ public class GameplayCommands implements CommandRegisterer {
         target.setFlyingAllowed(fly);
         String mode = "commands.fly." + (fly ? "on" : "off");
         if (!ctx.has("player") || ctx.senderAsPlayer().equals(target)) {
-            ctx.sendMessage(
-                new TextTranslation("commands.fly.self")
-                    .gray()
+            ctx.sendNotification(
+                Text.translation("commands.fly.self").gray()
                     .argTranslate(mode, Text::darkGray)
             );
         } else {
-            ctx.sendMessage(
-                new TextTranslation("commands.fly.self")
-                    .gray()
+            ctx.sendNotification(
+                Text.translation("commands.fly.self").gray()
                     .argTranslate(mode, Text::darkGray)
                     .arg(target.getDisplayName())
             );
         }
     }
 
+    @Command(name = "heal", syntax = {
+        "<target:Player>",
+        ""
+    })
+    public static void commandHeal(CommandContext ctx) throws CommandException {
+        Player target = ctx.has("target") ? ctx.get("target").asPlayer() : ctx.senderAsPlayer();
+        if (target.heal()) {
+            target.playSound(CraftSounds.HEAL, 1F, ctx.randomFloat(0.7F));
+            if (ctx.sender() == target) {
+                ctx.sendNotification(
+                    Text.translation("commands.heal.self").gray()
+                );
+            } else {
+                ctx.sendNotification(
+                    Text.translation("commands.heal.other").gray()
+                        .arg(target.getName(), Text::darkGray)
+                );
+            }
+        } else {
+            if (ctx.sender() == target) {
+                throw new CommandException("commands.heal.self.not_hurt");
+            } else {
+                throw new CommandException("commands.heal.other.not_hurt", target.getName());
+            }
+        }
+    }
+
+    @Command(name = "feed", syntax = {
+        "<target:Player>",
+        ""
+    })
+    public static void commandFeed(CommandContext ctx) throws CommandException {
+        Player target = ctx.has("target") ? ctx.get("target").asPlayer() : ctx.senderAsPlayer();
+        if (target.feed()) {
+            target.playSound(SoundEvents.ENTITY_PLAYER_BURP, 1F, ctx.randomFloat(0.7F));
+            if (ctx.sender() == target) {
+                ctx.sendNotification(
+                    Text.translation("commands.feed.self").gray()
+                );
+            } else {
+                ctx.sendNotification(
+                    Text.translation("commands.feed.other").gray()
+                        .arg(target.getName(), Text::darkGray)
+                );
+            }
+        } else {
+            if (ctx.sender() == target) {
+                throw new CommandException("commands.feed.self.not_hungry");
+            } else {
+                throw new CommandException("commands.feed.other.not_hungry", target.getName());
+            }
+        }
+    }
+
+    @Command(name = "craft", syntax = {
+        "",
+        "<target:Player>"
+    })
+    public static void commandCraft(CommandContext ctx) throws CommandException {
+        Player target = ctx.has("target") ? ctx.get("target").asPlayer() : ctx.senderAsPlayer();
+        Location location = target.getLocation();
+        target.openInteraction(new BlockWorkbench.InterfaceCraftingTable(location.getWorld(), location.getPos()));
+    }
+
     @Command(name = "inventory", aliases = "inv", syntax = {
-        "<player:Player>"
+        "<target:Player>"
     })
     public static void commandInventory(CommandContext ctx) throws CommandException {
         Player viewer = ctx.senderAsPlayer();
-        OfflinePlayer target = ctx.get("player").asOfflinePlayer();
+        OfflinePlayer target = ctx.get("target").asOfflinePlayer();
         World requesterWorld = viewer.getWorld();
         if (target.loadData(requesterWorld, true)) {
             FakePlayer fakePlayer = target.asFake(requesterWorld);
             viewer.openChestInventory(new WrappedPlayerInventory(fakePlayer.inventory, viewer, target));
         } else {
-            throw new CommandException("commands.inventory.no_data", target.getProfile().getName());
+            throw new CommandException("commands.inventory.no_data", target.getName());
         }
     }
 
     @Command(name = "enderchest", aliases = "ec", syntax = {
-        "<player:Player>",
+        "<target:Player>",
         ""
     })
     public static void commandEnderchest(CommandContext ctx) throws CommandException {
         Player viewer = ctx.senderAsPlayer();
-        OfflinePlayer target = ctx.has("player") ? ctx.get("player").asOfflinePlayer() : viewer;
+        OfflinePlayer target = ctx.has("target") ? ctx.get("target").asOfflinePlayer() : viewer;
         World requesterWorld = viewer.getWorld();
         if (target.loadData(requesterWorld, true)) {
             FakePlayer fakePlayer = target.asFake(requesterWorld);
             viewer.openChestInventory(new WrappedPlayerEnderchest(fakePlayer.getInventoryEnderChest(), viewer, target));
         } else {
-            throw new CommandException("commands.inventory.no_data", target.getProfile().getName());
+            throw new CommandException("commands.inventory.no_data", target.getName());
         }
     }
 
@@ -145,8 +206,8 @@ public class GameplayCommands implements CommandRegisterer {
                         time = ctx.get("value").asInt();
                     }
                     for (World world : getAffectedWorlds(ctx.sender())) {
-                        ctx.sendMessage(
-                            new TextTranslation("commands.time.set")
+                        ctx.sendNotification(
+                            Text.translation("commands.time.set")
                                 .yellow()
                                 .argTranslate("%s", a -> {
                                     if (phrase) {
@@ -155,7 +216,7 @@ public class GameplayCommands implements CommandRegisterer {
                                         a.argTranslate("commands.time.ticks", b -> b.arg(time).gold());
                                     }
                                 })
-                                .argText(world.getName(), Text::gold)
+                                .arg(world.getName(), Text::gold)
                         );
                         world.setTotalTime(time);
                     }
@@ -169,11 +230,11 @@ public class GameplayCommands implements CommandRegisterer {
                         time = ctx.get("value").asInt();
                     }
                     for (World world : getAffectedWorlds(ctx.sender())) {
-                        ctx.sendMessage(
-                            new TextTranslation("commands.time.added")
+                        ctx.sendNotification(
+                            Text.translation("commands.time.added")
                                 .yellow()
                                 .argTranslate("commands.time.ticks", b -> b.arg(time).gold())
-                                .argText(world.getName(), Text::gold)
+                                .arg(world.getName(), Text::gold)
                         );
                         world.addTotalTime(time);
                     }
@@ -184,25 +245,25 @@ public class GameplayCommands implements CommandRegisterer {
                     switch (ctx.action()) {
                         case "day": {
                             ctx.sendMessage(
-                                new TextTranslation("commands.time.query.days")
+                                Text.translation("commands.time.query.days")
                                     .gray()
-                                    .argText(String.valueOf(world.getTotalDays()), Text::darkGray)
+                                    .arg(String.valueOf(world.getTotalDays()), Text::darkGray)
                             );
                             break;
                         }
                         case "daytime": {
                             ctx.sendMessage(
-                                new TextTranslation("commands.time.query")
+                                Text.translation("commands.time.query")
                                     .gray()
-                                    .argText(String.valueOf(world.getCurrentDayTime()), Text::darkGray)
+                                    .arg(String.valueOf(world.getCurrentDayTime()), Text::darkGray)
                             );
                             break;
                         }
                         case "gametime": {
                             ctx.sendMessage(
-                                new TextTranslation("commands.time.query.total")
+                                Text.translation("commands.time.query.total")
                                     .gray()
-                                    .argText(String.valueOf(world.getTotalTime()), Text::darkGray)
+                                    .arg(String.valueOf(world.getTotalTime()), Text::darkGray)
                             );
                             break;
                         }
@@ -214,11 +275,10 @@ public class GameplayCommands implements CommandRegisterer {
             String phrase = ctx.action();
             long time = parseTimePhrase(phrase);
             for (World world : getAffectedWorlds(ctx.sender())) {
-                ctx.sendMessage(
-                    new TextTranslation("commands.time.set")
-                        .yellow()
-                        .argTranslate("commands.time.set." + phrase, Text::gold)
-                        .argText(world.getName(), Text::gold)
+                ctx.sendNotification(
+                    Text.translation("commands.time.set").gray()
+                        .arg(world.getName(), Text::darkGray)
+                        .argTranslate("commands.time.set." + phrase, Text::darkGray)
                 );
                 world.setTotalTime(time);
             }
@@ -314,7 +374,7 @@ public class GameplayCommands implements CommandRegisterer {
     }
 
     @ArgumentCompleter(type = {"XCoord", "YCoord", "ZCoord"})
-    public static List<String> completerXCoord(ArgumentCompletionContext ctx) {
+    public static List<String> completerCoord(ArgumentCompletionContext ctx) {
         if (ctx.partialName().isEmpty()) {
             Location location = ctx.targetBlockOrSelfLocation();
             int coord = -1;

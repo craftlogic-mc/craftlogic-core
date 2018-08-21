@@ -3,17 +3,20 @@ package ru.craftlogic.api.world;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.WorldServer;
-import ru.craftlogic.api.server.Server;
+import ru.craftlogic.api.Server;
 
+import java.lang.ref.WeakReference;
 import java.util.Objects;
 
 public class World {
     private final Server server;
     private final Dimension dimension;
+    private final WeakReference<WorldServer> handle;
 
-    public World(Server server, Dimension dimension) {
+    public World(Server server, WorldServer handle) {
         this.server = server;
-        this.dimension = dimension;
+        this.dimension = Dimension.fromVanilla(handle.provider.getDimensionType());
+        this.handle = new WeakReference<>(handle);
     }
 
     public String getName() {
@@ -24,8 +27,12 @@ public class World {
         return this.dimension;
     }
 
+    public boolean isLoaded() {
+        return getHandle() != null;
+    }
+
     public WorldServer getHandle() {
-        return this.server.getHandle().getWorld(this.dimension.getVanilla().getId());
+        return this.handle.get();
     }
 
     public Location getLocation(BlockPos pos) {

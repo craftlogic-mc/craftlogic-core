@@ -2,6 +2,7 @@ package ru.craftlogic.api.recipe;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
+import ru.craftlogic.api.CraftRecipes;
 
 public class ProcessingRecipe<M extends RecipeGrid, R extends Recipe<M>> {
     private final Class<M> matrixType;
@@ -55,12 +56,12 @@ public class ProcessingRecipe<M extends RecipeGrid, R extends Recipe<M>> {
         compound.setInteger("timer", this.timer);
     }
 
-    public static <M extends RecipeGrid, R extends Recipe<M>> ProcessingRecipe<M, R> readFromNBT(Class<M> matrixType, NBTTagCompound compound) {
+    public static <G extends RecipeGrid, R extends Recipe<G>> ProcessingRecipe<G, R> readFromNBT(Class<G> gridType, NBTTagCompound compound) {
         ResourceLocation recipeName = new ResourceLocation(compound.getString("recipe"));
         int timer = compound.getInteger("timer");
-        R recipe = Recipes.getByName(matrixType, recipeName);
+        R recipe = CraftRecipes.getByName(gridType, recipeName);
         if (recipe != null) {
-            ProcessingRecipe<M, R> pr = new ProcessingRecipe<>(matrixType, recipe);
+            ProcessingRecipe<G, R> pr = new ProcessingRecipe<>(gridType, recipe);
             pr.timer = timer;
             return pr;
         }

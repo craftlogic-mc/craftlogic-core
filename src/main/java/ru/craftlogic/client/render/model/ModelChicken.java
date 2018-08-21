@@ -3,7 +3,6 @@ package ru.craftlogic.client.render.model;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
-import org.lwjgl.opengl.GL11;
 
 import static net.minecraft.util.math.MathHelper.cos;
 
@@ -108,21 +107,14 @@ public class ModelChicken extends ModelBase {
     @Override
     public void render(Entity chicken, float limbSwing, float limbSingMod, float rotation, float deltaYaw, float pitch, float scale) {
         if (this.isChild) {
-            GL11.glPushMatrix();
             this.setRotationAngles(limbSwing, limbSingMod, rotation, deltaYaw, pitch, scale, chicken);
-            GL11.glScalef(0.7F, 0.7F, 0.7F);
-            GL11.glTranslatef(0F, 0.6F, 0F);
             this.chickHead.render(scale);
             this.chickBill.render(scale);
             this.chickBody.render(scale);
             this.chickRightLeg.render(scale);
             this.chickLeftLeg.render(scale);
-            GL11.glPopMatrix();
         } else {
-            GL11.glPushMatrix();
             this.setRotationAngles(limbSwing, limbSingMod, rotation, deltaYaw, pitch, scale, chicken);
-            GL11.glScalef(1.3F, 1.3F, 1.3F);
-            GL11.glTranslatef(0F, -0.6F, 0F);
             this.rightLeg.render(scale);
             this.leftLeg.render(scale);
             this.head.render(scale);
@@ -133,7 +125,6 @@ public class ModelChicken extends ModelBase {
             this.tail.render(scale);
             this.rightWing.render(scale);
             this.leftWing.render(scale);
-            GL11.glPopMatrix();
         }
     }
 
@@ -144,14 +135,14 @@ public class ModelChicken extends ModelBase {
     }
 
     @Override
-    public void setRotationAngles(float limbSwing, float limbSingMod, float rotation, float yaw, float deltaPitch, float scale, Entity chicken) {
-        super.setRotationAngles(limbSwing, limbSingMod, rotation, yaw, deltaPitch, scale, chicken);
+    public void setRotationAngles(float limbSwing, float limbSingMod, float rotation, float yaw, float pitch, float scale, Entity chicken) {
+        super.setRotationAngles(limbSwing, limbSingMod, rotation, yaw, pitch, scale, chicken);
         if (chicken.getEntityId() % 2 == 0) {
             yaw += 90F;
         } else {
             yaw -= 90F;
         }
-        this.head.rotateAngleX = (float) Math.toRadians(deltaPitch);
+        this.head.rotateAngleX = (float) Math.toRadians(pitch);
         this.head.rotateAngleY = (float) Math.toRadians(yaw);
         this.rightLeg.rotateAngleX = cos(limbSwing * 0.6662F) * 1.4F * limbSingMod;
         this.leftLeg.rotateAngleX = cos((float) (limbSwing * 0.6662F + Math.PI)) * 1.4F * limbSingMod;

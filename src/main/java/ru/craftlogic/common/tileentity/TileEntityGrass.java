@@ -43,8 +43,6 @@ public class TileEntityGrass extends TileEntityBase implements Updatable, PlantS
             if (type != null) {
                 this.plant = type.createPlant(getLocation(), this);
                 this.plant.deserializeNBT(plant.getCompoundTag("data"));
-            } else {
-                System.out.println("Unable to find plant: " + name);
             }
         }
     }
@@ -55,7 +53,6 @@ public class TileEntityGrass extends TileEntityBase implements Updatable, PlantS
         if (this.plant != null) {
             NBTTagCompound plant = new NBTTagCompound();
             String name = this.plant.getRegistryName().toString();
-            System.out.println("Saving plant with name: " + name);
             plant.setString("name", name);
             plant.setTag("data", this.plant.serializeNBT());
             compound.setTag("plant", plant);
@@ -68,12 +65,6 @@ public class TileEntityGrass extends TileEntityBase implements Updatable, PlantS
         if (this.plant != null) {
             this.plant.randomTick(random);
         }
-    }
-
-    @Override
-    public void invalidate() {
-        super.invalidate();
-        System.out.println("Grass tile invalidated on " + (world.isRemote ? "client" : "server"));
     }
 
     @Override

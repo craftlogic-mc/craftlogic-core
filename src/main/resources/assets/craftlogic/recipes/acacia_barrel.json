@@ -1,0 +1,32 @@
+{
+  "conditions": [
+    {
+      "type": "minecraft:item_exists",
+      "item": "craftlogic:barrel_wood"
+    }
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:planks",
+      "data": 4
+    },
+    "T": {
+      "item": "minecraft:wooden_pressure_plate"
+    },
+    "S": {
+      "item": "minecraft:wooden_slab",
+      "data": 4
+    }
+  },
+  "pattern": [
+    "PTP",
+    "P P",
+    "PSP"
+  ],
+  "result": {
+    "count": 1,
+    "item": "craftlogic:barrel_wood",
+    "data": 4
+  },
+  "type": "minecraft:crafting_shaped"
+}

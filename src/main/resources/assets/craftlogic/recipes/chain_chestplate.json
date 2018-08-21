@@ -1,0 +1,23 @@
+{
+  "conditions": [
+    {
+      "type": "minecraft:item_exists",
+      "item": "minecraft:chainmail_chestplate"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "A A",
+    "AAA",
+    "AAA"
+  ],
+  "key": {
+    "A": {
+      "item": "craftlogic:chain_mesh"
+    }
+  },
+  "result": {
+    "item": "minecraft:chainmail_chestplate",
+    "count": 1
+  }
+}

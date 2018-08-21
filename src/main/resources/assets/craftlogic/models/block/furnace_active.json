@@ -1,4 +1,5 @@
 {
+    "parent": "block/block",
     "textures": {
         "particle": "craftlogic:blocks/furnace_side",
         "side": "craftlogic:blocks/furnace_side",

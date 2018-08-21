@@ -19,11 +19,13 @@ import ru.craftlogic.api.block.Updatable;
 import ru.craftlogic.api.block.holders.ScreenHolder;
 import ru.craftlogic.api.inventory.InventoryFieldHolder;
 import ru.craftlogic.api.inventory.InventoryHolder;
-import ru.craftlogic.api.inventory.manager.InventoryItemManager;
-import ru.craftlogic.api.inventory.manager.ListInventoryItemManager;
+import ru.craftlogic.api.inventory.manager.InventoryManager;
+import ru.craftlogic.api.inventory.manager.ListInventoryManager;
 import ru.craftlogic.api.recipe.ProcessingRecipe;
-import ru.craftlogic.api.recipe.Recipes;
+import ru.craftlogic.api.CraftRecipes;
 import ru.craftlogic.api.tile.TileEntityBase;
+import ru.craftlogic.api.util.ExperienceBuffer;
+import ru.craftlogic.api.util.TemperatureBuffer;
 import ru.craftlogic.client.screen.ScreenSmeltingVat;
 import ru.craftlogic.common.inventory.ContainerSmeltingVat;
 import ru.craftlogic.common.recipe.RecipeAlloying;
@@ -35,10 +37,10 @@ public class TileEntitySmeltingVat extends TileEntityBase implements HeatAccepto
         InventoryHolder, ScreenHolder, RecipeGridAlloying {
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(3, ItemStack.EMPTY);
-    private int temperature, hotTemperature = 2000, maxTemperature = 2200;
+    private final ExperienceBuffer experience = new ExperienceBuffer(Float.MAX_VALUE);
+    private final TemperatureBuffer temperature = new TemperatureBuffer(2000);
     private ProcessingRecipe<RecipeGridAlloying, RecipeAlloying> currentRecipe;
     public boolean locked;
-    public float exp;
 
     public TileEntitySmeltingVat(World world, IBlockState state) {
         super(world, state);
@@ -58,18 +60,18 @@ public class TileEntitySmeltingVat extends TileEntityBase implements HeatAccepto
         this.ticksExisted++;
 
         if (!this.world.isRemote) {
-            if (this.temperature > 0 && this.ticksExisted % 4 == 0) {
-                this.temperature--;
+            if (this.temperature.getStored() > 0 && this.ticksExisted % 4 == 0) {
+                this.temperature.drain(1, false);
             }
 
-            if (this.temperature > 0 && this.canOperate()) {
+            if (this.temperature.getStored() > 0 && this.canOperate()) {
                 if (this.currentRecipe != null) {
-                    int speed = (int) Math.max(1F, 2F * (float) this.temperature / (float)this.currentRecipe.getRecipe().getTemperature());
+                    int speed = (int) Math.max(1F, 2F * (float) this.temperature.getStored() / (float)this.currentRecipe.getRecipe().getTemperature());
                     for (int i = 0; i < speed; i++) {
                         if (!this.currentRecipe.incrTimer()) {
                             RecipeAlloying recipe = this.currentRecipe.getRecipe();
                             ItemStack ist = recipe.getResult();
-                            this.exp += recipe.getExp();
+                            this.experience.accept(getLocation(), recipe.getExp(), false);
                             this.growSlotContents(SmelterSlot.OUTPUT, ist, ist.getCount());
                             this.currentRecipe = null;
                             this.markDirty();
@@ -77,7 +79,7 @@ public class TileEntitySmeltingVat extends TileEntityBase implements HeatAccepto
                         }
                     }
                 } else {
-                    RecipeAlloying recipe = Recipes.getMatchingRecipe(this);
+                    RecipeAlloying recipe = CraftRecipes.getMatchingRecipe(this);
                     if (recipe != null) {
                         this.currentRecipe = new ProcessingRecipe<>(this, recipe);
                         this.currentRecipe.consume(this);
@@ -123,7 +125,7 @@ public class TileEntitySmeltingVat extends TileEntityBase implements HeatAccepto
 
     @Override
     public int getTemperature() {
-        return temperature;
+        return temperature.getStored();
     }
 
     @Override
@@ -132,31 +134,21 @@ public class TileEntitySmeltingVat extends TileEntityBase implements HeatAccepto
     }
 
     @Override
-    public void setTemperature(int temperature) {
-        this.temperature = temperature;
-    }
-
-    @Override
-    public int getHotTemperature() {
-        return hotTemperature;
-    }
-
-    @Override
     public int getMaxTemperature() {
-        return maxTemperature;
+        return this.temperature.getCapacity();
     }
 
     @Override
     public int acceptHeat(EnumFacing side, int amount) {
         if (this.ticksExisted % 2 == 0) {
-            this.temperature += amount;
+            this.temperature.accept(amount, false);
         }
         return amount;
     }
 
     @Override
-    public InventoryItemManager getItemManager() {
-        return new ListInventoryItemManager(this.items);
+    public InventoryManager getInventoryManager() {
+        return new ListInventoryManager(this.items);
     }
 
     @Override
@@ -164,7 +156,6 @@ public class TileEntitySmeltingVat extends TileEntityBase implements HeatAccepto
         fieldHolder.addReadOnlyField(SmelterField.PROGRESS, this::getProgressTime);
         fieldHolder.addReadOnlyField(SmelterField.REQUIRED_TIME, this::getRequiredTime);
         fieldHolder.addReadOnlyField(SmelterField.TEMPERATURE, this::getTemperature);
-        fieldHolder.addReadOnlyField(SmelterField.HOT_TEMPERATURE, this::getHotTemperature);
         fieldHolder.addReadOnlyField(SmelterField.MAX_TEMPERATURE, this::getMaxTemperature);
     }
 
@@ -183,9 +174,7 @@ public class TileEntitySmeltingVat extends TileEntityBase implements HeatAccepto
             NBTTagCompound pr = compound.getCompoundTag("ProcessingRecipe");
             this.currentRecipe = ProcessingRecipe.readFromNBT(RecipeGridAlloying.class, pr);
         }
-        this.temperature = compound.getShort("Temperature");
-        //this.hotTemperature = compound.getShort("HotTemperature");
-        //this.maxTemperature = compound.getShort("MaxTemperature");
+        this.temperature.readFromNBT(compound, "Temperature");
         ItemStackHelper.loadAllItems(compound, this.items);
     }
 
@@ -197,9 +186,7 @@ public class TileEntitySmeltingVat extends TileEntityBase implements HeatAccepto
             this.currentRecipe.writeToNBT(pr);
             compound.setTag("ProcessingRecipe", pr);
         }
-        compound.setShort("Temperature", (short) this.temperature);
-        compound.setShort("HotTemperature", (short) this.hotTemperature);
-        compound.setShort("MaxTemperature", (short) this.maxTemperature);
+        this.temperature.writeToNBT(compound, "Temperature");
         ItemStackHelper.saveAllItems(compound, this.items);
         return compound;
     }
@@ -221,15 +208,14 @@ public class TileEntitySmeltingVat extends TileEntityBase implements HeatAccepto
     }
 
     @Override
-    public float takeExp() {
-        float exp = this.exp;
-        this.exp = 0;
-        return exp;
+    public float takeExp(float amount, boolean simulate) {
+        return this.experience.drain(amount, simulate);
     }
 
     @Override
-    protected void writeToPacket(NBTTagCompound compound) {
+    protected NBTTagCompound writeToPacket(NBTTagCompound compound) {
         compound.setBoolean("locked", this.locked);
+        return compound;
     }
 
     @Override
@@ -244,6 +230,6 @@ public class TileEntitySmeltingVat extends TileEntityBase implements HeatAccepto
     }
 
     public enum SmelterField implements FieldIdentifier {
-        PROGRESS, REQUIRED_TIME, TEMPERATURE, HOT_TEMPERATURE, MAX_TEMPERATURE
+        PROGRESS, REQUIRED_TIME, TEMPERATURE, MAX_TEMPERATURE
     }
 }

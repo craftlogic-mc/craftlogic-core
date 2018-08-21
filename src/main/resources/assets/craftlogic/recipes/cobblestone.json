@@ -1,0 +1,22 @@
+{
+  "conditions": [
+    {
+      "type": "minecraft:item_exists",
+      "item": "craftlogic:rock"
+    }
+  ],
+  "key": {
+    "A": {
+      "item": "craftlogic:rock"
+    }
+  },
+  "pattern": [
+    "AA",
+    "AA"
+  ],
+  "result": {
+    "count": 1,
+    "item": "minecraft:cobblestone"
+  },
+  "type": "minecraft:crafting_shaped"
+}

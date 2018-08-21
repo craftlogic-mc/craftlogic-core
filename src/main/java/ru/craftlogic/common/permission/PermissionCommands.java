@@ -6,121 +6,134 @@ import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.management.PlayerProfileCache;
 import ru.craftlogic.api.command.*;
 import ru.craftlogic.api.text.Text;
-import ru.craftlogic.api.text.TextTranslation;
 import ru.craftlogic.api.world.OfflinePlayer;
+import ru.craftlogic.common.permission.GroupManager.Group;
+import ru.craftlogic.common.permission.UserManager.User;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class PermissionCommands implements CommandRegisterer {
+public class PermissionCommands implements CommandRegistrar {
     @Command(name = "perm", syntax = {
-        "group <group:PermissionGroup> [create|prefix|suffix|addPerm|delPerm] <value>...",
-        "group <group:PermissionGroup> [create|delete|info|prefix|suffix|users]",
-        "user <username:CachedUsername> [addGroup|delGroup|prefix|suffix] <value>...",
-        "user <username:CachedUsername> [info|groups|prefix|suffix]"
-    }, aliases = "permissions")
+        "group <group:PermGroup> permissions [add|delete] <value>...",
+        "group <group:PermGroup> permissions",
+        "group <group:PermGroup> [create|prefix|suffix] <value>...",
+        "group <group:PermGroup> [create|delete|prefix|suffix|users]",
+        "group <group:PermGroup>",
+        "user <username:OfflinePlayer> groups [add|delete] <value>...",
+        "user <username:OfflinePlayer> groups",
+        "user <username:OfflinePlayer> permissions [add|delete] <value>...",
+        "user <username:OfflinePlayer> permissions",
+        "user <username:OfflinePlayer> [prefix|suffix] <value>...",
+        "user <username:OfflinePlayer> [prefix|suffix]",
+        "user <username:OfflinePlayer>"
+    }, aliases = {"perms", "permission", "permissions"})
     public static void commandPerm(CommandContext ctx) throws Exception {
-        String firstConst = ctx.constant();
         PermissionManager permissionManager = ctx.server().getPermissionManager();
         PlayerProfileCache profileCache = ctx.server().getProfileCache();
-        switch (firstConst) {
-            case "group":
+        switch (ctx.constant(0)) {
+            case "group": {
                 String groupName = ctx.get("group").asString();
-                PermissionManager.Group group = permissionManager.getGroup(groupName);
-                if (ctx.action().equals("create")) {
-                    if (group != null) {
-                        throw new CommandException("commands.perm.group.create.exists", groupName);
-                    }
-                    int priority = 0;
-                    String parent = "default";
-                    if (ctx.has("value")) {
-                        String value = ctx.get("value").asString();
-                        if (value.contains(" ")) {
-                            String[] vals = value.split(" ");
-                            switch (vals.length) {
-                                case 2:
-                                    priority = Integer.parseInt(vals[1]);
-                                case 1:
-                                    parent = vals[0];
-                                    break;
-                                default:
-                                    throw new WrongUsageException("commands.perm.usage");
+                Group group = permissionManager.getGroup(groupName);
+                if (ctx.hasConstant(1)) {
+                    switch (ctx.constant(1)) {
+                        case "permissions": {
+                            if (ctx.has("value")) {
+                                String perm = ctx.get("value").asString();
+                                switch (ctx.action()) {
+                                    case "add": {
+                                        boolean added = group.permissions.add(perm);
+                                        ctx.sendMessage("commands.perm.group.permissions.add." + (added ? "success" : "unable"), perm, groupName);
+                                        break;
+                                    }
+                                    case "delete": {
+                                        boolean deleted = group.permissions.remove(perm);
+                                        ctx.sendMessage("commands.perm.group.permissions.delete." + (deleted ? "success" : "unable"), perm, groupName);
+                                        break;
+                                    }
+                                }
+                            } else {
+                                sendPermissions(group, ctx);
                             }
+                            break;
                         }
                     }
-                    group = permissionManager.new Group(groupName, parent, new ArrayList<>(), null, null, priority);
-                    permissionManager.groups.put(groupName, group);
-                    permissionManager.save(true);
-                    ctx.sendMessage("commands.perm.group.create.success", groupName);
-                } else {
-                    if (group == null) {
-                        throw new CommandException("commands.perm.group.notFound", groupName);
+                } else if (ctx.hasAction()) {
+                    if (ctx.action().equals("create")) {
+                        if (group != null) {
+                            throw new CommandException("commands.perm.group.create.exists", groupName);
+                        }
+                        createGroup(permissionManager, ctx, groupName);
                     } else {
                         switch (ctx.action()) {
-                            case "info":
-                                PermissionManager.Group parent = group.parent();
-                                ctx.sendMessage(
-                                    new TextTranslation("commands.perm.info.group.0")
-                                        .gray()
-                                        .argText(groupName, Text::darkGray)
-                                );
-                                ctx.sendMessage(
-                                    new TextTranslation("commands.perm.info.group.1")
-                                        .argText(parent == null ? "~not set~" : parent.name(), Text::darkGray)
-                                );
-                                ctx.sendMessage(
-                                    new TextTranslation("commands.perm.info.group.2")
-                                        .argText(group.prefix())
-                                );
-                                ctx.sendMessage(
-                                    new TextTranslation("commands.perm.info.group.3")
-                                        .argText(group.suffix())
-                                );
-                                ctx.sendMessage("commands.perm.info.group.4");
-
-                                for (String s : group.permissions()) {
-                                    ctx.sendMessage(
-                                        new TextTranslation("commands.generic.list.entry")
-                                            .argText(s, d ->
-                                                d.darkGray().suggestCommand("/perm group " + groupName + " delPerm " + s)
-                                            )
-                                    );
+                            case "create": {
+                                if (group != null) {
+                                    throw new CommandException("commands.perm.group.create.exists", groupName);
                                 }
+                                createGroup(permissionManager, ctx, groupName);
                                 break;
-                            case "delete":
+                            }
+                            case "delete": {
+                                if (group == null) {
+                                    throw new CommandException("commands.perm.group.notFound", groupName);
+                                }
                                 if (groupName.equals("default")) {
-                                    throw new CommandException("commands.perm.group.delete.unable");
+                                    throw new CommandException("commands.perm.group.delete.unable", groupName);
                                 } else {
-                                    permissionManager.groups.remove(groupName, group);
+                                    permissionManager.groupManager.groups.remove(groupName, group);
                                     permissionManager.save(true);
                                     ctx.sendMessage("commands.perm.group.delete.success", groupName);
                                 }
                                 break;
-                            case "prefix":
+                            }
+                            case "prefix": {
+                                if (group == null) {
+                                    throw new CommandException("commands.perm.group.notFound", groupName);
+                                }
                                 if (!ctx.has("value")) {
-                                    ctx.sendMessage("commands.perm.info.prefix", groupName, group.prefix());
+                                    ctx.sendMessage("commands.perm.info.group.exact.prefix", groupName, group.prefix());
                                 } else {
-                                    group.prefix = ctx.get("value").asString();
+                                    String prefix = ctx.get("value").asString();
+                                    if (prefix.equals("\"\"")) {
+                                        group.prefix = "";
+                                        ctx.sendMessage("commands.perm.info.group.exact.prefix.reset", groupName);
+                                    } else {
+                                        ctx.sendMessage("commands.perm.info.group.exact.prefix.set", groupName, prefix);
+                                        group.prefix = prefix;
+                                    }
                                     permissionManager.save(true);
-                                    ctx.sendMessage("commands.perm.info.prefix.set", groupName, group.prefix());
                                 }
                                 break;
-                            case "suffix":
+                            }
+                            case "suffix": {
+                                if (group == null) {
+                                    throw new CommandException("commands.perm.group.notFound", groupName);
+                                }
                                 if (!ctx.has("value")) {
-                                    ctx.sendMessage("commands.perm.info.suffix", groupName, group.suffix());
+                                    ctx.sendMessage("commands.perm.info.group.exact.suffix", groupName, group.suffix());
                                 } else {
-                                    group.suffix = ctx.get("value").asString();
+                                    String suffix = ctx.get("value").asString();
+                                    if (suffix.equals("\"\"")) {
+                                        group.suffix = "";
+                                        ctx.sendMessage("commands.perm.info.group.exact.suffix.reset", groupName);
+                                    } else {
+                                        ctx.sendMessage("commands.perm.info.group.exact.suffix.set", groupName, suffix);
+                                        group.suffix = suffix;
+                                    }
                                     permissionManager.save(true);
-                                    ctx.sendMessage("commands.perm.info.suffix.set", groupName, group.suffix());
                                 }
                                 break;
-                            case "users":
+                            }
+                            case "users": {
+                                if (group == null) {
+                                    throw new CommandException("commands.perm.group.notFound", groupName);
+                                }
                                 if (groupName.equalsIgnoreCase("default")) {
-                                    ctx.sendMessage("commands.perm.info.users.everyone");
+                                    ctx.sendMessage("commands.perm.info.group.members.everyone");
                                 } else {
                                     List<String> users = new ArrayList<>();
-                                    for (PermissionManager.User user : group.users()) {
+                                    for (User user : group.users()) {
                                         UUID id = user.id();
                                         GameProfile profile = profileCache.getProfileByUUID(id);
                                         if (profile != null && profile.getName() != null) {
@@ -129,43 +142,229 @@ public class PermissionCommands implements CommandRegisterer {
                                             users.add(id.toString());
                                         }
                                     }
-                                    ctx.sendMessage("commands.perm.info.users", users.toString());
+                                    ctx.sendMessage("commands.perm.info.group.members", users.toString());
                                 }
                                 break;
-                            case "addPerm": {
-                                String perm = ctx.get("value").asString();
-                                if (group.permissions.add(perm)) {
-                                    ctx.sendMessage("commands.perm.permadd.success", groupName, perm);
-                                } else {
-                                    ctx.sendMessage("commands.perm.permadd.unable", groupName, perm);
-                                }
-                                break;
-                            }
-                            case "delPerm": {
-                                String perm = ctx.get("value").asString();
-                                if (group.permissions.remove(perm)) {
-                                    ctx.sendMessage("commands.perm.permdel.success", groupName, perm);
-                                } else {
-                                    ctx.sendMessage("commands.perm.permdel.unable", groupName, perm);
-                                }
                             }
                         }
                     }
+                } else {
+                    if (group == null) {
+                        throw new CommandException("commands.perm.group.notFound", groupName);
+                    }
+                    sendGroupInfo(ctx, group);
                 }
                 break;
-            case "user":
+            }
+            case "user": {
                 String username = ctx.get("username").asString();
                 OfflinePlayer player = ctx.server().getOfflinePlayerByName(username);
                 if (player != null) {
-                    PermissionManager.User user = permissionManager.getUser(player);
-
+                    User user = permissionManager.getUser(player);
+                    if (ctx.hasConstant(1)) {
+                        switch (ctx.constant(1)) {
+                            case "groups": {
+                                if (ctx.has("value")) {
+                                    String groupName = ctx.get("value").asString();
+                                    Group group = permissionManager.getGroup(groupName);
+                                    if (group != null) {
+                                        switch (ctx.action()) {
+                                            case "add": {
+                                                boolean added = user.groups.add(group);
+                                                ctx.sendMessage("commands.perm.user.groups.add." + (added ? "success" : "unable"), username, groupName);
+                                                break;
+                                            }
+                                            case "delete": {
+                                                boolean deleted = user.groups.remove(group);
+                                                ctx.sendMessage("commands.perm.user.groups.delete." + (deleted ? "success" : "unable"), username, groupName);
+                                                break;
+                                            }
+                                        }
+                                    } else {
+                                        throw new CommandException("commands.perm.group.notFound", groupName);
+                                    }
+                                } else {
+                                    sendGroups(user, player.getName(), ctx);
+                                }
+                                break;
+                            }
+                            case "permissions": {
+                                if (ctx.has("value")) {
+                                    String perm = ctx.get("value").asString();
+                                    switch (ctx.action()) {
+                                        case "add": {
+                                            boolean added = user.permissions.add(perm);
+                                            ctx.sendMessage("commands.perm.user.permissions.add." + (added ? "success" : "unable"), perm, username);
+                                            break;
+                                        }
+                                        case "delete": {
+                                            boolean deleted = user.permissions.remove(perm);
+                                            ctx.sendMessage("commands.perm.user.permissions.delete." + (deleted ? "success" : "unable"), perm, user);
+                                            break;
+                                        }
+                                    }
+                                } else {
+                                    sendPermissions(user, player.getName(), ctx);
+                                }
+                                break;
+                            }
+                        }
+                    } else if (ctx.hasAction()) {
+                        switch (ctx.action()) {
+                            case "prefix": {
+                                if (!ctx.has("value")) {
+                                    ctx.sendMessage("commands.perm.info.user.exact.prefix", username, user.prefix());
+                                } else {
+                                    String prefix = ctx.get("value").asString();
+                                    if (prefix.equals("\"\"")) {
+                                        user.prefix = "";
+                                        ctx.sendMessage("commands.perm.info.user.exact.prefix.reset", username);
+                                    } else {
+                                        user.prefix = prefix;
+                                        ctx.sendMessage("commands.perm.info.user.exact.prefix.set", username, prefix);
+                                    }
+                                }
+                                break;
+                            }
+                            case "suffix": {
+                                if (!ctx.has("value")) {
+                                    ctx.sendMessage("commands.perm.info.user.exact.suffix", username, user.suffix());
+                                } else {
+                                    String suffix = ctx.get("value").asString();
+                                    if (suffix.equals("\"\"")) {
+                                        user.suffix = "";
+                                        ctx.sendMessage("commands.perm.info.user.exact.suffix.reset", username);
+                                    } else {
+                                        user.suffix = suffix;
+                                        ctx.sendMessage("commands.perm.info.user.exact.suffix.set", username, suffix);
+                                    }
+                                    permissionManager.save(true);
+                                }
+                                break;
+                            }
+                        }
+                    } else {
+                        sendUserInfo(ctx, username, user);
+                    }
                 } else {
                     throw new CommandException("commands.generic.userNeverPlayed", username);
                 }
+                break;
+            }
         }
     }
 
-    @ArgumentCompleter(type = "PermissionGroup")
+    private static void sendUserInfo(CommandContext ctx, String username, User user) {
+        ctx.sendMessage(
+            Text.translation("commands.perm.info.user.header")
+                .gray()
+                .arg(username, Text::darkGray)
+        );
+        ctx.sendMessage(
+            Text.translation("commands.perm.info.user.prefix")
+                .arg(user.prefix())
+        );
+        ctx.sendMessage(
+            Text.translation("commands.perm.info.user.suffix")
+                .arg(user.suffix())
+        );
+        sendGroups(user, username, ctx);
+    }
+
+    private static void sendGroupInfo(CommandContext ctx, Group group) {
+        Group parent = group.parent();
+        ctx.sendMessage(
+            Text.translation("commands.perm.info.group.header")
+                .gray()
+                .arg(group.name, Text::darkGray)
+        );
+        if (parent != null) {
+            ctx.sendMessage(
+                Text.translation("commands.perm.info.group.parent")
+                    .arg(parent.name(), Text::darkGray)
+            );
+        }
+        ctx.sendMessage(
+            Text.translation("commands.perm.info.group.prefix")
+                .arg(group.prefix())
+        );
+        ctx.sendMessage(
+            Text.translation("commands.perm.info.group.suffix")
+                .arg(group.suffix())
+        );
+        sendPermissions(group, ctx);
+    }
+
+    private static void sendPermissions(User user, String username, CommandContext ctx) {
+        ctx.sendMessage(
+            Text.string("/").gray()
+                .appendTranslate("commands.perm.info.permissions", Text::gray)
+        );
+
+        for (String s : user.permissions()) {
+            ctx.sendMessage(
+                Text.string("| ").gray()
+                    .appendText(s, d ->
+                        d.darkGray().suggestCommand("/perm user " + username + " permissions delete " + s)
+                    )
+            );
+        }
+    }
+
+    private static void sendPermissions(Group group, CommandContext ctx) {
+        ctx.sendMessage(
+            Text.string("/").gray()
+                .appendTranslate("commands.perm.info.permissions", Text::gray)
+        );
+
+        for (String s : group.permissions()) {
+            ctx.sendMessage(
+                Text.string("| ").gray()
+                    .appendText(s, d ->
+                        d.darkGray().suggestCommand("/perm group " + group.name + " permissions delete " + s)
+                    )
+            );
+        }
+    }
+
+    private static void sendGroups(User user, String username, CommandContext ctx) {
+        ctx.sendMessage("commands.perm.info.user.groups");
+
+        for (Group g : user.groups) {
+            ctx.sendMessage(
+                Text.string("- ")
+                    .appendText(g.name, d ->
+                        d.darkGray().suggestCommand("/perm user " + username + " groups delete " + g.name)
+                    )
+            );
+        }
+    }
+
+    private static void createGroup(PermissionManager permissionManager, CommandContext ctx, String groupName) throws Exception {
+        int priority = 0;
+        String parent = "default";
+        if (ctx.has("value")) {
+            String value = ctx.get("value").asString();
+            if (value.contains(" ")) {
+                String[] vals = value.split(" ");
+                switch (vals.length) {
+                    case 2:
+                        priority = Integer.parseInt(vals[1]);
+                    case 1:
+                        parent = vals[0];
+                        break;
+                    default:
+                        throw new WrongUsageException("commands.perm.usage");
+                }
+            }
+        }
+        Group group = permissionManager.groupManager.new Group(groupName, parent, new ArrayList<>(), null, null, priority);
+        permissionManager.groupManager.groups.put(groupName, group);
+        permissionManager.save(true);
+        ctx.sendMessage("commands.perm.group.create.success", groupName);
+    }
+
+    @ArgumentCompleter(type = "PermGroup")
     public static List<String> completerPermGroup(ArgumentCompletionContext ctx) {
         String[] groupsNames = ctx.server().getPermissionManager().getAllGroups();
         List<String> variants = ctx.partialName().isEmpty() ? new ArrayList<>(groupsNames.length) : new ArrayList<>();

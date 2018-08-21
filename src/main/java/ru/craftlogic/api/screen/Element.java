@@ -1,16 +1,21 @@
 package ru.craftlogic.api.screen;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 
 import java.util.List;
 
 public abstract class Element {
-    protected static final ResourceLocation DEFAULT_TEXTURE = new ResourceLocation("craftlogic", "textures/gui/elements.png");
+    protected static final ResourceLocation ELEMENTS_TEXTURE = new ResourceLocation("craftlogic", "textures/gui/elements.png");
+    protected static final Gson GSON = new GsonBuilder().setLenient().create();
 
     private final ElementContainer container;
     private int x, y;
     private boolean visible = true;
+    private ITextComponent tooltip;
 
     public Element(ElementContainer container, int x, int y) {
         this.container = container;
@@ -34,14 +39,51 @@ public abstract class Element {
         return y;
     }
 
+    public abstract int getWidth();
+
+    public abstract int getHeight();
+
     public ElementContainer getContainer() {
         return container;
     }
 
-    protected abstract void draw(int mouseX, int mouseY, float deltaTime);
+    protected abstract void drawBackground(int mouseX, int mouseY, float deltaTime);
+
+    protected void drawForeground(int mouseX, int mouseY, float deltaTime) {
+        if (isVisible() && isMouseOver(mouseX, mouseY)) {
+            ITextComponent tooltip = getTooltip(mouseX, mouseY);
+            if (tooltip != null) {
+                drawTooltip(tooltip, mouseX, mouseY);
+            }
+        }
+    }
+
+    protected boolean isMouseOver(int mouseX, int mouseY) {
+        int x = getX();
+        int y = getY();
+        int w = getWidth();
+        int h = getHeight();
+        return mouseX >= x && mouseY >= y && mouseX <= x + w && mouseY <= y + h;
+    }
+
+    public void setTooltip(ITextComponent tooltip) {
+        this.tooltip = tooltip;
+    }
+
+    protected ITextComponent getTooltip(int mouseX, int mouseY) {
+        return tooltip;
+    }
 
     protected void bindDefaultTexture() {
-        getContainer().bindTexture(DEFAULT_TEXTURE);
+        getContainer().bindTexture(ELEMENTS_TEXTURE);
+    }
+
+    protected void drawColoredRect(double x, double y, double w, double h, int color) {
+        getContainer().drawColoredRect(x, y, w, h, color);
+    }
+
+    protected void drawGradientRect(double x, double y, double w, double h, int from, int to) {
+        getContainer().drawGradientRect(x, y, w, h, from, to);
     }
 
     protected void drawTexturedRect(double x, double y, double w, double h, double tx, double ty) {
@@ -98,5 +140,30 @@ public abstract class Element {
 
     protected void drawTooltip(List<String> lines, int x, int y) {
         getContainer().drawTooltip(lines, x, y);
+    }
+
+    protected static int parseColor(Object e) {
+        if (e instanceof Number) {
+            return ((Number) e).intValue();
+        }
+        String color = ((String)e).toLowerCase();
+
+        if (color.startsWith("#")) {
+            color = color.substring(1);
+        } else if (color.startsWith("0x")) {
+            color = color.substring(2);
+        } else {
+            throw new IllegalArgumentException("Illegal color code: " + e);
+        }
+
+        return Integer.parseInt(color, 16);
+    }
+
+    protected static int parseInt(Object e) {
+        return ((Number) e).intValue();
+    }
+
+    protected static ITextComponent parseText(Object e) {
+        return e instanceof String ? new TextComponentString((String) e) : (ITextComponent) e;
     }
 }

@@ -5,7 +5,7 @@ import net.minecraft.util.text.TextComponentString;
 public final class TextString extends Text<TextComponentString, TextString> {
     private final String text;
 
-    public TextString(String text) {
+    TextString(String text) {
         this.text = text;
     }
 

@@ -13,6 +13,10 @@ import javax.annotation.Nullable;
 
 @Mixin(UniversalBucket.class)
 public class MixinItemUniversalBucket extends Item  {
+    /**
+     * @author Radviger
+     * @reason Sorted CreativeTab items
+     */
     @Overwrite
     public void getSubItems(@Nullable CreativeTabs tab, @Nonnull NonNullList<ItemStack> items) {}
 }

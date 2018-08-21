@@ -12,8 +12,7 @@ import net.minecraft.network.play.server.*;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.scoreboard.ServerScoreboard;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.PlayerList;
-import net.minecraft.server.management.PlayerProfileCache;
+import net.minecraft.server.management.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -30,10 +29,14 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import ru.craftlogic.api.entity.Player;
 import ru.craftlogic.api.event.player.PlayerLeftMessageEvent;
 import ru.craftlogic.api.server.AdvancedPlayerList;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.util.UUID;
 
 @Mixin(PlayerList.class)
@@ -47,6 +50,47 @@ public class MixinPlayerList implements AdvancedPlayerList {
     @Shadow
     private IPlayerFileData playerDataManager;
 
+    @Redirect(method = "<init>", at = @At(value = "NEW", args = "class=net/minecraft/server/management/UserListBans"))
+    public UserListBans createBans(File file) {
+        File dir = new File("./settings/");
+
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        return new UserListBans(new File(dir, file.getName()));
+    }
+
+    @Redirect(method = "<init>", at = @At(value = "NEW", args = "class=net/minecraft/server/management/UserListIPBans"))
+    public UserListIPBans createIPBans(File file) {
+        File dir = new File("./settings/");
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        return new UserListIPBans(new File(dir, file.getName()));
+    }
+
+    @Redirect(method = "<init>", at = @At(value = "NEW", args = "class=net/minecraft/server/management/UserListOps"))
+    public UserListOps createOPs(File file) {
+        File dir = new File("./settings/");
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        return new UserListOps(new File(dir, file.getName()));
+    }
+
+    @Redirect(method = "<init>", at = @At(value = "NEW", args = "class=net/minecraft/server/management/UserListWhitelist"))
+    public UserListWhitelist createWhiteList(File file) {
+        File dir = new File("./settings/");
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        return new UserListWhitelist(new File(dir, file.getName()));
+    }
+
+    /**
+     * @author Radviger
+     * @reason Ability to edit/disable player join messages
+     */
     @Overwrite(remap = false)
     public void initializeConnectionToPlayer(NetworkManager netManager, EntityPlayerMP player, NetHandlerPlayServer netHandler) {
         GameProfile profile = player.getGameProfile();
@@ -55,6 +99,9 @@ public class MixinPlayerList implements AdvancedPlayerList {
         String username = cachedProfile == null ? profile.getName() : cachedProfile.getName();
         profileCache.addEntry(profile);
         NBTTagCompound playerData = this.readPlayerDataFromFile(player);
+        if (playerData == null || ((Player)player).getFirstPlayed() == 0) {
+            ((Player)player).setFirstPlayed(System.currentTimeMillis());
+        }
         player.setWorld(this.mcServer.getWorld(player.dimension));
         World playerWorld = this.mcServer.getWorld(player.dimension);
         if (playerWorld == null) {

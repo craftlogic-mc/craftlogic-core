@@ -10,17 +10,24 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
+import ru.craftlogic.api.block.Updatable;
+import ru.craftlogic.api.screen.element.widget.WidgetSlot;
 
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+import static ru.craftlogic.api.CraftAPI.MOD_ID;
+
 public abstract class ScreenWithInventory<C extends Container> extends GuiContainer implements ElementContainer {
+    protected static final ResourceLocation BLANK_TEXTURE = new ResourceLocation(MOD_ID, "textures/gui/empty.png");
+    protected C container;
     private float textureScaleX = 1, textureScaleY = 1;
     private Set<Element> elements = new HashSet<>();
 
     public ScreenWithInventory(C container) {
         super(container);
+        this.container = container;
     }
 
     public C getContainer() {
@@ -56,12 +63,12 @@ public abstract class ScreenWithInventory<C extends Container> extends GuiContai
     }
 
     @Override
-    public void drawWorldBackground(int index) {
+    public void drawWorldBackground(int yScroll) {
         Minecraft client = this.getClient();
         if (client.world != null) {
-            this.drawGradientRect(0, 0, this.width, this.height, -1072689136, -804253680);
+            this.drawGradientRect(0, 0, this.width, this.height, 0xC0101010, 0xD0101010);
         } else {
-            this.drawBackground(index);
+            this.drawBackground(yScroll);
         }
     }
 
@@ -86,6 +93,16 @@ public abstract class ScreenWithInventory<C extends Container> extends GuiContai
     }
 
     @Override
+    public void updateScreen() {
+        super.updateScreen();
+        for (Element element : this.elements) {
+            if (element instanceof Updatable) {
+                ((Updatable) element).update();
+            }
+        }
+    }
+
+    @Override
     public void bindTexture(ResourceLocation texture, int width, int height) {
         getClient().getTextureManager().bindTexture(texture);
         this.textureScaleX = 1F / width;
@@ -93,13 +110,33 @@ public abstract class ScreenWithInventory<C extends Container> extends GuiContai
     }
 
     @Override
-    public int getWidth() {
+    public int getWindowWidth() {
         return this.width;
     }
 
     @Override
-    public int getHeight() {
+    public int getWindowHeight() {
         return this.height;
+    }
+
+    @Override
+    public int getWidth() {
+        return this.xSize;
+    }
+
+    @Override
+    public int getHeight() {
+        return this.ySize;
+    }
+
+    @Override
+    public int getLocalX() {
+        return this.guiLeft;
+    }
+
+    @Override
+    public int getLocalY() {
+        return this.guiTop;
     }
 
     @Override
@@ -107,6 +144,11 @@ public abstract class ScreenWithInventory<C extends Container> extends GuiContai
         super.initGui();
         this.getClient().setIngameNotInFocus();
         this.elements.clear();
+        int x = getLocalX();
+        int y = getLocalY();
+        for (Slot slot : this.container.inventorySlots) {
+            this.elements.add(new WidgetSlot(this, x + slot.xPos - 1, y + slot.yPos - 1, WidgetSlot.SlotSize.NORMAL));
+        }
         this.init();
     }
 
@@ -132,7 +174,7 @@ public abstract class ScreenWithInventory<C extends Container> extends GuiContai
     protected final void drawGuiContainerBackgroundLayer(float deltaTime, int mouseX, int mouseY) {
         this.drawBackground(mouseX, mouseY, deltaTime);
         for (Element element : this.elements) {
-            element.draw(mouseX, mouseY, deltaTime);
+            element.drawBackground(mouseX, mouseY, deltaTime);
         }
     }
 
@@ -140,6 +182,9 @@ public abstract class ScreenWithInventory<C extends Container> extends GuiContai
     protected final void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         float deltaTime = getClient().getRenderPartialTicks();
         this.drawForeground(mouseX, mouseY, deltaTime);
+        for (Element element : this.elements) {
+            element.drawForeground(mouseX, mouseY, deltaTime);
+        }
     }
 
     @Override

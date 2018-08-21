@@ -21,6 +21,10 @@ public class MixinParticleManager {
     @Shadow
     public void addEffect(Particle particle) {}
 
+    /**
+     * @author Radviger
+     * @reason Colored rain particles
+     */
     @Nullable
     @Overwrite
     public Particle spawnEffectParticle(int id, double x, double y, double z, double mx, double my, double mz, int... data) {

@@ -40,19 +40,23 @@ public abstract class MixinEntityExpBottle extends EntityThrowable {
             EnumParticleTypes particle = EnumParticleTypes.SPELL;
 
             for(int i = 0; i < 100; ++i) {
-                double d18 = rand.nextDouble() * 4.0D;
-                double d21 = rand.nextDouble() * 3.141592653589793D * 2.0D;
+                double d18 = rand.nextDouble() * 4;
+                double d21 = rand.nextDouble() * Math.PI * 2;
                 double d24 = Math.cos(d21) * d18;
-                double d26 = 0.01D + rand.nextDouble() * 0.5D;
+                double d26 = 0.01D + rand.nextDouble() * 0.5;
                 double d28 = Math.sin(d21) * d18;
 
-                this.world.spawnParticle(particle, x + d24 * 0.1D, y + 0.3D, z + d28 * 0.1D, d24, d26, d28);
+                this.world.spawnParticle(particle, x + d24 * 0.1, y + 0.3, z + d28 * 0.1, d24, d26, d28);
             }
 
             this.world.playSound(null, x, y, z, SoundEvents.ENTITY_SPLASH_POTION_BREAK, SoundCategory.NEUTRAL, 1F, rand.nextFloat() * 0.1F + 0.9F);
         }
     }
     
+    /**
+     * @author Radviger
+     * @reason Fix splash potion particles
+     */
     @Overwrite
     protected void onImpact(RayTraceResult target) {
         if (!this.world.isRemote) {

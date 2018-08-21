@@ -7,9 +7,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
 import org.apache.logging.log4j.Logger;
@@ -18,13 +15,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import ru.craftlogic.api.command.AdvancedCommandManager;
-import ru.craftlogic.api.text.TextTranslation;
-import ru.craftlogic.common.command.CommandRegistry.CommandContainer;
+import ru.craftlogic.api.text.Text;
+import ru.craftlogic.common.command.CommandManager.CommandContainer;
 
 import javax.annotation.Nullable;
 import java.util.*;
 
-import static ru.craftlogic.CraftLogic.wrapWithActiveModId;
+import static ru.craftlogic.api.CraftAPI.wrapWithActiveModId;
 
 @Mixin(CommandHandler.class)
 public abstract class MixinCommandHandler implements AdvancedCommandManager {
@@ -34,6 +31,10 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
     private final Map<String, List<ResourceLocation>> aliases = new HashMap<>();
     private final Map<ResourceLocation, CommandContainer> registry = new HashMap<>();
 
+    /**
+     * @author Radviger
+     * @reason Extended commands' features
+     */
     @Overwrite
     public int executeCommand(ICommandSender sender, String rawString) {
         rawString = rawString.trim();
@@ -51,7 +52,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
 
         try {
             if (container == null) {
-                sender.sendMessage(new TextTranslation("commands.generic.notFound").red().build());
+                sender.sendMessage(Text.translation("commands.generic.notFound").red().build());
             } else if (container.command.checkPermission(this.getServer(), sender)) {
                 ICommand command = container.command;
                 int usernameIndex = this.getUsernameIndex(command, args);
@@ -91,43 +92,45 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
                     }
                 }
             } else {
-                sender.sendMessage(new TextTranslation("commands.generic.permission").red().build());
+                sender.sendMessage(Text.translation("commands.generic.permission").red().build());
             }
         } catch (CommandException exc) {
-            TextComponentTranslation msg = new TextComponentTranslation(exc.getMessage(), exc.getErrorObjects());
-            msg.getStyle().setColor(TextFormatting.RED);
-            sender.sendMessage(msg);
+            sender.sendMessage(Text.translation(exc).red().build());
         }
 
         sender.setCommandStat(Type.SUCCESS_COUNT, i);
         return i;
     }
 
+    /**
+     * @author Radviger
+     * @reason Extended commands' features
+     */
     @Overwrite
     protected boolean tryExecute(ICommandSender sender, String[] args, ICommand command, String rawCommand) {
         try {
             command.execute(this.getServer(), sender, args);
             return true;
         } catch (WrongUsageException exc) {
-            ITextComponent u = new TextComponentTranslation(exc.getMessage(), exc.getErrorObjects());
-            u.getStyle().setColor(TextFormatting.RED);
-            ITextComponent msg = new TextComponentTranslation("commands.generic.usage", u);
-            msg.getStyle().setColor(TextFormatting.DARK_RED);
-            sender.sendMessage(msg);
+            sender.sendMessage(
+                Text.translation("commands.generic.usage").darkRed()
+                    .argTranslate(exc, Text::red)
+                    .build()
+            );
         } catch (CommandException exc) {
-            TextComponentTranslation msg = new TextComponentTranslation(exc.getMessage(), exc.getErrorObjects());
-            msg.getStyle().setColor(TextFormatting.RED);
-            sender.sendMessage(msg);
+            sender.sendMessage(Text.translation(exc).red().build());
         } catch (Throwable t) {
-            TextComponentTranslation msg = new TextComponentTranslation("commands.generic.exception");
-            msg.getStyle().setColor(TextFormatting.RED);
-            sender.sendMessage(msg);
+            sender.sendMessage(Text.translation("commands.generic.exception").red().build());
             LOGGER.warn("Couldn't process command: " + rawCommand, t);
         }
 
         return false;
     }
 
+    /**
+     * @author Radviger
+     * @reason Extended commands' features
+     */
     @Overwrite
     public ICommand registerCommand(ICommand command) {
         ResourceLocation commandName = wrapWithActiveModId(command.getName(), "minecraft");
@@ -141,7 +144,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
             this.aliases.computeIfAbsent(alias, k -> new ArrayList<>()).add(commandName);
         }
 
-        LOGGER.info("Registered command " + commandName);
+        LOGGER.debug("Registered command " + commandName);
 
         return command;
     }
@@ -171,6 +174,10 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
         return dirty;
     }
 
+    /**
+     * @author Radviger
+     * @reason Extended commands' features
+     */
     @Overwrite
     public List<String> getTabCompletions(ICommandSender sender, String rawString, @Nullable BlockPos targetBlockPos) {
         String[] args = rawString.split(" ", -1);
@@ -217,6 +224,10 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
         }
     }
 
+    /**
+     * @author Radviger
+     * @reason Extended commands' features
+     */
     @Overwrite
     public List<ICommand> getPossibleCommands(ICommandSender sender) {
         Set<ICommand> result = new HashSet<>();
@@ -230,6 +241,10 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
         return new ArrayList<>(result);
     }
 
+    /**
+     * @author Radviger
+     * @reason Extended commands' features
+     */
     @Overwrite
     public Map<String, ICommand> getCommands() {
         Map<String, ICommand> result = new HashMap<>();

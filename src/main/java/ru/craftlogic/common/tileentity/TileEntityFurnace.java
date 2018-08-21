@@ -17,13 +17,15 @@ import ru.craftlogic.CraftLogic;
 import ru.craftlogic.api.block.HeatAcceptor;
 import ru.craftlogic.api.block.Updatable;
 import ru.craftlogic.api.block.holders.ScreenHolder;
-import ru.craftlogic.api.inventory.manager.InventoryItemManager;
-import ru.craftlogic.api.inventory.manager.ListInventoryItemManager;
+import ru.craftlogic.api.inventory.InventoryFieldHolder;
+import ru.craftlogic.api.inventory.manager.InventoryManager;
+import ru.craftlogic.api.inventory.manager.ListInventoryManager;
 import ru.craftlogic.api.sound.LoopingSoundSource;
 import ru.craftlogic.api.tile.TileEntityBase;
+import ru.craftlogic.api.util.TemperatureBuffer;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.common.CraftItems;
-import ru.craftlogic.common.CraftSounds;
+import ru.craftlogic.api.CraftItems;
+import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.util.Furnace;
 
 import java.util.Random;
@@ -34,9 +36,7 @@ import static ru.craftlogic.util.Furnace.getItemBurnTime;
 
 public class TileEntityFurnace extends TileEntityBase implements Updatable, Furnace, LoopingSoundSource, ScreenHolder,
         HeatAcceptor {
-    private int hotTemperature = 2000;
-    private int maxTemperature = hotTemperature + 200;
-    private int temperature = 0;
+    private final TemperatureBuffer temperature = new TemperatureBuffer(2000);
     private int fuel, maxFuel;
 
     private NonNullList<ItemStack> inventory = NonNullList.withSize(2, ItemStack.EMPTY);
@@ -46,39 +46,41 @@ public class TileEntityFurnace extends TileEntityBase implements Updatable, Furn
     }
 
     @Override
+    public void addSyncFields(InventoryFieldHolder fieldHolder) {
+        fieldHolder.addReadOnlyField(FurnaceField.FUEL, this::getFuel);
+        fieldHolder.addReadOnlyField(FurnaceField.MAX_FUEL, this::getMaxFuel);
+        fieldHolder.addReadOnlyField(FurnaceField.TEMPERATURE, this.temperature::getStored);
+        fieldHolder.addReadOnlyField(FurnaceField.MAX_TEMPERATURE, this.temperature::getCapacity);
+    }
+
+    @Override
     public void update() {
         this.ticksExisted++;
         if (!this.world.isRemote) {
             Location location = this.getLocation();
             boolean closed = !location.getBlockProperty(OPEN);
-            int envTemperature = this.getEnvironmentTemperature();
-            if (envTemperature > this.temperature) {
-                this.temperature += Math.max(1, (envTemperature - this.temperature) / 4);
-            }
-            if (this.temperature >= this.maxTemperature) {
+            if (this.temperature.getStored() >= this.temperature.getCapacity()) {
+                Random rand = this.world.rand;
+
+                if (rand.nextInt(10) == 0) {
+                    for (int i = 0; i < 4; ++i) {
+                        Location offsetLocation = location.randomize(rand, 3);
+                        offsetLocation.setBlockIfPossible(Blocks.FIRE);
+                    }
+                }
                 location.explode(null, 1F, true, false);
                 location.setBlock(Blocks.LAVA);
             } else {
-                if (this.temperature >= this.hotTemperature) {
-                    Random rand = this.world.rand;
-
-                    if (rand.nextInt(10) == 0) {
-                        for (int i = 0; i < 4; ++i) {
-                            Location offsetLocation = location.randomize(rand, 3);
-                            offsetLocation.setBlockIfPossible(Blocks.FIRE);
-                        }
-                    }
-                }
                 if (this.ticksExisted % 4 == 0) {
                     HeatAcceptor heatAcceptor = location.offset(EnumFacing.UP).getTileEntity(HeatAcceptor.class);
                     if (heatAcceptor != null) {
                         float targetTemperature = heatAcceptor.getTemperature();
-                        if (this.temperature > envTemperature && this.temperature > targetTemperature) {
-                            int output = Math.min(this.temperature, 2);
-                            this.temperature -= heatAcceptor.acceptHeat(EnumFacing.DOWN, output) / 2;
+                        if (this.temperature.getStored() > targetTemperature) {
+                            int output = Math.min(this.temperature.getStored(), 2);
+                            this.temperature.drain(heatAcceptor.acceptHeat(EnumFacing.DOWN, output) / 2, false);
                         }
                     } else if (this.fuel <= 0) {
-                        this.temperature = Math.max(envTemperature, (this.temperature - (closed ? 4 : 8)));
+                        this.temperature.drain(closed ? 4 : 8, false);
                     }
                     boolean active = this.fuel > 0;
                     if (location.getBlockProperty(ACTIVE) != active) {
@@ -89,7 +91,7 @@ public class TileEntityFurnace extends TileEntityBase implements Updatable, Furn
                 }
                 if (this.fuel > 0) {
                     if (this.ticksExisted % (closed ? 4 : 8) == 0) {
-                        this.temperature++;
+                        this.temperature.accept(1, false);
                         this.fuel = Math.max(0, this.fuel - (closed ? 4 : 8));
                     }
                     if (this.fuel == 0 && this.maxFuel > 0 && this.world.rand.nextInt(this.maxFuel) >= 100) {
@@ -100,8 +102,8 @@ public class TileEntityFurnace extends TileEntityBase implements Updatable, Furn
                     if (!fuelItem.isEmpty()) {
                         int burnTime = getItemBurnTime(fuelItem);
                         int burnTemperature = getItemBurnTemperature(fuelItem);
-                        if (this.temperature >= burnTemperature
-                                || this.temperature >= burnTemperature / 2 && this.world.rand.nextInt(2) == 0) {
+                        if (this.temperature.getStored() >= burnTemperature
+                                || this.temperature.getStored() >= burnTemperature / 2 && this.world.rand.nextInt(2) == 0) {
                             fuelItem.shrink(1);
                             this.fuel = this.maxFuel = burnTime;
                         }
@@ -114,6 +116,11 @@ public class TileEntityFurnace extends TileEntityBase implements Updatable, Furn
     @Override
     public boolean isSoundActive(SoundEvent sound) {
         return !this.isInvalid() && Furnace.super.isSoundActive(sound);
+    }
+
+    @Override
+    public void dropTemperature(int amount, boolean simulate) {
+        this.temperature.drain(amount, simulate);
     }
 
     @Override
@@ -140,7 +147,7 @@ public class TileEntityFurnace extends TileEntityBase implements Updatable, Furn
                     player.setHeldItem(hand, heldItem.getItem().getContainerItem(heldItem));
                     player.openContainer.detectAndSendChanges();
                 }
-                this.dropTemperature(100);
+                this.dropTemperatureWithEffect(100);
             } else if (heldItem.getItem() == Items.POTIONITEM && PotionUtils.getPotionFromItem(heldItem) == PotionTypes.WATER) {
                 if (!player.capabilities.isCreativeMode) {
                     heldItem.shrink(1);
@@ -149,7 +156,7 @@ public class TileEntityFurnace extends TileEntityBase implements Updatable, Furn
                     }
                     player.openContainer.detectAndSendChanges();
                 }
-                this.dropTemperature(10);
+                this.dropTemperatureWithEffect(10);
             } else {
                 CraftLogic.showScreen(this, player);
             }
@@ -158,25 +165,22 @@ public class TileEntityFurnace extends TileEntityBase implements Updatable, Furn
     }
 
     @Override
-    public InventoryItemManager getItemManager() {
-        return new ListInventoryItemManager(this.inventory);
+    public InventoryManager getInventoryManager() {
+        return new ListInventoryManager(this.inventory);
     }
 
     @Override
-    protected void writeToPacket(NBTTagCompound compound) {
+    protected NBTTagCompound writeToPacket(NBTTagCompound compound) {
         compound.setInteger("fuel", this.fuel);
-        compound.setFloat("temperature", this.temperature);
-        compound.setFloat("hotTemperature", this.hotTemperature);
-        compound.setFloat("maxTemperature", this.maxTemperature);
+        this.temperature.writeToNBT(compound, "temperature");
+        return compound;
     }
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
         this.fuel = compound.getInteger("fuel");
-        this.temperature = compound.getInteger("temperature");
-        this.hotTemperature = compound.getInteger("hotTemperature");
-        this.maxTemperature = compound.getInteger("maxTemperature");
+        this.temperature.readFromNBT(compound, "temperature");
         ItemStackHelper.loadAllItems(compound, this.inventory);
     }
 
@@ -184,44 +188,30 @@ public class TileEntityFurnace extends TileEntityBase implements Updatable, Furn
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         compound = super.writeToNBT(compound);
         compound.setInteger("fuel", this.fuel);
-        compound.setInteger("temperature", this.temperature);
-        compound.setInteger("hotTemperature", this.hotTemperature);
-        compound.setInteger("maxTemperature", this.maxTemperature);
+        this.temperature.writeToNBT(compound, "temperature");
         ItemStackHelper.saveAllItems(compound, this.inventory);
         return compound;
     }
 
     @Override
     protected void readFromPacket(NBTTagCompound compound) {
-        float oldTemperature = this.temperature;
+        float oldTemperature = this.temperature.getStored();
         this.fuel = compound.getInteger("fuel");
-        this.temperature = compound.getInteger("temperature");
-        this.hotTemperature = compound.getInteger("hotTemperature");
-        this.maxTemperature = compound.getInteger("maxTemperature");
+        this.temperature.readFromNBT(compound, "temperature");
         if (this.world != null && this.pos != null
-                && this.temperature >= this.hotTemperature / 2 && oldTemperature < this.hotTemperature / 2) {
-            CraftLogic.playSound(this, CraftSounds.FURNACE_HOT_LOOP);
+                && this.temperature.getStored() >= this.temperature.getCapacity() / 3 && oldTemperature < this.temperature.getCapacity() / 3) {
+            CraftSounds.playSound(this, CraftSounds.FURNACE_HOT_LOOP);
         }
     }
 
     @Override
     public int getTemperature() {
-        return temperature;
-    }
-
-    @Override
-    public void setTemperature(int temperature) {
-        this.temperature = temperature;
-    }
-
-    @Override
-    public int getHotTemperature() {
-        return hotTemperature;
+        return temperature.getStored();
     }
 
     @Override
     public int getMaxTemperature() {
-        return maxTemperature;
+        return temperature.getCapacity();
     }
 
     @Override
@@ -236,7 +226,6 @@ public class TileEntityFurnace extends TileEntityBase implements Updatable, Furn
 
     @Override
     public int acceptHeat(EnumFacing side, int amount) {
-        this.temperature += amount;
-        return amount;
+        return this.temperature.accept(amount, false);
     }
 }

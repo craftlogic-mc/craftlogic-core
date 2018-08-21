@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 import java.util.Random;
 
 @Mixin(Entity.class)
-public class MixinEntity {
+public abstract class MixinEntity {
     @Shadow public World world;
     @Shadow protected Random rand;
     @Shadow protected boolean inWater;
@@ -27,45 +27,38 @@ public class MixinEntity {
     @Shadow public float width, height;
 
     @Shadow
-    public AxisAlignedBB getEntityBoundingBox() {
-        return null;
-    }
+    public abstract AxisAlignedBB getEntityBoundingBox();
 
     @Shadow
     @Nullable
-    public Entity getRidingEntity() {
-        return null;
-    }
+    public abstract Entity getRidingEntity();
 
     @Shadow
-    public void extinguish() {}
+    public abstract void extinguish();
 
     @Shadow
-    public Entity getControllingPassenger() {
-        return null;
-    }
+    public abstract Entity getControllingPassenger();
 
     @Shadow
-    public boolean isBeingRidden() {
-        return false;
-    }
+    public abstract boolean isBeingRidden();
 
     @Shadow
-    protected SoundEvent getSwimSound() {
-        return null;
-    }
+    protected abstract SoundEvent getSwimSound();
 
     @Shadow
-    protected SoundEvent getSplashSound() {
-        return null;
-    }
+    protected abstract SoundEvent getSplashSound();
 
     @Shadow
-    public void playSound(SoundEvent sound, float volume, float pitch) {}
+    public abstract void playSound(SoundEvent sound, float volume, float pitch);
 
+    /**
+     * @author Radviger
+     * @reason Colored fluid particles
+     */
     @Overwrite
     protected void doWaterSplashEffect() {
         int color = 0xFFFFFF;
+
         Entity entity = this.isBeingRidden() && this.getControllingPassenger() != null ? this.getControllingPassenger() : (Entity)(Object)this;
         float f = entity == (Object)this ? 0.2F : 0.9F;
 
@@ -90,16 +83,24 @@ public class MixinEntity {
         }
     }
 
+    /**
+     * @author Radviger
+     * @reason Unknown
+     */
     @Overwrite
     public boolean isOverWater() {
-        return this.world.handleMaterialAcceleration(this.getEntityBoundingBox().grow(0.0, -20.0, 0.0).shrink(0.001), Material.WATER, (Entity)(Object)this);
+        return this.world.handleMaterialAcceleration(this.getEntityBoundingBox().grow(0, -20.0, 0).shrink(0.001), Material.WATER, (Entity)(Object)this);
     }
 
+    /**
+     * @author Radviger
+     * @reason Unknown
+     */
     @Overwrite
     public boolean handleWaterMovement() {
         if (this.getRidingEntity() instanceof EntityBoat) {
             this.inWater = false;
-        } else if (this.world.handleMaterialAcceleration(this.getEntityBoundingBox().grow(0.0, -0.4000000059604645, 0.0).shrink(0.001), Material.WATER, (Entity)(Object)this)) {
+        } else if (this.world.handleMaterialAcceleration(this.getEntityBoundingBox().grow(0, -0.4000000059604645, 0).shrink(0.001), Material.WATER, (Entity)(Object)this)) {
             if (!this.inWater && !this.firstUpdate) {
                 this.doWaterSplashEffect();
             }

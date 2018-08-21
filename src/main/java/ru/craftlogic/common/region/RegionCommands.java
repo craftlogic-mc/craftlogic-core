@@ -1,14 +1,15 @@
 package ru.craftlogic.common.region;
 
-import com.mojang.authlib.GameProfile;
 import net.minecraft.command.CommandException;
 import ru.craftlogic.api.command.*;
 import ru.craftlogic.api.world.Location;
+import ru.craftlogic.api.world.OfflinePlayer;
 import ru.craftlogic.api.world.Player;
+import ru.craftlogic.common.region.RegionManager.Region;
 
 import java.util.*;
 
-public class RegionCommands implements CommandRegisterer {
+public class RegionCommands implements CommandRegistrar {
     @Command(name = "home", syntax = {
         "[create|delete]",
         "[invite|expel|ban] <player:Player>",
@@ -23,40 +24,50 @@ public class RegionCommands implements CommandRegisterer {
         Location location = sender.getLocation();
         if (ctx.has("player") & ctx.hasAction()) {
             String player = ctx.get("player").asString();
-            GameProfile targetProfile = ctx.server().getOfflinePlayerByName(player).getProfile();
-            if (targetProfile != null && targetProfile.getId() != null) {
-                UUID targetId = targetProfile.getId();
+            OfflinePlayer target = ctx.server().getOfflinePlayerByName(player);
+            if (target != null && target.getId() != null) {
+                UUID targetId = target.getId();
+                String targetName = target.getName();
                 if (targetId.equals(sender.getProfile().getId())) {
                     throw new CommandException("commands.home.player.yourself");
                 }
-                RegionManager.Region region = regionManager.getRegion(sender.getWorld().getName(), targetId);
-                if (region != null) {
-                    switch (ctx.action()) {
-                        case "invite":
+                switch (ctx.action()) {
+                    case "invite": {
+                        Region region = regionManager.getRegion(sender.getWorld().getName(), sender.getId());
+                        if (region != null) {
                             if (!region.members.contains(targetId)) {
                                 region.members.add(targetId);
                                 regionManager.save(true);
-                                throw new CommandException("commands.home.invite.success", targetProfile.getName());
+                                sender.sendMessage("commands.home.invite.success", targetName);
                             } else {
-                                throw new CommandException("commands.home.invite.already", targetProfile.getName());
+                                throw new CommandException("commands.home.invite.already", targetName);
                             }
-                        case "expel":
+                        } else {
+                            throw new CommandException("commands.home.missing", location.getWorldName());
+                        }
+                        break;
+                    }
+                    case "expel": {
+                        Region region = regionManager.getRegion(sender.getWorld().getName(), sender.getId());
+                        if (region != null) {
                             if (region.members.contains(targetId)) {
                                 region.members.remove(targetId);
-                                ctx.sendMessage("commands.home.expel.success", targetProfile.getName());
                                 regionManager.save(true);
+                                ctx.sendMessage("commands.home.expel.success", targetName);
                             } else {
-                                throw new CommandException("commands.home.expel.already", targetProfile.getName());
+                                throw new CommandException("commands.home.expel.already", targetName);
                             }
-                            break;
-                        case "ban":
-                            throw new CommandException("commands.home.ban.unsupported");
+                        } else {
+                            throw new CommandException("commands.home.missing", location.getWorldName());
+                        }
+                        break;
                     }
-                } else {
-                    throw new CommandException("commands.home.missing", location.getWorldName());
+                    case "ban": {
+                        throw new CommandException("commands.home.ban.unsupported");
+                    }
                 }
             } else {
-                throw new CommandException("commands.home.player.notFound", player);
+                throw new CommandException("commands.generic.player.notFound", player);
             }
         } else if (ctx.hasConstant() && ctx.constant().equals("flag")) {
             String flag = ctx.get("flag").asString();
@@ -66,13 +77,13 @@ public class RegionCommands implements CommandRegisterer {
 
             }
         } else if (ctx.hasAction()) {
-            RegionManager.Region region = regionManager.getRegion(sender.getWorld().getName(), sender.getProfile().getId());
+            Region region = regionManager.getRegion(sender.getWorld().getName(), sender.getProfile().getId());
             if (ctx.action().equals("create")) {
                 if (region != null) {
-                    throw new CommandException("commands.home.create.already");
+                    throw new CommandException("commands.home.create.already", location.getWorldName());
                 } else {
                     int radius = 24;
-                    List<RegionManager.Region> intersects = regionManager.getRegions(location, radius);
+                    List<Region> intersects = regionManager.getRegions(location, radius);
                     if (intersects.isEmpty()) {
                         UUID owner = sender.getProfile().getId();
                         region = regionManager.new Region(owner, location, radius, new ArrayList<>(), new HashMap<>());
@@ -93,17 +104,17 @@ public class RegionCommands implements CommandRegisterer {
             }
         } else {
             String targetPlayerName = sender.getProfile().getName();
-            RegionManager.Region region = null;
+            Region region;
             if (ctx.has("player")) {
                 targetPlayerName = ctx.get("player").asString();
-                GameProfile targetPlayer = ctx.server().getOfflinePlayerByName(targetPlayerName).getProfile();
+                OfflinePlayer targetPlayer = ctx.get("player").asOfflinePlayer();
                 if (targetPlayer != null && targetPlayer.getId() != null) {
                     region = regionManager.getRegion(location.getWorldName(), targetPlayer.getId());
                     if (region != null && !region.members.contains(sender.getProfile().getId())) {
                         throw new CommandException("commands.home.accessDenied", targetPlayerName);
                     }
                 } else {
-                    throw new CommandException("commands.home.player.notFound", targetPlayerName);
+                    throw new CommandException("commands.generic.player.notFound", targetPlayerName);
                 }
             } else {
                 region = regionManager.getRegion(sender.getWorld().getName(), sender.getProfile().getId());

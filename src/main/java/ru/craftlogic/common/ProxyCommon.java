@@ -6,56 +6,53 @@ import net.minecraft.block.BlockSlab.EnumBlockHalf;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EntityDamageSource;
+import net.minecraft.util.IThreadListener;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDestroyBlockEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
-import ru.craftlogic.api.network.message.MessageShowScreen;
+import ru.craftlogic.api.CraftAPI;
+import ru.craftlogic.api.network.AdvancedMessage;
 import ru.craftlogic.api.proxy.Proxy;
-import ru.craftlogic.api.recipe.OreStack;
-import ru.craftlogic.api.recipe.Recipes;
+import ru.craftlogic.api.Server;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.common.entity.EntityThrownItem;
-import ru.craftlogic.common.recipe.RecipeAlloying;
-import ru.craftlogic.common.recipe.RecipeGridAlloying;
+import ru.craftlogic.api.world.Player;
+import ru.craftlogic.common.economy.EconomyManager;
+import ru.craftlogic.common.script.ScriptManager;
+import ru.craftlogic.common.script.impl.ScriptContainerFile;
+import ru.craftlogic.network.message.*;
 
-import static ru.craftlogic.CraftLogic.*;
+import java.util.Random;
+
+import static ru.craftlogic.api.CraftNetwork.registerMessage;
 
 public class ProxyCommon extends Proxy {
     public void preInit() {
-        CraftSounds.init();
-        CraftBlocks.init();
-        CraftItems.init();
-        CraftPlants.init();
-
-        Recipes.registerRecipe(RecipeGridAlloying.class, new RecipeAlloying(
-            new ResourceLocation(MODID, "iron_nugget"),
-            new ItemStack(Items.IRON_NUGGET, 8),
-            1F,
-            1538,
-            300,
-            new OreStack("oreIron")
-        ));
-        Recipes.registerRecipe(RecipeGridAlloying.class, new RecipeAlloying(
-            new ResourceLocation(MODID, "iron_ingot"),
-            new ItemStack(Items.IRON_INGOT),
-            1F,
-            1538,
-            150,
-            new OreStack("nuggetIron", 9)
-        ));
+        CraftAPI.init(FMLCommonHandler.instance().getSide());
     }
 
     public void init() {
-        registerMessage(new MessageShowScreen.Handler(), MessageShowScreen.class, Side.CLIENT);
+        registerMessage(this::handleShowScreen, MessageShowScreen.class, Side.CLIENT);
+        registerMessage(this::handleShowScriptScreen, MessageShowScriptScreen.class, Side.CLIENT);
+        registerMessage(this::handleBalance, MessageBalance.class, Side.CLIENT);
+        registerMessage(this::handleClearChat, MessageClearChat.class, Side.CLIENT);
+        registerMessage(this::handleClientCustom, MessageCustom.class, Side.CLIENT);
+        registerMessage(this::handleServerCustom, MessageCustom.class, Side.SERVER);
+        registerMessage(this::handleToast, MessageToast.class, Side.CLIENT);
+        registerMessage(this::handleCountdown, MessageCountdown.class, Side.CLIENT);
     }
 
     public void postInit() {
-        registerEntity(EntityThrownItem.class, "thrown_item", 64, 10, true);
+
     }
 
     @SubscribeEvent
@@ -79,5 +76,82 @@ public class ProxyCommon extends Proxy {
                 System.out.println("Broken half: " + half);
             }
         }
+    }
+
+    @SubscribeEvent
+    public void onZombieKilled(LivingDeathEvent event) {
+        EntityLivingBase living = event.getEntityLiving();
+        if (!living.world.isRemote && living instanceof EntityZombie && event.getSource() instanceof EntityDamageSource) {
+            EntityDamageSource source = (EntityDamageSource) event.getSource();
+            Random rand = new Random();
+            if (source.damageType.equals("player") && rand.nextInt(5) == 0) {
+                EntityPlayer killer = (EntityPlayer) source.getTrueSource();
+                if (killer != null) {
+                    Server server = CraftAPI.getServer();
+                    Player player = server.getPlayer(killer.getGameProfile());
+                    if (player != null) {
+                        EconomyManager economyManager = server.getEconomyManager();
+                        if (economyManager.isEnabled()) {
+                            float money = economyManager.roundUpToFormat(rand.nextFloat() * 0.9F + 0.1F);
+                            economyManager.setBalance(player, economyManager.getBalance(player) + money);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected EntityPlayer getPlayer(MessageContext context) {
+        return context.getServerHandler().player;
+    }
+
+    protected void syncTask(MessageContext context, Runnable task) {
+        IThreadListener listener = context.side.isClient()
+                ? FMLClientHandler.instance().getClient()
+                : FMLCommonHandler.instance().getMinecraftServerInstance();
+        listener.addScheduledTask(task);
+    }
+
+    protected AdvancedMessage handleShowScreen(MessageShowScreen message, MessageContext context) {
+        return null;
+    }
+
+    protected AdvancedMessage handleShowScriptScreen(MessageShowScriptScreen message, MessageContext context) {
+        return null;
+    }
+
+    protected AdvancedMessage handleBalance(MessageBalance message, MessageContext context) {
+        return null;
+    }
+
+    protected AdvancedMessage handleClearChat(MessageClearChat messageClearChat, MessageContext context) {
+        return null;
+    }
+
+    protected AdvancedMessage handleClientCustom(MessageCustom message, MessageContext context) {
+        return null;
+    }
+
+    protected AdvancedMessage handleServerCustom(MessageCustom message, MessageContext context) {
+        Server server = CraftAPI.getServer();
+        ScriptManager scriptManager = server.getScriptManager();
+        if (scriptManager.isEnabled()) {
+            String channel = message.getChannel();
+            for (ScriptContainerFile script : scriptManager.getAllLoadedScripts()) {
+                NBTTagCompound response = script.handlePayload(channel, message.getData());
+                if (response != null) {
+                    return new MessageCustom(channel, response);
+                }
+            }
+        }
+        return null;
+    }
+
+    protected AdvancedMessage handleToast(MessageToast message, MessageContext context) {
+        return null;
+    }
+
+    protected AdvancedMessage handleCountdown(MessageCountdown message, MessageContext context) {
+        return null;
     }
 }

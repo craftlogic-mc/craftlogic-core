@@ -5,12 +5,15 @@ import net.minecraft.block.BlockStone;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import ru.craftlogic.api.CraftItems;
+
+import java.util.Random;
 
 @Mixin(BlockStone.class)
 public abstract class MixinBlockStone extends Block {
@@ -18,39 +21,31 @@ public abstract class MixinBlockStone extends Block {
         super(Material.ROCK);
     }
 
-    @Override
-    public void onBlockDestroyedByPlayer(World world, BlockPos pos, IBlockState state) {
-        if (!world.isRemote) {
-            if (state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE) {
-                for (EnumFacing side : EnumFacing.values()) {
-                    BlockPos offsetPos = pos.offset(side);
-                    IBlockState s = world.getBlockState(offsetPos);
-                    if (s.getBlock() == this && s.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE
-                            && world.rand.nextBoolean() && !world.isSideSolid(offsetPos.down(), EnumFacing.UP)) {
-
-                        world.setBlockState(offsetPos, Blocks.COBBLESTONE.getDefaultState());
-                        this.onBlockDestroyedByPlayer(world, offsetPos, s);
-                    }
-                }
-            }
-        }
+    /**
+     * @author Radviger
+     * @reason Rocks
+     */
+    @Overwrite
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+        return CraftItems.ROCK;
     }
 
     @Override
-    public void onNeighborChange(IBlockAccess blockAccessor, BlockPos pos, BlockPos neighborPos) {
-        if (blockAccessor instanceof WorldServer && ((WorldServer)blockAccessor).rand.nextInt(5) == 0) {
-            World world = (World)blockAccessor;
-            IBlockState state = world.getBlockState(pos);
-            if (state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE) {
-                for (EnumFacing side : EnumFacing.values()) {
-                    BlockPos offsetPos = pos.offset(side);
-                    IBlockState s = world.getBlockState(offsetPos);
-                    if (s.getBlock() == this && s.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE
-                            && world.rand.nextBoolean() && !world.isSideSolid(offsetPos.down(), EnumFacing.UP)) {
+    public int quantityDropped(Random random) {
+        return 1 + random.nextInt(4);
+    }
 
-                        world.setBlockState(offsetPos, Blocks.COBBLESTONE.getDefaultState());
-                    }
-                }
+    @Override
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos) {
+        world.scheduleBlockUpdate(pos, this, 1, 0);
+    }
+
+    @Override
+    public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
+        if (!world.isRemote && random.nextInt(5) == 0 && state.getBlock() == this) {
+            if (state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE
+                    && !world.isSideSolid(pos.down(), EnumFacing.UP)) {
+                world.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState());
             }
         }
     }
