@@ -172,42 +172,53 @@ public class TileEntityBarrel extends TileEntityBase implements Barrel, Updatabl
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         compound = super.writeToNBT(compound);
-        this.writeToPacket(compound);
+        writeMode(this.mode, compound, "mode");
         return compound;
     }
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-        this.readFromPacket(compound);
+        this.mode = readMode(compound, this, "mode");
     }
 
     @Override
     protected NBTTagCompound writeToPacket(NBTTagCompound compound) {
-        if (this.mode != null && this.mode.getRegistryName() != null) {
-            NBTTagCompound mode = new NBTTagCompound();
-
-            mode.setString("name", this.mode.getRegistryName().toString());
-            NBTTagCompound data = new NBTTagCompound();
-            this.mode.writeToNBT(data);
-            mode.setTag("data", data);
-
-            compound.setTag("mode", mode);
-        }
+        writeMode(this.mode, compound, "mode");
         return compound;
     }
 
     @Override
     protected void readFromPacket(NBTTagCompound compound) {
-        if (compound.hasKey("mode")) {
-            NBTTagCompound mode = compound.getCompoundTag("mode");
-            BarrelModeType type = BarrelModeType.REGISTRY.getValue(new ResourceLocation(mode.getString("name")));
+        this.mode = readMode(compound, this, "mode");
+        if (this.mode == null) {
+            System.out.println("Received null mode at: " + getPos());
+        }
+    }
+
+    public static BarrelMode readMode(NBTTagCompound compound, Barrel barrel, String key) {
+        if (compound.hasKey(key)) {
+            NBTTagCompound tag = compound.getCompoundTag(key);
+            BarrelModeType type = BarrelModeType.REGISTRY.getValue(new ResourceLocation(tag.getString("name")));
             if (type != null) {
-                this.mode = type.createMode(this);
-                this.mode.readFromNBT(mode.getCompoundTag("data"));
+                BarrelMode mode = type.createMode(barrel);
+                mode.readFromNBT(tag.getCompoundTag("data"));
+                return mode;
             }
-        } else {
-            this.mode = null;
+        }
+        return null;
+    }
+
+    public static void writeMode(BarrelMode mode, NBTTagCompound compound, String key) {
+        if (mode != null && mode.getRegistryName() != null) {
+            NBTTagCompound tag = new NBTTagCompound();
+
+            tag.setString("name", mode.getRegistryName().toString());
+            NBTTagCompound data = new NBTTagCompound();
+            mode.writeToNBT(data);
+            tag.setTag("data", data);
+
+            compound.setTag(key, tag);
         }
     }
 }

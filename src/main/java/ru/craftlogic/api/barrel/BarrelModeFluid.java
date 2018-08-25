@@ -71,8 +71,8 @@ public class BarrelModeFluid extends BarrelMode {
                         //melt things or smth.
                     }
                 }
-            } else {
-                if (fluid.getFluid() == FluidRegistry.WATER) {
+            } else if (fluid.getFluid() == FluidRegistry.WATER) {
+                if (!barrel.isClosed()) {
                     for (EnumFacing side : EnumFacing.values()) {
                         Location l = location.offset(side);
                         Mossable mossable = l.getBlock(Mossable.class);
@@ -86,6 +86,9 @@ public class BarrelModeFluid extends BarrelMode {
                         } else {
                             break;
                         }
+                    }
+                    if (location.offset(EnumFacing.UP).canBlockSeeSky() && location.getWorld().isDaytime()) {
+                        this.tank.drain(100, true);
                     }
                 }
             }
@@ -122,9 +125,8 @@ public class BarrelModeFluid extends BarrelMode {
     @Override
     public void fillWithRain(Barrel barrel, Fluid fluid) {
         boolean thundering = barrel.getLocation().getWorld().isThundering();
-        if (this.tank.getFluid() != null
-                && this.tank.getFluid().getFluid() == FluidRegistry.WATER && fluid.getName().equals("acid_water")) {
-
+        FluidStack lastFluid = this.tank.getFluid();
+        if (lastFluid != null && lastFluid.getFluid() == FluidRegistry.WATER && fluid.getName().equals("acid_water")) {
             this.tank.setFluid(new FluidStack(fluid, this.tank.getFluidAmount()));
         } else {
             this.tank.fill(new FluidStack(fluid, thundering ? 100 : 50), true);

@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import ru.craftlogic.CraftConfig;
 import ru.craftlogic.common.block.*;
 
 import javax.annotation.Nullable;
@@ -54,15 +55,21 @@ public class MixinBlock {
                 break;
             }
             case "minecraft:melon_stem": {
-                block = new BlockGourdStem(BlockGourd.GourdVariant.MELON);
+                if (CraftConfig.tweaks.enableFancyGourd) {
+                    block = new BlockGourdStem(BlockGourd.GourdVariant.MELON);
+                }
                 break;
             }
             case "minecraft:pumpkin_stem": {
-                block = new BlockGourdStem(BlockGourd.GourdVariant.PUMPKIN);
+                if (CraftConfig.tweaks.enableFancyGourd) {
+                    block = new BlockGourdStem(BlockGourd.GourdVariant.PUMPKIN);
+                }
                 break;
             }
             case "minecraft:torch": {
-                block = new BlockBurningTorch();
+                if (CraftConfig.tweaks.enableTorchBurning) {
+                    block = new BlockBurningTorch();
+                }
                 break;
             }
             case "minecraft:nether_brick_fence":
@@ -72,13 +79,15 @@ public class MixinBlock {
             case "minecraft:jungle_fence":
             case "minecraft:acacia_fence":
             case "minecraft:dark_oak_fence": {
-                MixinBlock old = (MixinBlock) (Object)block;
-                block = new BlockDiagonalFence(old.blockMaterial, old.blockMapColor);
-                MixinBlock b = (MixinBlock) (Object)block;
-                b.blockHardness = old.blockHardness;
-                b.blockResistance  = old.blockResistance;
-                b.blockSoundType  = old.blockSoundType;
-                b.unlocalizedName  = old.unlocalizedName;
+                if (CraftConfig.tweaks.enableDiagonalFences) {
+                    MixinBlock old = (MixinBlock) (Object) block;
+                    block = new BlockDiagonalFence(old.blockMaterial, old.blockMapColor);
+                    MixinBlock b = (MixinBlock) (Object) block;
+                    b.blockHardness = old.blockHardness;
+                    b.blockResistance = old.blockResistance;
+                    b.blockSoundType = old.blockSoundType;
+                    b.unlocalizedName = old.unlocalizedName;
+                }
                 break;
             }
         }

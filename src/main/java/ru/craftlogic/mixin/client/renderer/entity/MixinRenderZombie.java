@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.entity.RenderZombie;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.util.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import ru.craftlogic.api.entity.Zombie;
 
 @Mixin(RenderZombie.class)
@@ -22,7 +23,11 @@ public abstract class MixinRenderZombie extends RenderBiped<EntityZombie> {
         GlStateManager.scale(size, size, size);
     }
 
-    @Override
+    /**
+     * @author Radviger
+     * @reason Custom zombies
+     */
+    @Overwrite
     protected ResourceLocation getEntityTexture(EntityZombie zombie) {
         return ((Zombie)zombie).getVariant().getTexture();
     }

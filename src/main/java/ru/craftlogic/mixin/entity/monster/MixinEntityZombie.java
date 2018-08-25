@@ -38,6 +38,7 @@ import ru.craftlogic.api.entity.Zombie;
 import ru.craftlogic.common.entity.ai.EntityAICustomZombieAttack;
 
 import javax.annotation.Nullable;
+import java.util.Random;
 
 @Mixin(EntityZombie.class)
 public abstract class MixinEntityZombie extends EntityMob implements Zombie {
@@ -170,7 +171,9 @@ public abstract class MixinEntityZombie extends EntityMob implements Zombie {
 
     @Inject(method = "readEntityFromNBT", at = @At("RETURN"))
     public void onNbtRead(NBTTagCompound compound, CallbackInfo info) {
-        this.dataManager.set(SIZE, compound.getFloat("size"));
+        if (compound.hasKey("size")) {
+            this.dataManager.set(SIZE, compound.getFloat("size"));
+        }
         this.dataManager.set(VARIANT, compound.getByte("variant"));
         this.setCombatTask();
     }
@@ -200,7 +203,8 @@ public abstract class MixinEntityZombie extends EntityMob implements Zombie {
     @Inject(method = "onInitialSpawn", at = @At("RETURN"))
     public void onSpawned(DifficultyInstance difficulty, @Nullable IEntityLivingData data, CallbackInfoReturnable<IEntityLivingData> info) {
         boolean isExactZombie = (Object)this.getClass() == EntityZombie.class;
-        int variant = isExactZombie ? this.world.rand.nextInt(ZombieVariant.values().length) : 0;
+        Random rand = this.world.rand;
+        int variant = isExactZombie && rand.nextInt(5) == 0 ? rand.nextInt(ZombieVariant.values().length) : 0;
         this.dataManager.set(VARIANT, (byte) variant);
         this.setEquipmentBasedOnDifficulty(difficulty);
         this.setEnchantmentBasedOnDifficulty(difficulty);

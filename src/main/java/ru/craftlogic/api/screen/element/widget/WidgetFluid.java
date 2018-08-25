@@ -2,6 +2,8 @@ package ru.craftlogic.api.screen.element.widget;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.GlStateManager.DestFactor;
+import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.util.ResourceLocation;
@@ -81,7 +83,7 @@ public class WidgetFluid extends Widget {
 
                                 GL11.glPushMatrix();
                                 GlStateManager.enableBlend();
-                                GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                                GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 
                                 while (progressHeight > 0) {
                                     int h = progressHeight >= 16 ? 16 : progressHeight;

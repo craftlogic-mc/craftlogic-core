@@ -130,8 +130,8 @@ public class ScriptCommands implements CommandRegistrar {
             return;
         }
         Binding binding = script.getBinding();
-        binding.setProperty("$server", ctx.server());
-        binding.setProperty("$me", ctx.sender());
+        binding.setProperty("server", ctx.server());
+        binding.setProperty("me", ctx.sender());
         for (Player player : ctx.server().getOnlinePlayers()) {
             binding.setProperty("$" + player.getProfile().getName(), player);
         }

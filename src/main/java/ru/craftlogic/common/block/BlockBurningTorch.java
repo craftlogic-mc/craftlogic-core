@@ -7,19 +7,21 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.model.ModelAutoReg;
 import ru.craftlogic.api.model.ModelManager;
 
@@ -38,7 +40,7 @@ public class BlockBurningTorch extends BlockTorch implements ModelAutoReg {
         this.setTickRandomly(true);
         this.setDefaultState(this.blockState.getBaseState()
             .withProperty(FACING, EnumFacing.UP)
-            .withProperty(LIT, false)
+            .withProperty(LIT, !CraftConfig.tweaks.enableTorchBurning)
         );
     }
 
@@ -63,7 +65,8 @@ public class BlockBurningTorch extends BlockTorch implements ModelAutoReg {
 
     @Override
     public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing side, float tx, float ty, float tz, int meta, EntityLivingBase placer) {
-        return super.getStateForPlacement(world, pos, side, tx, ty, tz, meta, placer).withProperty(LIT, meta == 1);
+        return super.getStateForPlacement(world, pos, side, tx, ty, tz, meta, placer)
+                .withProperty(LIT, !CraftConfig.tweaks.enableTorchBurning);
     }
 
     @Override
@@ -97,7 +100,7 @@ public class BlockBurningTorch extends BlockTorch implements ModelAutoReg {
 
     @Override
     public int getMetaFromState(IBlockState state) {
-        int meta = 0;
+        int meta;
         switch(state.getValue(FACING)) {
             case EAST:
                 meta = 1;
@@ -130,7 +133,7 @@ public class BlockBurningTorch extends BlockTorch implements ModelAutoReg {
 
     @Override
     public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
-        if (state.getValue(LIT) && (rand.nextInt(20) == 0 || world.isRainingAt(pos.up()) )) {
+        if (state.getValue(LIT) && (rand.nextInt(20) == 0 || world.isRainingAt(pos.up())) && CraftConfig.tweaks.enableTorchBurning) {
             state.cycleProperty(LIT);
         }
     }
@@ -161,11 +164,5 @@ public class BlockBurningTorch extends BlockTorch implements ModelAutoReg {
         modelManager.registerItemVariants(item, "minecraft:torch", "minecraft:unlit_torch");
         modelManager.registerItemModel(item, 0, "unlit_torch");
         modelManager.registerItemModel(item, 1, "torch");
-    }
-
-    @Override
-    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> blocks) {
-        blocks.add(new ItemStack(this, 1, 0));
-        blocks.add(new ItemStack(this, 1, 1));
     }
 }

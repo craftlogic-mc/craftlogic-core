@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
+import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.recipe.DictStack;
 import ru.craftlogic.api.recipe.Recipe;
 import ru.craftlogic.api.recipe.RecipeGrid;
@@ -24,7 +25,9 @@ public class CraftRecipes {
     private static final Map<Class<? extends RecipeGrid>, Map<ResourceLocation, Recipe>> RECIPES = new HashMap<>();
 
     static void init(Side side) {
-        FurnaceRecipes.instance().addSmelting(CraftItems.ROCK, new ItemStack(CraftItems.STONE_BRICK), 0.15F);
+        if (CraftConfig.items.enableRocks && CraftConfig.items.enableStoneBricks) {
+            FurnaceRecipes.instance().addSmelting(CraftItems.ROCK, new ItemStack(CraftItems.STONE_BRICK), 0.15F);
+        }
 
         CraftRecipes.registerRecipe(RecipeGridAlloying.class, new RecipeAlloying(
             new ResourceLocation(MOD_ID, "iron_nugget"),

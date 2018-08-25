@@ -30,21 +30,6 @@ public class MixinRenderItem {
      * @reason Dirty hook
      */
     @Overwrite
-    protected void registerItem(Item item, int meta, String model) {
-        /*if (Block.getBlockFromItem(item) == Blocks.CARPET && model.endsWith("_carpet")) {
-            return;
-        }
-        if (Block.getBlockFromItem(item) == Blocks.WOOL && model.endsWith("_wool")) {
-            return;
-        }*/
-        this.itemModelMesher.register(item, meta, new ModelResourceLocation(model, "inventory"));
-    }
-
-    /**
-     * @author Radviger
-     * @reason Dirty hook
-     */
-    @Overwrite
     public void renderItemOverlayIntoGUI(FontRenderer fontRenderer, ItemStack item, int x, int y, @Nullable String countString) {
         if (!item.isEmpty()) {
             Tessellator tess = Tessellator.getInstance();

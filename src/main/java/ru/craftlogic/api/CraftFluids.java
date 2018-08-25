@@ -21,10 +21,10 @@ public class CraftFluids {
         FluidRegistry.enableUniversalBucket();
     }
 
-    public static FluidBase CRUDE_OIL, MILK;
+    public static FluidBase /*CRUDE_OIL, */MILK;
 
     static void init(Side side) {
-        CRUDE_OIL = registerFluid("crude_oil", CraftMaterials.CRUDE_OIL).setViscosity(2000).setDensity(1000);
+        //CRUDE_OIL = registerFluid("crude_oil", CraftMaterials.CRUDE_OIL).setViscosity(2000).setDensity(1000);
         MILK = registerFluid("milk", CraftMaterials.MILK);
     }
 

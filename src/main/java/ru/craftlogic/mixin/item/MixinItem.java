@@ -64,21 +64,9 @@ public class MixinItem {
     protected static void registerItemBlock(Block block, Item item) {
         ResourceLocation name = Block.REGISTRY.getNameForObject(block);
         switch (name.toString()) {
-            case "minecraft:wool": {
-                item = new ItemWool(block);
-                break;
-            }
-            case "minecraft:carpet": {
-                item = new ItemCarpet(block);
-                break;
-            }
             case "minecraft:brown_mushroom":
             case "minecraft:red_mushroom": {
                 item = new ItemMushroom(block);
-                break;
-            }
-            case "minecraft:torch": {
-                item = new ItemBurningTorch(block);
                 break;
             }
         }

@@ -8,6 +8,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
+import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.item.ItemBlockBase;
 import ru.craftlogic.common.block.*;
@@ -35,11 +36,16 @@ public class CraftBlocks {
         UNFIRED_POTTERY = registerBlockWithItem(new BlockUnfiredPottery());
         CAULDRON = registerBlockWithItem(new BlockCauldron());
         SMELTING_VAT = registerBlockWithItem(new BlockSmeltingVat());
-        BARREL_WOOD = registerBlockWithItem(new BlockBarrelWood());
-        BARREL_STONE = registerBlockWithItem(new BlockBarrelStone());
 
-        PUMPKIN = registerBlock(new BlockGourd(BlockGourd.GourdVariant.PUMPKIN));
-        MELON = registerBlock(new BlockGourd(BlockGourd.GourdVariant.MELON));
+        if (CraftConfig.blocks.enableBarrels) {
+            BARREL_WOOD = registerBlockWithItem(new BlockBarrelWood());
+            BARREL_STONE = registerBlockWithItem(new BlockBarrelStone());
+        }
+
+        if (CraftConfig.tweaks.enableFancyGourd) {
+            PUMPKIN = registerBlock(new BlockGourd(BlockGourd.GourdVariant.PUMPKIN));
+            MELON = registerBlock(new BlockGourd(BlockGourd.GourdVariant.MELON));
+        }
     }
 
     public static <B extends Block> B registerBlock(@Nonnull B block) {

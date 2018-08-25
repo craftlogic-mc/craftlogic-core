@@ -108,8 +108,12 @@ public class CommandContext {
         return this.has(name) ? Optional.of(this.get(name)) : Optional.empty();
     }
 
-    public <T> Optional<T> getIfPresent(String name, CheckedFunction<Argument, T, CommandException> mapper) {
-        return this.getIfPresent(name).map(mapper.unwrap());
+    public <T> Optional<T> getIfPresent(String name, CheckedFunction<Argument, T, CommandException> mapper) throws CommandException {
+        Optional<Argument> value = this.getIfPresent(name);
+        if (value.isPresent()) {
+            return Optional.of(mapper.apply(value.get()));
+        }
+        return Optional.empty();
     }
 
     public Argument get(String name) {

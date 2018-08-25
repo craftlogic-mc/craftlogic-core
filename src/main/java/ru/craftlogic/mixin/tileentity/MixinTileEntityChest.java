@@ -88,11 +88,11 @@ public abstract class MixinTileEntityChest extends TileEntityLockableLoot implem
     }
 
     @Shadow
-    public BlockChest.Type getChestType() { return null; }
+    public abstract BlockChest.Type getChestType();
 
     @Shadow
-    private boolean isChestAt(BlockPos pos) { return false; }
+    protected abstract boolean isChestAt(BlockPos pos);
 
     @Shadow
-    private void setNeighbor(TileEntityChest chest, EnumFacing side) {}
+    protected abstract void setNeighbor(TileEntityChest chest, EnumFacing side);
 }

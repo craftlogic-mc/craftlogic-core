@@ -4,6 +4,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
+import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.item.ItemBase;
 import ru.craftlogic.api.item.ItemFoodBase;
 import ru.craftlogic.common.item.*;
@@ -26,14 +27,24 @@ public class CraftItems {
     static void init(Side side) {
         ASH = registerItem(new ItemBase("ash", CreativeTabs.MATERIALS));
         THERMOMETER = registerItem(new ItemThermometer());
-        ROCK = registerItem(new ItemRock());
-        MOSS = registerItem(new ItemMoss());
-        STONE_BRICK = registerItem(new ItemStoneBrick());
-        RAW_EGG = registerItem(new ItemFoodBase("egg_raw", CreativeTabs.FOOD, 4, 0.1F, false));
-        FRIED_EGG = registerItem(new ItemFoodBase("egg_fried", CreativeTabs.FOOD, 5, 0.5F, false));
+        if (CraftConfig.items.enableRocks) {
+            ROCK = registerItem(new ItemRock());
+        }
+        if (CraftConfig.items.enableMoss) {
+            MOSS = registerItem(new ItemMoss());
+        }
+        if (CraftConfig.items.enableStoneBricks) {
+            STONE_BRICK = registerItem(new ItemStoneBrick());
+        }
+        if (CraftConfig.items.enableRawEggs) {
+            RAW_EGG = registerItem(new ItemFoodBase("egg_raw", CreativeTabs.FOOD, 4, 0.1F, false));
+            FRIED_EGG = registerItem(new ItemFoodBase("egg_fried", CreativeTabs.FOOD, 5, 0.5F, false));
+        }
         WOOL_CARD = registerItem(new ItemWoolCard());
-        CHAIN_LINKS = registerItem(new ItemBase("chain_links", CreativeTabs.MATERIALS));
-        CHAIN_MESH = registerItem(new ItemBase("chain_mesh", CreativeTabs.MATERIALS));
+        if (CraftConfig.items.enableChainCrafting) {
+            CHAIN_LINKS = registerItem(new ItemBase("chain_links", CreativeTabs.MATERIALS));
+            CHAIN_MESH = registerItem(new ItemBase("chain_mesh", CreativeTabs.MATERIALS));
+        }
         CROWBAR = registerItem(new ItemCrowbar());
     }
 

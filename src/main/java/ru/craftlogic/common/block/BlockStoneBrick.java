@@ -19,9 +19,10 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import ru.craftlogic.CraftConfig;
+import ru.craftlogic.api.CraftItems;
 import ru.craftlogic.api.block.Mossable;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.api.CraftItems;
 
 import java.util.Random;
 
@@ -42,7 +43,7 @@ public class BlockStoneBrick extends BlockFalling implements Mossable {
     @Override
     @SideOnly(Side.CLIENT)
     public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
-        if (state.getValue(VARIANT) == EnumType.CRACKED) {
+        if (state.getValue(VARIANT) == EnumType.CRACKED && CraftConfig.tweaks.enableCrackedStoneBrickGravity) {
             super.randomDisplayTick(state, world, pos, rand);
         }
     }
@@ -71,7 +72,7 @@ public class BlockStoneBrick extends BlockFalling implements Mossable {
 
     @Override
     public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
-        if (state.getValue(VARIANT) == EnumType.CRACKED) {
+        if (state.getValue(VARIANT) == EnumType.CRACKED && CraftConfig.tweaks.enableCrackedStoneBrickGravity) {
             super.updateTick(world, pos, state, rand);
         }
     }
@@ -107,14 +108,16 @@ public class BlockStoneBrick extends BlockFalling implements Mossable {
                 }
             }
             if (state.getValue(VARIANT) == EnumType.DEFAULT && cold == heat && heat >= 2 && rand.nextInt(3) == 0) {
-                world.playEvent(2001, pos, Block.getStateId(state));
-                world.setBlockState(pos, state.withProperty(VARIANT, EnumType.CRACKED));
+                if (CraftConfig.tweaks.enableStoneBrickCracking) {
+                    world.playEvent(2001, pos, Block.getStateId(state));
+                    world.setBlockState(pos, state.withProperty(VARIANT, EnumType.CRACKED));
+                }
             } else if (humidity > heat) {
                 if (state.getValue(VARIANT) == EnumType.DEFAULT) {
                     if (rand.nextInt(30) == 0) {
                         this.growMoss(new Location(world, pos));
                     }
-                } else {
+                } else if (CraftConfig.tweaks.enableMossSpreading) {
                     for (int x = -1; x <= 1; x++) {
                         for (int y = -1; y <= 1; y++) {
                             for (int z = -1; z <= 1; z++) {
@@ -136,29 +139,37 @@ public class BlockStoneBrick extends BlockFalling implements Mossable {
                         }
                     }
                 }
-            } else if (humidity < heat) {
-                if (state.getValue(VARIANT) == EnumType.MOSSY && rand.nextInt(2) == 0) {
-                    world.playEvent(1009, pos, 0);
-                    world.playEvent(2000, pos, 5);
-                    world.setBlockState(pos, Blocks.STONEBRICK.getDefaultState());
-                }
+            } else if (humidity < heat && state.getValue(VARIANT) == EnumType.MOSSY && rand.nextInt(2) == 0
+                    && CraftConfig.tweaks.enableMossDecay) {
+
+                world.playEvent(1009, pos, 0);
+                world.playEvent(2000, pos, 5);
+                world.setBlockState(pos, Blocks.STONEBRICK.getDefaultState());
             }
         }
     }
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        return CraftItems.STONE_BRICK;
+        if (CraftConfig.items.enableStoneBricks) {
+            return CraftItems.STONE_BRICK;
+        } else {
+            return super.getItemDropped(state, rand, fortune);
+        }
     }
 
     @Override
     public int quantityDropped(Random rand) {
-        return rand.nextInt(5) == 0 ? 3 : 4;
+        if (CraftConfig.items.enableStoneBricks) {
+            return rand.nextInt(5) == 0 ? 3 : 4;
+        } else {
+            return 1;
+        }
     }
 
     @Override
     public int quantityDropped(IBlockState state, int fortune, Random rand) {
-        if (state.getValue(VARIANT) == EnumType.CRACKED) {
+        if (state.getValue(VARIANT) == EnumType.CRACKED && CraftConfig.items.enableStoneBricks) {
             return rand.nextInt(4);
         } else {
             return super.quantityDropped(state, fortune, rand);
@@ -169,7 +180,7 @@ public class BlockStoneBrick extends BlockFalling implements Mossable {
     public void getDrops(NonNullList<ItemStack> drops, IBlockAccess blockAccessor, BlockPos pos, IBlockState state, int fortune) {
         Random rand = blockAccessor instanceof World ? ((World)blockAccessor).rand : RANDOM;
         super.getDrops(drops, blockAccessor, pos, state, fortune);
-        if (state.getValue(VARIANT) == EnumType.MOSSY && rand.nextInt(4) == 0) {
+        if (state.getValue(VARIANT) == EnumType.MOSSY && rand.nextInt(4) == 0 && CraftConfig.items.enableMoss) {
             drops.add(new ItemStack(CraftItems.MOSS));
         }
     }
@@ -181,7 +192,7 @@ public class BlockStoneBrick extends BlockFalling implements Mossable {
 
     @Override
     public boolean growMoss(Location location) {
-        if (location.getBlockProperty(VARIANT) == EnumType.DEFAULT) {
+        if (location.getBlockProperty(VARIANT) == EnumType.DEFAULT && CraftConfig.tweaks.enableStoneBrickMossGrowth) {
             boolean loaded = location.isAreaLoaded(32);
             location.setBlockProperty(VARIANT, EnumType.MOSSY, loaded ? 3 : 2);
             return true;
@@ -190,7 +201,7 @@ public class BlockStoneBrick extends BlockFalling implements Mossable {
     }
 
     @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer p_getPickBlock_5_) {
-        return super.getPickBlock(state, target, world, pos, p_getPickBlock_5_);
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+        return new ItemStack(Blocks.STONEBRICK, 1, this.getMetaFromState(state));
     }
 }
