@@ -23,6 +23,9 @@ public class CraftItems {
     public static Item CHAIN_LINKS;
     public static Item CHAIN_MESH;
     public static Item CROWBAR;
+    public static Item MILK_BOTTLE;
+    public static Item MILK_BOWL;
+    public static Item WATER_BOWL;
 
     static void init(Side side) {
         ASH = registerItem(new ItemBase("ash", CreativeTabs.MATERIALS));
@@ -34,7 +37,7 @@ public class CraftItems {
             MOSS = registerItem(new ItemMoss());
         }
         if (CraftConfig.items.enableStoneBricks) {
-            STONE_BRICK = registerItem(new ItemStoneBrick());
+            STONE_BRICK = registerItem(new ItemBase("stone_brick", CreativeTabs.MATERIALS));
         }
         if (CraftConfig.items.enableRawEggs) {
             RAW_EGG = registerItem(new ItemFoodBase("egg_raw", CreativeTabs.FOOD, 4, 0.1F, false));
@@ -46,6 +49,9 @@ public class CraftItems {
             CHAIN_MESH = registerItem(new ItemBase("chain_mesh", CreativeTabs.MATERIALS));
         }
         CROWBAR = registerItem(new ItemCrowbar());
+        MILK_BOTTLE = registerItem(new ItemMilkBottle());
+        //MILK_BOWL = registerItem(new ItemFluidBowl(CraftFluids.MILK));
+        //WATER_BOWL = registerItem(new ItemFluidBowl(FluidRegistry.WATER));
     }
 
     public static Item registerItem(@Nonnull Item item) {

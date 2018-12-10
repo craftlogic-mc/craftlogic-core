@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x,variant=oak": {"model": "craftlogic:drying_rack/oak"},
+    "axis=z,variant=oak": {"model": "craftlogic:drying_rack/oak", "y": 90},
+    "axis=x,variant=spruce": {"model": "craftlogic:drying_rack/spruce"},
+    "axis=z,variant=spruce": {"model": "craftlogic:drying_rack/spruce", "y": 90},
+    "axis=x,variant=birch": {"model": "craftlogic:drying_rack/birch"},
+    "axis=z,variant=birch": {"model": "craftlogic:drying_rack/birch", "y": 90},
+    "axis=x,variant=jungle": {"model": "craftlogic:drying_rack/jungle"},
+    "axis=z,variant=jungle": {"model": "craftlogic:drying_rack/jungle", "y": 90},
+    "axis=x,variant=acacia": {"model": "craftlogic:drying_rack/acacia"},
+    "axis=z,variant=acacia": {"model": "craftlogic:drying_rack/acacia", "y": 90},
+    "axis=x,variant=dark_oak": {"model": "craftlogic:drying_rack/dark_oak"},
+    "axis=z,variant=dark_oak": {"model": "craftlogic:drying_rack/dark_oak", "y": 90}
+  }
+}

@@ -7,6 +7,8 @@ import ru.craftlogic.api.screen.ElementContainer;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static ru.craftlogic.api.CraftAPI.parseColor;
+
 public class ElementLabel extends Element {
     private Supplier<ITextComponent> text;
     private final LabelAlign align;

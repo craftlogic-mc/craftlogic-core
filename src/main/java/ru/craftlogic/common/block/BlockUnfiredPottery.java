@@ -6,7 +6,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
@@ -27,13 +26,13 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import ru.craftlogic.api.CraftBlocks;
 import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
 import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.util.Nameable;
 import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.api.CraftBlocks;
 import ru.craftlogic.common.tileentity.TileEntityUnfiredPottery;
 
 import java.util.HashMap;
@@ -160,18 +159,14 @@ public class BlockUnfiredPottery extends BlockBase implements TileEntityHolder<T
     @Override
     public int getMetaFromState(IBlockState state) {
         int meta = state.getValue(VARIANT).ordinal();
-        if (state.getValue(COVERED)) {
-            meta |= 4;
-        }
-        if (state.getValue(DONE)) {
-            meta |= 8;
-        }
+        if (state.getValue(COVERED)) meta |= 4;
+        if (state.getValue(DONE)) meta |= 8;
         return meta;
     }
 
     @Override
-    protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, VARIANT, COVERED, DONE);
+    protected IProperty[] getProperties() {
+        return new IProperty[] {VARIANT, COVERED, DONE};
     }
 
     @Override

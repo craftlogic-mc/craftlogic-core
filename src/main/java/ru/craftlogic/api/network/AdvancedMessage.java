@@ -2,10 +2,15 @@ package ru.craftlogic.api.network;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import ru.craftlogic.api.CraftAPI;
 
 import java.io.IOException;
 
 public abstract class AdvancedMessage implements IMessage {
+    public AdvancedNetwork getNetwork() {
+        return CraftAPI.NETWORK;
+    }
+
     @Override
     public final void fromBytes(ByteBuf buf) {
         try {

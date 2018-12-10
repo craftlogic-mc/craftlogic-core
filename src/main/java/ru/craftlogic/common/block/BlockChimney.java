@@ -2,10 +2,10 @@ package ru.craftlogic.common.block;
 
 import net.minecraft.block.BlockHopper;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.statemap.DefaultStateMapper;
 import net.minecraft.entity.EntityLivingBase;
@@ -72,8 +72,8 @@ public class BlockChimney extends BlockBase implements TileEntityHolder<TileEnti
     }
 
     @Override
-    protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, FACING, VARIANT);
+    protected IProperty[] getProperties() {
+        return new IProperty[] {FACING, VARIANT};
     }
 
     @Override

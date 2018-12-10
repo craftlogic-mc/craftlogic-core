@@ -4,7 +4,8 @@ buildscript {
         mavenCentral()
         maven {
             name = 'forge'
-            url = "http://files.minecraftforge.net/maven" }
+            url = "http://files.minecraftforge.net/maven" 
+        }
         maven {
             name = 'sponge'
             url = 'http://repo.spongepowered.org/maven'

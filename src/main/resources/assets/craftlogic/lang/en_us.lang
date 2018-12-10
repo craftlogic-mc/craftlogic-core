@@ -2,12 +2,18 @@ tooltip.temperature=Temperature: %d/%d °C
 tooltip.fluid=%s: %d/%d mB
 tooltip.empty=Empty
 tooltip.bird=Bird: %s
-tooltip.balance=Balance: %s %s
+tooltip.you=You
+tooltip.server_stop=Server is stopping...
 
+gui.reconnect.in=Reconnect in %s...
+
+fluid.milk=Milk
 fluid.oil=Oil
+
 entity.MinecartFruance.name=Minecart Furnace
 
-item.forge.bucketFilled.oil=Oil Bucket
+item.forge.bucketFilled.milk=Milk Bucket
+item.forge.bucketFilled.oil=Crude Oil Bucket
 
 tile.unfired_cauldron.name=Unfired Cauldron
 tile.unfired_smelting_vat.name=Unfired Smelting Vat
@@ -17,8 +23,8 @@ tile.cauldron.name=Cauldron
 tile.smelting_vat.name=Smelting Vat
 tile.barrel_wood.name=Wooden Barrel
 tile.barrel_stone.name=Stone Barrel
+tile.drying_rack.name=Drying Rack
 
-item.wool.name=Wool
 item.crowbar.name=Crowbar
 item.wool_card.name=Wool Card
 item.ash.name=Ash
@@ -28,28 +34,31 @@ item.moss.name=Moss
 item.thermometer.name=Thermometer
 item.egg_raw.name=Broken Egg
 item.egg_fried.name=Fried Egg
-item.chain_links.name=Chaiin Links
+item.chain_links.name=Chain Links
 item.chain_mesh.name=Chain Mesh
+item.milk_bottle.name=Milk Bottle
 
-chat.alone=It seems that nobody hears you...
-chat.permission=You don't have permission to send messages to that channel!
-chat.spy=[Spy] %s
+commands.stop.start_delayed=Stopping the server in %s
 
 commands.generic.unknownFailure=Unknown failure! See console for more details.
 commands.generic.noPermission=You don't have required permission: %s
 commands.generic.playerOnly=This command can only be used by a player!
+commands.generic.locatableOnly=This command can only be used by an inworld sender!
 commands.generic.userNeverPlayed=Player '%s' have not played on this server yet
 commands.generic.ip.invalid=Invalid IP-address format: %s
 commands.generic.world.notFound=World %s cannot be found
 commands.generic.wrongTimeFormat=Wrong time format: %s
 commands.generic.yes=yes
 commands.generic.no=no
+commands.generic.year.single=%d year
+commands.generic.year.plural.a=%d years
+commands.generic.year.plural.b=%d years
 commands.generic.month.single=%d month
 commands.generic.month.plural.a=%d months
 commands.generic.month.plural.b=%d months
 commands.generic.day.single=%d day
 commands.generic.day.plural.a=%d days
-commands.generic.day.plural.b=%d daya
+commands.generic.day.plural.b=%d days
 commands.generic.hour.single=%d hour
 commands.generic.hour.plural.a=%d hours
 commands.generic.hour.plural.b=%d hours
@@ -59,6 +68,12 @@ commands.generic.minute.plural.b=%d minutes
 commands.generic.second.single=%d second
 commands.generic.second.plural.a=%d seconds
 commands.generic.second.plural.b=%d seconds
+commands.generic.uuid.invalidFormat=Invalid UUID format: %s
+
+commands.home.teleport.you=Welcome home!
+commands.home.teleport.other=Welcome to %s's home!
+commands.home.missing.you=Your home bed is missing or obstructed!
+commands.home.missing.other=%s's home bed is missing or obstructed!
 
 commands.heal.self=You've healed yourself!
 commands.heal.other=You've healed %s!
@@ -69,30 +84,9 @@ commands.feed.other=You've feeded %s!
 commands.feed.self.not_hungry=You're not hungry!
 commands.feed.other.not_hungry=%s is not hungry!
 
-commands.economy.disabled=Economy is disabled!
-commands.economy.not_enough=You do not have enough money! You need: %s
-commands.economy.set=Set %s's balance to %s
-commands.economy.given=Given %s to %s' account
-commands.economy.taken=Taken %s from %s' account
-commands.economy.usage=/eco <give|take|set> <player> <sum>
-
-commands.pay.sent=You have sent %s to %s
-commands.pay.received=You have received %s from %s
-commands.pay.usage=/pay <receiver> <sum>
-commands.pay.self=You cannot send money to yourself!
-
-commands.baltop.usage=/baltop [size]
-commands.baltop.header=-- Top %d rich players --
-commands.baltop.entry=%d. %s: %s
-commands.baltop.empty=No accounts
-
-commands.balance.usage=/balance [username]
-commands.balance.other=%s's balance: %s
-commands.balance=Your balance: %s
-
 commands.seen.usage=/seen <username>
 commands.seen.online=Player %s is now online and located at: %s
-commands.seen.offlie=%s's last location was: %s (%s ago)
+commands.seen.offline=%s's last location was: %s (%s ago)
 
 commands.ops.usage=/ops [min level]
 commands.ops.header=Server operators:
@@ -102,18 +96,6 @@ commands.ops.empty=No operators
 
 commands.tempban.usage=/tempban <username> <time> [reason]
 commands.tempban-ip.usage=/tempban-ip <address> <time> [reason]
-
-commands.script.usage=/script <list|load|unload> [id] - Script management
-commands.script.disabled=Scripting system is disabled!
-commands.script.list=Loaded scripts: %s
-commands.script.list.empty=No scripts has been loaded
-commands.script.load.success=Successfully loaded script %s
-commands.script.load.fail=Error loading script '%s': %s. See console for more details.
-commands.script.load.fail.generic=Script loading failed
-commands.script.unload.success=Successfully unloaded script %s
-commands.script.unload.fail=Error unloading script '%s': %s. See console for more details.
-commands.script.unload.fail.generic=Script unloading failed
-commands.script.entry.click=Click to unload script %s
 
 commands.time.usage=/time <day|night> OR /time set <value> OR /time add <value> [unit] OR /time query <day|daytime|gametime>
 commands.time.unknownUnit=Unknown time unit: %s
@@ -146,76 +128,6 @@ commands.gamemode.survival=Survival
 commands.gamemode.spectator=Spectator
 commands.gamemode.adventure=Adventure
 
-commands.perm.usage=/perm group <name> <info|prefix|suffix|users|create|delete> OR /perm group <name> <addPerm|delPerm|setPrefix|setSuffix> <value...>
-commands.perm.group.create.exists=Group with name '%s' already exists!
-commands.perm.group.create.success=Successfully created new group named '%s'
-commands.perm.group.delete.unable=Unable to delete group '%s'!
-commands.perm.group.delete.success=Successfully deleted group '%s'
-commands.perm.group.notFound=Group '%s' cannot be found!
-commands.perm.info.group.header=<- Information about group '%s' ->
-commands.perm.info.group.parent=Parent group: %s
-commands.perm.info.group.prefix=Prefix: %s
-commands.perm.info.group.suffix=Suffix: %s
-commands.perm.info.permissions=Permissions:
-commands.perm.info.group.exact.prefix.set=Prefix of group '%s' was set to '%s'
-commands.perm.info.group.exact.prefix.reset=Prefix of group '%s' was reset
-commands.perm.info.group.exact.prefix=Prefix of group '%s' is '%s'
-commands.perm.info.group.exact.suffix.set=Suffix of group '%s' was set to '%s'
-commands.perm.info.group.exact.suffix.reset=Suffix of group '%s' was reset
-commands.perm.info.group.exact.suffix=Suffix of group '%s' is '%s'
-commands.perm.info.group.members=Group members: %s
-commands.perm.info.group.members.everyone=This is a default group and every user is a member of it
-commands.perm.info.user.header=<- Information about user '%s' (%s) ->
-commands.perm.info.user.prefix=Prefix: %s
-commands.perm.info.user.suffix=Suffix: %s
-commands.perm.info.user.groups=Groups:
-commands.perm.info.user.exact.prefix.set=Prefix of user '%s' was set to '%s'
-commands.perm.info.user.exact.prefix.reset=Prefix of user '%s' was reset
-commands.perm.info.user.exact.prefix=Prefix of user '%s' is '%s'
-commands.perm.info.user.exact.suffix.set=Suffix of user '%s' was set to '%s'
-commands.perm.info.user.exact.suffix.reset=Suffix of user '%s' was reset
-commands.perm.info.user.exact.suffix=Suffix of user '%s' is '%s'
-commands.perm.group.permissions.add.success=Successfully added permission '%s' to group '%s'
-commands.perm.group.permissions.add.unable=Permission '%s' is already granted to group '%s'
-commands.perm.group.permissions.delete.success=Successfully removed permission '%s' from group '%s'
-commands.perm.group.permissions.delete.unable=Permission '%s' is missing for group '%s'
-commands.perm.user.permissions.add.success=Successfully added permission '%s' to user '%s'
-commands.perm.user.permissions.add.unable=Permission '%s' is already granted to user '%s'
-commands.perm.user.permissions.delete.success=Successfully removed permission '%s' from user '%s'
-commands.perm.user.permissions.delete.unable=Permission '%s' is missing for user '%s'
-commands.perm.user.groups.add.success=Successfully added group '%s' to user '%s'
-commands.perm.user.groups.add.unable=Group '%s' is already granted to user '%s'
-commands.perm.user.groups.delete.success=Successfully removed group '%s' from user '%s'
-commands.perm.user.groups.delete.unable=Group '%s' is missing for user '%s'
-
-commands.home.usage=/home <create|delete|invite|expel|ban> [player]
-commands.home.player.yourself=You cannot point at yourself!
-commands.home.invite.success=You have invited player '%s' to your home!
-commands.home.invite.already=Player '%s' is already invited to your home!
-commands.home.expel.success=You have expelled player '%s' from your home!
-commands.home.expel.already=Player '%s' is not invited to your home!
-commands.home.ban.unsupported=This feature is not supported yet!
-commands.home.missing=You don't have any homes in world '%s'!
-commands.home.create.already=You have already created home in world '%s'!
-commands.home.create.success=Welcome to your new home!
-commands.home.create.intersects=Region intersects with another one in radius of %d block(s)
-commands.home.delete.success=You have just deleted your home region! Notice that all the blocks left in that region could be griefed!
-commands.home.welcome=Welcome back to your home!
-commands.home.welcome.other=Welcome to %s's home!
-commands.home.accessDenied=You're not invited to %s's home!
-commands.chat.disabled=Extended chat features are disabled!
-commands.chat.reload.success=Successfully reloaded chat config!
-commands.chat.reload.failed=Failed to reload chat config: %s. See console for more details
-commands.chat.clear=Successfully cleared all players' chats!
-commands.mute.usage=/mute <player> <duration> [reason...]
-commands.mute.already=Player %s is already muted!
-commands.mute.you.reason=You have benn muted for %s! Reason: %s
-commands.mute.you=You have benn muted for %s!
-commands.mute.target.reason=Player %s was muted for %d. Reson: %s
-commands.mute.target=Player %s was muted for %d.
-commands.unmute.already=Player %s is not muted!
-commands.unmute.success=Player %s has been successfully unmuted!
-
 disconnect.ip-banned.temp=Your ip-address is temporarely banned from this server!
 disconnect.ip-banned.permanent=Your ip-address is permanently banned from this server!
 disconnect.banned.temp=You are temporarely banned from this server!
@@ -224,4 +136,3 @@ disconnect.banned.reason=Ban reason: %s
 disconnect.banned.expiration=Ban expiration date: %s
 disconnect.whitelist=You are not white-listed on this server
 disconnect.full=The server is full
-chat.muted=You cannot write to that channel because you're muted!

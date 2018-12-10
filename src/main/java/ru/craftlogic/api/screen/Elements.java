@@ -2,6 +2,7 @@ package ru.craftlogic.api.screen;
 
 import net.minecraft.util.ResourceLocation;
 import ru.craftlogic.api.screen.element.ElementButton;
+import ru.craftlogic.api.screen.element.ElementCheckBox;
 import ru.craftlogic.api.screen.element.ElementGradient;
 import ru.craftlogic.api.screen.element.ElementLabel;
 
@@ -53,6 +54,7 @@ public final class Elements {
         init = true;
 
         register("button", ElementButton::new);
+        register("checkbox", ElementCheckBox::new);
         register("label", ElementLabel::new);
         register("gradient", ElementGradient::new);
     }

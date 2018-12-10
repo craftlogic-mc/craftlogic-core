@@ -84,9 +84,14 @@
     "subtitle": "craftlogic.subtitle.ban",
     "sounds": [ "craftlogic:ban" ]
   },
-  "tomes": {
+  "tome": {
     "category": "player",
-    "subtitle": "craftlogic.subtitle.tomes",
-    "sounds": [ "craftlogic:tomes" ]
+    "subtitle": "craftlogic.subtitle.tome",
+    "sounds": [ "craftlogic:tome" ]
+  },
+  "opening_failed": {
+    "category": "player",
+    "subtitle": "craftlogic.subtitle.opening_failed",
+    "sounds": [ "craftlogic:opening_failed" ]
   }
 }

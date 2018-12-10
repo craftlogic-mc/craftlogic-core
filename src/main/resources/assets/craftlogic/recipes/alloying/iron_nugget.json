@@ -1,0 +1,10 @@
+{
+  "input": "dictionary:oreIron",
+  "exp": 1.0,
+  "temperature": 1538,
+  "time": 300,
+  "output": {
+    "name": "minecraft:iron_nugget",
+    "amount": 8
+  }
+}

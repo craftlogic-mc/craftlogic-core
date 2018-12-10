@@ -5,6 +5,8 @@ import ru.craftlogic.api.screen.ElementContainer;
 
 import java.util.Map;
 
+import static ru.craftlogic.api.CraftAPI.parseColor;
+
 public class ElementGradient extends Element {
     private final int width, height;
     private final int startColor, endColor;

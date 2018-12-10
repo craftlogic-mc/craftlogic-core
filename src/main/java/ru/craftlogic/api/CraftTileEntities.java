@@ -9,7 +9,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.client.render.tileentity.RenderBarrel;
+import ru.craftlogic.client.render.tileentity.RenderDryingRack;
 import ru.craftlogic.common.tileentity.TileEntityBarrel;
+import ru.craftlogic.common.tileentity.TileEntityDryingRack;
 
 import javax.annotation.Nonnull;
 import java.util.HashMap;
@@ -20,7 +22,7 @@ import static ru.craftlogic.api.CraftAPI.MOD_ID;
 import static ru.craftlogic.api.CraftAPI.wrapWithActiveModId;
 
 public class CraftTileEntities {
-    static Map<ResourceLocation, TileEntityInfo<?>> TILE_REGISTRY = new HashMap<>();
+    private static Map<ResourceLocation, TileEntityInfo<?>> TILE_REGISTRY = new HashMap<>();
 
     static void init(Side side) {
         if (side == Side.CLIENT) {
@@ -31,6 +33,7 @@ public class CraftTileEntities {
     @SideOnly(Side.CLIENT)
     private static void initClient() {
         registerTileEntityRenderer(TileEntityBarrel.class, RenderBarrel::new);
+        registerTileEntityRenderer(TileEntityDryingRack.class, RenderDryingRack::new);
     }
 
     public static void registerTileEntity(@Nonnull String name, TileEntityInfo<?> type) {

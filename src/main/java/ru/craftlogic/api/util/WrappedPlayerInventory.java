@@ -9,30 +9,28 @@ import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.api.inventory.WrappedInventoryFieldHolder;
 import ru.craftlogic.api.inventory.manager.InventoryManager;
 import ru.craftlogic.api.inventory.manager.SizeCheckedInventoryManager;
-import ru.craftlogic.api.world.OfflinePlayer;
+import ru.craftlogic.api.world.PhantomPlayer;
 import ru.craftlogic.api.world.Player;
 
 import javax.annotation.Nullable;
 
 public class WrappedPlayerInventory implements InventoryHolder {
-    private final InventoryPlayer inventory;
     private final Player viewer;
-    private final OfflinePlayer player;
+    private final PhantomPlayer target;
 
-    public WrappedPlayerInventory(InventoryPlayer inventory, Player viewer, OfflinePlayer player) {
-        this.inventory = inventory;
+    public WrappedPlayerInventory(Player viewer, PhantomPlayer target) {
         this.viewer = viewer;
-        this.player = player;
+        this.target = target;
     }
 
     @Override
     public String getName() {
-        return this.player.getProfile().getName();
+        return this.target.getProfile().getName();
     }
 
     @Override
     public ITextComponent getDisplayName() {
-        return this.player.getDisplayName();
+        return this.target.getDisplayName();
     }
 
     @Override
@@ -41,11 +39,7 @@ public class WrappedPlayerInventory implements InventoryHolder {
     }
 
     private InventoryPlayer getInventory() {
-        if (this.player.isOnline()) {
-            return this.player.asOnline().getInventory();
-        } else {
-            return this.inventory;
-        }
+        return this.target.getInventory();
     }
 
     @Override
@@ -56,16 +50,14 @@ public class WrappedPlayerInventory implements InventoryHolder {
     @Override
     public void markDirty() {
         this.getInventory().markDirty();
-        if (!this.player.isOnline()) {
-            this.player.saveData(this.viewer.getWorld(), false);
-        } else {
-            this.player.asOnline().getOpenContainer().detectAndSendChanges();
+        if (this.target.isOnline()) {
+            this.target.getOpenContainer().detectAndSendChanges();
         }
     }
 
     @Override
     public boolean isUsableByPlayer(EntityPlayer player) {
-        return !this.player.isOnline() || !this.player.asOnline().isDead();
+        return !this.target.isOnline() || !this.target.isDead();
     }
 
     @Override
@@ -75,8 +67,8 @@ public class WrappedPlayerInventory implements InventoryHolder {
 
     @Override
     public void closeInventory(EntityPlayer player) {
-        if (!this.player.isOnline()) {
-            this.player.saveData(this.viewer.getWorld(), true);
+        if (!this.target.isOnline()) {
+            this.target.saveData();
         }
         this.viewer.playSound(SoundEvents.BLOCK_CHEST_CLOSE, 1F, 1F);
     }
@@ -84,6 +76,6 @@ public class WrappedPlayerInventory implements InventoryHolder {
     @Nullable
     @Override
     public InventoryFieldHolder getFieldHolder() {
-        return new WrappedInventoryFieldHolder(inventory);
+        return new WrappedInventoryFieldHolder(this.getInventory());
     }
 }

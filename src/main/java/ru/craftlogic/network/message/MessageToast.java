@@ -9,17 +9,17 @@ import java.io.IOException;
 
 public class MessageToast extends AdvancedMessage {
     private ITextComponent title, subtitle;
-    private long timeout;
+    private int timeout;
 
     @ReflectiveUsage
     public MessageToast() {}
 
-    public MessageToast(ITextComponent title, long timeout) {
+    public MessageToast(ITextComponent title, int timeout) {
         this.title = title;
         this.timeout = timeout;
     }
 
-    public MessageToast(ITextComponent title, ITextComponent subtitle, long timeout) {
+    public MessageToast(ITextComponent title, ITextComponent subtitle, int timeout) {
         this.title = title;
         this.subtitle = subtitle;
         this.timeout = timeout;
@@ -31,7 +31,7 @@ public class MessageToast extends AdvancedMessage {
         if (buf.readBoolean()) {
             this.subtitle = buf.readTextComponent();
         }
-        this.timeout = buf.readLong();
+        this.timeout = buf.readInt();
     }
 
     @Override
@@ -43,7 +43,7 @@ public class MessageToast extends AdvancedMessage {
         } else {
             buf.writeBoolean(false);
         }
-        buf.writeLong(this.timeout);
+        buf.writeInt(this.timeout);
     }
 
     public ITextComponent getTitle() {
@@ -54,7 +54,7 @@ public class MessageToast extends AdvancedMessage {
         return subtitle;
     }
 
-    public long getTimeout() {
+    public int getTimeout() {
         return timeout;
     }
 }

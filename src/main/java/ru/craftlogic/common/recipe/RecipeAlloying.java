@@ -1,12 +1,17 @@
 package ru.craftlogic.common.recipe;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.JsonUtils;
 import net.minecraft.util.ResourceLocation;
 import ru.craftlogic.api.inventory.manager.InventoryManager;
 import ru.craftlogic.api.recipe.DictStack;
 import ru.craftlogic.api.recipe.Recipe;
 
 import java.util.List;
+
+import static ru.craftlogic.api.recipe.Recipe.parseItem;
 
 public class RecipeAlloying implements Recipe<RecipeGridAlloying> {
     private final ResourceLocation name;
@@ -16,6 +21,17 @@ public class RecipeAlloying implements Recipe<RecipeGridAlloying> {
     private final int temperature;
     private final int time;
 
+    public RecipeAlloying(ResourceLocation name, JsonObject json) {
+        this(
+            name,
+            (ItemStack)parseItem(json.get("output")),
+            JsonUtils.getFloat(json, "exp", 0F),
+            JsonUtils.getInt(json, "temperature"),
+            JsonUtils.getInt(json, "time"),
+            parseInput(json.get("input"))
+        );
+    }
+
     public RecipeAlloying(ResourceLocation name, ItemStack result, float exp, int temperature, int time, Object... input) {
         this.name = name;
         this.input = input;
@@ -23,6 +39,19 @@ public class RecipeAlloying implements Recipe<RecipeGridAlloying> {
         this.exp = exp;
         this.temperature = temperature;
         this.time = time;
+    }
+
+    private static Object[] parseInput(JsonElement json) {
+        if (json.isJsonArray()) {
+            Object[] input = new Object[json.getAsJsonArray().size()];
+            int i = 0;
+            for (JsonElement e : json.getAsJsonArray()) {
+                input[i++] = parseItem(e);
+            }
+            return input;
+        } else {
+            return new Object[] { parseItem(json) };
+        }
     }
 
     @Override

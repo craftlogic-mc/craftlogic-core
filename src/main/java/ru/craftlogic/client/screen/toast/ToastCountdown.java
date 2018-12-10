@@ -8,16 +8,18 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.toasts.GuiToast;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.JsonUtils;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.text.ITextComponent;
 import ru.craftlogic.api.CraftMessages;
 import ru.craftlogic.api.CraftSounds;
 
 public class ToastCountdown extends AdvancedToast {
-
     private String id;
     private final ITextComponent title;
-    private final int timeout;
     private final int color;
+    private final SoundEvent tickSound;
+    private int timeout;
     private int counter;
 
     public ToastCountdown(JsonObject data) {
@@ -25,15 +27,17 @@ public class ToastCountdown extends AdvancedToast {
             JsonUtils.getString(data, "id"),
             ITextComponent.Serializer.fromJsonLenient(JsonUtils.getString(data, "title")),
             JsonUtils.getInt(data, "timeout"),
-            JsonUtils.getInt(data, "color", 0xFF555555)
+            JsonUtils.getInt(data, "color", 0xFF555555),
+            data.has("tickSound") ? SoundEvent.REGISTRY.getObject(new ResourceLocation(data.get("tickSound").getAsString())) : CraftSounds.COUNTDOWN_TICK
         );
     }
 
-    public ToastCountdown(String id, ITextComponent title, int timeout, int color) {
+    public ToastCountdown(String id, ITextComponent title, int timeout, int color, SoundEvent tickSound) {
         this.id = id;
         this.title = title;
         this.timeout = this.counter = timeout;
         this.color = color;
+        this.tickSound = tickSound;
     }
 
     @Override
@@ -62,15 +66,16 @@ public class ToastCountdown extends AdvancedToast {
         if (c != this.counter) {
             this.counter = c;
             SoundHandler soundHandler = client.getSoundHandler();
-            soundHandler.playSound(PositionedSoundRecord.getRecord(CraftSounds.COUNTDOWN_TICK, 1F, 1F));
+            soundHandler.playSound(PositionedSoundRecord.getRecord(this.tickSound, 1F, 1F));
         }
 
         return this.counter > 0 ? Visibility.SHOW : Visibility.HIDE;
     }
 
     public void setCountdown(int countdown) {
-        if (countdown <= this.timeout) {
-            this.counter = countdown;
+        if (countdown > this.timeout) {
+            this.timeout = countdown;
         }
+        this.counter = countdown;
     }
 }

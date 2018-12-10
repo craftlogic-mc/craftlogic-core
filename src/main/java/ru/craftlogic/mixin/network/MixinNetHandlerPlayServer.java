@@ -17,9 +17,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.event.player.PlayerJoinedMessageEvent;
+import ru.craftlogic.api.network.AdvancedNetHandlerPlayServer;
 
 @Mixin(NetHandlerPlayServer.class)
-public class MixinNetHandlerPlayServer {
+public class MixinNetHandlerPlayServer implements AdvancedNetHandlerPlayServer {
     @Shadow @Final
     private static Logger LOGGER;
     @Shadow @Final
@@ -54,5 +55,10 @@ public class MixinNetHandlerPlayServer {
         if (min == -32) min = -CraftConfig.tweaks.maxStructureSize;
         if (max == 32) max = CraftConfig.tweaks.maxStructureSize;
         return MathHelper.clamp(value, min, max);
+    }
+
+    @Override
+    public MinecraftServer getServer() {
+        return server;
     }
 }

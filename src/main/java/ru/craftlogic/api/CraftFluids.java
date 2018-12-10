@@ -15,11 +15,7 @@ import static ru.craftlogic.api.CraftAPI.MOD_ID;
 import static ru.craftlogic.api.CraftAPI.wrapWithActiveModId;
 
 public class CraftFluids {
-    static BiMap<String, Integer> FLUID_NAME_TO_ID = HashBiMap.create();
-
-    static {
-        FluidRegistry.enableUniversalBucket();
-    }
+    public static BiMap<String, Integer> FLUID_NAME_TO_ID = HashBiMap.create();
 
     public static FluidBase /*CRUDE_OIL, */MILK;
 

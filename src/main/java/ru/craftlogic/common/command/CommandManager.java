@@ -1,6 +1,7 @@
 package ru.craftlogic.common.command;
 
 import com.google.gson.JsonObject;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.command.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
@@ -9,13 +10,13 @@ import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.craftlogic.api.CraftAPI;
-import ru.craftlogic.api.Server;
 import ru.craftlogic.api.command.*;
+import ru.craftlogic.api.permission.PermissionManager;
+import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.util.CheckedFunction;
 import ru.craftlogic.api.util.ConfigurableManager;
 import ru.craftlogic.api.world.CommandSender;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.common.permission.PermissionManager;
 
 import javax.annotation.Nullable;
 import java.lang.invoke.MethodHandle;
@@ -38,7 +39,7 @@ public class CommandManager extends ConfigurableManager {
 
     public CommandManager(Server server, Path settingsDirectory) {
         super(server, settingsDirectory.resolve("commands.json"), LOGGER);
-        this.commandHandler = (CommandHandler) server.getHandle().commandManager;
+        this.commandHandler = (CommandHandler) server.unwrap().commandManager;
     }
 
     @Override
@@ -63,7 +64,7 @@ public class CommandManager extends ConfigurableManager {
 
     }
 
-    public ICommand registerCommand(String name, List<String> syntax, List<String> aliases, List<String> permissions, CommandExecutor executor) {
+    public ICommand registerCommand(String name, List<String> syntax, List<String> aliases, List<String> permissions, int opLevel, CommandExecutor executor) {
         String modId = CraftAPI.getActiveModId();
 
         CommandExtended cmd = new CommandExtended(
@@ -71,6 +72,7 @@ public class CommandManager extends ConfigurableManager {
             name,
             aliases,
             permissions,
+            opLevel,
             executor
         );
 
@@ -108,6 +110,7 @@ public class CommandManager extends ConfigurableManager {
                                 Arrays.asList(annotation.syntax()),
                                 Arrays.asList(annotation.aliases()),
                                 Arrays.asList(annotation.permissions()),
+                                annotation.opLevel(),
                                 mh::invoke
                             );
                             this.typedCommands
@@ -120,7 +123,7 @@ public class CommandManager extends ConfigurableManager {
                 } else if (method.isAnnotationPresent(ArgumentCompleter.class)) {
                     if (method.getParameterCount() == 1
                         && method.getParameterTypes()[0] == ArgumentCompletionContext.class
-                        && method.getReturnType() == List.class) {
+                        && Collection.class.isAssignableFrom(method.getReturnType())) {
 
                         ArgumentCompleter annotation = method.getAnnotation(ArgumentCompleter.class);
 
@@ -130,7 +133,7 @@ public class CommandManager extends ConfigurableManager {
                                 this.completers.put(type, new TypedArgCompleter(
                                     type,
                                     annotation.isEntityName(),
-                                    ctx -> (List<String>) mh.invoke(ctx)
+                                    ctx -> (Collection<String>) mh.invoke(ctx)
                                 ));
                             }
                         } catch (IllegalAccessException e) {
@@ -161,9 +164,9 @@ public class CommandManager extends ConfigurableManager {
     public static class TypedArgCompleter {
         private final String type;
         private final boolean isEntityName;
-        private final CheckedFunction<ArgumentCompletionContext, List<String>, Throwable> completer;
+        private final CheckedFunction<ArgumentCompletionContext, Collection<String>, Throwable> completer;
 
-        public TypedArgCompleter(String type, boolean isEntityName, CheckedFunction<ArgumentCompletionContext, List<String>, Throwable> completer) {
+        public TypedArgCompleter(String type, boolean isEntityName, CheckedFunction<ArgumentCompletionContext, Collection<String>, Throwable> completer) {
             this.type = type;
             this.isEntityName = isEntityName;
             this.completer = completer;
@@ -190,9 +193,10 @@ public class CommandManager extends ConfigurableManager {
         private final String name;
         private final List<String> aliases;
         private final List<String> permissions;
+        private final int opLevel;
         private final CommandExecutor executor;
 
-        public CommandExtended(List<String> syntax, String name, List<String> aliases, List<String> permissions, CommandExecutor executor) {
+        public CommandExtended(List<String> syntax, String name, List<String> aliases, List<String> permissions, int opLevel, CommandExecutor executor) {
             List<ArgumentsPattern> patterns = new ArrayList<>();
 
             for (String a : syntax) {
@@ -208,6 +212,7 @@ public class CommandManager extends ConfigurableManager {
             }
 
             this.permissions = permissions;
+            this.opLevel = opLevel;
             this.executor = executor;
         }
 
@@ -253,8 +258,16 @@ public class CommandManager extends ConfigurableManager {
                 if (!_s.isDedicatedServer() && sender.getName().equals(_s.getServerOwner())) {
                     return true;
                 }
+                GameProfile profile = ((EntityPlayer) sender).getGameProfile();
                 PermissionManager permissionManager = CommandManager.this.server.getPermissionManager();
-                return permissionManager.hasPermissions(((EntityPlayer)sender).getGameProfile(), this.permissions);
+                if (permissionManager.isEnabled()) {
+                    for (String permission : this.permissions) {
+                        if (!permissionManager.hasPermission(profile, permission)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
             }
             return false;
         }
@@ -314,7 +327,7 @@ public class CommandManager extends ConfigurableManager {
                             t = data[1];
                         }
                         if (name.startsWith("action") || name.startsWith("const")) {
-                            throw new IllegalArgumentException(name + " is a reserved keyword and you cannot use it as an argument name!");
+                            throw new IllegalArgumentException(name + " is a reserved keyword and cannot be used as argument name!");
                         }
                         String type = t;
                         this.args.add(new Argument(name, vararg) {
@@ -324,7 +337,15 @@ public class CommandManager extends ConfigurableManager {
                                 if (c != null) {
                                     try {
                                         Location l = targetBlock != null ? new Location(sender.getEntityWorld(), targetBlock) : null;
-                                        return c.completer.apply(new ArgumentCompletionContext(server, type, CommandSender.from(server, sender), partialValue, l));
+                                        ArgumentCompletionContext ctx = new ArgumentCompletionContext(server, type, CommandSender.from(server, sender), partialValue, l);
+                                        Collection<String> variants = c.completer.apply(ctx);
+                                        List<String> result = new ArrayList<>();
+                                        for (String variant : variants) {
+                                            if (variant.startsWith(partialValue)) {
+                                                result.add(variant);
+                                            }
+                                        }
+                                        return result;
                                     } catch (Throwable throwable) {
                                         throwable.printStackTrace();
                                     }

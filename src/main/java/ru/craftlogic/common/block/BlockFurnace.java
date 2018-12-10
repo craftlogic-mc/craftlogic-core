@@ -3,9 +3,9 @@ package ru.craftlogic.common.block;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.SoundEvents;
@@ -17,11 +17,11 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import ru.craftlogic.api.CraftBlocks;
 import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
 import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.api.CraftBlocks;
 import ru.craftlogic.common.tileentity.TileEntityFurnace;
 
 import java.util.Random;
@@ -145,8 +145,8 @@ public class BlockFurnace extends BlockBase implements TileEntityHolder<TileEnti
     }
 
     @Override
-    protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, FACING, OPEN, ACTIVE);
+    protected IProperty[] getProperties() {
+        return new IProperty[] {FACING, OPEN, ACTIVE};
     }
 
     @Override

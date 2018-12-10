@@ -3,14 +3,10 @@ package ru.craftlogic.api.world;
 import net.minecraft.world.DimensionType;
 import net.minecraftforge.common.util.EnumHelper;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public enum Dimension {
     OVERWORLD(DimensionType.OVERWORLD),
     NETHER(DimensionType.NETHER),
     THE_END(DimensionType.THE_END);
-    private static final Map<DimensionType, Dimension> VANILLA_TO_CL = new HashMap<>();
 
     private final DimensionType vanillaType;
 
@@ -27,16 +23,16 @@ public enum Dimension {
     }
 
     public static Dimension fromVanilla(DimensionType vanillaType) {
-        if (VANILLA_TO_CL.containsKey(vanillaType)) {
-            return VANILLA_TO_CL.get(vanillaType);
+        for (Dimension dimension : values()) {
+            if (dimension.vanillaType == vanillaType) {
+                return dimension;
+            }
         }
-        Dimension dimension = EnumHelper.addEnum(
+        return EnumHelper.addEnum(
             Dimension.class,
             vanillaType.getName().toUpperCase(),
             new Class[] { DimensionType.class },
             vanillaType
         );
-        VANILLA_TO_CL.put(vanillaType, dimension);
-        return dimension;
     }
 }

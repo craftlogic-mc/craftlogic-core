@@ -2,9 +2,9 @@ package ru.craftlogic.api.recipe;
 
 
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.List;
 import java.util.function.Predicate;
 
 public class DictStack implements Predicate<ItemStack> {
@@ -29,11 +29,15 @@ public class DictStack implements Predicate<ItemStack> {
         return count;
     }
 
+    public NonNullList<ItemStack> getAllVariants() {
+        return OreDictionary.getOres(this.material);
+    }
+
     @Override
     public boolean test(ItemStack stack) {
-        List<ItemStack> ores = OreDictionary.getOres(this.material);
-        for (ItemStack s : ores) {
-            if (s.isItemEqual(stack)) {
+        int id = OreDictionary.getOreID(this.material);
+        for (int oreID : OreDictionary.getOreIDs(stack)) {
+            if (oreID == id) {
                 return true;
             }
         }

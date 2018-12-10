@@ -26,27 +26,18 @@ public class MixinItem {
     @Overwrite
     private static void registerItem(int id, ResourceLocation name, Item item) {
         switch (name.toString()) {
-            case "minecraft:string": {
-                item = new ItemString();
-                break;
-            }
-            case "minecraft:brick": {
-                item = new ItemBrick(false);
-                break;
-            }
-            case "minecraft:netherbrick": {
-                item = new ItemBrick(true);
-                break;
-            }
             case "minecraft:bowl": {
                 item = new ItemBowl();
                 break;
             }
-            case "minecraft:milk_bucket":
             case "minecraft:mushroom_stew":
             case "minecraft:rabbit_stew":
             case "minecraft:beetroot_soup": {
                 item.setCreativeTab(null);
+                break;
+            }
+            case "minecraft:milk_bucket": {
+                item = new ItemMilkBucket().setCreativeTab(null);
                 break;
             }
         }

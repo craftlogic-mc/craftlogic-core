@@ -1,9 +1,9 @@
 package ru.craftlogic.util;
 
 import net.minecraft.command.ICommandSender;
-import ru.craftlogic.api.world.CommandSender;
+import ru.craftlogic.api.world.LocatableCommandSender;
 
-public class WrappedCommandSender implements CommandSender {
+public class WrappedCommandSender implements LocatableCommandSender {
     private ICommandSender sender;
 
     public WrappedCommandSender(ICommandSender sender) {
@@ -16,12 +16,12 @@ public class WrappedCommandSender implements CommandSender {
     }
 
     @Override
-    public ICommandSender getHandle() {
+    public ICommandSender unwrap() {
         return sender;
     }
 
     @Override
-    public boolean hasPermissions(String... permissions) {
-        return false;
+    public boolean hasPermission(String permission, int opLevel) {
+        return opLevel == 0;
     }
 }

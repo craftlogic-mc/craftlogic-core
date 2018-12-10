@@ -1,21 +1,18 @@
 package ru.craftlogic.api.world;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.FakePlayerFactory;
-import ru.craftlogic.api.Server;
+import ru.craftlogic.api.permission.PermissionManager;
+import ru.craftlogic.api.server.Server;
 
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Function;
 
 public class OfflinePlayer implements Permissible {
     protected final Server server;
     protected final GameProfile profile;
-    protected FakePlayer fakeEntity;
-    protected boolean loadedData;
 
     public OfflinePlayer(Server server, GameProfile profile) {
         this.server = server;
@@ -23,8 +20,27 @@ public class OfflinePlayer implements Permissible {
     }
 
     @Override
-    public boolean hasPermissions(String... permissions) {
-        return this.server.getPermissionManager().hasPermissions(this.profile, permissions);
+    public boolean hasPermission(String permission, int opLevel) {
+        PermissionManager permissionManager = this.server.getPermissionManager();
+        if (permissionManager.isEnabled()) {
+            return permissionManager.hasPermission(this.profile, permission);
+        } else {
+            return getOperatorLevel() >= opLevel;
+        }
+    }
+
+    @Override
+    public <T> T getPermissionMetadata(String meta, T def, Function<String, T> mapper) {
+        PermissionManager permissionManager = this.server.getPermissionManager();
+        if (permissionManager.isEnabled()) {
+            String m = permissionManager.getPermissionMetadata(this.profile, meta);
+            if (m != null) {
+                try {
+                    return mapper.apply(m);
+                } catch (IllegalArgumentException ignored) {}
+            }
+        }
+        return def;
     }
 
     @Override
@@ -33,50 +49,32 @@ public class OfflinePlayer implements Permissible {
     }
 
     public boolean isOperator() {
-        return this.server.isPlayerOperator(this.profile);
+        return this.server.getPlayerManager().isOperator(this.profile);
+    }
+
+    public int getOperatorLevel() {
+        return this.server.getPlayerManager().getOperatorLevel(this.profile);
     }
 
     public boolean setOperator(boolean operator, int level, boolean bypassPlayerLimit) {
-        return this.server.setPlayerOperator(this.profile, operator, level, bypassPlayerLimit);
-    }
-
-    public int getPermissionLevel() {
-        return this.server.getPermissionLevel(this.profile);
+        return this.server.getPlayerManager().setOperator(this.profile, operator, level, bypassPlayerLimit);
     }
 
     public boolean isBypassesPlayerLimit() {
-        return this.server.isPlayerBypassesPlayerLimit(this.profile);
+        return this.server.getPlayerManager().isBypassesPlayerLimit(this.profile);
     }
 
     public boolean isWhitelisted() {
-        return this.server.isPlayerWhitelisted(this.profile);
+        return this.server.getPlayerManager().isWhitelisted(this.profile);
     }
 
     public void setWhitelisted(boolean whitelisted) {
-        this.server.setPlayerWhitelisted(this.profile, whitelisted);
+        this.server.getPlayerManager().setWhitelisted(this.profile, whitelisted);
     }
 
     public boolean isOnline() {
-        return this.server.isPlayerOnline(this.profile);
+        return this.server.getPlayerManager().isOnline(this.profile);
     }
-
-    public long getLastPlayed(World world) {
-        if (this.loadData(world, true)) {
-            return this.asFake(world).getLastActiveTime();
-        } else {
-            return 0;
-        }
-    }
-
-    public Location getLastLocation(World world) {
-        if (this.loadData(world, true)) {
-            FakePlayer data = this.asFake(world);
-            return new Location(world.getHandle(), data.posX, data.posY, data.posZ, data.rotationYaw, data.rotationPitch);
-        } else {
-            return null;
-        }
-    }
-
 
     public GameProfile getProfile() {
         return this.profile;
@@ -90,38 +88,16 @@ public class OfflinePlayer implements Permissible {
         return this.profile.getId();
     }
 
-    public boolean loadData(World world, boolean reload) {
-        if ((this.fakeEntity == null || reload) && !this.loadedData) {
-            NBTTagCompound data = this.server.loadOfflinePlayerData(this.asFake(world));
-            if (data != null) {
-                this.loadedData = true;
-                return true;
-            }
-        }
-        return false;
+    public boolean hasData(World world) {
+        return isOnline() || asPhantom(world).hasData(world);
     }
 
-    public boolean saveData(World world, boolean unload) {
-        if (this.fakeEntity != null) {
-            this.server.saveOfflinePlayerData(this.fakeEntity);
-            if (unload) {
-                this.fakeEntity = null;
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public FakePlayer asFake(World world) {
-        if (this.fakeEntity == null) {
-            this.fakeEntity = FakePlayerFactory.get(world.getHandle(), this.profile);
-        }
-        return this.fakeEntity;
+    public PhantomPlayer asPhantom(World world) {
+        return world.getServer().getPlayerManager().getPhantom(this, world);
     }
 
     public Player asOnline() {
-        return this.server.getPlayer(this.profile);
+        return this.server.getPlayerManager().getOnline(this.profile);
     }
 
     @Override

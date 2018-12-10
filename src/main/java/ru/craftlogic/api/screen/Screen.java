@@ -110,8 +110,11 @@ public abstract class Screen extends GuiScreen implements ElementContainer {
     }
 
     @Override
-    public void updateScreen() {
+    public final void updateScreen() {
         super.updateScreen();
+        if (this instanceof Updatable) {
+            ((Updatable) this).update();
+        }
         for (Element element : this.elements) {
             if (element instanceof Updatable) {
                 ((Updatable) element).update();

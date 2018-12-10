@@ -23,6 +23,8 @@ public class ItemBowl extends ItemBase {
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
         if (this.isInCreativeTab(tab)) {
             items.add(new ItemStack(this));
+            //items.add(new ItemStack(CraftItems.MILK_BOWL));
+            //items.add(new ItemStack(CraftItems.WATER_BOWL));
             items.add(new ItemStack(Items.MUSHROOM_STEW));
             items.add(new ItemStack(Items.RABBIT_STEW));
             items.add(new ItemStack(Items.BEETROOT_SOUP));

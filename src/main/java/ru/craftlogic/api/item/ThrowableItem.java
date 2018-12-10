@@ -61,7 +61,7 @@ public interface ThrowableItem {
         }
         if (!world.isRemote) {
             EntityThrownItem entity = new EntityThrownItem(world, player, item, !player.capabilities.isCreativeMode);
-            entity.shoot(player, player.rotationPitch, player.rotationYaw, -20F, 0.5F, 1F);
+            entity.shoot(player, player.rotationPitch, player.rotationYaw, 0F, 0.5F, 1F);
             world.spawnEntity(entity);
             player.addStat(StatList.getObjectUseStats(item.getItem()));
         }

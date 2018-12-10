@@ -70,11 +70,6 @@ public class BlockBurningTorch extends BlockTorch implements ModelAutoReg {
     }
 
     @Override
-    public int damageDropped(IBlockState state) {
-        return state.getValue(LIT) ? 1 : 0;
-    }
-
-    @Override
     public IBlockState getStateFromMeta(int meta) {
         IBlockState state = this.getDefaultState().withProperty(LIT, (meta & 8) > 0);
         switch(meta & 7) {
@@ -163,6 +158,5 @@ public class BlockBurningTorch extends BlockTorch implements ModelAutoReg {
         Item item = Item.getItemFromBlock(this);
         modelManager.registerItemVariants(item, "minecraft:torch", "minecraft:unlit_torch");
         modelManager.registerItemModel(item, 0, "unlit_torch");
-        modelManager.registerItemModel(item, 1, "torch");
     }
 }

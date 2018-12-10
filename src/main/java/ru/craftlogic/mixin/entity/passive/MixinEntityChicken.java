@@ -44,7 +44,7 @@ import java.util.UUID;
 @Mixin(EntityChicken.class)
 public abstract class MixinEntityChicken extends EntityAnimal implements Chicken {
     private static final DataParameter<Integer> VARIANT = EntityDataManager.createKey(EntityChicken.class, DataSerializers.VARINT);
-    private static final DataParameter<Byte> TAMED = EntityDataManager.createKey(EntityChicken.class, DataSerializers.BYTE);
+    private static final DataParameter<Boolean> TAMED = EntityDataManager.createKey(EntityChicken.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.createKey(EntityChicken.class, DataSerializers.OPTIONAL_UNIQUE_ID);
     @Shadow @Final
     private static Set<Item> TEMPTATION_ITEMS;
@@ -86,7 +86,7 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
     protected void entityInit() {
         super.entityInit();
         this.dataManager.register(VARIANT, 0);
-        this.dataManager.register(TAMED, (byte)0);
+        this.dataManager.register(TAMED, false);
         this.dataManager.register(OWNER_UNIQUE_ID, Optional.absent());
     }
 
@@ -135,19 +135,19 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
                 }
                 this.playSound(SoundEvents.ENTITY_CHICKEN_EGG, 1F, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1F);
                 ItemStack egg = new ItemStack(Items.EGG);
-                if (!egg.hasTagCompound()) {
-                    egg.setTagCompound(new NBTTagCompound());
-                }
-                NBTTagCompound compound = egg.getSubCompound("BirdData");
-                compound.setString("id", EntityRegistry.getEntry(getClass()).getRegistryName().toString());
-                compound.setInteger("variant", this.getVariant().ordinal());
+                NBTTagCompound compound = new NBTTagCompound();
+                NBTTagCompound data = egg.getSubCompound("BirdData");
+                data.setString("id", EntityRegistry.getEntry(getClass()).getRegistryName().toString());
+                data.setInteger("variant", this.getVariant().ordinal());
+                compound.setTag("BirdData", data);
+                egg.setTagCompound(compound);
                 this.entityDropItem(egg, 0F);
             }
         }
     }
 
     @Shadow
-    public boolean isChickenJockey() { return false; }
+    public abstract boolean isChickenJockey();
 
     @Inject(method = "writeEntityToNBT", at = @At("TAIL"))
     public void onNBTWrite(NBTTagCompound compound, CallbackInfo info) {
@@ -176,14 +176,20 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
     @Override
     public boolean processInteract(EntityPlayer player, EnumHand hand) {
         ItemStack heldItem = player.getHeldItem(hand);
-        if (!this.isTamed() && (this.aiTempt == null || this.aiTempt.isRunning()) && TEMPTATION_ITEMS.contains(heldItem.getItem()) && player.getDistanceSq(this) < 9.0) {
+        boolean tamed = this.isTamed();
+        boolean fed = this.isInLove();
+        if ((!tamed || !fed) && (this.aiTempt == null || this.aiTempt.isRunning()) && TEMPTATION_ITEMS.contains(heldItem.getItem()) && player.getDistanceSq(this) < 9.0) {
             if (!player.capabilities.isCreativeMode) {
                 heldItem.shrink(1);
             }
 
             if (!this.world.isRemote) {
-                if (this.rand.nextInt(3) == 0 && !ForgeEventFactory.onAnimalTame(this, player)) {
-                    this.setTamedBy(player);
+                if (this.rand.nextInt(3) == 0) {
+                    if (!tamed && !ForgeEventFactory.onAnimalTame(this, player)) {
+                        this.setTamedBy(player);
+                    } else {
+                        this.setInLove(player);
+                    }
                     this.playTameEffect(true);
                 } else {
                     this.playTameEffect(false);
@@ -274,17 +280,14 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
         return this.possibleEggs;
     }
 
+    @Override
     public boolean isTamed() {
-        return (this.getDataManager().get(TAMED) & 4) != 0;
+        return this.getDataManager().get(TAMED);
     }
 
+    @Override
     public void setTamed(boolean tamed) {
-        byte b = this.getDataManager().get(TAMED);
-        if (tamed) {
-            this.getDataManager().set(TAMED, (byte)(b | 4));
-        } else {
-            this.getDataManager().set(TAMED, (byte)(b & -5));
-        }
+        this.getDataManager().set(TAMED, tamed);
     }
 
     @Nullable
@@ -292,6 +295,7 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
         return this.getDataManager().get(OWNER_UNIQUE_ID).orNull();
     }
 
+    @Override
     public void setOwnerId(@Nullable UUID id) {
         this.getDataManager().set(OWNER_UNIQUE_ID, Optional.fromNullable(id));
     }

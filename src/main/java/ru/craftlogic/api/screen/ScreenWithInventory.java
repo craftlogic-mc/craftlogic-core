@@ -17,10 +17,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static ru.craftlogic.api.CraftAPI.MOD_ID;
-
 public abstract class ScreenWithInventory<C extends Container> extends GuiContainer implements ElementContainer {
-    protected static final ResourceLocation BLANK_TEXTURE = new ResourceLocation(MOD_ID, "textures/gui/empty.png");
     protected C container;
     private float textureScaleX = 1, textureScaleY = 1;
     private Set<Element> elements = new HashSet<>();

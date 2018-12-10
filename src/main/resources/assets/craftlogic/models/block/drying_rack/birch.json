@@ -1,0 +1,6 @@
+{
+    "parent": "craftlogic:block/drying_rack/_parent",
+    "textures": {
+        "all": "blocks/planks_birch"
+    }
+}

@@ -142,25 +142,12 @@ public abstract class Element {
         getContainer().drawTooltip(lines, x, y);
     }
 
-    protected static int parseColor(Object e) {
-        if (e instanceof Number) {
-            return ((Number) e).intValue();
-        }
-        String color = ((String)e).toLowerCase();
-
-        if (color.startsWith("#")) {
-            color = color.substring(1);
-        } else if (color.startsWith("0x")) {
-            color = color.substring(2);
-        } else {
-            throw new IllegalArgumentException("Illegal color code: " + e);
-        }
-
-        return Integer.parseInt(color, 16);
-    }
-
     protected static int parseInt(Object e) {
         return ((Number) e).intValue();
+    }
+
+    protected static boolean parseBoolean(Object e) {
+        return e instanceof String ? e.equals("true") : (Boolean) e;
     }
 
     protected static ITextComponent parseText(Object e) {

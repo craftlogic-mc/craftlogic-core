@@ -12,5 +12,6 @@ public @interface Command {
     String[] syntax() default {""};
     String[] aliases() default {};
     String[] permissions() default {};
+    int opLevel() default 4;
     boolean serverOnly() default false;
 }

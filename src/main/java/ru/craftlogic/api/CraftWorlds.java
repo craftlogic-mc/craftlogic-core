@@ -1,5 +1,6 @@
 package ru.craftlogic.api;
 
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.MapStorage;
@@ -16,7 +17,7 @@ public class CraftWorlds {
 
     }
 
-    public static DimensionData getDimensionData() {
+    public static DimensionData getDimensionData(MinecraftServer server) {
         World world = getOrLoadWorld(0);
         return getWorldData(world, DimensionData.class, "craft_dimension_map");
     }
@@ -42,7 +43,7 @@ public class CraftWorlds {
             if (world != null && world.provider.getDimension() == dimension) {
                 return world;
             }
-        } else if (CraftAPI.getServer() != null) {
+        } else {
             if (DimensionManager.isDimensionRegistered(dimension)) {
                 WorldServer ret = DimensionManager.getWorld(dimension);
                 if (ret == null) {

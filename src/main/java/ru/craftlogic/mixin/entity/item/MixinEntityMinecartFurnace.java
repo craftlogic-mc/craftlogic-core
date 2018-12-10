@@ -26,16 +26,16 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import ru.craftlogic.CraftLogic;
+import ru.craftlogic.api.CraftAPI;
+import ru.craftlogic.api.CraftBlocks;
+import ru.craftlogic.api.CraftItems;
+import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.api.inventory.InventoryFieldHolder;
 import ru.craftlogic.api.inventory.manager.InventoryManager;
 import ru.craftlogic.api.inventory.manager.ListInventoryManager;
 import ru.craftlogic.api.sound.EntitySoundSource;
 import ru.craftlogic.api.util.TemperatureBuffer;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.api.CraftBlocks;
-import ru.craftlogic.api.CraftItems;
-import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.common.block.BlockFurnace;
 import ru.craftlogic.common.item.ItemCrowbar;
 import ru.craftlogic.util.Furnace;
@@ -283,7 +283,7 @@ public abstract class MixinEntityMinecartFurnace extends EntityMinecart implemen
                 this.pushX = (this.posX - player.posX) / 500.0;
                 this.pushZ = (this.posZ - player.posZ) / 500.0;
             } else {
-                CraftLogic.showScreen(this, player);
+                CraftAPI.showScreen(this, player);
             }
         }
         return true;

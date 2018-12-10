@@ -5,15 +5,14 @@ import net.minecraft.server.management.PlayerList;
 import net.minecraft.server.management.UserListBansEntry;
 import net.minecraft.server.management.UserListIPBansEntry;
 import net.minecraft.util.text.ITextComponent;
-import org.apache.commons.lang3.StringUtils;
+import ru.craftlogic.api.CraftMessages;
 import ru.craftlogic.api.command.*;
 import ru.craftlogic.api.command.CommandContext.Argument;
+import ru.craftlogic.api.server.Server;
+import ru.craftlogic.api.server.WorldManager;
 import ru.craftlogic.api.text.Text;
-import ru.craftlogic.api.world.Location;
-import ru.craftlogic.api.world.OfflinePlayer;
-import ru.craftlogic.api.world.Player;
-import ru.craftlogic.api.world.World;
-import ru.craftlogic.api.CraftMessages;
+import ru.craftlogic.api.world.*;
+import ru.craftlogic.network.message.MessageStopServer;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,14 +20,36 @@ import java.util.List;
 import java.util.Set;
 
 public class ManagementCommands implements CommandRegistrar {
+    @Command(name = "stop", syntax = {
+        "",
+        "<delay>",
+        "<delay> <reconnect>"
+    })
+    public static void commandStop(CommandContext ctx) throws CommandException {
+        int delay = ctx.has("delay") ? ctx.get("delay").asInt(0, 30) : 0;
+        Server server = ctx.server();
+        if (delay > 0) {
+            int reconnect = ctx.has("reconnect") ? ctx.get("reconnect").asInt(0, 15 * 60) : 60;
+            ctx.sendNotification("commands.stop.start_delayed", CraftMessages.parseDuration(delay * 1000L).build());
+            server.broadcastPacket(new MessageStopServer(delay, reconnect));
+            server.addDelayedTask(ManagementCommands::stopServer, delay * 1000L);
+        } else {
+            ctx.sendNotification("commands.stop.start");
+            stopServer(server);
+        }
+    }
+
+    private static void stopServer(Server server) {
+        server.unwrap().initiateShutdown();
+    }
+
     @Command(name = "op", syntax = {
         "<username:OfflinePlayer>",
         "<username:OfflinePlayer> <level>",
         "<username:OfflinePlayer> <level> <bypassPlayerLimit>"
     }, serverOnly = true)
     public static void commandOp(CommandContext ctx) throws CommandException {
-        Argument username = ctx.get("username");
-        OfflinePlayer target = username.asOfflinePlayer();
+        OfflinePlayer target = ctx.get("username").asOfflinePlayer();
         int level = ctx.getIfPresent("level", a -> a.asInt(1, 4)).orElse(1);
         boolean bypassPlayerLimit = ctx.getIfPresent("bypassPlayerLimit", Argument::asBoolean).orElse(false);
 
@@ -38,8 +59,7 @@ public class ManagementCommands implements CommandRegistrar {
 
     @Command(name = "deop", syntax = "<username:OfflinePlayer>", serverOnly = true)
     public static void commandDeOp(CommandContext ctx) throws CommandException {
-        Argument username = ctx.get("username");
-        OfflinePlayer target = username.asOfflinePlayer();
+        OfflinePlayer target = ctx.get("username").asOfflinePlayer();
         boolean success = target.setOperator(false, -1, false);
         ctx.sendNotification("commands.deop." + (success ? "success" : "failed"), target.getDisplayName());
     }
@@ -51,7 +71,7 @@ public class ManagementCommands implements CommandRegistrar {
     public static void commandOpList(CommandContext ctx) throws CommandException {
         int level = ctx.getIfPresent("level", a -> a.asInt(1, 4)).orElse(1);
 
-        Set<OfflinePlayer> operators = ctx.server().getOperators(level);
+        Set<OfflinePlayer> operators = ctx.server().getPlayerManager().getOperators(level);
 
         if (operators.isEmpty()) {
             if (level != 1) {
@@ -70,13 +90,13 @@ public class ManagementCommands implements CommandRegistrar {
             ctx.sendMessage(
                 Text.translation("commands.ops.entry")
                     .arg(displayName, a -> a.gold().runCommand("/deop " + operator.getName()))
-                    .arg(operator.getPermissionLevel())
+                    .arg(operator.getOperatorLevel())
                     .argTranslate("commands.generic." + (b ? "yes" : "no"), b ? Text::green : Text::red)
             );
         }
     }
 
-    @Command(name = "seen", syntax = "<username:OfflinePlayer>")
+    @Command(name = "seen", syntax = "<username:OfflinePlayer>", opLevel = 1)
     public static void commandSeen(CommandContext ctx) throws CommandException {
         OfflinePlayer player = ctx.get("username").asOfflinePlayer();
         if (player.isOnline()) {
@@ -87,15 +107,17 @@ public class ManagementCommands implements CommandRegistrar {
                     .arg(coordinates.gold())
             );
         } else {
-            World world = ctx.sender().getWorld();
-            Location lastLocation = player.getLastLocation(world);
-            long lastPlayed = player.getLastPlayed(world);
+            WorldManager worldManager = ctx.server().getWorldManager();
+            World world = ctx.sender() instanceof LocatableCommandSender ? ctx.senderAsLocatable().getWorld() : worldManager.get(Dimension.OVERWORLD);
+            PhantomPlayer fakePlayer = player.asPhantom(world);
+            Location lastLocation = fakePlayer.getLocation();
+            long lastPlayed = fakePlayer.getLastPlayed();
             if (lastPlayed != 0 && lastLocation != null) {
                 Text<?, ?> coordinates = CraftMessages.parseCoordinates(lastLocation);
-                Text<?, ?> time = CraftMessages.parseDuration(lastPlayed);
+                Text<?, ?> time = CraftMessages.parseDuration(System.currentTimeMillis() - lastPlayed);
                 ctx.sendMessage(
                     Text.translation("commands.seen.offline").yellow()
-                        .arg(player.getName(), Text::gold)
+                        .arg(fakePlayer.getName(), Text::gold)
                         .arg(coordinates.gold())
                         .arg(time.gold())
                 );
@@ -108,7 +130,7 @@ public class ManagementCommands implements CommandRegistrar {
     @Command(name = "tempban", syntax = {
         "<username:OfflinePlayer> <time> <reason>...",
         "<username:OfflinePlayer> <time>"
-    }, serverOnly = true)
+    }, serverOnly = true, opLevel = 3)
     public static void commandTempBan(CommandContext ctx) throws CommandException {
         OfflinePlayer player = ctx.get("username").asOfflinePlayer();
         Date expirationDate = new Date(System.currentTimeMillis() + parseDuration(ctx.get("time").asString()));
@@ -119,7 +141,7 @@ public class ManagementCommands implements CommandRegistrar {
     @Command(name = "ban", syntax = {
         "<username:OfflinePlayer> <reason>...",
         "<username:OfflinePlayer>"
-    }, serverOnly = true)
+    }, serverOnly = true, opLevel = 3)
     public static void commandBan(CommandContext ctx) throws CommandException {
         OfflinePlayer player = ctx.get("username").asOfflinePlayer();
         String reason = ctx.getIfPresent("reason", Argument::asString).orElse(null);
@@ -149,7 +171,7 @@ public class ManagementCommands implements CommandRegistrar {
 
     private static void banUser(CommandContext ctx, OfflinePlayer player, Date expirationDate, String reason) {
         UserListBansEntry bansEntry = new UserListBansEntry(player.getProfile(), null, ctx.server().getName(), expirationDate, reason);
-        PlayerList playerList = ctx.server().getHandle().getPlayerList();
+        PlayerList playerList = ctx.server().unwrap().getPlayerList();
         playerList.getBannedPlayers().addEntry(bansEntry);
 
         if (player.isOnline()) {
@@ -166,12 +188,12 @@ public class ManagementCommands implements CommandRegistrar {
     private static void banIP(CommandContext ctx, String address, Date expirationDate, String reason) {
         UserListIPBansEntry bansEntry = new UserListIPBansEntry(address, null, ctx.server().getName(), expirationDate, reason);
 
-        PlayerList playerList = ctx.server().getHandle().getPlayerList();
+        PlayerList playerList = ctx.server().unwrap().getPlayerList();
         playerList.getBannedIPs().addEntry(bansEntry);
 
         List<String> users = new ArrayList<>();
 
-        for (Player player : ctx.server().getOnlinePlayers()) {
+        for (Player player : ctx.server().getPlayerManager().getAllOnline()) {
             if (address.equals(player.getIP())) {
                 users.add(player.getName());
                 player.disconnect(CraftMessages.getBanMessage(bansEntry, true));
@@ -224,14 +246,7 @@ public class ManagementCommands implements CommandRegistrar {
     }
 
     @ArgumentCompleter(type = "OfflinePlayer", isEntityName = true)
-    public static List<String> completerUsername(ArgumentCompletionContext ctx) {
-        String[] usernames = ctx.server().getProfileCache().getUsernames();
-        List<String> variants = ctx.partialName().isEmpty() ? new ArrayList<>(usernames.length) : new ArrayList<>();
-        for (String username : usernames) {
-            if (StringUtils.startsWithIgnoreCase(username, ctx.partialName())) {
-                variants.add(username);
-            }
-        }
-        return variants;
+    public static Set<String> completerUsername(ArgumentCompletionContext ctx) {
+        return ctx.server().getPlayerManager().getAllOfflineNames();
     }
 }

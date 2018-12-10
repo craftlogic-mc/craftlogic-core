@@ -29,6 +29,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -78,12 +79,27 @@ public abstract class MixinEntityZombie extends EntityMob implements Zombie {
     @Inject(method = "notifyDataManagerChange", at = @At("RETURN"))
     public void dataChange(DataParameter<?> parameter, CallbackInfo info) {
         if (parameter == SIZE) {
-            this.multiplySize(this.dataManager.get(SIZE));
+            float size = this.dataManager.get(SIZE);
+            this.multiplySize(size);
         }
     }
 
     @Shadow @Final
     protected abstract void multiplySize(float modifier);
+
+    /**
+     * @author Radviger
+     * @reason
+     */
+    @Overwrite
+    public float getEyeHeight() {
+        float height = 1.74F * this.dataManager.get(SIZE);
+        if (this.isChild()) {
+            height -= 0.81F;
+        }
+
+        return height;
+    }
 
     @Override
     public ZombieVariant getVariant() {

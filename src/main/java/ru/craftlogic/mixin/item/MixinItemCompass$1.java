@@ -1,5 +1,6 @@
 package ru.craftlogic.mixin.item;
 
+import com.google.common.util.concurrent.AtomicDouble;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -17,13 +18,17 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Mixin(targets = "net/minecraft/item/ItemCompass$1")
 public abstract class MixinItemCompass$1 implements IItemPropertyGetter {
     @SideOnly(Side.CLIENT)
-    private int updateCountdown;
+    private Map<UUID, AtomicInteger> updateCountdown;
     @SideOnly(Side.CLIENT)
-    private double interference;
+    private Map<UUID, AtomicDouble> interference;
     @SideOnly(Side.CLIENT)
     @Shadow
     long lastUpdateTick;
@@ -38,6 +43,9 @@ public abstract class MixinItemCompass$1 implements IItemPropertyGetter {
         if (entity == null && !item.isOnItemFrame()) {
             return 0F;
         } else {
+            if (updateCountdown == null) updateCountdown = new HashMap<>();
+            if (interference == null) interference = new HashMap<>();
+
             boolean handheld = entity != null;
             Entity holder = handheld ? entity : item.getItemFrame();
             if (world == null) {
@@ -52,9 +60,12 @@ public abstract class MixinItemCompass$1 implements IItemPropertyGetter {
             if (!world.provider.isSurfaceWorld()) {
                 angle = Math.random();
             } else {
-                if (updateCountdown++ >= 15) {
-                    updateCountdown = 0;
-                    interference = 0;
+                UUID id = holder.getUniqueID();
+                AtomicInteger uc = this.updateCountdown.computeIfAbsent(id, k -> new AtomicInteger(0));
+                AtomicDouble itf = this.interference.computeIfAbsent(id, k -> new AtomicDouble(0));
+                if (uc.getAndIncrement() >= 15) {
+                    uc.set(0);
+                    itf.set(0);
                     BlockPos pos = new BlockPos(holder);
 
                     for (BlockPos.MutableBlockPos p : BlockPos.getAllInBoxMutable(pos.add(-15, -15, -15), pos.add(15, 15, 15))) {
@@ -62,14 +73,14 @@ public abstract class MixinItemCompass$1 implements IItemPropertyGetter {
                             double distance = pos.distanceSq(p);
                             IBlockState state = world.getBlockState(p);
                             if (state.getBlock() == Blocks.IRON_ORE) {
-                                interference += Math.sqrt(distance > 0 ? sensitivityDistanceSq / distance : sensitivityDistanceSq);
+                                itf.addAndGet(Math.sqrt(distance > 0 ? sensitivityDistanceSq / distance : sensitivityDistanceSq));
                             }
                         }
                     }
                 }
-                if (interference > 0) {
+                if (itf.get() > 0) {
                     double sin = Math.sin((double)this.lastUpdateTick) / 50.0;
-                    angle += sin * interference;
+                    angle += sin * itf.get();
                 }
             }
 

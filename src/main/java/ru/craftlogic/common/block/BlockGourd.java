@@ -2,11 +2,12 @@ package ru.craftlogic.common.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
+import net.minecraft.block.BlockStem;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -22,12 +23,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import ru.craftlogic.api.CraftBlocks;
 import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.block.Colored;
 import ru.craftlogic.api.block.Growable;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.api.world.WorldNameable;
-import ru.craftlogic.api.CraftBlocks;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -131,10 +132,14 @@ public class BlockGourd extends BlockBase implements Colored, Growable {
     }
 
     private void checkCanStay(Location location) {
-        if (!location.offset(EnumFacing.DOWN).isSideSolid(EnumFacing.UP)) {
-            location.playEvent(2001, Block.getStateId(location.getBlockState()));
-            location.setBlockToAir(true);
+        IBlockState stem = location.offset(location.getBlockProperty(FACING)).getBlockState();
+        if (location.offset(EnumFacing.DOWN).isSideSolid(EnumFacing.UP) && stem.getBlock() instanceof BlockGourdStem
+                && stem.getValue(BlockStem.AGE) == 7) {
+            return;
         }
+
+        location.playEvent(2001, Block.getStateId(location.getBlockState()));
+        location.setBlockToAir(true);
     }
 
     @Override
@@ -148,8 +153,8 @@ public class BlockGourd extends BlockBase implements Colored, Growable {
     }
 
     @Override
-    protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, FACING, AGE);
+    protected IProperty[] getProperties() {
+        return new IProperty[] {FACING, AGE};
     }
 
     @Override

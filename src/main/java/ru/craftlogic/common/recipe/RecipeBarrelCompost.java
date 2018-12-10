@@ -1,10 +1,15 @@
 package ru.craftlogic.common.recipe;
 
+import com.google.gson.JsonObject;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.JsonUtils;
 import net.minecraft.util.ResourceLocation;
+import ru.craftlogic.api.CraftBarrelModes;
 import ru.craftlogic.api.barrel.BarrelModeType;
 import ru.craftlogic.api.recipe.DictStack;
-import ru.craftlogic.api.CraftBarrelModes;
+
+import static ru.craftlogic.api.CraftAPI.parseColor;
+import static ru.craftlogic.api.recipe.Recipe.parseItem;
 
 public class RecipeBarrelCompost extends RecipeBarrel {
     private final ResourceLocation name;
@@ -12,6 +17,16 @@ public class RecipeBarrelCompost extends RecipeBarrel {
     private final int color;
     private final int time;
     private final int gain;
+
+    public RecipeBarrelCompost(ResourceLocation name, JsonObject json) {
+        this(
+            name,
+            parseItem(json.get("item")),
+            parseColor(json.get("color")),
+            JsonUtils.getInt(json, "time"),
+            JsonUtils.getInt(json, "gain")
+        );
+    }
 
     public RecipeBarrelCompost(ResourceLocation name, Object ingredient, int color, int time, int gain) {
         this.name = name;

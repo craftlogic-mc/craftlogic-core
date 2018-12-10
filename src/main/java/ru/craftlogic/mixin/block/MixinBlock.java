@@ -72,6 +72,12 @@ public class MixinBlock {
                 }
                 break;
             }
+            case "minecraft:lit_pumpkin": {
+                if (CraftConfig.tweaks.enableTorchBurning) {
+                    block = new BlockLitPumpkin();
+                }
+                break;
+            }
             case "minecraft:nether_brick_fence":
             case "minecraft:fence":
             case "minecraft:spruce_fence":

@@ -14,17 +14,14 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.*;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.IPlantable;
 import ru.craftlogic.api.math.Bounding;
-import ru.craftlogic.api.math.RadiusBounding;
+import ru.craftlogic.api.math.CenteredBounding;
 
 import java.lang.ref.WeakReference;
 import java.util.Random;
@@ -86,7 +83,11 @@ public class Location extends ChunkLocation {
     }
 
     public static Location deserialize(World world, JsonObject json) {
-        return new Location(world,
+        return deserialize(world.provider.getDimension(), json);
+    }
+
+    public static Location deserialize(int dimension, JsonObject json) {
+        return new Location(dimension,
             json.get("x").getAsDouble(),
             json.get("y").getAsDouble(),
             json.get("z").getAsDouble(),
@@ -211,6 +212,10 @@ public class Location extends ChunkLocation {
         this.setBlockState(this.getBlockState().cycleProperty(property), flag);
     }
 
+    public AxisAlignedBB getBlockBounding() {
+        return getBlockState().getBoundingBox(getWorld(), getPos());
+    }
+
     public Biome getBiome() {
         return this.getWorld().getBiome(this.getPos());
     }
@@ -259,14 +264,19 @@ public class Location extends ChunkLocation {
     public void spawnParticle(EnumParticleTypes particle, double ox, double oy, double oz, double mx, double my, double mz, int... data) {
         World world = this.getWorld();
         if (world instanceof WorldServer) {
-            ((WorldServer)world).spawnParticle(particle, this.getX() + ox, this.getY() + oy, this.getZ() + oz, 1, mx, my, mz,  1.0, data);
+            ((WorldServer)world).spawnParticle(particle, this.getX() + ox, this.getY() + oy, this.getZ() + oz, 1, mx, my, mz, 1.0, data);
         } else {
             world.spawnParticle(particle, this.getX() + ox, this.getY() + oy, this.getZ() + oz, mx, my, mz, data);
         }
     }
 
     public void playSound(SoundEvent sound, SoundCategory category, float volume, float pitch) {
-        this.getWorld().playSound(null, this.getX(), this.getY(), this.getZ(), sound, category, volume, pitch);
+        World world = this.getWorld();
+        if (world.isRemote) {
+            world.playSound(this.getX(), this.getY(), this.getZ(), sound, category, volume, pitch, false);
+        } else {
+            world.playSound(null, this.getX(), this.getY(), this.getZ(), sound, category, volume, pitch);
+        }
     }
 
     public void playEvent(int id, int data) {
@@ -290,8 +300,8 @@ public class Location extends ChunkLocation {
         }
     }
 
-    public Bounding toBounding(int radius) {
-        return new RadiusBounding(this.getX(), this.getY(), this.getZ(), radius) {
+    public Bounding toBounding(int width, int height, int depth) {
+        return new CenteredBounding(this.getX(), this.getY(), this.getZ(), width, height, depth) {
             @Override
             public double getStartY() {
                 return Math.max(this.getStartY(), 0);
@@ -304,8 +314,8 @@ public class Location extends ChunkLocation {
         };
     }
 
-    public Bounding toFullHeightBounding(int radius) {
-        return new RadiusBounding(this.getX(), this.getY(), this.getZ(), radius) {
+    public Bounding toFullHeightBounding(int width, int depth) {
+        return new CenteredBounding(this.getX(), this.getY(), this.getZ(), width, 0, depth) {
             @Override
             public double getStartY() {
                 return 0;

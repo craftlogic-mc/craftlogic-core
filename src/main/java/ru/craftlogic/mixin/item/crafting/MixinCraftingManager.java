@@ -105,17 +105,6 @@ public class MixinCraftingManager {
     private static IRecipe parseRecipeJson(JsonObject json) { return null; }
 
     private static boolean isRecipeReplaced(ResourceLocation id) {
-        switch (id.toString()) {
-            case "minecraft:lead":
-            case "minecraft:fishing_rod":
-            case "minecraft:bow":
-            case "minecraft:string_to_wool": {
-                return true;
-            }
-        }
-        if (id.getResourceDomain().equals("minecraft") && id.getResourcePath().endsWith("_carpet")) {
-            return true;
-        }
         return false;
     }
 }

@@ -10,6 +10,11 @@ import static ru.craftlogic.api.CraftAPI.MOD_ID;
 
 @Config(modid = MOD_ID)
 public class CraftConfig {
+    @Config.Comment("Default maven repositories for remote dependencies")
+    public static String[] mavenMirrors = {
+        "http://central.maven.org/maven2"
+    };
+
     public static Items items = new Items();
 
     public static class Items {
@@ -49,6 +54,8 @@ public class CraftConfig {
         @Config.Comment("Maximum size of a structure that a structure block can handle")
         public int maxStructureSize = 64;
 
+        @Config.Comment("Enable hiding full HUD bars")
+        public boolean enableHidingFullHUDBars = false;
         @Config.Comment("Enable cobblestone gravity")
         public boolean enableCobblestoneGravity = true;
         @Config.Comment("Enable moss growing on cobblestone")

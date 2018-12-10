@@ -1,40 +1,96 @@
 package ru.craftlogic.common.command;
 
+import com.mojang.authlib.GameProfile;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockWorkbench;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandException;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameType;
-import net.minecraftforge.common.util.FakePlayer;
-import org.apache.commons.lang3.StringUtils;
+import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.api.command.*;
 import ru.craftlogic.api.command.CommandContext.Argument;
-import ru.craftlogic.api.Server;
+import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.util.WrappedPlayerEnderchest;
 import ru.craftlogic.api.util.WrappedPlayerInventory;
 import ru.craftlogic.api.world.*;
-import ru.craftlogic.api.CraftSounds;
 
-import java.util.ArrayList;
+import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 public class GameplayCommands implements CommandRegistrar {
+    @Nullable
+    private static Location adjustBedLocation(Location l) {
+        if (l != null) {
+            BlockPos p = l.getPos();
+            net.minecraft.world.World world = l.getWorld();
+            IBlockState state = l.getBlockState();
+            Block block = state.getBlock();
+            if (block.isBed(state, world, p, null)) {
+                p = block.getBedSpawnPosition(state, world, p, null);
+                if (p != null) {
+                    return new Location(world, p);
+                }
+            }
+        }
+        return null;
+    }
+
+    private static void teleportHome(CommandContext ctx, Player sender, GameProfile target, Location bedLocation) throws CommandException {
+        if (bedLocation != null) {
+            sender.teleport(bedLocation);
+            if (sender.getId().equals(target.getId())) {
+                ctx.sendMessage(Text.translation("commands.home.teleport.you").green());
+            } else {
+                ctx.sendMessage(Text.translation("commands.home.teleport.other").green().arg(target.getName(), Text::darkGreen));
+            }
+        } else {
+            if (sender.getId().equals(target.getId())) {
+                throw new CommandException("commands.home.missing.you");
+            } else {
+                throw new CommandException("commands.home.missing.other", target.getName());
+            }
+        }
+    }
+
+    @Command(name = "home", syntax = {
+        "",
+        "<target:Player>"
+    }, opLevel = 1)
+    public static void commandHome(CommandContext ctx) throws CommandException {
+        Player sender = ctx.senderAsPlayer();
+        OfflinePlayer target = ctx.has("target") ? ctx.get("target").asOfflinePlayer() : sender;
+        if (target.isOnline()) {
+            Location bedLocation = adjustBedLocation(target.asOnline().getBedLocation());
+            teleportHome(ctx, sender, target.getProfile(), bedLocation);
+        } else {
+            PhantomPlayer fake = target.asPhantom(sender.getWorld());
+            Location bedLocation = adjustBedLocation(fake.getBedLocation());
+            teleportHome(ctx, sender, fake.getProfile(), bedLocation);
+        }
+    }
+
     @Command(name = "gamemode", aliases = "gm", syntax = {
         "<mode:GameMode>",
         "<mode:GameMode> <player:Player>",
         ""
-    })
+    }, opLevel = 2)
     public static void commandGameMode(CommandContext ctx) throws CommandException {
         if (ctx.has("mode")) {
             GameType mode = GameType.parseGameTypeWithDefault(ctx.get("mode").asString(), GameType.SURVIVAL);
             String modeName = mode.getName();
             if (ctx.has("player")) {
-                if (ctx.checkPermissions(true, "commands.gamemode.others")) {
+                if (ctx.checkPermission(true, "commands.gamemode.others", 3)) {
                     Player target = ctx.get("player").asPlayer();
                     target.setGameMode(mode);
                     ctx.sendNotification(
@@ -69,7 +125,7 @@ public class GameplayCommands implements CommandRegistrar {
         "[off|on]",
         "<player:Player>",
         "<player:Player> [off|on]"
-    })
+    }, opLevel = 1)
     public static void commandFly(CommandContext ctx) throws CommandException {
         Player target = ctx.getIfPresent("player", Argument::asPlayer).orElse(ctx.senderAsPlayer());
         boolean fly = ctx.hasAction() ? ctx.action().equals("on") : !target.isFlyingAllowed();
@@ -92,7 +148,7 @@ public class GameplayCommands implements CommandRegistrar {
     @Command(name = "heal", syntax = {
         "<target:Player>",
         ""
-    })
+    }, opLevel = 1)
     public static void commandHeal(CommandContext ctx) throws CommandException {
         Player target = ctx.has("target") ? ctx.get("target").asPlayer() : ctx.senderAsPlayer();
         if (target.heal()) {
@@ -119,7 +175,7 @@ public class GameplayCommands implements CommandRegistrar {
     @Command(name = "feed", syntax = {
         "<target:Player>",
         ""
-    })
+    }, opLevel = 1)
     public static void commandFeed(CommandContext ctx) throws CommandException {
         Player target = ctx.has("target") ? ctx.get("target").asPlayer() : ctx.senderAsPlayer();
         if (target.feed()) {
@@ -146,7 +202,7 @@ public class GameplayCommands implements CommandRegistrar {
     @Command(name = "craft", syntax = {
         "",
         "<target:Player>"
-    })
+    }, opLevel = 1)
     public static void commandCraft(CommandContext ctx) throws CommandException {
         Player target = ctx.has("target") ? ctx.get("target").asPlayer() : ctx.senderAsPlayer();
         Location location = target.getLocation();
@@ -155,14 +211,13 @@ public class GameplayCommands implements CommandRegistrar {
 
     @Command(name = "inventory", aliases = "inv", syntax = {
         "<target:Player>"
-    })
+    }, opLevel = 2)
     public static void commandInventory(CommandContext ctx) throws CommandException {
         Player viewer = ctx.senderAsPlayer();
         OfflinePlayer target = ctx.get("target").asOfflinePlayer();
         World requesterWorld = viewer.getWorld();
-        if (target.loadData(requesterWorld, true)) {
-            FakePlayer fakePlayer = target.asFake(requesterWorld);
-            viewer.openChestInventory(new WrappedPlayerInventory(fakePlayer.inventory, viewer, target));
+        if (target.hasData(requesterWorld)) {
+            viewer.openChestInventory(new WrappedPlayerInventory(viewer, target.asPhantom(requesterWorld)));
         } else {
             throw new CommandException("commands.inventory.no_data", target.getName());
         }
@@ -171,14 +226,13 @@ public class GameplayCommands implements CommandRegistrar {
     @Command(name = "enderchest", aliases = "ec", syntax = {
         "<target:Player>",
         ""
-    })
+    }, opLevel = 2)
     public static void commandEnderchest(CommandContext ctx) throws CommandException {
         Player viewer = ctx.senderAsPlayer();
         OfflinePlayer target = ctx.has("target") ? ctx.get("target").asOfflinePlayer() : viewer;
         World requesterWorld = viewer.getWorld();
-        if (target.loadData(requesterWorld, true)) {
-            FakePlayer fakePlayer = target.asFake(requesterWorld);
-            viewer.openChestInventory(new WrappedPlayerEnderchest(fakePlayer.getInventoryEnderChest(), viewer, target));
+        if (target.hasData(requesterWorld)) {
+            viewer.openChestInventory(new WrappedPlayerEnderchest(viewer, target.asPhantom(requesterWorld)));
         } else {
             throw new CommandException("commands.inventory.no_data", target.getName());
         }
@@ -186,11 +240,15 @@ public class GameplayCommands implements CommandRegistrar {
 
     @Command(name = "time", syntax = {
         "[day|night]",
+        "[day|night] <world:World>",
         "set <value>",
+        "set <value> <world:World>",
         "add <value>",
-        "add <value> <unit:TimeUnit>",
-        "query [day|daytime|gametime]"
-    })
+        "add <value> <world:World>",
+        "add <value> <world:World> <unit:TimeUnit>",
+        "query [day|daytime|gametime]",
+        "query [day|daytime|gametime] <world:World>"
+    }, opLevel = 2)
     public static void commandTime(CommandContext ctx) throws CommandException {
         if (ctx.hasConstant()) {
             switch (ctx.constant()) {
@@ -205,10 +263,11 @@ public class GameplayCommands implements CommandRegistrar {
                         phrase = false;
                         time = ctx.get("value").asInt();
                     }
-                    for (World world : getAffectedWorlds(ctx.sender())) {
+                    for (World world : getAffectedWorlds(ctx)) {
                         ctx.sendNotification(
                             Text.translation("commands.time.set")
                                 .yellow()
+                                .arg(world.getName(), Text::gold)
                                 .argTranslate("%s", a -> {
                                     if (phrase) {
                                         a.argTranslate("commands.time.set." + value, Text::gold);
@@ -216,7 +275,6 @@ public class GameplayCommands implements CommandRegistrar {
                                         a.argTranslate("commands.time.ticks", b -> b.arg(time).gold());
                                     }
                                 })
-                                .arg(world.getName(), Text::gold)
                         );
                         world.setTotalTime(time);
                     }
@@ -229,7 +287,7 @@ public class GameplayCommands implements CommandRegistrar {
                     } else {
                         time = ctx.get("value").asInt();
                     }
-                    for (World world : getAffectedWorlds(ctx.sender())) {
+                    for (World world : getAffectedWorlds(ctx)) {
                         ctx.sendNotification(
                             Text.translation("commands.time.added")
                                 .yellow()
@@ -241,13 +299,13 @@ public class GameplayCommands implements CommandRegistrar {
                     break;
                 }
                 case "query": {
-                    World world = ctx.sender().getWorld();
+                    World world = ctx.senderAsLocatable().getWorld();
                     switch (ctx.action()) {
                         case "day": {
                             ctx.sendMessage(
                                 Text.translation("commands.time.query.days")
                                     .gray()
-                                    .arg(String.valueOf(world.getTotalDays()), Text::darkGray)
+                                    .arg(world.getTotalDays(), Text::darkGray)
                             );
                             break;
                         }
@@ -255,7 +313,7 @@ public class GameplayCommands implements CommandRegistrar {
                             ctx.sendMessage(
                                 Text.translation("commands.time.query")
                                     .gray()
-                                    .arg(String.valueOf(world.getCurrentDayTime()), Text::darkGray)
+                                    .arg(world.getCurrentDayTime(), Text::darkGray)
                             );
                             break;
                         }
@@ -263,7 +321,7 @@ public class GameplayCommands implements CommandRegistrar {
                             ctx.sendMessage(
                                 Text.translation("commands.time.query.total")
                                     .gray()
-                                    .arg(String.valueOf(world.getTotalTime()), Text::darkGray)
+                                    .arg(world.getTotalTime(), Text::darkGray)
                             );
                             break;
                         }
@@ -274,7 +332,7 @@ public class GameplayCommands implements CommandRegistrar {
         } else {
             String phrase = ctx.action();
             long time = parseTimePhrase(phrase);
-            for (World world : getAffectedWorlds(ctx.sender())) {
+            for (World world : getAffectedWorlds(ctx)) {
                 ctx.sendNotification(
                     Text.translation("commands.time.set").gray()
                         .arg(world.getName(), Text::darkGray)
@@ -285,11 +343,16 @@ public class GameplayCommands implements CommandRegistrar {
         }
     }
 
-    private static Set<World> getAffectedWorlds(CommandSender sender) {
+    private static Set<World> getAffectedWorlds(CommandContext ctx) throws CommandException {
+        CommandSender sender = ctx.sender();
         if (sender instanceof Server) {
-            return ((Server) sender).getLoadedWorlds();
+            return ((Server) sender).getWorldManager().getAllLoaded();
+        } else if (sender instanceof LocatableCommandSender) {
+            return Collections.singleton(((LocatableCommandSender) sender).getWorld());
+        } else if (ctx.has("world")) {
+            return Collections.singleton(ctx.get("world").asWorld());
         } else {
-            return Collections.singleton(sender.getWorld());
+            throw new CommandException("commands.generic.specifyWorld");
         }
     }
 
@@ -328,49 +391,24 @@ public class GameplayCommands implements CommandRegistrar {
 
     @ArgumentCompleter(type = "TimeUnit")
     public static List<String> completerTimeUnit(ArgumentCompletionContext ctx) {
-        List<String> result = new ArrayList<>();
-        for (String mode : new String[] {"d", "day", "days", "h", "hour", "hours", "m", "minute", "minutes"}) {
-            if (mode.startsWith(ctx.partialName())) {
-                result.add(mode);
-            }
-        }
-        return result;
+        return Arrays.asList("d", "day", "days", "h", "hour", "hours", "m", "minute", "minutes");
     }
 
     @ArgumentCompleter(type = "GameMode")
     public static List<String> completerGameMode(ArgumentCompletionContext ctx) {
-        List<String> result = new ArrayList<>();
-        for (GameType mode : GameType.values()) {
-            if (mode.getName().startsWith(ctx.partialName())) {
-                result.add(mode.getName());
-            }
-        }
-        return result;
+        return Stream.of(GameType.values())
+                .map(GameType::getName)
+                .collect(Collectors.toList());
     }
 
     @ArgumentCompleter(type = "World")
-    public static List<String> completerWorld(ArgumentCompletionContext ctx) {
-        Set<World> worlds = ctx.server().getLoadedWorlds();
-        List<String> variants = ctx.partialName().isEmpty() ? new ArrayList<>(worlds.size()) : new ArrayList<>();
-        for (World world : worlds) {
-            String worldName = world.getName();
-            if (worldName.startsWith(ctx.partialName())) {
-                variants.add(worldName);
-            }
-        }
-        return variants;
+    public static Set<String> completerWorld(ArgumentCompletionContext ctx) {
+        return ctx.server().getWorldManager().getAllLoadedNames();
     }
 
     @ArgumentCompleter(type = "Player", isEntityName = true)
-    public static List<String> completerPlayer(ArgumentCompletionContext ctx) {
-        String[] onlinePlayerNames = ctx.server().getOnlinePlayerNames();
-        List<String> variants = ctx.partialName().isEmpty() ? new ArrayList<>(onlinePlayerNames.length) : new ArrayList<>();
-        for (String playerName : onlinePlayerNames) {
-            if (StringUtils.startsWithIgnoreCase(playerName, ctx.partialName())) {
-                variants.add(playerName);
-            }
-        }
-        return variants;
+    public static Set<String> completerPlayer(ArgumentCompletionContext ctx) {
+        return ctx.server().getPlayerManager().getAllOnlineNames();
     }
 
     @ArgumentCompleter(type = {"XCoord", "YCoord", "ZCoord"})

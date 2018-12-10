@@ -1,17 +1,17 @@
 package ru.craftlogic.util;
 
+import net.minecraft.profiler.Profiler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 import java.util.function.Supplier;
 
-public class AdvancedProfiler {
+public class AdvancedProfiler extends Profiler {
     private static final Logger LOGGER = LogManager.getLogger();
     private final List<String> sections = new ArrayList<>();
     private final List<Long> timestamps = new ArrayList<>();
     private final long warnTime;
-    public boolean enabled;
     private String currentSection = "";
     private final Map<String, Long> profilingData = new HashMap<>();
 
@@ -25,8 +25,9 @@ public class AdvancedProfiler {
         this.sections.clear();
     }
 
+    @Override
     public void startSection(String name) {
-        if (this.enabled) {
+        if (this.profilingEnabled) {
             if (!this.currentSection.isEmpty()) {
                 this.currentSection = this.currentSection + ".";
             }
@@ -39,14 +40,15 @@ public class AdvancedProfiler {
     }
 
     public void startSection(Supplier<String> nameSupplier) {
-        if (this.enabled) {
+        if (this.profilingEnabled) {
             this.startSection(nameSupplier.get());
         }
 
     }
 
+    @Override
     public void endSection() {
-        if (this.enabled) {
+        if (this.profilingEnabled) {
             long i = System.nanoTime();
             long j = this.timestamps.remove(this.timestamps.size() - 1);
             this.sections.remove(this.sections.size() - 1);
@@ -65,8 +67,9 @@ public class AdvancedProfiler {
         }
     }
 
+    @Override
     public List<AdvancedProfiler.Result> getProfilingData(String name) {
-        if (!this.enabled) {
+        if (!this.profilingEnabled) {
             return Collections.emptyList();
         } else {
             long rootTime = this.profilingData.getOrDefault("root", 0L);
@@ -118,11 +121,13 @@ public class AdvancedProfiler {
         }
     }
 
+    @Override
     public void endStartSection(String name) {
         this.endSection();
         this.startSection(name);
     }
 
+    @Override
     public String getNameOfLastSection() {
         return this.sections.isEmpty() ? "[UNKNOWN]" : this.sections.get(this.sections.size() - 1);
     }
@@ -130,37 +135,6 @@ public class AdvancedProfiler {
     public void endStartSection(Supplier<String> nameSupplier) {
         this.endSection();
         this.startSection(nameSupplier);
-    }
-
-    @Deprecated
-    public void startSection(Class<?> clazz) {
-        if (this.enabled) {
-            this.startSection(clazz.getSimpleName());
-        }
-    }
-
-    public static final class Result implements Comparable<Result> {
-        public double usePercentage, totalUsePercentage;
-        public String profilerName;
-
-        public Result(String name, double percentage, double totalPercentage) {
-            this.profilerName = name;
-            this.usePercentage = percentage;
-            this.totalUsePercentage = totalPercentage;
-        }
-
-        @Override
-        public int compareTo(Result other) {
-            if (other.usePercentage < this.usePercentage) {
-                return -1;
-            } else {
-                return other.usePercentage > this.usePercentage ? 1 : other.profilerName.compareTo(this.profilerName);
-            }
-        }
-
-        public int getColor() {
-            return (this.profilerName.hashCode() & 0xAAAAAA) + 0x444444;
-        }
     }
 }
 

@@ -4,44 +4,40 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.apache.logging.log4j.Logger;
-import ru.craftlogic.api.Server;
-import ru.craftlogic.common.command.CommandManager;
+import ru.craftlogic.api.CraftAPI;
+import ru.craftlogic.api.server.Server;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public abstract class ConfigurableManager {
+public abstract class ConfigurableManager extends ServerManager {
     protected static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
-    protected final Server server;
     protected final Path configFile;
-    protected final Logger logger;
 
     private boolean needsSave = false;
     private JsonObject config;
 
-    public ConfigurableManager(Server server, Path configFile, Logger logger) {
-        this.server = server;
+    protected ConfigurableManager(Server server, Path configFile, Logger logger) {
+        super(server, logger);
         this.configFile = configFile;
-        this.logger = logger;
-    }
-
-    public final Server getServer() {
-        return server;
     }
 
     protected Path getConfigFile() {
         return this.configFile;
     }
 
-    protected Logger getLogger() {
-        return this.logger;
+    protected String getModId() {
+        return CraftAPI.MOD_ID;
     }
 
     protected String getDefaultConfig() {
-        return "/assets/craftlogic/config/" + getConfigFile().getFileName().toString();
+        return "/assets/" + getModId() + "/config/" + getConfigFile().getFileName().toString();
     }
 
     public boolean isDirty() {
@@ -52,6 +48,7 @@ public abstract class ConfigurableManager {
         this.needsSave = dirty;
     }
 
+    @Override
     public final void load() throws IOException {
         Path configFile = this.getConfigFile();
         JsonObject root = null;
@@ -97,8 +94,14 @@ public abstract class ConfigurableManager {
 
     protected abstract void load(JsonObject config);
 
+    @Override
     public final void save() throws IOException {
         this.save(false);
+    }
+
+    @Override
+    public void unload() throws Exception {
+        this.save(true);
     }
 
     public final void save(boolean force) throws IOException {
@@ -118,6 +121,4 @@ public abstract class ConfigurableManager {
     }
 
     protected abstract void save(JsonObject config);
-
-    public void registerCommands(CommandManager commandManager) {}
 }

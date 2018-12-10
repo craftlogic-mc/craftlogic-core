@@ -2,38 +2,60 @@ package ru.craftlogic.api.world;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryEnderChest;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.server.SPacketPlayerPosLook;
 import net.minecraft.network.play.server.SPacketSoundEffect;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.FoodStats;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.GameType;
 import net.minecraft.world.IInteractionObject;
-import ru.craftlogic.CraftLogic;
-import ru.craftlogic.api.CraftNetwork;
+import ru.craftlogic.api.CraftAPI;
+import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.api.block.holders.ScreenHolder;
+import ru.craftlogic.api.entity.AdvancedPlayer;
 import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.api.network.AdvancedMessage;
-import ru.craftlogic.api.Server;
+import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.text.Text;
+import ru.craftlogic.api.util.BooleanConsumer;
 import ru.craftlogic.network.message.MessageCountdown;
-import ru.craftlogic.network.message.MessageCustom;
+import ru.craftlogic.network.message.MessageQuestion;
 import ru.craftlogic.network.message.MessageToast;
 
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-public class Player extends OfflinePlayer implements CommandSender {
+public class Player extends OfflinePlayer implements LocatableCommandSender {
+    private final Map<String, BooleanConsumer> pendingCallbacks = new HashMap<>();
+
     public Player(Server server, GameProfile profile) {
         super(server, profile);
+    }
+
+    public static Player from(EntityPlayerMP player) {
+        return ((AdvancedPlayer)player).wrapped();
+    }
+
+    public ItemStack getHeldItem(EnumHand hand) {
+        return getEntity().getHeldItem(hand);
+    }
+
+    public void setHeldItem(EnumHand hand, ItemStack item) {
+        getEntity().setHeldItem(hand, item);
     }
 
     public InventoryPlayer getInventory() {
@@ -48,8 +70,7 @@ public class Player extends OfflinePlayer implements CommandSender {
         return getEntity().getPlayerIP();
     }
 
-    @Override
-    public long getLastPlayed(World world) {
+    public long getLastPlayed() {
         return getEntity().getLastActiveTime();
     }
 
@@ -59,12 +80,8 @@ public class Player extends OfflinePlayer implements CommandSender {
     }
 
     @Override
-    public ICommandSender getHandle() {
+    public ICommandSender unwrap() {
         return getEntity();
-    }
-
-    public World getWorld() {
-        return this.server.getWorld(Dimension.fromVanilla(getEntity().world.provider.getDimensionType()));
     }
 
     @Override
@@ -80,24 +97,16 @@ public class Player extends OfflinePlayer implements CommandSender {
         getEntity().displayGUIChest(holder);
     }
 
-    public void showScreen(String name) {
-        this.showScreen(name, "");
-    }
-
-    public void showScreen(String name, String args) {
-        CraftLogic.showScreen(name, getEntity(), args);
-    }
-
     public void showScreen(ScreenHolder holder) {
         this.showScreen(holder, 0);
     }
 
     public void showScreen(ScreenHolder holder, int subId) {
-        CraftLogic.showScreen(holder, getEntity(), subId);
+        CraftAPI.showScreen(holder, getEntity(), subId);
     }
 
     public boolean teleport(Location location) {
-        return this.teleport(location.getBlockX(), location.getBlockY(), location.getBlockZ(), location.getYaw(), location.getPitch());
+        return this.teleport(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
     }
 
     public boolean teleport(double x, double y, double z, float yaw, float pitch) {
@@ -153,7 +162,7 @@ public class Player extends OfflinePlayer implements CommandSender {
     }
 
     public EntityPlayerMP getEntity() {
-        return this.server.getHandle().getPlayerList().getPlayerByUUID(this.profile.getId());
+        return this.server.unwrap().getPlayerList().getPlayerByUUID(this.profile.getId());
     }
 
     public boolean isHurt() {
@@ -188,6 +197,24 @@ public class Player extends OfflinePlayer implements CommandSender {
         }
     }
 
+    public boolean confirm(String id) {
+        return confirm(id, true);
+    }
+
+    public boolean decline(String id) {
+        return confirm(id, false);
+    }
+
+    public boolean confirm(String id, boolean choice) {
+        BooleanConsumer callback = this.pendingCallbacks.get(id);
+        if (callback != null) {
+            callback.accept(choice);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public void playSound(SoundEvent sound, float volume, float pitch) {
         EntityPlayerMP player = getEntity();
         SPacketSoundEffect packet = new SPacketSoundEffect(sound, player.getSoundCategory(), player.posX, player.posY, player.posZ, volume, pitch);
@@ -195,7 +222,8 @@ public class Player extends OfflinePlayer implements CommandSender {
     }
 
     public RayTraceResult getLookingSpot() {
-        return this.getLookingSpot(getEntity().capabilities.isCreativeMode ? 5 : 4.5);
+        IAttributeInstance reachDistance = getEntity().getEntityAttribute(EntityPlayer.REACH_DISTANCE);
+        return this.getLookingSpot(reachDistance.getAttributeValue());
     }
     
     public RayTraceResult getLookingSpot(double distance) {
@@ -210,6 +238,11 @@ public class Player extends OfflinePlayer implements CommandSender {
         return player.world.rayTraceBlocks(eyes, target, false, false, true);
     }
 
+    public Location getBedLocation() {
+        BlockPos bed = getEntity().getBedLocation();
+        return bed != null ? new Location(getWorld().unwrap(), bed) : null;
+    }
+
     public void disconnect(Text<?, ?> reason) {
         this.disconnect(reason.build());
     }
@@ -219,30 +252,30 @@ public class Player extends OfflinePlayer implements CommandSender {
     }
 
     public long getFirstPlayed() {
-        return ((ru.craftlogic.api.entity.Player)getEntity()).getFirstPlayed();
+        return ((AdvancedPlayer)getEntity()).getFirstPlayed();
     }
 
     public void sendPacket(AdvancedMessage packet) {
-        CraftNetwork.sendTo(getEntity(), packet);
+        packet.getNetwork().sendTo(getEntity(), packet);
     }
 
-    public void sendPacket(String channel, NBTTagCompound packet) {
+/*    public void sendPacket(String channel, NBTTagCompound packet) {
         this.sendPacket(new MessageCustom(channel, packet));
-    }
+    }*/
 
-    public void sendToast(Text<?, ?> title, long timeout) {
+    public void sendToast(Text<?, ?> title, int timeout) {
         this.sendToast(title.build(), timeout);
     }
 
-    public void sendToast(ITextComponent title, long timeout) {
+    public void sendToast(ITextComponent title, int timeout) {
         this.sendPacket(new MessageToast(title, timeout));
     }
 
-    public void sendToast(Text<?, ?> title, Text<?, ?> subtitle, long timeout) {
+    public void sendToast(Text<?, ?> title, Text<?, ?> subtitle, int timeout) {
         this.sendToast(title.build(), subtitle.build(), timeout);
     }
 
-    public void sendToast(ITextComponent title, ITextComponent subtitle, long timeout) {
+    public void sendToast(ITextComponent title, ITextComponent subtitle, int timeout) {
         this.sendPacket(new MessageToast(title, subtitle, timeout));
     }
 
@@ -255,10 +288,23 @@ public class Player extends OfflinePlayer implements CommandSender {
     }
 
     public void sendCountdown(String id, ITextComponent title, int timeout) {
-        this.sendPacket(new MessageCountdown(id, title, timeout));
+        this.sendCountdown(id, title, timeout, 0xFF555555);
     }
 
     public void sendCountdown(String id, ITextComponent title, int timeout, int color) {
-        this.sendPacket(new MessageCountdown(id, title, timeout, color));
+        this.sendCountdown(id, title, timeout, color, CraftSounds.COUNTDOWN_TICK);
+    }
+
+    public void sendCountdown(String id, ITextComponent title, int timeout, int color, SoundEvent tickSound) {
+        this.sendPacket(new MessageCountdown(id, title, timeout, color, tickSound));
+    }
+
+    public void sendQuestion(String id, Text<?, ?> question, int timeout, BooleanConsumer callback) {
+        this.sendQuestion(id, question.build(), timeout, callback);
+    }
+
+    public void sendQuestion(String id, ITextComponent question, int timeout, BooleanConsumer callback) {
+        this.sendPacket(new MessageQuestion(id, question, timeout));
+        this.pendingCallbacks.put(id, callback);
     }
 }

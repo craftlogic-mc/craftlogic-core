@@ -7,7 +7,8 @@
   ],
   "key": {
     "P": {
-      "item": "minecraft:stone"
+      "item": "minecraft:stone",
+      "data": 0
     },
     "T": {
       "item": "minecraft:stone_pressure_plate"

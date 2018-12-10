@@ -13,7 +13,9 @@ import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.*;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
-import ru.craftlogic.CraftLogic;
+import ru.craftlogic.api.CraftAPI;
+import ru.craftlogic.api.CraftItems;
+import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.api.block.HeatAcceptor;
 import ru.craftlogic.api.block.Updatable;
 import ru.craftlogic.api.block.holders.ScreenHolder;
@@ -24,8 +26,6 @@ import ru.craftlogic.api.sound.LoopingSoundSource;
 import ru.craftlogic.api.tile.TileEntityBase;
 import ru.craftlogic.api.util.TemperatureBuffer;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.api.CraftItems;
-import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.util.Furnace;
 
 import java.util.Random;
@@ -158,7 +158,7 @@ public class TileEntityFurnace extends TileEntityBase implements Updatable, Furn
                 }
                 this.dropTemperatureWithEffect(10);
             } else {
-                CraftLogic.showScreen(this, player);
+                CraftAPI.showScreen(this, player);
             }
         }
         return true;

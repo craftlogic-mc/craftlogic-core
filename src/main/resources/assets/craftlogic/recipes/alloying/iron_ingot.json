@@ -1,0 +1,10 @@
+{
+  "input": {
+    "name": "dictionary:nuggetIron",
+    "amount": 9
+  },
+  "exp": 1.0,
+  "temperature": 1538,
+  "time": 150,
+  "output": "minecraft:iron_ingot"
+}

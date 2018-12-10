@@ -125,11 +125,11 @@ public class ElementButton extends InteractiveElement {
             drawTexturedRect(x, y, w / 2, h, 0, ty, this.color);
             drawTexturedRect(x + w / 2, y, w / 2, h, 200 - w / 2, ty, this.color);
 
-            int textColor = 0xe0e0e0;
+            int textColor = 0xE0E0E0;
             if (!this.isEnabled()) {
-                textColor = 0xa0a0a0;
+                textColor = 0xA0A0A0;
             } else if (state == ButtonState.HOVER) {
-                textColor = 0xffffa0;
+                textColor = 0xFFFFA0;
             }
 
             drawCenteredText(title, x + getWidth() / 2, y + getHeight() / 2, textColor, true);

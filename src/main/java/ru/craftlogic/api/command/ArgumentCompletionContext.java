@@ -1,7 +1,8 @@
 package ru.craftlogic.api.command;
 
-import ru.craftlogic.api.Server;
+import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.world.CommandSender;
+import ru.craftlogic.api.world.LocatableCommandSender;
 import ru.craftlogic.api.world.Location;
 
 import javax.annotation.Nullable;
@@ -43,6 +44,6 @@ public class ArgumentCompletionContext {
     }
 
     public Location targetBlockOrSelfLocation() {
-        return this.targetBlock() != null ? this.targetBlock() : this.sender().getLocation();
+        return this.targetBlock() != null ? this.targetBlock() : ((LocatableCommandSender)this.sender()).getLocation();
     }
 }

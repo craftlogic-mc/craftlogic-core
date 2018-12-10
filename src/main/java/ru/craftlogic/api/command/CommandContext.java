@@ -4,13 +4,10 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
-import ru.craftlogic.api.Server;
+import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.util.CheckedFunction;
-import ru.craftlogic.api.world.CommandSender;
-import ru.craftlogic.api.world.OfflinePlayer;
-import ru.craftlogic.api.world.Player;
-import ru.craftlogic.api.world.World;
+import ru.craftlogic.api.world.*;
 import ru.craftlogic.api.CraftMessages;
 
 import java.util.*;
@@ -18,12 +15,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class CommandContext {
-    private final Server server;
-    private final CommandSender sender;
-    private final ICommand command;
-    private final List<Argument> indexToArg = new ArrayList<>();
-    private final Map<String, Argument> nameToArg = new HashMap<>();
-    private final Random random = new Random();
+    protected final Server server;
+    protected final CommandSender sender;
+    protected final ICommand command;
+    protected final List<Argument> indexToArg = new ArrayList<>();
+    protected final Map<String, Argument> nameToArg = new HashMap<>();
+    protected final Random random = new Random();
 
     public CommandContext(Server server, CommandSender sender, ICommand command, List<Argument> args) {
         this.server = server;
@@ -60,9 +57,17 @@ public class CommandContext {
         return this.sender;
     }
 
+    public LocatableCommandSender senderAsLocatable() throws CommandException {
+        if (this.sender instanceof LocatableCommandSender) {
+            return (LocatableCommandSender) this.sender;
+        } else {
+            throw new CommandException("commands.generic.locatableOnly");
+        }
+    }
+
     public Player senderAsPlayer() throws CommandException {
         if (this.sender instanceof Player) {
-            return ((Player) this.sender);
+            return (Player) this.sender;
         } else {
             throw new CommandException("commands.generic.playerOnly");
         }
@@ -151,7 +156,7 @@ public class CommandContext {
     }
 
     public void sendNotification(int flags, ITextComponent message) {
-        CraftMessages.notifyCommandListener(this.server.getHandle(), this.sender.getHandle(), this.command, flags, message);
+        CraftMessages.notifyCommandListener(this.server.unwrap(), this.sender.unwrap(), this.command, flags, message);
     }
 
     public void sendMessage(String message, Object... args) {
@@ -166,12 +171,12 @@ public class CommandContext {
         this.sender.sendMessage(text.build());
     }
 
-    public boolean checkPermissions(boolean panic, String... permissions) throws CommandException {
-        if (this.server.isSinglePlayer() || this.sender.hasPermissions(permissions)) {
+    public boolean checkPermission(boolean panic, String permission, int opLevel) throws CommandException {
+        if (this.server.isSinglePlayer() || this.sender.hasPermission(permission, opLevel)) {
             return true;
         }
         if (panic) {
-            throw new CommandException("commands.generic.noPermission", Arrays.toString(permissions));
+            throw new CommandException("commands.generic.noPermission", permission);
         }
         return false;
     }
@@ -208,8 +213,16 @@ public class CommandContext {
             return this.value;
         }
 
+        public UUID asUUID() throws CommandException {
+            try {
+                return UUID.fromString(this.value);
+            } catch (IllegalArgumentException exc) {
+                throw new CommandException("commands.generic.uuid.invalidFormat", this.value);
+            }
+        }
+
         public OfflinePlayer asOfflinePlayer() throws CommandException {
-            OfflinePlayer player = this.context.server.getOfflinePlayerByName(this.value);
+            OfflinePlayer player = this.context.server.getPlayerManager().getOffline(this.value);
             if (player == null) {
                 throw new CommandException("commands.generic.userNeverPlayed", this.value);
             }
@@ -217,7 +230,7 @@ public class CommandContext {
         }
 
         public Player asPlayer() throws CommandException {
-            Player player = this.context.server.getPlayerByName(this.value);
+            Player player = this.context.server.getPlayerManager().getOnline(this.value);
             if (player == null) {
                 throw new CommandException("commands.generic.player.notFound", this.value);
             }
@@ -232,7 +245,7 @@ public class CommandContext {
         }
 
         public World asWorld() throws CommandException {
-            World world = this.context.server.getWorld(this.value);
+            World world = this.context.server.getWorldManager().get(this.value);
             if (world == null) {
                 throw new CommandException("commands.generic.world.notFound", this.value);
             }

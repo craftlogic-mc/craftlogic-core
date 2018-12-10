@@ -22,7 +22,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static ru.craftlogic.api.CraftAPI.MOD_ID;
+
 public interface ElementContainer {
+    ResourceLocation BLANK_TEXTURE = new ResourceLocation(MOD_ID, "textures/gui/empty.png");
+
     boolean addElement(Element element);
     boolean removeElement(Element element);
     Set<Element> getElements();

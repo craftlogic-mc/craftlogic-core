@@ -2,7 +2,9 @@ package ru.craftlogic.api.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockFaceShape;
+import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
@@ -85,7 +87,17 @@ public class BlockBase extends Block implements ModelAutoReg {
 
     protected boolean onBlockActivated(Location location, EntityPlayer player, EnumHand hand, RayTraceResult target) {
         TileEntityBase tile = location.getTileEntity(TileEntityBase.class);
-        return tile != null && tile.onActivated(player, hand, target);
+        if (tile != null) {
+            if (tile.onActivated(player, hand, target)) {
+                return true;
+            } else if (this instanceof Partial) {
+                Partial.Part part = ((Partial) this).getPart(location, target);
+                if (part != null) {
+                    return part.onActivated(location, player, hand);
+                }
+            }
+        }
+        return false;
     }
 
     @Override final
@@ -316,5 +328,14 @@ public class BlockBase extends Block implements ModelAutoReg {
 
     protected Item asItem() {
         return Item.getItemFromBlock(this);
+    }
+
+    protected IProperty[] getProperties() {
+        return new IProperty[0];
+    }
+
+    @Override
+    protected final BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, getProperties());
     }
 }

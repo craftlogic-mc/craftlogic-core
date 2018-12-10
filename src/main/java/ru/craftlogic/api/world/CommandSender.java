@@ -2,72 +2,55 @@ package ru.craftlogic.api.world;
 
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.rcon.RConConsoleSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.CommandBlockBaseLogic;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
-import ru.craftlogic.api.CraftAPI;
-import ru.craftlogic.api.Server;
+import ru.craftlogic.api.server.AdvancedServer;
+import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.util.WrappedCommandSender;
 
-public interface CommandSender extends Permissible, Locatable {
+public interface CommandSender extends Permissible {
     default Server getServer() {
-        ICommandSender handle = getHandle();
-        if (handle.getServer() == CraftAPI.getServer().getHandle()) {
-            return CraftAPI.getServer();
-        } else {
-            throw new IllegalStateException("Unknown server instance: " + handle.getServer());
-        }
+        return Server.from(unwrap().getServer());
     }
 
     @Override
     default ITextComponent getDisplayName() {
-        return getHandle().getDisplayName();
+        return unwrap().getDisplayName();
     }
 
     String getName();
 
-    @Override
-    default Location getLocation() {
-        ICommandSender handle = getHandle();
-        return new Location(handle.getEntityWorld(), handle.getPositionVector());
-    }
-
     default void sendMessage(ITextComponent message) {
-        getHandle().sendMessage(message);
+        unwrap().sendMessage(message);
     }
 
     default void sendMessage(Text<?, ?> text) {
-        getHandle().sendMessage(text.build());
+        unwrap().sendMessage(text.build());
     }
 
     default void sendMessage(String format, Object... args) {
-        getHandle().sendMessage(new TextComponentTranslation(format, args));
+        unwrap().sendMessage(new TextComponentTranslation(format, args));
     }
 
-    ICommandSender getHandle();
+    ICommandSender unwrap();
 
     static CommandSender from(Server server, ICommandSender sender) {
         if (sender instanceof EntityPlayerMP) {
-            return server.getPlayer(((EntityPlayerMP) sender).getGameProfile());
+            return server.getPlayerManager().getOnline(((EntityPlayerMP) sender).getGameProfile());
         } else if (sender instanceof MinecraftServer) {
-            if (CraftAPI.getServer().getHandle() == sender) {
-                return CraftAPI.getServer();
-            }
-        } else if (sender instanceof CommandBlockBaseLogic) {
+            return ((AdvancedServer)sender).wrapped();
+        } else if (sender instanceof CommandBlockBaseLogic || sender instanceof RConConsoleSource) {
             return new WrappedCommandSender(sender) {
                 @Override
-                public boolean hasPermissions(String... permissions) {
+                public boolean hasPermission(String permission, int opLevel) {
                     return true;
                 }
             };
         }
         return new WrappedCommandSender(sender);
-    }
-
-    default World getWorld() {
-        net.minecraft.world.World nmw = getHandle().getEntityWorld();
-        return getServer().getWorld(Dimension.fromVanilla(nmw.provider.getDimensionType()));
     }
 }

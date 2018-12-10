@@ -19,10 +19,10 @@ public class ToastText extends AdvancedToast {
         );
     }
 
-    public ToastText(ITextComponent title, ITextComponent subtitle, long timeout) {
+    public ToastText(ITextComponent title, ITextComponent subtitle, int timeout) {
         this.title = title;
         this.subtitle = subtitle;
-        this.timeout = timeout;
+        this.timeout = (long)timeout * 1000L;
     }
 
     @Override

@@ -28,6 +28,7 @@ public class CraftBlocks {
     public static Block CAULDRON;
     public static Block SMELTING_VAT;
     public static Block BARREL_WOOD, BARREL_STONE;
+    public static Block DRYING_RACK;
     public static BlockGourd MELON, PUMPKIN;
 
     static void init(Side side) {
@@ -41,6 +42,8 @@ public class CraftBlocks {
             BARREL_WOOD = registerBlockWithItem(new BlockBarrelWood());
             BARREL_STONE = registerBlockWithItem(new BlockBarrelStone());
         }
+
+        DRYING_RACK = registerBlockWithItem(new BlockDryingRack());
 
         if (CraftConfig.tweaks.enableFancyGourd) {
             PUMPKIN = registerBlock(new BlockGourd(BlockGourd.GourdVariant.PUMPKIN));

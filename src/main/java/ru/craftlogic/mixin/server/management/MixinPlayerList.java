@@ -25,22 +25,28 @@ import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.apache.logging.log4j.Logger;
+import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import ru.craftlogic.api.entity.Player;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import ru.craftlogic.api.entity.AdvancedPlayer;
 import ru.craftlogic.api.event.player.PlayerLeftMessageEvent;
 import ru.craftlogic.api.server.AdvancedPlayerList;
+import ru.craftlogic.api.server.AdvancedPlayerFileData;
+import ru.craftlogic.api.server.Server;
 
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.UUID;
 
 @Mixin(PlayerList.class)
-public class MixinPlayerList implements AdvancedPlayerList {
+public abstract class MixinPlayerList implements AdvancedPlayerList {
     @Shadow @Final
     private static Logger LOGGER;
 
@@ -99,8 +105,8 @@ public class MixinPlayerList implements AdvancedPlayerList {
         String username = cachedProfile == null ? profile.getName() : cachedProfile.getName();
         profileCache.addEntry(profile);
         NBTTagCompound playerData = this.readPlayerDataFromFile(player);
-        if (playerData == null || ((Player)player).getFirstPlayed() == 0) {
-            ((Player)player).setFirstPlayed(System.currentTimeMillis());
+        if (playerData == null || ((AdvancedPlayer)player).getFirstPlayed() == 0) {
+            ((AdvancedPlayer)player).setFirstPlayed(System.currentTimeMillis());
         }
         player.setWorld(this.mcServer.getWorld(player.dimension));
         World playerWorld = this.mcServer.getWorld(player.dimension);
@@ -190,38 +196,52 @@ public class MixinPlayerList implements AdvancedPlayerList {
         FMLCommonHandler.instance().firePlayerLoggedIn(player);
     }
 
+    @Inject(method = "createPlayerForUser", at = @At("HEAD"))
+    public void onPlayerCreate(GameProfile profile, CallbackInfoReturnable<EntityPlayerMP> info) {
+        Server.from(this.mcServer).getPlayerManager().savePhantomFor(profile);
+    }
+
+    @Inject(method = "playerLoggedOut", at = @At("TAIL"))
+    public void onPlayerDestroy(EntityPlayerMP player, CallbackInfo info) {
+        Server.from(this.mcServer).getPlayerManager().loadPhantomFor(player.getGameProfile());
+    }
+
+    @Redirect(method = "recreatePlayerEntity", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/EntityPlayerMP;connection:Lnet/minecraft/network/NetHandlerPlayServer;", opcode = Opcodes.PUTFIELD))
+    public void setConnection(EntityPlayerMP player, NetHandlerPlayServer connection) {
+        ((AdvancedPlayer)player).setFirstPlayed(((AdvancedPlayer)connection.player).getFirstPlayed());
+        player.connection = connection;
+    }
+
     @Override
-    public IPlayerFileData getDataManager() {
-        return this.playerDataManager;
+    public AdvancedPlayerFileData getDataManager() {
+        return (AdvancedPlayerFileData) this.playerDataManager;
     }
 
     @Shadow
-    public void sendMessage(ITextComponent message) { }
+    public abstract void sendMessage(ITextComponent message);
 
     @Shadow
-    public void playerLoggedIn(EntityPlayerMP player) { }
+    public abstract void playerLoggedIn(EntityPlayerMP player);
 
     @Shadow
-    private void setPlayerGameTypeBasedOnOther(EntityPlayerMP oldPlayer, EntityPlayerMP newPlayer, World world) { }
+    protected abstract void setPlayerGameTypeBasedOnOther(EntityPlayerMP oldPlayer, EntityPlayerMP newPlayer, World world);
 
     @Shadow
     @Nullable
-    public NBTTagCompound readPlayerDataFromFile(EntityPlayerMP player) { return null; }
+    public abstract NBTTagCompound readPlayerDataFromFile(EntityPlayerMP player);
 
     @Shadow
-    public void updateTimeAndWeatherForPlayer(EntityPlayerMP player, WorldServer world) { }
+    public abstract void updateTimeAndWeatherForPlayer(EntityPlayerMP player, WorldServer world);
 
     @Shadow
-    public void updatePermissionLevel(EntityPlayerMP player) { }
+    public abstract void updatePermissionLevel(EntityPlayerMP player);
 
     @Shadow
-    protected void sendScoreboard(ServerScoreboard scoreboard, EntityPlayerMP player) { }
+    protected abstract void sendScoreboard(ServerScoreboard scoreboard, EntityPlayerMP player);
 
     @Shadow
-    public MinecraftServer getServerInstance() {
-        return this.mcServer;
-    }
+    public abstract MinecraftServer getServerInstance();
 
     @Shadow
-    public int getMaxPlayers() { return 0; }
+    public abstract int getMaxPlayers();
 }

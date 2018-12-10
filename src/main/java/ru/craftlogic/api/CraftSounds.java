@@ -22,7 +22,7 @@ public class CraftSounds {
     public static SoundEvent COUNTDOWN_TICK;
     public static SoundEvent CART_PLACE;
     public static SoundEvent CART_LOADING;
-    public static SoundEvent HEAL, HINT, WARNING, LEVEL_UP, SPELL, SLOW, HIDE, KICK, BAN, TOMES;
+    public static SoundEvent HEAL, HINT, WARNING, LEVEL_UP, SPELL, SLOW, HIDE, KICK, BAN, TOME, OPENING_FAILED;
 
     static void init(Side side) {
         FURNACE_VENT_OPEN = registerSound("furnace.vent.open");
@@ -42,7 +42,8 @@ public class CraftSounds {
         HIDE = registerSound("hide");
         KICK = registerSound("kick");
         BAN = registerSound("ban");
-        TOMES = registerSound("tomes");
+        TOME = registerSound("tome");
+        OPENING_FAILED = registerSound("opening_failed");
     }
 
     public static SoundEvent registerSound(@Nonnull String name) {

@@ -137,61 +137,45 @@ public class CraftMessages {
         long hour = 60 * minute;
         long day = 24 * hour;
         long month = 30 * day;
+        long year = 12 * month;
 
-        if (delta >= month) {
-            int m = (int) (delta / month);
-            time.appendTranslate(pluralify(m,
-                "commands.generic.month.single",
-                "commands.generic.month.plural.a",
-                "commands.generic.month.plural.b"
-            ), t -> t.arg(m));
+        boolean prev = false;
+
+        if (appendTimeMeasure(delta, year, "year", time, false)) {
+            delta %= year;
+            prev = true;
+        }
+        if (prev |= appendTimeMeasure(delta, month, "month", time, prev)) {
             delta %= month;
         }
-
-        if (delta >= day) {
-            int d = (int) (delta / day);
-            time.appendText(" ");
-            time.appendTranslate(pluralify(d,
-                "commands.generic.day.single",
-                "commands.generic.day.plural.a",
-                "commands.generic.day.plural.b"
-            ), t -> t.arg(d));
+        if (prev |= appendTimeMeasure(delta, day, "day", time, prev)) {
             delta %= day;
         }
-
-        if (delta >= hour) {
-            int h = (int) (delta / hour);
-            time.appendText(" ");
-            time.appendTranslate(pluralify(h,
-                "commands.generic.hour.single",
-                "commands.generic.hour.plural.a",
-                "commands.generic.hour.plural.b"
-            ), t -> t.arg(h));
+        if (prev |= appendTimeMeasure(delta, hour, "hour", time, prev)) {
             delta %= hour;
         }
-
-        if (delta >= minute) {
-            int m = (int) (delta / minute);
-            time.appendText(" ");
-            time.appendTranslate(pluralify(m,
-                "commands.generic.minute.single",
-                "commands.generic.minute.plural.a",
-                "commands.generic.minute.plural.b"
-            ), t -> t.arg(m));
+        if (prev |= appendTimeMeasure(delta, minute, "minute", time, prev)) {
             delta %= minute;
         }
-
-        if (delta >= second) {
-            int s = (int) (delta / second);
-            time.appendText(" ");
-            time.appendTranslate(pluralify(s,
-                "commands.generic.second.single",
-                "commands.generic.second.plural.a",
-                "commands.generic.second.plural.b"
-            ), t -> t.arg(s));
-        }
+        appendTimeMeasure(delta, second, "second", time, prev);
 
         return time;
+    }
+
+    private static boolean appendTimeMeasure(long delta, long measure, String name, TextString target, boolean prev) {
+        if (delta >= measure) {
+            int m = (int) (delta / measure);
+            if (prev) {
+                target.appendText(" ");
+            }
+            target.appendTranslate(pluralify(m,
+                "commands.generic." + name + ".single",
+                "commands.generic." + name + ".plural.a",
+                "commands.generic." + name + ".plural.b"
+            ), t -> t.arg(m));
+            return true;
+        }
+        return false;
     }
 
     public static Text<?, ?> format(String format, Map<String, String> args) {

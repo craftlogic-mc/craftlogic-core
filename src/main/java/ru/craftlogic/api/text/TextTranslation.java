@@ -22,6 +22,17 @@ public final class TextTranslation extends Text<TextComponentTranslation, TextTr
         return this;
     }
 
+    public TextTranslation arg(Number arg, Consumer<TextString> decorator) {
+        if (decorator != null) {
+            TextString text = Text.string(String.valueOf(arg));
+            decorator.accept(text);
+            this.args.add(text.build());
+        } else {
+            this.args.add(arg);
+        }
+        return this;
+    }
+
     public TextTranslation arg(ITextComponent arg) {
         return this.arg(arg, null);
     }

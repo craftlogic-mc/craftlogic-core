@@ -3,8 +3,8 @@ package ru.craftlogic.common.block;
 import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.statemap.DefaultStateMapper;
 import net.minecraft.creativetab.CreativeTabs;
@@ -40,15 +40,13 @@ public class BlockBarrelWood extends BlockBarrel {
     @Override
     public int getMetaFromState(IBlockState state) {
         int meta = state.getValue(VARIANT).getMetadata();
-        if (state.getValue(CLOSED)) {
-            meta |= 8;
-        }
+        if (state.getValue(CLOSED)) meta |= 8;
         return meta;
     }
 
     @Override
-    protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, VARIANT, CLOSED);
+    protected IProperty[] getProperties() {
+        return new IProperty[] {VARIANT, CLOSED};
     }
 
     @Override

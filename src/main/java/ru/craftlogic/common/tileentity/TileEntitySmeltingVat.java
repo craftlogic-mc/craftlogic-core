@@ -13,7 +13,8 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.CraftLogic;
+import ru.craftlogic.api.CraftAPI;
+import ru.craftlogic.api.CraftRecipes;
 import ru.craftlogic.api.block.HeatAcceptor;
 import ru.craftlogic.api.block.Updatable;
 import ru.craftlogic.api.block.holders.ScreenHolder;
@@ -22,7 +23,6 @@ import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.api.inventory.manager.InventoryManager;
 import ru.craftlogic.api.inventory.manager.ListInventoryManager;
 import ru.craftlogic.api.recipe.ProcessingRecipe;
-import ru.craftlogic.api.CraftRecipes;
 import ru.craftlogic.api.tile.TileEntityBase;
 import ru.craftlogic.api.util.ExperienceBuffer;
 import ru.craftlogic.api.util.TemperatureBuffer;
@@ -49,7 +49,7 @@ public class TileEntitySmeltingVat extends TileEntityBase implements HeatAccepto
     @Override
     public boolean onActivated(EntityPlayer player, EnumHand hand, RayTraceResult target) {
         if (!this.world.isRemote) {
-            CraftLogic.showScreen(this, player);
+            CraftAPI.showScreen(this, player);
         }
         return true;
     }

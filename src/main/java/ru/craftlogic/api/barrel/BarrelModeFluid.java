@@ -129,7 +129,7 @@ public class BarrelModeFluid extends BarrelMode {
         if (lastFluid != null && lastFluid.getFluid() == FluidRegistry.WATER && fluid.getName().equals("acid_water")) {
             this.tank.setFluid(new FluidStack(fluid, this.tank.getFluidAmount()));
         } else {
-            this.tank.fill(new FluidStack(fluid, thundering ? 100 : 50), true);
+            this.tank.fill(new FluidStack(fluid, thundering ? 250 : 100), true);
             barrel.markForUpdate();
         }
     }
