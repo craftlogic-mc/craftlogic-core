@@ -24,18 +24,20 @@ public interface Recipe<G extends RecipeGrid> extends Comparable<Recipe> {
 
     static Object parseItem(JsonElement json) {
         if (json.isJsonPrimitive()) {
-            ResourceLocation id = new ResourceLocation(json.getAsString());
-            if (id.getResourceDomain().equals("dictionary")) {
-                return new DictStack(id.getResourcePath());
+            String name = json.getAsString();
+            if (name.startsWith("dictionary:")) {
+                return new DictStack(name.substring(11));
             } else {
+                ResourceLocation id = new ResourceLocation(name);
                 return new ItemStack(MoreObjects.firstNonNull(Item.REGISTRY.getObject(id), Items.AIR));
             }
         } else {
-            ResourceLocation id = new ResourceLocation(JsonUtils.getString(json.getAsJsonObject(), "name"));
+            String name = JsonUtils.getString(json.getAsJsonObject(), "name");
             int amount = JsonUtils.getInt(json.getAsJsonObject(), "amount", 1);
-            if (id.getResourceDomain().equals("dictionary")) {
-                return new DictStack(id.getResourcePath(), amount);
+            if (name.startsWith("dictionary:")) {
+                return new DictStack(name.substring(11), amount);
             } else {
+                ResourceLocation id = new ResourceLocation(name);
                 int meta = JsonUtils.getInt(json.getAsJsonObject(), "meta", 0);
                 Item item = MoreObjects.firstNonNull(Item.REGISTRY.getObject(id), Items.AIR);
                 if (item == Items.AIR) {

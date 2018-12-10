@@ -35,10 +35,12 @@ public class DictStack implements Predicate<ItemStack> {
 
     @Override
     public boolean test(ItemStack stack) {
-        int id = OreDictionary.getOreID(this.material);
-        for (int oreID : OreDictionary.getOreIDs(stack)) {
-            if (oreID == id) {
-                return true;
+        if (!stack.isEmpty()) {
+            int id = OreDictionary.getOreID(this.material);
+            for (int oreID : OreDictionary.getOreIDs(stack)) {
+                if (oreID == id) {
+                    return true;
+                }
             }
         }
         return false;
