@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "closed=false,covered=false,facing=north": {"model": "craftlogic:bee_house/spruce_uncovered_opened"},
+    "closed=true,covered=false,facing=north": {"model": "craftlogic:bee_house/spruce_uncovered_closed"},
+    "closed=false,covered=true,facing=north": {"model": "craftlogic:bee_house/spruce_covered_opened"},
+    "closed=true,covered=true,facing=north": {"model": "craftlogic:bee_house/spruce_covered_closed"},
+    "closed=false,covered=false,facing=south": {"model": "craftlogic:bee_house/spruce_uncovered_opened", "y": 180},
+    "closed=true,covered=false,facing=south": {"model": "craftlogic:bee_house/spruce_uncovered_closed", "y": 180},
+    "closed=false,covered=true,facing=south": {"model": "craftlogic:bee_house/spruce_covered_opened", "y": 180},
+    "closed=true,covered=true,facing=south": {"model": "craftlogic:bee_house/spruce_covered_closed", "y": 180},
+    "closed=false,covered=false,facing=west": {"model": "craftlogic:bee_house/spruce_uncovered_opened", "y": 270},
+    "closed=true,covered=false,facing=west": {"model": "craftlogic:bee_house/spruce_uncovered_closed", "y": 270},
+    "closed=false,covered=true,facing=west": {"model": "craftlogic:bee_house/spruce_covered_opened", "y": 270},
+    "closed=true,covered=true,facing=west": {"model": "craftlogic:bee_house/spruce_covered_closed", "y": 270},
+    "closed=false,covered=false,facing=east": {"model": "craftlogic:bee_house/spruce_uncovered_opened", "y": 90},
+    "closed=true,covered=false,facing=east": {"model": "craftlogic:bee_house/spruce_uncovered_closed", "y": 90},
+    "closed=false,covered=true,facing=east": {"model": "craftlogic:bee_house/spruce_covered_opened", "y": 90},
+    "closed=true,covered=true,facing=east": {"model": "craftlogic:bee_house/spruce_covered_closed", "y": 90}
+  }
+}

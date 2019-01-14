@@ -31,15 +31,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import ru.craftlogic.api.entity.AdvancedPlayer;
 import ru.craftlogic.api.event.player.PlayerLeftMessageEvent;
-import ru.craftlogic.api.server.AdvancedPlayerList;
 import ru.craftlogic.api.server.AdvancedPlayerFileData;
-import ru.craftlogic.api.server.Server;
+import ru.craftlogic.api.server.AdvancedPlayerList;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -114,7 +110,7 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
             player.dimension = 0;
             playerWorld = this.mcServer.getWorld(0);
             BlockPos spawnPoint = playerWorld.provider.getRandomizedSpawnPoint();
-            player.setPosition((double)spawnPoint.getX(), (double)spawnPoint.getY(), (double)spawnPoint.getZ());
+            player.setPositionAndUpdate((double)spawnPoint.getX(), (double)spawnPoint.getY(), (double)spawnPoint.getZ());
         }
 
         player.setWorld(playerWorld);
@@ -194,16 +190,6 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
 
         player.addSelfToInternalCraftingInventory();
         FMLCommonHandler.instance().firePlayerLoggedIn(player);
-    }
-
-    @Inject(method = "createPlayerForUser", at = @At("HEAD"))
-    public void onPlayerCreate(GameProfile profile, CallbackInfoReturnable<EntityPlayerMP> info) {
-        Server.from(this.mcServer).getPlayerManager().savePhantomFor(profile);
-    }
-
-    @Inject(method = "playerLoggedOut", at = @At("TAIL"))
-    public void onPlayerDestroy(EntityPlayerMP player, CallbackInfo info) {
-        Server.from(this.mcServer).getPlayerManager().loadPhantomFor(player.getGameProfile());
     }
 
     @Redirect(method = "recreatePlayerEntity", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/EntityPlayerMP;connection:Lnet/minecraft/network/NetHandlerPlayServer;", opcode = Opcodes.PUTFIELD))

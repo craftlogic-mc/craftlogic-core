@@ -4,7 +4,11 @@ tooltip.empty=Пусто
 tooltip.bird=Птица: %s
 tooltip.you=Вы
 tooltip.server_stop=Сервер выключается...
+tooltip.home_teleport=Телепортация домой...
+tooltip.home_teleport.other=Телепортация домой к %s...
 
+gui.reconnect.stop=Сервер остановился
+gui.reconnect.crash=Сервер аварийно закрылся
 gui.reconnect.in=Повтор соединения через %s...
 
 fluid.milk=Молоко
@@ -68,7 +72,7 @@ commands.generic.second.plural.a=%d секунды
 commands.generic.second.plural.b=%d секунд
 commands.generic.uuid.invalidFormat=Неправильный формат UUID: %s
 
-commands.stop.start_delayed=Выключение сервере через %s
+commands.stop.delayed=Выключение сервера через %s
 
 commands.home.teleport.you=Добро пожаловать домой!
 commands.home.teleport.other=Добро пожаловать в дом %s!

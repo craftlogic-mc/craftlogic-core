@@ -70,6 +70,7 @@
     "world.gen.structure.MixinVillageHouseButcher",
     "world.gen.structure.MixinVillageWell",
     "world.gen.structure.MixinVillageHall",
+    "world.gen.structure.MixinJungleTemple",
     "world.storage.MixinSaveHandler",
     "advancement.MixinAdvancementManager",
     "capability.MixinDoubleChestItemHandler",
@@ -93,13 +94,14 @@
     "client.renderer.entity.MixinRenderPigZombie",
     "client.renderer.model.MixinModelZombie",
     "client.gui.MixinGuiIngame",
-    "client.gui.MixinGuiLanguage$List",
     "client.gui.inventory.MixinGuiInventory",
     "client.gui.inventory.MixinGuiCrafting",
+    "client.gui.toast.MixinGuiToast",
     "client.MixinMinecraft"
   ],
   "server": [
-    "server.MixinServerEula"
+    "server.MixinServerEula",
+    "server.MixinRconSession"
   ],
   "injectors": {
     "defaultRequire": 1

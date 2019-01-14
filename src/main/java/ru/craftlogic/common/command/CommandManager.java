@@ -1,11 +1,8 @@
 package ru.craftlogic.common.command;
 
 import com.google.gson.JsonObject;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.command.*;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.CommandBlockBaseLogic;
 import net.minecraft.util.math.BlockPos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -16,6 +13,7 @@ import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.util.CheckedFunction;
 import ru.craftlogic.api.util.ConfigurableManager;
 import ru.craftlogic.api.world.CommandSender;
+import ru.craftlogic.api.world.LocatableCommandSender;
 import ru.craftlogic.api.world.Location;
 
 import javax.annotation.Nullable;
@@ -251,33 +249,32 @@ public class CommandManager extends ConfigurableManager {
         }
 
         @Override
-        public boolean checkPermission(MinecraftServer _s, ICommandSender sender) {
-            if (_s == sender || sender instanceof CommandBlockBaseLogic) {
+        public boolean checkPermission(MinecraftServer _server, ICommandSender _sender) {
+            if (!_server.isDedicatedServer() && _sender.getName().equals(_server.getServerOwner())) {
                 return true;
-            } else if (sender instanceof EntityPlayer) {
-                if (!_s.isDedicatedServer() && sender.getName().equals(_s.getServerOwner())) {
-                    return true;
-                }
-                GameProfile profile = ((EntityPlayer) sender).getGameProfile();
-                PermissionManager permissionManager = CommandManager.this.server.getPermissionManager();
-                if (permissionManager.isEnabled()) {
-                    for (String permission : this.permissions) {
-                        if (!permissionManager.hasPermission(profile, permission)) {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
             }
-            return false;
+            CommandSender from = CommandSender.from(Server.from(_server), _sender);
+            PermissionManager permissionManager = CommandManager.this.server.getPermissionManager();
+            if (permissionManager.isEnabled()) {
+                for (String permission : this.permissions) {
+                    if (!from.hasPermission(permission, this.opLevel)) {
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                return from.getOperatorLevel() >= this.opLevel;
+            }
         }
 
         @Override
-        public List<String> getTabCompletions(MinecraftServer _s, ICommandSender sender, String[] rawArgs, @Nullable BlockPos targetPos) {
+        public List<String> getTabCompletions(MinecraftServer _server, ICommandSender _sender, String[] rawArgs, @Nullable BlockPos targetPos) {
+            Server server = Server.from(_server);
+            CommandSender sender = CommandSender.from(server, _sender);
             Set<String> result = new HashSet<>();
             for (ArgumentsPattern pattern : this.patterns) {
                 if (pattern.matches(rawArgs) != MatchLevel.NONE) {
-                    result.addAll(pattern.complete(CommandManager.this.server, sender, rawArgs, targetPos));
+                    result.addAll(pattern.complete(server, sender, rawArgs, targetPos));
                 }
             }
             return new ArrayList<>(result);
@@ -332,12 +329,12 @@ public class CommandManager extends ConfigurableManager {
                         String type = t;
                         this.args.add(new Argument(name, vararg) {
                             @Override
-                            public List<String> complete(Server server, ICommandSender sender, String partialValue, @Nullable BlockPos targetBlock) {
+                            public List<String> complete(Server server, CommandSender sender, String partialValue, @Nullable BlockPos targetBlock) {
                                 TypedArgCompleter c = CommandManager.this.completers.get(type);
                                 if (c != null) {
                                     try {
-                                        Location l = targetBlock != null ? new Location(sender.getEntityWorld(), targetBlock) : null;
-                                        ArgumentCompletionContext ctx = new ArgumentCompletionContext(server, type, CommandSender.from(server, sender), partialValue, l);
+                                        Location l = targetBlock != null && sender instanceof LocatableCommandSender ? ((LocatableCommandSender) sender).getWorld().getLocation(targetBlock) : null;
+                                        ArgumentCompletionContext ctx = new ArgumentCompletionContext(server, type, sender, partialValue, l);
                                         Collection<String> variants = c.completer.apply(ctx);
                                         List<String> result = new ArrayList<>();
                                         for (String variant : variants) {
@@ -368,7 +365,7 @@ public class CommandManager extends ConfigurableManager {
                         String[] variants = m.group(1).split("\\|");
                         this.args.add(new Argument("action_" + this.actionCounter++, false) {
                             @Override
-                            public List<String> complete(Server server, ICommandSender sender, String partialValue, @Nullable BlockPos targetBlock) {
+                            public List<String> complete(Server server, CommandSender sender, String partialValue, @Nullable BlockPos targetBlock) {
                                 List<String> result = new ArrayList<>();
                                 for (String variant : variants) {
                                     if (variant.startsWith(partialValue)) {
@@ -394,7 +391,7 @@ public class CommandManager extends ConfigurableManager {
                         String s = m.group();
                         this.args.add(new Argument("const_" + this.constantCounter++, false) {
                             @Override
-                            public List<String> complete(Server server, ICommandSender sender, String partialValue, @Nullable BlockPos targetBlock) {
+                            public List<String> complete(Server server, CommandSender sender, String partialValue, @Nullable BlockPos targetBlock) {
                                 if (s.startsWith(partialValue)) {
                                     return Collections.singletonList(s);
                                 }
@@ -472,7 +469,7 @@ public class CommandManager extends ConfigurableManager {
             return new CommandContext(server, CommandSender.from(server, sender), command, args);
         }
 
-        public List<String> complete(Server server, ICommandSender sender, String[] rawArgs, @Nullable BlockPos targetPos) {
+        public List<String> complete(Server server, CommandSender sender, String[] rawArgs, @Nullable BlockPos targetPos) {
             int lastRawIndex = rawArgs.length - 1;
             int lastArgIndex = this.args.size() - 1;
             if (lastRawIndex <= lastArgIndex) {
@@ -493,7 +490,7 @@ public class CommandManager extends ConfigurableManager {
                 this.isVararg = isVararg;
             }
 
-            public abstract List<String> complete(Server server, ICommandSender sender, String partialValue, @Nullable BlockPos targetBlock);
+            public abstract List<String> complete(Server server, CommandSender sender, String partialValue, @Nullable BlockPos targetBlock);
             public abstract MatchLevel matches(String partialValue);
             public boolean isEntityName() {
                 return false;

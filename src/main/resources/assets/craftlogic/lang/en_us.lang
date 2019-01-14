@@ -4,7 +4,11 @@ tooltip.empty=Empty
 tooltip.bird=Bird: %s
 tooltip.you=You
 tooltip.server_stop=Server is stopping...
+tooltip.home_teleport=Teleporting to home...
+tooltip.home_teleport.other=Teleporting to %s's home...
 
+gui.reconnect.stop=Server is stopped
+gui.reconnect.crash=Server is crashed
 gui.reconnect.in=Reconnect in %s...
 
 fluid.milk=Milk
@@ -38,7 +42,7 @@ item.chain_links.name=Chain Links
 item.chain_mesh.name=Chain Mesh
 item.milk_bottle.name=Milk Bottle
 
-commands.stop.start_delayed=Stopping the server in %s
+commands.stop.delayed=Stopping the server in %s
 
 commands.generic.unknownFailure=Unknown failure! See console for more details.
 commands.generic.noPermission=You don't have required permission: %s

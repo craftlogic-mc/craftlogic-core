@@ -23,8 +23,6 @@ import ru.craftlogic.network.message.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static ru.craftlogic.api.CraftAPI.NETWORK;
 
@@ -44,7 +42,8 @@ public class ProxyCommon extends AdvancedMessageHandler {
     }
 
     public void init() {
-        NETWORK.registerMessage(this::handleStopServer, MessageStopServer.class, Side.CLIENT);
+        NETWORK.registerMessage(this::handleServerStop, MessageServerStop.class, Side.CLIENT);
+        NETWORK.registerMessage(this::handleServerCrash, MessageServerCrash.class, Side.CLIENT);
         NETWORK.registerMessage(this::handleShowScreen, MessageShowScreen.class, Side.CLIENT);
         NETWORK.registerMessage(this::handleToast, MessageToast.class, Side.CLIENT);
         NETWORK.registerMessage(this::handleCountdown, MessageCountdown.class, Side.CLIENT);
@@ -76,7 +75,11 @@ public class ProxyCommon extends AdvancedMessageHandler {
         CraftFluids.FLUID_NAME_TO_ID.put(event.getFluidName(), event.getFluidID());
     }
 
-    protected AdvancedMessage handleStopServer(MessageStopServer message, MessageContext context) {
+    protected AdvancedMessage handleServerStop(MessageServerStop message, MessageContext context) {
+        return null;
+    }
+
+    protected AdvancedMessage handleServerCrash(MessageServerCrash message, MessageContext context) {
         return null;
     }
 

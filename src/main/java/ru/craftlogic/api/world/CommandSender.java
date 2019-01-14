@@ -22,6 +22,10 @@ public interface CommandSender extends Permissible {
         return unwrap().getDisplayName();
     }
 
+    default int getOperatorLevel() {
+        return 0;
+    }
+
     String getName();
 
     default void sendMessage(ITextComponent message) {
@@ -48,6 +52,11 @@ public interface CommandSender extends Permissible {
                 @Override
                 public boolean hasPermission(String permission, int opLevel) {
                     return true;
+                }
+
+                @Override
+                public int getOperatorLevel() {
+                    return 4;
                 }
             };
         }

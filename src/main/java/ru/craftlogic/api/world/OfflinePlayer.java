@@ -93,7 +93,7 @@ public class OfflinePlayer implements Permissible {
     }
 
     public PhantomPlayer asPhantom(World world) {
-        return world.getServer().getPlayerManager().getPhantom(this, world);
+        return new PhantomPlayer(world, this.getProfile());
     }
 
     public Player asOnline() {

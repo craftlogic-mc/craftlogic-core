@@ -191,9 +191,6 @@ public class TileEntityBarrel extends TileEntityBase implements Barrel, Updatabl
     @Override
     protected void readFromPacket(NBTTagCompound compound) {
         this.mode = readMode(compound, this, "mode");
-        if (this.mode == null) {
-            System.out.println("Received null mode at: " + getPos());
-        }
     }
 
     public static BarrelMode readMode(NBTTagCompound compound, Barrel barrel, String key) {

@@ -19,4 +19,13 @@ public class Reflection {
             fm.setAccessible(false);
         } catch (NoSuchFieldException | IllegalAccessException | UnableToFindFieldException ignored) {}
     }
+
+    public static <T, V> V getField(Class<T> type, T instance, String... fieldNames) {
+        try {
+            Field field = ReflectionHelper.findField(type, fieldNames);
+            return (V) field.get(instance);
+        } catch (IllegalAccessException | UnableToFindFieldException ignored) {
+            return null;
+        }
+    }
 }

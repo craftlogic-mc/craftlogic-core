@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,11 +49,26 @@ public class GameplayCommands implements CommandRegistrar {
 
     private static void teleportHome(CommandContext ctx, Player sender, GameProfile target, Location bedLocation) throws CommandException {
         if (bedLocation != null) {
-            sender.teleport(bedLocation);
-            if (sender.getId().equals(target.getId())) {
-                ctx.sendMessage(Text.translation("commands.home.teleport.you").green());
+            Consumer<Server> task = server -> {
+                if (sender.isOnline()) {
+                    sender.teleport(bedLocation);
+                    if (sender.getId().equals(target.getId())) {
+                        ctx.sendMessage(Text.translation("commands.home.teleport.you").green());
+                    } else {
+                        ctx.sendMessage(Text.translation("commands.home.teleport.other").green().arg(target.getName(), Text::darkGreen));
+                    }
+                }
+            };
+            double distance = bedLocation.distance(sender.getLocation());
+            if (distance <= 200 || sender.hasPermission("commands.home.instant")) {
+                task.accept(ctx.server());
             } else {
-                ctx.sendMessage(Text.translation("commands.home.teleport.other").green().arg(target.getName(), Text::darkGreen));
+                int timeout = Math.min(30, (int) (distance / 50));
+                Text<?, ?> message = sender.getId().equals(target.getId()) ?
+                        Text.translation("tooltip.home_teleport") :
+                        Text.translation("tooltip.home_teleport.other");
+                sender.sendCountdown("home", message, timeout);
+                ctx.server().addDelayedTask(task, timeout * 1000 + 250);
             }
         } else {
             if (sender.getId().equals(target.getId())) {

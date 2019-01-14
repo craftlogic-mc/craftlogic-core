@@ -1,0 +1,8 @@
+{
+    "parent": "craftlogic:block/bee_house/_covered_opened",
+    "textures": {
+        "planks": "blocks/planks_acacia",
+        "log": "blocks/log_acacia",
+        "log_top": "blocks/log_acacia_top"
+    }
+}

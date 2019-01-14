@@ -31,6 +31,7 @@ import ru.craftlogic.api.item.ItemBlockBase;
 import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.network.AdvancedMessage;
 import ru.craftlogic.api.screen.Elements;
+import ru.craftlogic.api.screen.toast.AdvancedToast;
 import ru.craftlogic.client.screen.ScreenQuestion;
 import ru.craftlogic.client.screen.ScreenReconnect;
 import ru.craftlogic.client.screen.toast.ToastCountdown;
@@ -148,7 +149,7 @@ public class ProxyClient extends ProxyCommon {
     }
 
     @Override
-    protected AdvancedMessage handleStopServer(MessageStopServer message, MessageContext context) {
+    protected AdvancedMessage handleServerStop(MessageServerStop message, MessageContext context) {
         syncTask(context, () -> {
             GuiToast toasts = this.client.getToastGui();
             String address = null;
@@ -166,20 +167,41 @@ public class ProxyClient extends ProxyCommon {
             addDelayedTask(client -> {
                 WorldClient world = client.world;
                 if (world != null) {
-                    System.out.println("Has world");
                     world.sendQuittingDisconnectingPacket();
-                    System.out.println("Disconnect packet sent");
                     client.loadWorld(null);
-                    System.out.println("Unloaded world");
                 }
                 if (reconnect > 0 && a != null) {
-                    System.out.println("Reconnecting menu");
-                    client.displayGuiScreen(new ScreenReconnect(a, reconnect));
+                    client.displayGuiScreen(new ScreenReconnect(a, reconnect, new TextComponentTranslation("gui.reconnect.stop")));
                 } else if (world != null) {
-                    System.out.println("Disconnected menu");
                     client.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.lost", new TextComponentTranslation("multiplayer.disconnect.server_shutdown")));
                 }
             }, delay * 1000L);
+        });
+        return null;
+    }
+
+    @Override
+    protected AdvancedMessage handleServerCrash(MessageServerCrash message, MessageContext context) {
+        syncTask(context, () -> {
+            String address = null;
+            if (this.client.getConnection() != null) {
+                NetworkManager networkManager = this.client.getConnection().getNetworkManager();
+                InetSocketAddress remoteAddress = (InetSocketAddress) networkManager.getRemoteAddress();
+                address = remoteAddress.getHostString() + ":" + remoteAddress.getPort();
+            }
+            int reconnect = message.getReconnect();
+            String a = address;
+
+            WorldClient world = client.world;
+            if (world != null) {
+                world.sendQuittingDisconnectingPacket();
+                client.loadWorld(null);
+            }
+            if (reconnect > 0 && a != null) {
+                client.displayGuiScreen(new ScreenReconnect(a, reconnect, new TextComponentTranslation("gui.reconnect.crash")));
+            } else if (world != null) {
+                client.displayGuiScreen(new GuiDisconnected(new GuiMultiplayer(new GuiMainMenu()), "disconnect.lost", new TextComponentTranslation("multiplayer.disconnect.server_shutdown")));
+            }
         });
         return null;
     }
@@ -225,14 +247,10 @@ public class ProxyClient extends ProxyCommon {
     protected AdvancedMessage handleCountdown(MessageCountdown message, MessageContext context) {
         syncTask(context, () -> {
             GuiToast toasts = this.client.getToastGui();
-            ToastCountdown toast = toasts.getToast(ToastCountdown.class, message.getId());
-            if (toast != null) {
-                toast.setCountdown(message.getTimeout());
-            } else {
-                toasts.add(
-                    new ToastCountdown(message.getId(), message.getTitle(), message.getTimeout(), message.getColor(), message.getTickSound())
-                );
-            }
+            ((AdvancedToast)toasts).remove(t -> t instanceof ToastCountdown && t.getType().equals(message.getId()));
+            toasts.add(
+                new ToastCountdown(message.getId(), message.getTitle(), message.getTimeout(), message.getColor(), message.getTickSound())
+            );
         });
         return null;
     }

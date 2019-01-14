@@ -53,6 +53,8 @@ public class CraftConfig {
         @Config.RangeInt(min = 32, max = 128)
         @Config.Comment("Maximum size of a structure that a structure block can handle")
         public int maxStructureSize = 64;
+        @Config.Comment("Reconnect delay on server crash")
+        public int crashReconnectDelay = 60;
 
         @Config.Comment("Enable hiding full HUD bars")
         public boolean enableHidingFullHUDBars = false;

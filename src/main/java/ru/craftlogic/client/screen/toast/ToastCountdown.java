@@ -19,7 +19,7 @@ public class ToastCountdown extends AdvancedToast {
     private final ITextComponent title;
     private final int color;
     private final SoundEvent tickSound;
-    private int timeout;
+    private final int timeout;
     private int counter;
 
     public ToastCountdown(JsonObject data) {
@@ -70,12 +70,5 @@ public class ToastCountdown extends AdvancedToast {
         }
 
         return this.counter > 0 ? Visibility.SHOW : Visibility.HIDE;
-    }
-
-    public void setCountdown(int countdown) {
-        if (countdown > this.timeout) {
-            this.timeout = countdown;
-        }
-        this.counter = countdown;
     }
 }

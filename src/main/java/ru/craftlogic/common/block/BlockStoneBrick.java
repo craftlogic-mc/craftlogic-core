@@ -12,7 +12,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
@@ -21,6 +24,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.CraftItems;
+import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.api.block.Mossable;
 import ru.craftlogic.api.world.Location;
 
@@ -75,6 +79,21 @@ public class BlockStoneBrick extends BlockFalling implements Mossable {
         if (state.getValue(VARIANT) == EnumType.CRACKED && CraftConfig.tweaks.enableCrackedStoneBrickGravity) {
             super.updateTick(world, pos, state, rand);
         }
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (state.getValue(VARIANT) == EnumType.MOSSY && CraftConfig.items.enableMoss) {
+            if (!world.isRemote) {
+                if (world.rand.nextInt(4) == 0) {
+                    player.addItemStackToInventory(new ItemStack(CraftItems.MOSS));
+                }
+                world.playSound(null, pos, CraftSounds.SQUASH, SoundCategory.PLAYERS, 1F, 0.8F + 0.2F * world.rand.nextFloat());
+                world.setBlockState(pos, state.withProperty(VARIANT, EnumType.DEFAULT));
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override

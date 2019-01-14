@@ -12,17 +12,16 @@ import ru.craftlogic.api.event.player.PlayerJoinedMessageEvent;
 import ru.craftlogic.api.event.player.PlayerLeftMessageEvent;
 import ru.craftlogic.api.util.ServerManager;
 import ru.craftlogic.api.world.OfflinePlayer;
-import ru.craftlogic.api.world.PhantomPlayer;
 import ru.craftlogic.api.world.Player;
-import ru.craftlogic.api.world.World;
 
 import javax.annotation.Nonnull;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class PlayerManager extends ServerManager {
     private final Set<Player> onlinePlayers = new HashSet<>();
-    private final Map<UUID, PhantomPlayer> phantoms = new HashMap<>();
 
     public PlayerManager(Server server, Path settingsDirectory) {
         super(server, LogManager.getLogger("PlayerManager"));
@@ -90,17 +89,6 @@ public class PlayerManager extends ServerManager {
                 return true;
         }
         return false;
-    }
-
-    public PhantomPlayer getPhantom(OfflinePlayer player, World world) {
-        UUID id = player.getId();
-        if (this.phantoms.containsKey(id)) {
-            return this.phantoms.get(id);
-        } else {
-            PhantomPlayer phantom = new PhantomPlayer(world, player.getProfile());
-            this.phantoms.put(id, phantom);
-            return phantom;
-        }
     }
 
     public Player getOnline(GameProfile profile) {
@@ -202,20 +190,6 @@ public class PlayerManager extends ServerManager {
             return true;
         }
         return false;
-    }
-
-    public void loadPhantomFor(GameProfile profile) {
-        PhantomPlayer phantomPlayer = this.phantoms.get(profile.getId());
-        if (phantomPlayer != null) {
-            phantomPlayer.loadData();
-        }
-    }
-
-    public void savePhantomFor(GameProfile profile) {
-        PhantomPlayer phantomPlayer = this.phantoms.remove(profile.getId());
-        if (phantomPlayer != null) {
-            phantomPlayer.saveData();
-        }
     }
 
     public Set<GameProfile> getOperatorProfiles() {

@@ -12,7 +12,7 @@ import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.server.WorldManager;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.world.*;
-import ru.craftlogic.network.message.MessageStopServer;
+import ru.craftlogic.network.message.MessageServerStop;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,8 +30,8 @@ public class ManagementCommands implements CommandRegistrar {
         Server server = ctx.server();
         if (delay > 0) {
             int reconnect = ctx.has("reconnect") ? ctx.get("reconnect").asInt(0, 15 * 60) : 60;
-            ctx.sendNotification("commands.stop.start_delayed", CraftMessages.parseDuration(delay * 1000L).build());
-            server.broadcastPacket(new MessageStopServer(delay, reconnect));
+            ctx.sendNotification("commands.stop.delayed", CraftMessages.parseDuration(delay * 1000L).build());
+            server.broadcastPacket(new MessageServerStop(delay, reconnect));
             server.addDelayedTask(ManagementCommands::stopServer, delay * 1000L);
         } else {
             ctx.sendNotification("commands.stop.start");

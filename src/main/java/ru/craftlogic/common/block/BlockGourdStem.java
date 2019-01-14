@@ -119,7 +119,7 @@ public class BlockGourdStem extends BlockBush implements Growable {
                         pos = pos.offset(s);
                         soil = world.getBlockState(pos.down());
                         Block block = soil.getBlock();
-                        if (world.isAirBlock(pos) && (block.canSustainPlant(soil, world, pos.down(), EnumFacing.UP, this) || block == Blocks.DIRT || block == Blocks.GRASS)) {
+                        if (world.isAirBlock(pos) && block.isSideSolid(soil, world, pos.down(), EnumFacing.UP)) {
                             world.setBlockState(pos, this.getCrop().getDefaultState().withProperty(BlockHorizontal.FACING, s.getOpposite()));
                         }
                     }

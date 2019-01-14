@@ -21,6 +21,7 @@ import ru.craftlogic.api.world.CommandSender;
 import ru.craftlogic.api.world.Player;
 import ru.craftlogic.common.command.CommandManager;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -332,6 +333,18 @@ public class Server implements CommandSender {
     public void broadcastCountdown(String id, ITextComponent title, int timeout, int color, SoundEvent tickSound) {
         for (Player player : getPlayerManager().getAllOnline()) {
             player.sendCountdown(id, title, timeout, color, tickSound);
+        }
+    }
+
+    public void broadcastTitle(ITextComponent title, @Nullable ITextComponent subtitle, int fadeIn, int timeout, int fadeOut) {
+        for (Player player : getPlayerManager().getAllOnline()) {
+            player.sendTitle(title, subtitle, fadeIn, timeout, fadeOut);
+        }
+    }
+
+    public void broadcastTitle(Text<?, ?> title, @Nullable Text<?, ?> subtitle, int fadeIn, int timeout, int fadeOut) {
+        for (Player player : getPlayerManager().getAllOnline()) {
+            player.sendTitle(title, subtitle, fadeIn, timeout, fadeOut);
         }
     }
 

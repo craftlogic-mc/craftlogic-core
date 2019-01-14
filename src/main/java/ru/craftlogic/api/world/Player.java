@@ -9,8 +9,10 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryEnderChest;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.play.server.SPacketPlayerPosLook;
 import net.minecraft.network.play.server.SPacketSoundEffect;
+import net.minecraft.network.play.server.SPacketTitle;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.FoodStats;
 import net.minecraft.util.SoundEvent;
@@ -27,6 +29,7 @@ import ru.craftlogic.api.block.holders.ScreenHolder;
 import ru.craftlogic.api.entity.AdvancedPlayer;
 import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.api.network.AdvancedMessage;
+import ru.craftlogic.api.network.AdvancedNetHandlerPlayServer;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.util.BooleanConsumer;
@@ -34,6 +37,7 @@ import ru.craftlogic.network.message.MessageCountdown;
 import ru.craftlogic.network.message.MessageQuestion;
 import ru.craftlogic.network.message.MessageToast;
 
+import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -117,6 +121,7 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
 
         entity.dismountRidingEntity();
         entity.connection.setPlayerLocation(x, y, z, yaw, pitch, lookFlags);
+        ((AdvancedNetHandlerPlayServer)entity.connection).resetPosition();
         entity.setRotationYawHead(yaw);
 
         if (!entity.isElytraFlying()) {
@@ -297,6 +302,23 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
 
     public void sendCountdown(String id, ITextComponent title, int timeout, int color, SoundEvent tickSound) {
         this.sendPacket(new MessageCountdown(id, title, timeout, color, tickSound));
+    }
+
+    public void sendTitle(Text<?, ?> title, @Nullable Text<?, ?> subtitle, int fadeIn, int timeout, int fadeOut) {
+        this.sendTitle(title.build(), subtitle == null ? null : subtitle.build(), fadeIn, timeout, fadeOut);
+    }
+
+    public void sendTitle(ITextComponent title, @Nullable ITextComponent subtitle, int fadeIn, int timeout, int fadeOut) {
+        EntityPlayerMP entity = this.getEntity();
+        if (entity != null) {
+            NetHandlerPlayServer connection = entity.connection;
+            connection.sendPacket(new SPacketTitle(SPacketTitle.Type.RESET, null, 0, 0, 0));
+            if (subtitle != null) {
+                connection.sendPacket(new SPacketTitle(SPacketTitle.Type.SUBTITLE, subtitle));
+            }
+            connection.sendPacket(new SPacketTitle(SPacketTitle.Type.TIMES, null, fadeIn, timeout, fadeOut));
+            connection.sendPacket(new SPacketTitle(SPacketTitle.Type.TITLE, title));
+        }
     }
 
     public void sendQuestion(String id, Text<?, ?> question, int timeout, BooleanConsumer callback) {

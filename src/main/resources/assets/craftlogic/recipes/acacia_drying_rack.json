@@ -1,0 +1,32 @@
+{
+  "conditions": [
+    {
+      "type": "minecraft:item_exists",
+      "item": "craftlogic:drying_rack"
+    }
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:planks",
+      "data": 4
+    },
+    "T": {
+      "item": "minecraft:stick"
+    },
+    "S": {
+      "item": "minecraft:wooden_slab",
+      "data": 4
+    }
+  },
+  "pattern": [
+    "PSP",
+    "TPT",
+    "T T"
+  ],
+  "result": {
+    "count": 1,
+    "item": "craftlogic:drying_rack",
+    "data": 4
+  },
+  "type": "minecraft:crafting_shaped"
+}

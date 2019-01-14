@@ -61,4 +61,12 @@ public class MixinNetHandlerPlayServer implements AdvancedNetHandlerPlayServer {
     public MinecraftServer getServer() {
         return server;
     }
+
+    @Override
+    public void resetPosition() {
+        this.captureCurrentPosition();
+    }
+
+    @Shadow
+    private void captureCurrentPosition() {}
 }

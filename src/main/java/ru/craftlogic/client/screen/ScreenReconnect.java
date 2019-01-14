@@ -15,10 +15,12 @@ import ru.craftlogic.api.text.Text;
 public class ScreenReconnect extends Screen implements Updatable {
     private final String address;
     private final long endTime;
+    private final ITextComponent reason;
 
-    public ScreenReconnect(String address, int reconnect) {
+    public ScreenReconnect(String address, int reconnect, ITextComponent reason) {
         this.address = address;
         this.endTime = System.currentTimeMillis() + reconnect * 1000L;
+        this.reason = reason;
     }
 
     @Override
@@ -41,6 +43,7 @@ public class ScreenReconnect extends Screen implements Updatable {
         int y = this.height / 2;
         long currentTime = System.currentTimeMillis();
         if (currentTime < this.endTime) {
+            drawCenteredText(this.reason, x, y - 25, 0xFFFFFFFF);
             Text<?, ?> timeout = CraftMessages.parseDuration(this.endTime - currentTime);
             ITextComponent text = new TextComponentTranslation("gui.reconnect.in", timeout.build());
             drawCenteredText(text, x, y - 10, 0xFFFFFFFF);

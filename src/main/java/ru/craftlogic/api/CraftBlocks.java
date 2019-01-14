@@ -1,7 +1,10 @@
 package ru.craftlogic.api;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
@@ -30,6 +33,8 @@ public class CraftBlocks {
     public static Block BARREL_WOOD, BARREL_STONE;
     public static Block DRYING_RACK;
     public static BlockGourd MELON, PUMPKIN;
+    public static Block BEE_HIVE;
+    public static BiMap<BlockPlanks.EnumType, Block> BEE_HOUSE = HashBiMap.create(BlockPlanks.EnumType.values().length);
 
     static void init(Side side) {
         FURNACE = registerBlockWithItem(new BlockFurnace());
@@ -48,6 +53,12 @@ public class CraftBlocks {
         if (CraftConfig.tweaks.enableFancyGourd) {
             PUMPKIN = registerBlock(new BlockGourd(BlockGourd.GourdVariant.PUMPKIN));
             MELON = registerBlock(new BlockGourd(BlockGourd.GourdVariant.MELON));
+        }
+
+        BEE_HIVE = registerBlockWithItem(new BlockBeeHive());
+
+        for (BlockPlanks.EnumType plankType : BlockPlanks.EnumType.values()) {
+            BEE_HOUSE.put(plankType, registerBlockWithItem(new BlockBeeHouse(plankType)));
         }
     }
 
