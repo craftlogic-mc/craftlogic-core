@@ -8,9 +8,12 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.statemap.DefaultStateMapper;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -52,6 +55,11 @@ public class BlockChimney extends BlockBase implements TileEntityHolder<TileEnti
     }
 
     @Override
+    public int damageDropped(IBlockState state) {
+        return 0;
+    }
+
+    @Override
     public IBlockState getStateFromMeta(int meta) {
         ChimneyType type = ChimneyType.values()[meta / 5];
         int f = meta % 5;
@@ -83,6 +91,14 @@ public class BlockChimney extends BlockBase implements TileEntityHolder<TileEnti
         Item item = this.asItem();
         modelManager.registerItemModel(item, 0, CraftAPI.MOD_ID + ":chimney/stone");
         modelManager.registerItemModel(item, 5, CraftAPI.MOD_ID + ":chimney/brick");
+    }
+
+    @Override
+    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> items) {
+        if (this.getCreativeTabToDisplayOn() == tab || tab == CreativeTabs.SEARCH) {
+            items.add(new ItemStack(this, 1, 0));
+            items.add(new ItemStack(this, 1, 5));
+        }
     }
 
     public enum ChimneyType implements Nameable {
