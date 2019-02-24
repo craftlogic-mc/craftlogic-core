@@ -1,5 +1,6 @@
 package ru.craftlogic.api.world;
 
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.IBlockAccess;
@@ -13,6 +14,10 @@ import java.util.Objects;
 public class ChunkLocation {
     private final int x, z;
     private int dimension;
+
+    public ChunkLocation(ChunkLocation location) {
+        this(location.getDimensionId(), location.getChunkX(), location.getChunkZ());
+    }
 
     public ChunkLocation(World world, int x, int z) {
         this(world.provider.getDimension(), x, z);
@@ -37,14 +42,14 @@ public class ChunkLocation {
     }
 
     public World getWorld() {
-        return CraftWorlds.getOrLoadWorld(this.getDimension());
+        return CraftWorlds.getOrLoadWorld(this.getDimensionId());
     }
 
     public String getWorldName() {
         try {
-            return DimensionType.getById(this.getDimension()).getName();
+            return DimensionType.getById(this.getDimensionId()).getName();
         } catch (IllegalArgumentException e) {
-            return "DIM" + this.getDimension();
+            return "DIM" + this.getDimensionId();
         }
     }
 
@@ -60,16 +65,31 @@ public class ChunkLocation {
         return this.z;
     }
 
-    public int getDimension() {
+    public Dimension getDimension() {
+        return Dimension.fromVanilla(DimensionType.getById(this.dimension));
+    }
+
+    public int getDimensionId() {
         return this.dimension;
     }
 
     public boolean isDimensionLoaded() {
-        return DimensionManager.getWorld(this.getDimension()) != null;
+        return DimensionManager.getWorld(this.getDimensionId()) != null;
     }
 
     public boolean isWithinWorldBorder() {
         return getWorld().getWorldBorder().contains(new ChunkPos(this.x, this.z));
+    }
+
+    public ChunkLocation offset(EnumFacing side) {
+        return this.offset(side, 1);
+    }
+
+    public ChunkLocation offset(EnumFacing side, int amount) {
+        return new ChunkLocation(this.dimension,
+            this.x + side.getFrontOffsetX() * amount,
+            this.z + side.getFrontOffsetZ() * amount
+        );
     }
 
     @Override
@@ -79,7 +99,7 @@ public class ChunkLocation {
         ChunkLocation loc = (ChunkLocation) o;
         return getChunkX() == loc.getChunkX() &&
                 getChunkZ() == loc.getChunkZ() &&
-                getDimension() == loc.getDimension();
+                getDimensionId() == loc.getDimensionId();
     }
 
     @Override

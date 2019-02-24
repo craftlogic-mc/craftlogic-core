@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
+import ru.craftlogic.api.world.ChunkLocation;
 import ru.craftlogic.api.world.Location;
 
 public class AdvancedBuffer extends PacketBuffer {
@@ -12,18 +13,18 @@ public class AdvancedBuffer extends PacketBuffer {
     }
 
     public AdvancedBuffer writeBlockLocation(Location location) {
-        this.writeInt(location.getDimension());
-        this.writeLong(location.getPos().toLong());
+        writeInt(location.getDimensionId());
+        writeLong(location.getPos().toLong());
         return this;
     }
 
     public AdvancedBuffer writeEntityLocation(Location location) {
-        this.writeInt(location.getDimension());
-        this.writeDouble(location.getX());
-        this.writeDouble(location.getY());
-        this.writeDouble(location.getZ());
-        this.writeFloat(location.getYaw());
-        this.writeFloat(location.getPitch());
+        writeInt(location.getDimensionId());
+        writeDouble(location.getX());
+        writeDouble(location.getY());
+        writeDouble(location.getZ());
+        writeFloat(location.getYaw());
+        writeFloat(location.getPitch());
         return this;
     }
 
@@ -35,17 +36,29 @@ public class AdvancedBuffer extends PacketBuffer {
         return new Location(readInt(), readDouble(), readDouble(), readDouble(), readFloat(), readFloat());
     }
 
+    public AdvancedBuffer writeChunkLocation(ChunkLocation location) {
+        writeInt(location.getDimensionId());
+        writeInt(location.getChunkX());
+        writeInt(location.getChunkZ());
+        return this;
+    }
+
+    public ChunkLocation readChunkLocation() {
+        return new ChunkLocation(readInt(), readInt(), readInt());
+    }
+
     public GameProfile readProfile() {
-        return readBoolean() ? new GameProfile(readUniqueId(), readString(Short.MAX_VALUE)) : new GameProfile(readUniqueId(), null);
+        boolean hasName = readBoolean();
+        return new GameProfile(readUniqueId(), hasName ? readString(Short.MAX_VALUE) : null);
     }
 
     public void writeProfile(GameProfile profile) {
-        if (profile.getName() != null) {
-            writeBoolean(true);
+        boolean hasName = profile.getName() != null;
+        writeBoolean(hasName);
+        if (hasName) {
             writeUniqueId(profile.getId());
             writeString(profile.getName());
         } else {
-            writeBoolean(false);
             writeUniqueId(profile.getId());
         }
     }

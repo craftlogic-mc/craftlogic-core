@@ -1,15 +1,21 @@
 package ru.craftlogic.api.command;
 
+import net.minecraft.block.Block;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
+import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
+import ru.craftlogic.api.CraftMessages;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.util.CheckedFunction;
 import ru.craftlogic.api.world.*;
-import ru.craftlogic.api.CraftMessages;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -73,40 +79,16 @@ public class CommandContext {
         }
     }
 
-    public String action() {
-        return this.action(0);
-    }
-
     public String action(int index) {
-        return this.get("action_" + index).asString();
-    }
-
-    public String constant() {
-        return this.constant(0);
-    }
-
-    public String constant(int index) {
-        return this.get("const_" + index).asString();
+        return this.get("action:" + index).asString();
     }
 
     public boolean has(String name) {
         return this.nameToArg.containsKey(name);
     }
 
-    public boolean hasAction() {
-        return this.hasAction(0);
-    }
-
     public boolean hasAction(int index) {
-        return this.has("action_" + index);
-    }
-
-    public boolean hasConstant() {
-        return this.hasConstant(0);
-    }
-
-    public boolean hasConstant(int index) {
-        return this.has("const_" + index);
+        return this.has("action:" + index);
     }
 
     public Optional<Argument> getIfPresent(String name) {
@@ -213,6 +195,7 @@ public class CommandContext {
             return this.value;
         }
 
+        @Nonnull
         public UUID asUUID() throws CommandException {
             try {
                 return UUID.fromString(this.value);
@@ -221,6 +204,7 @@ public class CommandContext {
             }
         }
 
+        @Nonnull
         public OfflinePlayer asOfflinePlayer() throws CommandException {
             OfflinePlayer player = this.context.server.getPlayerManager().getOffline(this.value);
             if (player == null) {
@@ -229,12 +213,17 @@ public class CommandContext {
             return player;
         }
 
+        @Nonnull
         public Player asPlayer() throws CommandException {
             Player player = this.context.server.getPlayerManager().getOnline(this.value);
             if (player == null) {
                 throw new CommandException("commands.generic.player.notFound", this.value);
             }
             return player;
+        }
+
+        public long asDuration() throws CommandException {
+            return parseDuration(this.value);
         }
 
         public String asIP() throws CommandException {
@@ -244,6 +233,7 @@ public class CommandContext {
             return this.value;
         }
 
+        @Nonnull
         public World asWorld() throws CommandException {
             World world = this.context.server.getWorldManager().get(this.value);
             if (world == null) {
@@ -314,6 +304,66 @@ public class CommandContext {
             }
         }
 
+        @Nonnull
+        public Item asItem() throws CommandException {
+            ResourceLocation id = new ResourceLocation(this.value);
+            if (!Item.REGISTRY.containsKey(id)) {
+                throw new CommandException("commands.give.item.notFound", value);
+            }
+            return Item.REGISTRY.getObject(id);
+        }
+
+        @Nonnull
+        public Block asBlock() throws CommandException {
+            ResourceLocation id = new ResourceLocation(this.value);
+            if (!Block.REGISTRY.containsKey(id)) {
+                throw new CommandException("commands.give.block.notFound", this.value);
+            }
+            return Block.REGISTRY.getObject(id);
+        }
+
+        @Nonnull
+        public IBlockState asBlockState() throws CommandException {
+            int firstBracket = this.value.indexOf('[');
+            boolean hasBracket = firstBracket >= 0;
+            ResourceLocation id = new ResourceLocation(hasBracket ? this.value.substring(0, firstBracket) : this.value);
+            if (!Block.REGISTRY.containsKey(id)) {
+                throw new CommandException("commands.give.block.notFound", this.value);
+            }
+            Block block = Block.REGISTRY.getObject(id);
+            IBlockState state = block.getDefaultState();
+            if (hasBracket) {
+                String args = this.value.substring(firstBracket + 1, this.value.length() - 1);
+                Map<String, IProperty<?>> properties = new HashMap<>();
+                for (IProperty<?> property : state.getPropertyKeys()) {
+                    properties.put(property.getName(), property);
+                }
+                if (!args.trim().isEmpty()) {
+                    for (String kv : args.split(",")) {
+                        String[] parts = kv.split("=");
+                        if (parts.length == 2) {
+                            String k = parts[0];
+                            String v = parts[1];
+                            if (properties.containsKey(k)) {
+                                IProperty property = properties.get(k);
+                                com.google.common.base.Optional<?> value = property.parseValue(v);
+                                if (value.isPresent()) {
+                                    state = state.withProperty(property, (Comparable)value.get());
+                                } else {
+                                    throw new CommandException("Invalid property value: " + k + "=" + v + " for block " + id);
+                                }
+                            } else {
+                                throw new CommandException("Invalid property " + k + " for block " + id);
+                            }
+                        } else {
+                            throw new CommandException("Invalid property=value pair: " + Arrays.toString(parts) + " for block " + id);
+                        }
+                    }
+                }
+            }
+            return state;
+        }
+
         @Override
         public String toString() {
             return "Argument{" +
@@ -322,6 +372,37 @@ public class CommandContext {
                     ", vararg=" + vararg +
                     '}';
         }
+    }
+
+    public static long parseDuration(String part) throws CommandException {
+        float time = 0;
+        String type = part.substring(part.length() - 1);
+        double t = Double.parseDouble(part.substring(0, part.length() - 1));
+        switch (type) {
+            case "s": {
+                time += t;
+                break;
+            }
+            case "m": {
+                time += 60 * t;
+                break;
+            }
+            case "h": {
+                time += 60 * 60 * t;
+                break;
+            }
+            case "d": {
+                time += 24 * 60 *60 * t;
+                break;
+            }
+            case "w": {
+                time += 7 * 24 * 60 * 60 * t;
+            }
+        }
+        if(time <= 0) {
+            throw new CommandException("commands.generic.wrongTimeFormat", part);
+        }
+        return (long)(time * 1000);
     }
 
     @Override

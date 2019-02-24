@@ -183,8 +183,7 @@ public class CommandManager extends ConfigurableManager {
 
     private static final Pattern VARARG_PATTERN = Pattern.compile("<([a-zA-Z0-9:]+)>\\.\\.\\.");
     private static final Pattern ARG_PATTERN = Pattern.compile("<([a-zA-Z0-9:]+)>");
-    private static final Pattern ACTION_PATTERN = Pattern.compile("\\[([a-zA-Z0-9|]+)\\]");
-    private static final Pattern CONSTANT_ACTION_PATTERN = Pattern.compile("[a-zA-Z0-9]+");
+    private static final Pattern ACTION_PATTERN = Pattern.compile("([a-zA-Z0-9|]+)");
 
     public final class CommandExtended implements ICommand {
         private final List<ArgumentsPattern> patterns;
@@ -299,7 +298,7 @@ public class CommandManager extends ConfigurableManager {
     public class ArgumentsPattern {
         private final String pattern;
         private List<Argument> args = new ArrayList<>();
-        private int actionCounter, constantCounter;
+        private int actionCounter;
 
         public ArgumentsPattern(String pattern) {
             this.pattern = pattern;
@@ -323,7 +322,7 @@ public class CommandManager extends ConfigurableManager {
                             name = data[0];
                             t = data[1];
                         }
-                        if (name.startsWith("action") || name.startsWith("const")) {
+                        if (name.startsWith("action")) {
                             throw new IllegalArgumentException(name + " is a reserved keyword and cannot be used as argument name!");
                         }
                         String type = t;
@@ -338,7 +337,7 @@ public class CommandManager extends ConfigurableManager {
                                         Collection<String> variants = c.completer.apply(ctx);
                                         List<String> result = new ArrayList<>();
                                         for (String variant : variants) {
-                                            if (variant.startsWith(partialValue)) {
+                                            if (variant.toLowerCase().startsWith(partialValue.toLowerCase())) {
                                                 result.add(variant);
                                             }
                                         }
@@ -363,7 +362,7 @@ public class CommandManager extends ConfigurableManager {
                         });
                     } else if ((m = ACTION_PATTERN.matcher(p)).matches()) {
                         String[] variants = m.group(1).split("\\|");
-                        this.args.add(new Argument("action_" + this.actionCounter++, false) {
+                        this.args.add(new Argument("action:" + this.actionCounter++, false) {
                             @Override
                             public List<String> complete(Server server, CommandSender sender, String partialValue, @Nullable BlockPos targetBlock) {
                                 List<String> result = new ArrayList<>();
@@ -387,30 +386,8 @@ public class CommandManager extends ConfigurableManager {
                                 return MatchLevel.NONE;
                             }
                         });
-                    } else if ((m = CONSTANT_ACTION_PATTERN.matcher(p)).matches()) {
-                        String s = m.group();
-                        this.args.add(new Argument("const_" + this.constantCounter++, false) {
-                            @Override
-                            public List<String> complete(Server server, CommandSender sender, String partialValue, @Nullable BlockPos targetBlock) {
-                                if (s.startsWith(partialValue)) {
-                                    return Collections.singletonList(s);
-                                }
-                                return Collections.emptyList();
-                            }
-
-                            @Override
-                            public MatchLevel matches(String partialValue) {
-                                if (s.equals(partialValue)) {
-                                    return MatchLevel.FULL;
-                                } else if (s.startsWith(partialValue)) {
-                                    return MatchLevel.PARTIAL;
-                                } else {
-                                    return MatchLevel.NONE;
-                                }
-                            }
-                        });
                     } else {
-                        throw new IllegalStateException("Invalid argument type at index " + i);
+                        throw new IllegalStateException("Invalid argument type at index " + i + " in pattern '" + pattern + "'");
                     }
                 }
             }

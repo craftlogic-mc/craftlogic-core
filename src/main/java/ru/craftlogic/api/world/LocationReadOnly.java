@@ -27,7 +27,7 @@ public class LocationReadOnly extends Location {
     }
 
     @Override
-    public int getDimension() {
+    public int getDimensionId() {
         if (this.blockAccessor instanceof World) {
             return ((World) this.blockAccessor).provider.getDimension();
         }

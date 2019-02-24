@@ -14,21 +14,23 @@ import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
+import ru.craftlogic.CraftConfig;
+import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.text.TextString;
 import ru.craftlogic.api.text.TextTranslation;
 import ru.craftlogic.api.world.Location;
 
 import java.net.SocketAddress;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static net.minecraft.server.management.UserListEntryBan.DATE_FORMAT;
-
 public class CraftMessages {
-    public static Text<?, ?> getDisconnectReason(MinecraftServer server, NetworkManager networkManager, GameProfile profile) {
-        PlayerList playerList = server.getPlayerList();
+    public static Text<?, ?> getDisconnectReason(MinecraftServer _server, NetworkManager networkManager, GameProfile profile) {
+        Server server = Server.from(_server);
+        PlayerList playerList = _server.getPlayerList();
         SocketAddress remoteAddress = networkManager.getRemoteAddress();
         UserListBans bannedPlayers = playerList.getBannedPlayers();
         UserListIPBans bannedIps = playerList.getBannedIPs();
@@ -54,7 +56,7 @@ public class CraftMessages {
         if (temp) {
             msg.appendText("\n")
                .appendTranslate("disconnect.banned.expiration", e ->
-                   e.arg(Text.date(entry.getBanEndDate(), DATE_FORMAT).darkRed())
+                   e.arg(Text.date(entry.getBanEndDate(), new SimpleDateFormat(CraftConfig.banDateFormat)).darkRed())
                );
         }
         return msg.red();

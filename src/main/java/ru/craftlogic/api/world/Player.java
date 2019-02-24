@@ -38,13 +38,11 @@ import ru.craftlogic.network.message.MessageQuestion;
 import ru.craftlogic.network.message.MessageToast;
 
 import javax.annotation.Nullable;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Player extends OfflinePlayer implements LocatableCommandSender {
     private final Map<String, BooleanConsumer> pendingCallbacks = new HashMap<>();
+    private final Set<UUID> pendingTeleports = new HashSet<>();
 
     public Player(Server server, GameProfile profile) {
         super(server, profile);
@@ -76,6 +74,10 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
 
     public long getLastPlayed() {
         return getEntity().getLastActiveTime();
+    }
+
+    public long getTimePlayed() {
+        return ((AdvancedPlayer)getEntity()).getTimePlayed();
     }
 
     @Override
@@ -328,5 +330,17 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
     public void sendQuestion(String id, ITextComponent question, int timeout, BooleanConsumer callback) {
         this.sendPacket(new MessageQuestion(id, question, timeout));
         this.pendingCallbacks.put(id, callback);
+    }
+
+    public boolean addPendingTeleport(UUID id) {
+        return this.pendingTeleports.add(id);
+    }
+
+    public boolean removePendingTeleport(UUID id) {
+        return this.pendingTeleports.remove(id) && this.server.cancelTask(id);
+    }
+
+    public Set<UUID> getPendingTeleports() {
+        return this.pendingTeleports;
     }
 }

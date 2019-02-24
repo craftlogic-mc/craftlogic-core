@@ -38,6 +38,7 @@ public class BlockBeeHouse extends BlockBase implements TileEntityHolder<TileEnt
         super(Material.WOOD, plankType.getName() + "_bee_house", 2F, CreativeTabs.DECORATIONS);
         this.plankType = plankType;
         this.setSoundType(SoundType.WOOD);
+        this.setUnlocalizedName("bee_house");
         this.setDefaultState(this.getBlockState().getBaseState()
             .withProperty(COVERED, true)
             .withProperty(CLOSED, true)
@@ -54,15 +55,15 @@ public class BlockBeeHouse extends BlockBase implements TileEntityHolder<TileEnt
         if (player.isSneaking()) {
             if (target.sideHit == EnumFacing.UP) {
                 if (!location.isWorldRemote()) {
-                    location.cycleBlockProperty(COVERED);
-                    SoundEvent sound = location.getBlockProperty(COVERED) ? BLOCK_WOODEN_TRAPDOOR_CLOSE : BLOCK_WOODEN_TRAPDOOR_OPEN;
+                    boolean covered = location.cycleBlockProperty(COVERED);
+                    SoundEvent sound = covered ? BLOCK_WOODEN_TRAPDOOR_CLOSE : BLOCK_WOODEN_TRAPDOOR_OPEN;
                     location.playSound(sound, SoundCategory.BLOCKS,1F, 0.9F);
                 }
                 return true;
             } else if (target.sideHit == location.getBlockProperty(FACING)) {
                 if (!location.isWorldRemote()) {
-                    location.cycleBlockProperty(CLOSED);
-                    SoundEvent sound = location.getBlockProperty(CLOSED) ? BLOCK_WOODEN_TRAPDOOR_CLOSE : BLOCK_WOODEN_TRAPDOOR_OPEN;
+                    boolean closed = location.cycleBlockProperty(CLOSED);
+                    SoundEvent sound = closed ? BLOCK_WOODEN_TRAPDOOR_CLOSE : BLOCK_WOODEN_TRAPDOOR_OPEN;
                     location.playSound(sound, SoundCategory.BLOCKS,1F, 1.5F);
                 }
                 return true;
@@ -132,9 +133,6 @@ public class BlockBeeHouse extends BlockBase implements TileEntityHolder<TileEnt
     @Override
     @SideOnly(Side.CLIENT)
     public void registerModel(ModelManager modelManager) {
-        for (BlockPlanks.EnumType planksType : BlockPlanks.EnumType.values()) {
-            String model = "bee_house/" + planksType.getName();
-            modelManager.registerItemModel(Item.getItemFromBlock(this), planksType.ordinal(), model);
-        }
+        modelManager.registerItemModel(Item.getItemFromBlock(this), "bee_house/" + getPlankType().getName());
     }
 }

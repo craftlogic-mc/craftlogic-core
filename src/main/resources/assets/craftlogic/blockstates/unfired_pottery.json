@@ -1,7 +1,0 @@
-{
-  "variants": {
-    "variant=cauldron": {"model": "craftlogic:unfired_cauldron"},
-    "variant=smelting_vat": {"model": "craftlogic:unfired_smelting_vat"},
-    "variant=flowerpot": {"model": "craftlogic:unfired_flowerpot"}
-  }
-}

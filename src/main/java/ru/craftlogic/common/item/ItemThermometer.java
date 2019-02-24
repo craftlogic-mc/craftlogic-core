@@ -28,7 +28,7 @@ public class ItemThermometer extends ItemBase {
                     Location location = new Location(holder).offset(holder.getAdjustedHorizontalFacing().getOpposite());
                     HeatAcceptor heatAcceptor = location.getTileEntity(HeatAcceptor.class);
                     if (heatAcceptor != null) {
-                        float value = heatAcceptor.getMaxTemperature() / heatAcceptor.getMaxTemperature();
+                        float value = (float)heatAcceptor.getMaxTemperature() / heatAcceptor.getMaxTemperature();
                         return Math.min(1f, Math.max(0f, value));
                     }
                 }

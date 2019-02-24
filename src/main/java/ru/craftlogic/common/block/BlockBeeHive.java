@@ -7,6 +7,7 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.api.block.BlockBase;
@@ -18,7 +19,33 @@ public class BlockBeeHive extends BlockBase implements ModelAutoReg {
 
     public BlockBeeHive() {
         super(Material.GRASS, "bee_hive", 1.5F, CreativeTabs.DECORATIONS);
-        this.setSoundType(SoundType.GROUND);
+        this.setSoundType(SoundType.PLANT);
+    }
+
+    @Override
+    public boolean isFullBlock(IBlockState state) {
+        return false;
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return false;
+    }
+
+    @Override
+    public boolean isOpaqueCube(IBlockState state) {
+        return false;
+    }
+
+    @Override
+    public boolean isTopSolid(IBlockState state) {
+        return false;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public BlockRenderLayer getBlockLayer() {
+        return BlockRenderLayer.CUTOUT;
     }
 
     @Override
@@ -36,7 +63,7 @@ public class BlockBeeHive extends BlockBase implements ModelAutoReg {
     public void registerModel(ModelManager modelManager) {
         super.registerModel(modelManager);
         modelManager.registerStateMapper(this, (state, mapper) ->
-            new ModelResourceLocation("minecraft:bee_hive", "normal")
+            new ModelResourceLocation("craftlogic:bee_hive", "normal")
         );
     }
 

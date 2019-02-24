@@ -67,6 +67,14 @@ public class World {
         return new Location(unwrap(), unwrap().getSpawnPoint());
     }
 
+    public int getHeight() {
+        return this.unwrap().getHeight();
+    }
+
+    public int getTerrainHeight(int x, int z) {
+        return this.unwrap().getHeight(x, z);
+    }
+
     public GameRules getRules() {
         return unwrap().getGameRules();
     }

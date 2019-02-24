@@ -2,6 +2,7 @@ package ru.craftlogic.api;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import ru.craftlogic.CraftConfig;
@@ -13,7 +14,6 @@ import javax.annotation.Nonnull;
 
 public class CraftItems {
     public static Item ASH;
-    public static Item THERMOMETER;
     public static Item ROCK;
     public static Item MOSS;
     public static Item STONE_BRICK;
@@ -26,10 +26,10 @@ public class CraftItems {
     public static Item MILK_BOTTLE;
     public static Item MILK_BOWL;
     public static Item WATER_BOWL;
+    public static Item ICON_QUESTION, ICON_FOOD, ICON_EQUIPMENT, ICON_RESOURCES;
 
     static void init(Side side) {
         ASH = registerItem(new ItemBase("ash", CreativeTabs.MATERIALS));
-        THERMOMETER = registerItem(new ItemThermometer());
         if (CraftConfig.items.enableRocks) {
             ROCK = registerItem(new ItemRock());
         }
@@ -50,8 +50,12 @@ public class CraftItems {
         }
         CROWBAR = registerItem(new ItemCrowbar());
         MILK_BOTTLE = registerItem(new ItemMilkBottle());
-        //MILK_BOWL = registerItem(new ItemFluidBowl(CraftFluids.MILK));
-        //WATER_BOWL = registerItem(new ItemFluidBowl(FluidRegistry.WATER));
+        ICON_QUESTION = registerItem(new ItemBase("icon_question", CreativeTabs.TOOLS));
+        ICON_FOOD = registerItem(new ItemBase("icon_food", CreativeTabs.TOOLS));
+        ICON_EQUIPMENT = registerItem(new ItemBase("icon_equipment", CreativeTabs.TOOLS));
+        ICON_RESOURCES = registerItem(new ItemBase("icon_resources", CreativeTabs.TOOLS));
+        MILK_BOWL = registerItem(new ItemFluidBowl(CraftFluids.MILK));
+        WATER_BOWL = registerItem(new ItemFluidBowl(FluidRegistry.WATER));
     }
 
     public static Item registerItem(@Nonnull Item item) {

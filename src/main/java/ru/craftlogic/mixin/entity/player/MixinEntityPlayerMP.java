@@ -21,6 +21,7 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
     private long playerLastActiveTime;
     @Shadow @Final public MinecraftServer mcServer;
     private long firstPlayed;
+    private long timePlayed;
 
     public MixinEntityPlayerMP(World world) {
         super(world);
@@ -30,12 +31,14 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
     public void onRead(NBTTagCompound compound, CallbackInfo info) {
         this.firstPlayed = compound.getLong("firstPlayed");
         this.playerLastActiveTime = compound.getLong("lastPlayed");
+        this.timePlayed = compound.getLong("timePlayed");
     }
 
     @Inject(method = "writeEntityToNBT", at = @At("RETURN"))
     public void onSave(NBTTagCompound compound, CallbackInfo info) {
         compound.setLong("firstPlayed", this.firstPlayed);
         compound.setLong("lastPlayed", this.playerLastActiveTime);
+        compound.setLong("timePlayed", this.timePlayed);
     }
 
     @Override
@@ -46,6 +49,16 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
     @Override
     public void setFirstPlayed(long firstPlayed) {
         this.firstPlayed = firstPlayed;
+    }
+
+    @Override
+    public void setTimePlayed(long timePlayed) {
+        this.timePlayed = timePlayed;
+    }
+
+    @Override
+    public long getTimePlayed() {
+        return timePlayed;
     }
 
     @Override

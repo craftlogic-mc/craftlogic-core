@@ -1,6 +1,7 @@
 package ru.craftlogic.common.item;
 
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -13,11 +14,14 @@ import net.minecraft.stats.StatList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.item.ItemBase;
+import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.util.FluidBowlWrapper;
 
 import javax.annotation.Nonnull;
@@ -71,5 +75,13 @@ public class ItemFluidBowl extends ItemBase {
     @Override
     public ICapabilityProvider initCapabilities(ItemStack item, @Nullable NBTTagCompound compound) {
         return new FluidBowlWrapper(item, this.fluid, 250);
+    }
+
+    @Override
+    public void registerModel(ModelManager modelManager) {
+        modelManager.registerCustomMeshDefinition(this, stack ->
+            new ModelResourceLocation(new ResourceLocation(CraftAPI.MOD_ID, "fluid_bowl"), "inventory")
+        );
+        modelManager.registerItemVariants(this, "fluid_bowl");
     }
 }

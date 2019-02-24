@@ -35,8 +35,7 @@ public class PlayerManager extends ServerManager {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPlayerLeft(PlayerEvent.PlayerLoggedOutEvent event) {
-        Player player = getOnline(event.player.getGameProfile());
-        this.onlinePlayers.remove(player);
+        this.onlinePlayers.removeIf(p -> p.getId().equals(event.player.getGameProfile().getId()));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)

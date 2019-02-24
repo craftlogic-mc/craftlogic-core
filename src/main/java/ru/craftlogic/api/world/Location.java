@@ -8,6 +8,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -31,6 +32,14 @@ public class Location extends ChunkLocation {
     private final double x, y, z;
     private float yaw, pitch;
     private WeakReference<World> world;
+
+    public Location(Location location) {
+        this(
+            location.getDimensionId(),
+            location.getX(), location.getY(), location.getZ(),
+            location.getYaw(), location.getPitch()
+        );
+    }
 
     public Location(World world, Vec3d vec) {
         this(world, vec.x, vec.y, vec.z);
@@ -204,12 +213,16 @@ public class Location extends ChunkLocation {
         this.setBlockState(this.getBlockState().withProperty(property, value), flag);
     }
 
-    public <T extends Comparable<T>> void cycleBlockProperty(IProperty<T> property) {
-        this.setBlockState(this.getBlockState().cycleProperty(property));
+    public <T extends Comparable<T>> T cycleBlockProperty(IProperty<T> property) {
+        IBlockState newState = this.getBlockState().cycleProperty(property);
+        this.setBlockState(newState);
+        return newState.getValue(property);
     }
 
-    public <T extends Comparable<T>> void cycleBlockProperty(IProperty<T> property, int flag) {
-        this.setBlockState(this.getBlockState().cycleProperty(property), flag);
+    public <T extends Comparable<T>> T cycleBlockProperty(IProperty<T> property, int flag) {
+        IBlockState newState = this.getBlockState().cycleProperty(property);
+        this.setBlockState(newState, flag);
+        return newState.getValue(property);
     }
 
     public AxisAlignedBB getBlockBounding() {
@@ -328,8 +341,18 @@ public class Location extends ChunkLocation {
         };
     }
 
+    @Override
     public Location offset(EnumFacing side) {
         return this.offset(side, 1);
+    }
+
+    @Override
+    public Location offset(EnumFacing side, int amount) {
+        return this.add(
+            side.getFrontOffsetX() * amount,
+            side.getFrontOffsetY() * amount,
+            side.getFrontOffsetZ() * amount
+        );
     }
 
     public Location offset(EnumFacing side, double amount) {
@@ -353,11 +376,15 @@ public class Location extends ChunkLocation {
     }
 
     protected Location add(double x, double y, double z) {
-        return new Location(this.getDimension(), this.getX() + x, this.getY() + y, this.getZ() + z);
+        return new Location(this.getDimensionId(), this.getX() + x, this.getY() + y, this.getZ() + z);
     }
 
     public boolean isBlockLoaded() {
-        return this.getWorld().isBlockLoaded(this.getPos());
+        return isWorldLoaded() && this.getWorld().isBlockLoaded(this.getPos());
+    }
+
+    public boolean isWorldLoaded() {
+        return this.getWorld() != null;
     }
 
     public boolean isSideSolid(EnumFacing facing) {
@@ -373,7 +400,7 @@ public class Location extends ChunkLocation {
     }
 
     public void spawnItem(ItemStack item) {
-        Block.spawnAsEntity(this.getWorld(), this.getPos(), item);
+        InventoryHelper.spawnItemStack(getWorld(), getX(), getY(), getZ(), item);
     }
 
     public boolean isWorldRemote() {
@@ -420,7 +447,7 @@ public class Location extends ChunkLocation {
                 return false;
             } else {
                 ChunkLocation loc = (ChunkLocation)o;
-                return loc.getDimension() == getDimension() && loc.getChunkX() == getChunkX() && loc.getChunkZ() == getChunkZ();
+                return loc.getDimensionId() == getDimensionId() && loc.getChunkX() == getChunkX() && loc.getChunkZ() == getChunkZ();
             }
         }
 
@@ -431,12 +458,12 @@ public class Location extends ChunkLocation {
             && location.z == z
             && location.yaw == yaw
             && location.pitch == pitch
-            && location.getDimension() == getDimension();
+            && location.getDimensionId() == getDimensionId();
     }
 
     @Override
     public int hashCode() {
-        int result = this.getDimension();
+        int result = this.getDimensionId();
         long temp = Double.doubleToLongBits(x);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(y);
@@ -476,6 +503,6 @@ public class Location extends ChunkLocation {
     }
 
     public double distanceSq(Location other) {
-        return this.getDimension() != other.getDimension() ? Double.POSITIVE_INFINITY : this.getPos().distanceSq(other.getPos());
+        return this.getDimensionId() != other.getDimensionId() ? Double.POSITIVE_INFINITY : this.getPos().distanceSq(other.getPos());
     }
 }

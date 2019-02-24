@@ -14,17 +14,13 @@ gui.reconnect.in=Повтор соединения через %s...
 fluid.milk=Молоко
 fluid.oil=Нефть
 
-entity.MinecartFruance.name=Самоходная вагонетка
+entity.MinecartFurnace.name=Самоходная вагонетка
 
 item.forge.bucketFilled.milk=Ведро молока
 item.forge.bucketFilled.oil=Ведро сырой нефти
 
-tile.unfired_cauldron.name=Необожжёный котёл
-tile.unfired_smelting_vat.name=Необожжённая ванна для выплавки
-tile.unfired_flowerpot.name=Необожжённый цветочный горшок
-
-tile.cauldron.name=Котёл
-tile.smelting_vat.name=Ванна для выплавки
+tile.bee_hive.name=Пчелиный улей
+tile.bee_house.name=Пчелиный домик
 tile.barrel_wood.name=Деревянная бочка
 tile.barrel_stone.name=Каменная бочка
 tile.drying_rack.name=Сушилка

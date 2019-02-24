@@ -217,7 +217,16 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
         } else {
             CommandContainer container = this.getCommand(rawCommandName);
             if (container != null && container.command.checkPermission(this.getServer(), sender)) {
-                return container.command.getTabCompletions(this.getServer(), sender, dropFirstString(args), targetBlockPos);
+                try {
+                    return container.command.getTabCompletions(this.getServer(), sender, dropFirstString(args), targetBlockPos);
+                } catch (Throwable t) {
+                    if (t.getCause() instanceof CommandException) {
+                        sender.sendMessage(Text.translation((CommandException)t.getCause()).red().build());
+                    } else {
+                        sender.sendMessage(Text.translation("commands.generic.exception").red().build());
+                        LOGGER.warn("Couldn't process command completion: " + rawCommandName, t);
+                    }
+                }
             }
 
             return Collections.emptyList();

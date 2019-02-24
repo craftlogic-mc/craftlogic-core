@@ -18,10 +18,7 @@ import ru.craftlogic.api.util.WrappedPlayerInventory;
 import ru.craftlogic.api.world.*;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -63,12 +60,13 @@ public class GameplayCommands implements CommandRegistrar {
             if (distance <= 200 || sender.hasPermission("commands.home.instant")) {
                 task.accept(ctx.server());
             } else {
-                int timeout = Math.min(30, (int) (distance / 50));
+                int timeout = 5;
                 Text<?, ?> message = sender.getId().equals(target.getId()) ?
                         Text.translation("tooltip.home_teleport") :
                         Text.translation("tooltip.home_teleport.other");
                 sender.sendCountdown("home", message, timeout);
-                ctx.server().addDelayedTask(task, timeout * 1000 + 250);
+                UUID id = ctx.server().addDelayedTask(task, timeout * 1000 + 250);
+                sender.addPendingTeleport(id);
             }
         } else {
             if (sender.getId().equals(target.getId())) {
@@ -138,13 +136,13 @@ public class GameplayCommands implements CommandRegistrar {
 
     @Command(name = "fly", syntax = {
         "",
-        "[off|on]",
+        "off|on",
         "<player:Player>",
-        "<player:Player> [off|on]"
+        "<player:Player> off|on"
     }, opLevel = 1)
     public static void commandFly(CommandContext ctx) throws CommandException {
         Player target = ctx.getIfPresent("player", Argument::asPlayer).orElse(ctx.senderAsPlayer());
-        boolean fly = ctx.hasAction() ? ctx.action().equals("on") : !target.isFlyingAllowed();
+        boolean fly = ctx.hasAction(0) ? ctx.action(0).equals("on") : !target.isFlyingAllowed();
         target.setFlyingAllowed(fly);
         String mode = "commands.fly." + (fly ? "on" : "off");
         if (!ctx.has("player") || ctx.senderAsPlayer().equals(target)) {
@@ -255,106 +253,105 @@ public class GameplayCommands implements CommandRegistrar {
     }
 
     @Command(name = "time", syntax = {
-        "[day|night]",
-        "[day|night] <world:World>",
+        "day|night",
+        "day|night <world:World>",
         "set <value>",
         "set <value> <world:World>",
         "add <value>",
         "add <value> <world:World>",
         "add <value> <world:World> <unit:TimeUnit>",
-        "query [day|daytime|gametime]",
-        "query [day|daytime|gametime] <world:World>"
+        "query day|daytime|gametime",
+        "query day|daytime|gametime <world:World>"
     }, opLevel = 2)
     public static void commandTime(CommandContext ctx) throws CommandException {
-        if (ctx.hasConstant()) {
-            switch (ctx.constant()) {
-                case "set": {
-                    long time;
-                    String value = ctx.get("value").asString().toLowerCase();
-                    boolean phrase;
-                    if (value.matches("d|day|n|night")) {
-                        phrase = true;
-                        time = parseTimePhrase(value);
-                    } else {
-                        phrase = false;
-                        time = ctx.get("value").asInt();
-                    }
-                    for (World world : getAffectedWorlds(ctx)) {
-                        ctx.sendNotification(
-                            Text.translation("commands.time.set")
-                                .yellow()
-                                .arg(world.getName(), Text::gold)
-                                .argTranslate("%s", a -> {
-                                    if (phrase) {
-                                        a.argTranslate("commands.time.set." + value, Text::gold);
-                                    } else {
-                                        a.argTranslate("commands.time.ticks", b -> b.arg(time).gold());
-                                    }
-                                })
-                        );
-                        world.setTotalTime(time);
-                    }
-                    break;
+        switch (ctx.action(0)) {
+            case "set": {
+                long time;
+                String value = ctx.get("value").asString().toLowerCase();
+                boolean phrase;
+                if (value.matches("d|day|n|night")) {
+                    phrase = true;
+                    time = parseTimePhrase(value);
+                } else {
+                    phrase = false;
+                    time = ctx.get("value").asInt();
                 }
-                case "add": {
-                    long time;
-                    if (ctx.has("unit")) {
-                        time = parseTimeUnit(ctx.get("value").asInt(), ctx.get("unit").asString());
-                    } else {
-                        time = ctx.get("value").asInt();
-                    }
-                    for (World world : getAffectedWorlds(ctx)) {
-                        ctx.sendNotification(
-                            Text.translation("commands.time.added")
-                                .yellow()
-                                .argTranslate("commands.time.ticks", b -> b.arg(time).gold())
-                                .arg(world.getName(), Text::gold)
-                        );
-                        world.addTotalTime(time);
-                    }
-                    break;
+                for (World world : getAffectedWorlds(ctx)) {
+                    ctx.sendNotification(
+                        Text.translation("commands.time.set")
+                            .yellow()
+                            .arg(world.getName(), Text::gold)
+                            .argTranslate("%s", a -> {
+                                if (phrase) {
+                                    a.argTranslate("commands.time.set." + value, Text::gold);
+                                } else {
+                                    a.argTranslate("commands.time.ticks", b -> b.arg(time).gold());
+                                }
+                            })
+                    );
+                    world.setTotalTime(time);
                 }
-                case "query": {
-                    World world = ctx.senderAsLocatable().getWorld();
-                    switch (ctx.action()) {
-                        case "day": {
-                            ctx.sendMessage(
-                                Text.translation("commands.time.query.days")
-                                    .gray()
-                                    .arg(world.getTotalDays(), Text::darkGray)
-                            );
-                            break;
-                        }
-                        case "daytime": {
-                            ctx.sendMessage(
-                                Text.translation("commands.time.query")
-                                    .gray()
-                                    .arg(world.getCurrentDayTime(), Text::darkGray)
-                            );
-                            break;
-                        }
-                        case "gametime": {
-                            ctx.sendMessage(
-                                Text.translation("commands.time.query.total")
-                                    .gray()
-                                    .arg(world.getTotalTime(), Text::darkGray)
-                            );
-                            break;
-                        }
-                    }
-                    break;
-                }
+                break;
             }
-        } else {
-            String phrase = ctx.action();
-            long time = parseTimePhrase(phrase);
-            for (World world : getAffectedWorlds(ctx)) {
-                ctx.sendNotification(
-                    Text.translation("commands.time.set").gray()
-                        .arg(world.getName(), Text::darkGray)
-                        .argTranslate("commands.time.set." + phrase, Text::darkGray)
-                );
-                world.setTotalTime(time);
+            case "add": {
+                long time;
+                if (ctx.has("unit")) {
+                    time = parseTimeUnit(ctx.get("value").asInt(), ctx.get("unit").asString());
+                } else {
+                    time = ctx.get("value").asInt();
+                }
+                for (World world : getAffectedWorlds(ctx)) {
+                    ctx.sendNotification(
+                        Text.translation("commands.time.added")
+                            .yellow()
+                            .argTranslate("commands.time.ticks", b -> b.arg(time).gold())
+                            .arg(world.getName(), Text::gold)
+                    );
+                    world.addTotalTime(time);
+                }
+                break;
+            }
+            case "query": {
+                World world = ctx.senderAsLocatable().getWorld();
+                switch (ctx.action(1)) {
+                    case "day": {
+                        ctx.sendMessage(
+                            Text.translation("commands.time.query.days")
+                                .gray()
+                                .arg(world.getTotalDays(), Text::darkGray)
+                        );
+                        break;
+                    }
+                    case "daytime": {
+                        ctx.sendMessage(
+                            Text.translation("commands.time.query")
+                                .gray()
+                                .arg(world.getCurrentDayTime(), Text::darkGray)
+                        );
+                        break;
+                    }
+                    case "gametime": {
+                        ctx.sendMessage(
+                            Text.translation("commands.time.query.total")
+                                .gray()
+                                .arg(world.getTotalTime(), Text::darkGray)
+                        );
+                        break;
+                    }
+                }
+                break;
+            }
+            default: {
+                String phrase = ctx.action(0);
+                long time = parseTimePhrase(phrase);
+                for (World world : getAffectedWorlds(ctx)) {
+                    ctx.sendNotification(
+                        Text.translation("commands.time.set").gray()
+                            .arg(world.getName(), Text::darkGray)
+                            .argTranslate("commands.time.set." + phrase, Text::darkGray)
+                    );
+                    world.setTotalTime(time);
+                }
             }
         }
     }

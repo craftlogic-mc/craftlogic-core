@@ -25,10 +25,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiFunction;
@@ -40,6 +37,7 @@ public class Server implements CommandSender {
     private final ExecutorService taskScheduler = Executors.newSingleThreadExecutor(
         r -> new Thread(r, "Server task scheduler")
     );
+    private final Set<UUID> cancelledTasks = new HashSet<>();
 
     public Server(MinecraftServer handle) {
         this.handle = handle;
@@ -192,18 +190,32 @@ public class Server implements CommandSender {
         }
     }
 
-    public void addTask(Consumer<Server> task) {
-        this.addDelayedTask(task, 0L);
+    public boolean cancelTask(UUID id) {
+        return this.cancelledTasks.add(id);
     }
 
-    public void addDelayedTask(Consumer<Server> task, long delay) {
+    public UUID addTask(Consumer<Server> task) {
+        UUID id = UUID.randomUUID();
+        this.addDelayedTask(id, task, 0L);
+        return id;
+    }
+
+    public UUID addDelayedTask(Consumer<Server> task, long delay) {
+        UUID id = UUID.randomUUID();
+        this.addDelayedTask(id, task, delay);
+        return id;
+    }
+
+    private void addDelayedTask(UUID id, Consumer<Server> task, long delay) {
         long start = System.currentTimeMillis();
         this.handle.addScheduledTask(() -> {
-            long delta = System.currentTimeMillis() - start;
-            if (delta >= delay) {
-                task.accept(this);
-            } else {
-                this.taskScheduler.submit(() -> addDelayedTask(task, delay - delta));
+            if (!this.cancelledTasks.remove(id)) {
+                long delta = System.currentTimeMillis() - start;
+                if (delta >= delay) {
+                    task.accept(this);
+                } else {
+                    this.taskScheduler.submit(() -> addDelayedTask(id, task, delay - delta));
+                }
             }
         });
     }

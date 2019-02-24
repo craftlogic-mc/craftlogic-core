@@ -15,6 +15,8 @@ public class CraftConfig {
         "http://central.maven.org/maven2"
     };
 
+    public static String banDateFormat = "yyyy-MM-dd HH:mm:ss Z";
+
     public static Items items = new Items();
 
     public static class Items {

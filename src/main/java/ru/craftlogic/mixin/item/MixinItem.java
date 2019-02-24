@@ -1,14 +1,19 @@
 package ru.craftlogic.mixin.item;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.RegistryNamespaced;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import ru.craftlogic.common.item.*;
+import ru.craftlogic.common.item.ItemBowl;
+import ru.craftlogic.common.item.ItemCarpet;
+import ru.craftlogic.common.item.ItemMilkBucket;
+import ru.craftlogic.common.item.ItemMushroom;
 
 import java.util.Map;
 
@@ -25,20 +30,28 @@ public class MixinItem {
      */
     @Overwrite
     private static void registerItem(int id, ResourceLocation name, Item item) {
-        switch (name.toString()) {
-            case "minecraft:bowl": {
-                item = new ItemBowl();
-                break;
+        if (name.getResourceDomain().equals("minecraft")) {
+            switch (name.getResourcePath()) {
+                case "bowl": {
+                    item = new ItemBowl();
+                    break;
+                }
+                case "mushroom_stew":
+                case "rabbit_stew":
+                case "beetroot_soup": {
+                    item.setCreativeTab(null);
+                    break;
+                }
+                case "milk_bucket": {
+                    item = new ItemMilkBucket().setCreativeTab(null);
+                    break;
+                }
             }
-            case "minecraft:mushroom_stew":
-            case "minecraft:rabbit_stew":
-            case "minecraft:beetroot_soup": {
-                item.setCreativeTab(null);
-                break;
-            }
-            case "minecraft:milk_bucket": {
-                item = new ItemMilkBucket().setCreativeTab(null);
-                break;
+            for (EnumDyeColor color : EnumDyeColor.values()) {
+                if (name.getResourcePath().equals(color.getName() + "_carpet")) {
+                    item = new ItemCarpet(((ItemBlock)item).getBlock());
+                    break;
+                }
             }
         }
         if (item.getRegistryName() == null) {

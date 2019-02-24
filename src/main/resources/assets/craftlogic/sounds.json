@@ -98,5 +98,10 @@
     "category": "player",
     "subtitle": "craftlogic.subtitle.squash",
     "sounds": [ "craftlogic:squash" ]
+  },
+  "error": {
+    "category": "player",
+    "subtitle": "craftlogic.subtitle.error",
+    "sounds": [ "craftlogic:error" ]
   }
 }

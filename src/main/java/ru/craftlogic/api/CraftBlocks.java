@@ -25,11 +25,6 @@ import java.util.function.Function;
 import static ru.craftlogic.api.CraftItems.registerItem;
 
 public class CraftBlocks {
-    public static Block FURNACE;
-    public static Block CHIMNEY;
-    public static Block UNFIRED_POTTERY;
-    public static Block CAULDRON;
-    public static Block SMELTING_VAT;
     public static Block BARREL_WOOD, BARREL_STONE;
     public static Block DRYING_RACK;
     public static BlockGourd MELON, PUMPKIN;
@@ -37,12 +32,6 @@ public class CraftBlocks {
     public static BiMap<BlockPlanks.EnumType, Block> BEE_HOUSE = HashBiMap.create(BlockPlanks.EnumType.values().length);
 
     static void init(Side side) {
-        FURNACE = registerBlockWithItem(new BlockFurnace());
-        CHIMNEY = registerBlockWithItem(new BlockChimney());
-        UNFIRED_POTTERY = registerBlockWithItem(new BlockUnfiredPottery());
-        CAULDRON = registerBlockWithItem(new BlockCauldron());
-        SMELTING_VAT = registerBlockWithItem(new BlockSmeltingVat());
-
         if (CraftConfig.blocks.enableBarrels) {
             BARREL_WOOD = registerBlockWithItem(new BlockBarrelWood());
             BARREL_STONE = registerBlockWithItem(new BlockBarrelStone());

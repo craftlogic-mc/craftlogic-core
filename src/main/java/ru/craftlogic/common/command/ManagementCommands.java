@@ -12,6 +12,7 @@ import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.server.WorldManager;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.world.*;
+import ru.craftlogic.network.message.MessagePlayerInfo;
 import ru.craftlogic.network.message.MessageServerStop;
 
 import java.util.ArrayList;
@@ -19,7 +20,26 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import static ru.craftlogic.api.command.CommandContext.parseDuration;
+
 public class ManagementCommands implements CommandRegistrar {
+    @Command(name = "info", syntax = "<target:OfflinePlayer>")
+    public static void commandInfo(CommandContext ctx) throws CommandException {
+        OfflinePlayer target = ctx.get("target").asOfflinePlayer();
+        WorldManager worldManager = ctx.server().getWorldManager();
+        World world = ctx.sender() instanceof LocatableCommandSender ? ctx.senderAsLocatable().getWorld() : worldManager.get(Dimension.OVERWORLD);
+        PhantomPlayer fakePlayer = target.asPhantom(world);
+        if (ctx.sender() instanceof Player) {
+            ctx.senderAsPlayer().sendPacket(new MessagePlayerInfo(
+                target.getProfile(), fakePlayer.getFirstPlayed(), fakePlayer.getLastPlayed(),
+                fakePlayer.getTimePlayed(), target.hasPermission("commands.info.edit"), fakePlayer.getLocation(),
+                fakePlayer.getBedLocation()
+            ));
+        } else {
+            ctx.sendMessage(Text.string("//TODO"));
+        }
+    }
+
     @Command(name = "stop", syntax = {
         "",
         "<delay>",
@@ -212,37 +232,6 @@ public class ManagementCommands implements CommandRegistrar {
                     .arg(String.join(", ", users), Text::gold)
             );
         }
-    }
-
-    public static long parseDuration(String part) throws CommandException {
-        float time = 0;
-        String type = part.substring(part.length() - 1);
-        double t = Double.parseDouble(part.substring(0, part.length() - 1));
-        switch (type) {
-            case "s": {
-                time += t;
-                break;
-            }
-            case "m": {
-                time += 60 * t;
-                break;
-            }
-            case "h": {
-                time += 60 * 60 * t;
-                break;
-            }
-            case "d": {
-                time += 24 * 60 *60 * t;
-                break;
-            }
-            case "w": {
-                time += 7 * 24 * 60 * 60 * t;
-            }
-        }
-        if(time <= 0) {
-            throw new CommandException("commands.generic.wrongTimeFormat", part);
-        }
-        return (long)(time * 1000);
     }
 
     @ArgumentCompleter(type = "OfflinePlayer", isEntityName = true)

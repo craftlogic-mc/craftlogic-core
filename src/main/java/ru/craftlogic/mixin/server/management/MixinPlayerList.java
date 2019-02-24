@@ -101,8 +101,11 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
         String username = cachedProfile == null ? profile.getName() : cachedProfile.getName();
         profileCache.addEntry(profile);
         NBTTagCompound playerData = this.readPlayerDataFromFile(player);
-        if (playerData == null || ((AdvancedPlayer)player).getFirstPlayed() == 0) {
-            ((AdvancedPlayer)player).setFirstPlayed(System.currentTimeMillis());
+        if (playerData == null) {
+            AdvancedPlayer ap = (AdvancedPlayer) player;
+            if (ap.getFirstPlayed() == 0) {
+                ap.setFirstPlayed(System.currentTimeMillis());
+            }
         }
         player.setWorld(this.mcServer.getWorld(player.dimension));
         World playerWorld = this.mcServer.getWorld(player.dimension);
@@ -194,7 +197,10 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
 
     @Redirect(method = "recreatePlayerEntity", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/EntityPlayerMP;connection:Lnet/minecraft/network/NetHandlerPlayServer;", opcode = Opcodes.PUTFIELD))
     public void setConnection(EntityPlayerMP player, NetHandlerPlayServer connection) {
-        ((AdvancedPlayer)player).setFirstPlayed(((AdvancedPlayer)connection.player).getFirstPlayed());
+        AdvancedPlayer newAp = (AdvancedPlayer) player;
+        AdvancedPlayer oldAp = (AdvancedPlayer) connection.player;
+        newAp.setFirstPlayed(oldAp.getFirstPlayed());
+        newAp.setTimePlayed(oldAp.getTimePlayed());
         player.connection = connection;
     }
 

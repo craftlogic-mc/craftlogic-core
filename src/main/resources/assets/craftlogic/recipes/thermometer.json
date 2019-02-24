@@ -1,0 +1,29 @@
+{
+  "conditions": [
+    {
+      "type": "minecraft:item_exists",
+      "item": "craftlogic:thermometer"
+    }
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "P": {
+      "item": "minecraft:glass_pane"
+    }
+  },
+  "pattern": [
+    "P",
+    "R",
+    "I"
+  ],
+  "result": {
+    "count": 1,
+    "item": "craftlogic:thermometer"
+  },
+  "type": "minecraft:crafting_shaped"
+}

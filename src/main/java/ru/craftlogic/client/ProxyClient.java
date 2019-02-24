@@ -32,6 +32,7 @@ import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.network.AdvancedMessage;
 import ru.craftlogic.api.screen.Elements;
 import ru.craftlogic.api.screen.toast.AdvancedToast;
+import ru.craftlogic.client.screen.ScreenPlayerInfo;
 import ru.craftlogic.client.screen.ScreenQuestion;
 import ru.craftlogic.client.screen.ScreenReconnect;
 import ru.craftlogic.client.screen.toast.ToastCountdown;
@@ -260,6 +261,16 @@ public class ProxyClient extends ProxyCommon {
         String id = message.getId();
         ScreenQuestion screen = new ScreenQuestion(message.getQuestion(), message.getTimeout(), choice ->
             CraftAPI.NETWORK.sendToServer(new MessageConfirmation(id, choice))
+        );
+        syncTask(context, () -> this.client.displayGuiScreen(screen));
+        return null;
+    }
+
+    @Override
+    protected AdvancedMessage handlePlayerInfo(MessagePlayerInfo message, MessageContext context) {
+        ScreenPlayerInfo screen = new ScreenPlayerInfo(
+            message.getProfile(), message.getFirstPlayed(), message.getLastPlayed(), message.getTimePlayed(),
+            message.isEditAllowed(), message.getLastLocation(), message.getBedLocation()
         );
         syncTask(context, () -> this.client.displayGuiScreen(screen));
         return null;

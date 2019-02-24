@@ -36,8 +36,8 @@ public class EntityThrownItem extends EntityThrowable {
 
     public EntityThrownItem(World world, EntityLivingBase thrower, ItemStack item, boolean drop) {
         super(world, thrower);
-        this.item = item.copy();
         this.drop = drop;
+        this.item = item.copy();
         this.item.setCount(1);
         this.dataManager.set(ITEM, this.item);
         if (thrower instanceof EntityPlayer) {
@@ -47,8 +47,8 @@ public class EntityThrownItem extends EntityThrowable {
 
     public EntityThrownItem(World world, double x, double y, double z, ItemStack item, boolean drop) {
         super(world, x, y, z);
-        this.item = item.copy();
         this.drop = drop;
+        this.item = item.copy();
         this.item.setCount(1);
         this.dataManager.set(ITEM, this.item);
     }
@@ -69,8 +69,7 @@ public class EntityThrownItem extends EntityThrowable {
     }
 
     public ItemStack getItem() {
-        ItemStack item = this.dataManager.get(ITEM);
-        return item == null ? ItemStack.EMPTY : item;
+        return this.dataManager.get(ITEM);
     }
 
     public void setItem(ItemStack item) {

@@ -15,8 +15,8 @@
     <option name="mappingFiles">
       <set>
         <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_snapshot\20180324\1.12.2\srgs\mcp.exc" />
-        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_snapshot\20180324\1.12.2\srgs\mcp-srg.srg" />
         <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_snapshot\20180324\1.12.2\srgs\notch-mcp.srg" />
+        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_snapshot\20180324\1.12.2\srgs\mcp-srg.srg" />
         <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_snapshot\20180324\1.12.2\srgs\mcp-notch.srg" />
         <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_snapshot\20180324\1.12.2\srgs\notch-srg.srg" />
         <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_snapshot\20180324\1.12.2\srgs\srg.exc" />
@@ -32,6 +32,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
       <excludeFolder url="file://$MODULE_DIR$/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
+      <excludeFolder url="file://$MODULE_DIR$/run" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

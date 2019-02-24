@@ -49,6 +49,7 @@ public class ProxyCommon extends AdvancedMessageHandler {
         NETWORK.registerMessage(this::handleCountdown, MessageCountdown.class, Side.CLIENT);
         NETWORK.registerMessage(this::handleQuestion, MessageQuestion.class, Side.CLIENT);
         NETWORK.registerMessage(this::handleConfirmation, MessageConfirmation.class, Side.SERVER);
+        NETWORK.registerMessage(this::handlePlayerInfo, MessagePlayerInfo.class, Side.CLIENT);
 
         for (ModIntegration integration : this.integrations) {
             if (Loader.isModLoaded(integration.getModId())) {
@@ -103,6 +104,10 @@ public class ProxyCommon extends AdvancedMessageHandler {
         EntityPlayer entity = getPlayer(context);
         Player player = ((AdvancedPlayer)entity).wrapped();
         player.confirm(message.getId(), message.getChoice());
+        return null;
+    }
+
+    protected AdvancedMessage handlePlayerInfo(MessagePlayerInfo message, MessageContext context) { ;
         return null;
     }
 }

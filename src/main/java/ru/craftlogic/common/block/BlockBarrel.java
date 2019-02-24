@@ -37,8 +37,8 @@ public abstract class BlockBarrel extends BlockBase implements TileEntityHolder<
     protected boolean onBlockActivated(Location location, EntityPlayer player, EnumHand hand, RayTraceResult target) {
         if (player.isSneaking()) {
             if (!location.isWorldRemote()) {
-                location.cycleBlockProperty(CLOSED);
-                SoundEvent sound = location.getBlockProperty(CLOSED) ? BLOCK_WOODEN_TRAPDOOR_CLOSE : BLOCK_WOODEN_TRAPDOOR_OPEN;
+                boolean closed = location.cycleBlockProperty(CLOSED);
+                SoundEvent sound = closed ? BLOCK_WOODEN_TRAPDOOR_CLOSE : BLOCK_WOODEN_TRAPDOOR_OPEN;
                 location.playSound(sound, SoundCategory.BLOCKS,1F, 1F);
             }
             return true;

@@ -9,7 +9,6 @@
     "block.MixinBlockTrapDoor",
     "block.MixinBlockButton",
     "block.MixinBlockBed",
-    "block.MixinBlockFurnace",
     "block.MixinBlockFenceGate",
     "block.MixinBlockWeb",
     "block.MixinBlockGrass",
@@ -86,6 +85,7 @@
   ],
   "client": [
     "client.particle.MixinParticleManager",
+    "client.renderer.MixinBufferBuilder",
     "client.renderer.MixinRenderItem",
     "client.renderer.MixinBlockModelShapes$3",
     "client.renderer.MixinBlockModelShapes$4",
@@ -94,6 +94,7 @@
     "client.renderer.entity.MixinRenderPigZombie",
     "client.renderer.model.MixinModelZombie",
     "client.gui.MixinGuiIngame",
+    "client.gui.inventory.MixinGuiRecipeBook",
     "client.gui.inventory.MixinGuiInventory",
     "client.gui.inventory.MixinGuiCrafting",
     "client.gui.toast.MixinGuiToast",
