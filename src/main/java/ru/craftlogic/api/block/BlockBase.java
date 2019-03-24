@@ -45,7 +45,7 @@ public class BlockBase extends Block implements ModelAutoReg {
         this.setCreativeTab(tab);
         this.setHardness(hardness);
         this.setRegistryName(name);
-        this.setUnlocalizedName(name);
+        this.setTranslationKey(name);
     }
 
     public BlockBase setHasSubtypes(boolean hasSubtypes) {
@@ -57,8 +57,8 @@ public class BlockBase extends Block implements ModelAutoReg {
         return this.hasSubtypes;
     }
 
-    public String getUnlocalizedName(ItemStack stack) {
-        return this.getUnlocalizedName();
+    public String getTranslationKey(ItemStack stack) {
+        return this.getTranslationKey();
     }
 
     @Override

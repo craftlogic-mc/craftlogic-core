@@ -29,7 +29,7 @@ public abstract class MixinEntityEnderman extends EntityMob {
         } else {
             Vec3d look = player.getLook(1.0F).normalize();
             Vec3d eyeHeight = new Vec3d(this.posX - player.posX, this.getEntityBoundingBox().minY + (double)this.getEyeHeight() - (player.posY + (double)player.getEyeHeight()), this.posZ - player.posZ);
-            double d0 = eyeHeight.lengthVector();
+            double d0 = eyeHeight.length();
             eyeHeight = eyeHeight.normalize();
             double distance = look.dotProduct(eyeHeight);
             return distance > 1.0D - 0.025D / d0 && player.canEntityBeSeen(this);

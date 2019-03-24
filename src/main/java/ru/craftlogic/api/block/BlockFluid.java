@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 public class BlockFluid extends BlockFluidClassic implements ModelAutoReg {
     public BlockFluid(String name, Fluid fluid, Material material) {
         super(fluid, material);
-        this.setUnlocalizedName(name);
+        this.setTranslationKey(name);
         this.setRegistryName(name);
     }
 

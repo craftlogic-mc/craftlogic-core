@@ -34,7 +34,7 @@ public class BlockLitPumpkin extends BlockPumpkin implements ModelAutoReg {
     public BlockLitPumpkin() {
         this.setHardness(1F);
         this.setSoundType(SoundType.WOOD);
-        this.setUnlocalizedName("litpumpkin");
+        this.setTranslationKey("litpumpkin");
         this.setDefaultState(
             this.blockState.getBaseState()
                 .withProperty(LIT, false)
@@ -99,7 +99,7 @@ public class BlockLitPumpkin extends BlockPumpkin implements ModelAutoReg {
     @Override
     public IBlockState getStateFromMeta(int meta) {
         return this.getDefaultState()
-                .withProperty(FACING, EnumFacing.getHorizontal(meta & 7))
+                .withProperty(FACING, EnumFacing.byHorizontalIndex(meta & 7))
                 .withProperty(LIT, (meta & 8) > 0);
     }
 

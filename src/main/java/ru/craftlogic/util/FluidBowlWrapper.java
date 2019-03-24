@@ -36,7 +36,7 @@ public class FluidBowlWrapper extends FluidHandlerItemStack {
         if (fluidStack == null) {
             this.container = new ItemStack(Items.BOWL);
         } else {
-            if (fluidStack.tag == null || fluidStack.tag.hasNoTags()) {
+            if (fluidStack.tag == null || fluidStack.tag.isEmpty()) {
                 if (fluid == FluidRegistry.WATER) {
                     this.container = new ItemStack(CraftItems.WATER_BOWL);
                 }

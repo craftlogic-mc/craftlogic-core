@@ -241,7 +241,7 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
         EntityPlayerMP player = getEntity();
         Vec3d eyes = player.getPositionEyes(partialTicks);
         Vec3d look = player.getLook(partialTicks);
-        Vec3d target = eyes.addVector(look.x * distance, look.y * distance, look.z * distance);
+        Vec3d target = eyes.add(look.x * distance, look.y * distance, look.z * distance);
         return player.world.rayTraceBlocks(eyes, target, false, false, true);
     }
 

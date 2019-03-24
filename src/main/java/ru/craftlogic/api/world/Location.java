@@ -349,17 +349,17 @@ public class Location extends ChunkLocation {
     @Override
     public Location offset(EnumFacing side, int amount) {
         return this.add(
-            side.getFrontOffsetX() * amount,
-            side.getFrontOffsetY() * amount,
-            side.getFrontOffsetZ() * amount
+            side.getXOffset() * amount,
+            side.getYOffset() * amount,
+            side.getZOffset() * amount
         );
     }
 
     public Location offset(EnumFacing side, double amount) {
         return this.add(
-            side.getFrontOffsetX() * amount,
-            side.getFrontOffsetY() * amount,
-            side.getFrontOffsetZ() * amount
+            side.getXOffset() * amount,
+            side.getYOffset() * amount,
+            side.getZOffset() * amount
         );
     }
 

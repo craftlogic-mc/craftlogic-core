@@ -1,17 +1,26 @@
-package ru.craftlogic.client.render.model;
+package ru.craftlogic.mixin.client.renderer.model;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.model.ModelSpider;
 import net.minecraft.entity.Entity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static net.minecraft.util.math.MathHelper.*;
 
-public class ModelSpider extends ModelBase {
-    public ModelRenderer head, neck, body;
-    public ModelRenderer[] legs = new ModelRenderer[8];
-    public ModelRenderer[] sleg = new ModelRenderer[2];
+@Mixin(ModelSpider.class)
+public class MixinModelSpider extends ModelBase {
+    private ModelRenderer head, neck, body;
+    private ModelRenderer[] legs = new ModelRenderer[8];
+    private ModelRenderer[] sleg = new ModelRenderer[2];
 
-    public ModelSpider() {
+    @Inject(method = "<init>", at = @At("RETURN"))
+    public void constructor(CallbackInfo ci) {
+        this.boxList.clear();
         float var1 = 0F;
         byte var2 = 15;
         this.head = new ModelRenderer(this, 32, 4);
@@ -65,7 +74,11 @@ public class ModelSpider extends ModelBase {
         this.legs[7].addChild(this.sleg[1]);
     }
 
-    @Override
+    /**
+     * @author Radviger
+     * @reason Custom spider model
+     */
+    @Overwrite
     public void render(Entity entity, float limbSwing, float limbSingMod, float rotation, float deltaYaw, float pitch, float scale) {
         this.setRotationAngles(limbSwing, limbSingMod, rotation, deltaYaw, pitch, scale, entity);
         this.head.render(scale);
@@ -81,7 +94,11 @@ public class ModelSpider extends ModelBase {
         this.legs[7].render(scale);
     }
 
-    @Override
+    /**
+     * @author Radviger
+     * @reason Custom spider model
+     */
+    @Overwrite
     public void setRotationAngles(float limbSwing, float limbSingMod, float rotation, float yaw, float pitch, float scale, Entity spider) {
         this.head.rotateAngleY = (float) Math.toRadians(yaw);
         this.head.rotateAngleX = (float) Math.toRadians(pitch);

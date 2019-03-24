@@ -23,7 +23,7 @@ public class MixinBlock {
     @Shadow @Final
     public static RegistryNamespacedDefaultedByKey<ResourceLocation, Block> REGISTRY;
 
-    @Shadow @Final protected Material blockMaterial;
+    @Shadow @Final protected Material material;
 
     @Shadow @Final protected MapColor blockMapColor;
 
@@ -33,7 +33,7 @@ public class MixinBlock {
 
     @Shadow protected SoundType blockSoundType;
 
-    @Shadow private String unlocalizedName;
+    @Shadow private String translationKey;
 
     /**
      * @author Radviger
@@ -87,12 +87,12 @@ public class MixinBlock {
             case "minecraft:dark_oak_fence": {
                 if (CraftConfig.tweaks.enableDiagonalFences) {
                     MixinBlock old = (MixinBlock) (Object) block;
-                    block = new BlockDiagonalFence(old.blockMaterial, old.blockMapColor);
+                    block = new BlockDiagonalFence(old.material, old.blockMapColor);
                     MixinBlock b = (MixinBlock) (Object) block;
                     b.blockHardness = old.blockHardness;
                     b.blockResistance = old.blockResistance;
                     b.blockSoundType = old.blockSoundType;
-                    b.unlocalizedName = old.unlocalizedName;
+                    b.translationKey = old.translationKey;
                 }
                 break;
             }

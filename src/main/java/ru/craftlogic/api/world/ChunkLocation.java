@@ -54,7 +54,7 @@ public class ChunkLocation {
     }
 
     public Chunk getChunk() {
-        return getWorld().getChunkFromChunkCoords(getChunkX(), getChunkZ());
+        return getWorld().getChunk(getChunkX(), getChunkZ());
     }
 
     public int getChunkX() {
@@ -87,8 +87,8 @@ public class ChunkLocation {
 
     public ChunkLocation offset(EnumFacing side, int amount) {
         return new ChunkLocation(this.dimension,
-            this.x + side.getFrontOffsetX() * amount,
-            this.z + side.getFrontOffsetZ() * amount
+            this.x + side.getXOffset() * amount,
+            this.z + side.getZOffset() * amount
         );
     }
 

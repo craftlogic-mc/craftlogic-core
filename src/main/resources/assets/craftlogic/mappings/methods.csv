@@ -7,7 +7,7 @@ func_104055_i,setForceGamemode,1,Set the forceGamemode field (whether joining pl
 func_104056_am,getForceGamemode,2,Get the forceGamemode field (whether joining players will be put in their old gamemode or the default one)
 func_104112_b,flushToDisk,2,Flushes all pending chunks fully back to disk
 func_104140_m,flushToDisk,2,Flushes all pending chunks fully back to disk
-func_110121_a,isNullOrEmpty,0,Returns whether a string is either null or empty.
+func_110121_a,isNotEmpty,0,Returns true if the given string is neither null nor empty.
 func_110124_au,getUniqueID,2,Returns the UUID of this entity.
 func_110128_b,onBroken,2,Called when this entity is broken. Entity parameter may be null.
 func_110131_b,removeFrameFromMap,2,Removes the dot representing this frame's position from the map when the item frame is broken.
@@ -86,7 +86,7 @@ func_110267_cL,getModifiedMaxHealth,2,Returns randomized max health
 func_110297_a_,verifySellingItem,2,"Notifies the merchant of a possible merchantrecipe being fulfilled or not. Usually, this is just a sound byte being played depending if the suggested itemstack is not null."
 func_110303_q,getLocationCape,0,
 func_110304_a,getDownloadImageSkin,0,
-func_110306_p,getLocationSkin,0,Returns true if the player instance has an associated skin.
+func_110306_p,getLocationSkin,0,Returns the ResourceLocation associated with the player's skin
 func_110311_f,getLocationSkin,0,Returns true if the username has an associated skin.
 func_110317_t,isRidingHorse,0,
 func_110318_g,sendHorseJump,0,
@@ -169,8 +169,8 @@ func_110612_e,getDirResourcepacks,0,
 func_110613_c,getRepositoryEntries,0,
 func_110614_g,getResourcePackFiles,0,
 func_110616_f,fixDirResourcepacks,0,
-func_110623_a,getResourcePath,2,
-func_110624_b,getResourceDomain,2,
+func_110623_a,getPath,2,
+func_110624_b,getNamespace,2,
 func_110646_a,getTextWithoutFormattingCodes,2,"Returns a copy of the given string, with formatting codes stripped away."
 func_110647_a,getOSType,0,
 func_110667_a,getNumberOfTeams,2,
@@ -359,7 +359,7 @@ func_143046_a,registerStrongholdPieces,2,
 func_143048_a,registerStructurePieces,2,
 func_143049_a,registerNetherFortressPieces,2,
 func_145747_a,sendMessage,2,Send a chat message to the CommandSender
-func_145748_c_,getDisplayName,2,Get the formatted ChatComponent that will be used for the sender's username in chat
+func_145748_c_,getDisplayName,2,"Returns a displayable component representing this thing's name. This method should be implemented slightly differently depending on the interface (for <a href=""https://github.com/ModCoderPack/MCPBot-Issues/issues/14"">technical reasons</a> the same method is used for both IWorldNameable and ICommandSender), but unlike {@link #getName()} this method will generally behave sanely.\n \n<dl>\n<dt>{@link net.minecraft.util.INameable#getDisplayName() INameable.getDisplayName()}</dt>\n<dd>A normal component. Might be a translation component or a text component depending on the context. Usually implemented as:</dd>\n<dd><pre><code>return this.{@link net.minecraft.util.INameable#hasCustomName() hasCustomName()} ? new TextComponentString(this.{@link #getName()}) : new TextComponentTranslation(this.{@link #getName()});</code></pre></dd>\n<dt>{@link net.minecraft.command.ICommandSender#getDisplayName() ICommandSender.getDisplayName()} and {@link net.minecraft.entity.Entity#getDisplayName() Entity.getDisplayName()}</dt>\n<dd>For most entities, this returns the result of {@link #getName()}, with {@linkplain net.minecraft.scoreboard.ScorePlayerTeam#formatPlayerName scoreboard formatting} and a {@linkplain net.minecraft.entity.Entity#getHoverEvent special hover event}.</dd>\n<dd>For non-entity command senders, this will return the result of {@link #getName()} in a text component.</dd>\n</dl>"
 func_145749_h,getLastOutput,2,Returns the lastOutput.
 func_145750_b,setLastOutput,2,
 func_145751_f,getCommandBlockType,0,"Currently this returns 0 for the traditional command block, and 1 for the minecart command block"
@@ -385,7 +385,7 @@ func_145799_b,setThrower,2,
 func_145800_j,getThrower,2,
 func_145806_a,setHurtEntities,2,
 func_145807_e,getWorldObj,0,
-func_145818_k_,hasCustomName,2,Returns true if this thing is named
+func_145818_k_,hasCustomName,2,"Checks if this thing has a custom name. This method has slightly different behavior depending on the interface (for <a href=""https://github.com/ModCoderPack/MCPBot-Issues/issues/14"">technical reasons</a> the same method is used for both IWorldNameable and Entity):\n \n<dl>\n<dt>{@link net.minecraft.util.INameable#hasCustomName() INameable.hasCustomName()}</dt>\n<dd>If true, then {@link #getName()} probably returns a preformatted name; otherwise, it probably returns a translation string. However, exact behavior varies.</dd>\n<dt>{@link net.minecraft.entity.Entity#hasCustomName() Entity.hasCustomName()}</dt>\n<dd>If true, then {@link net.minecraft.entity.Entity#getCustomNameTag() Entity.getCustomNameTag()} will return a non-empty string, which will be used by {@link #getName()}.</dd>\n</dl>"
 func_145822_e,getCommandBlockLogic,2,
 func_145828_a,addInfoToCrashReport,2,
 func_145829_t,validate,2,validates a tile entity
@@ -467,7 +467,7 @@ func_146079_cb,ignite,2,
 func_146082_f,setInLove,2,
 func_146086_d,setHorseArmorStack,2,Set horse armor stack (for example: new ItemStack(Items.iron_horse_armor))
 func_146094_a,getUUID,2,Gets a players UUID given their GameProfie
-func_146097_a,dropItem,2,
+func_146097_a,dropItem,2,"Creates and drops the provided item. Depending on the dropAround, it will drop teh item around the player, instead of dropping the item from where the player is pointing at. Likewise, if traceItem is true, the dropped item entity will have the thrower set as the player.\n \n@param dropAround Whether the item is dropped around the player, otherwise dropped in front of the player in the direction the player is pointing at\n@param traceItem Whether to trace the item to this player as the thrower"
 func_146103_bH,getGameProfile,2,Returns the GameProfile for this player
 func_146105_b,sendStatusMessage,2,
 func_146107_m,getStatFileWriter,0,
@@ -1258,17 +1258,17 @@ func_149625_d,getStack,2,
 func_149627_c,getSlotId,2,
 func_149630_c,getMatches,0,
 func_149634_a,getBlockFromItem,2,
-func_149637_q,isBlockNormalCube,2,Indicate if a material is a normal solid opaque cube
+func_149637_q,isBlockNormalCube,2,Indicate if a material is a normal solid opaque cube\n@deprecated call via {@link IBlockState#isBlockNormalCube()} whenever possible. Implementing/overriding is fine.
 func_149638_a,getExplosionResistance,2,Returns how much this block can resist explosions from the passed in entity.
-func_149645_b,getRenderType,2,"The type of render function called. MODEL for mixed tesr and static model, MODELBLOCK_ANIMATED for TESR-only, LIQUID for vanilla liquids, INVISIBLE to skip all rendering"
+func_149645_b,getRenderType,2,"The type of render function called. MODEL for mixed tesr and static model, MODELBLOCK_ANIMATED for TESR-only, LIQUID for vanilla liquids, INVISIBLE to skip all rendering\n@deprecated call via {@link IBlockState#getRenderType()} whenever possible. Implementing/overriding is fine."
 func_149647_a,setCreativeTab,2,
 func_149649_H,disableStats,2,
 func_149652_G,getEnableStats,2,Return the state of blocks statistics flags - if the block is counted for mined and placed.
 func_149653_t,getTickRandomly,2,Returns whether or not this block is of a type that needs random ticking. Called for ref-counting purposes by ExtendedBlockStorage in order to broadly cull a chunk from the random chunk update list for efficiency's sake.
-func_149656_h,getMobilityFlag,2,
+func_149656_h,getPushReaction,2,@deprecated call via {@link IBlockState#getMobilityFlag()} whenever possible. Implementing/overriding is fine.
 func_149659_a,canDropFromExplosion,2,Return whether this block can drop from an explosion.
-func_149662_c,isOpaqueCube,2,Used to determine ambient occlusion and culling when rebuilding chunks for render
-func_149663_c,setUnlocalizedName,2,
+func_149662_c,isOpaqueCube,2,Used to determine ambient occlusion and culling when rebuilding chunks for render\n@deprecated call via {@link IBlockState#isOpaqueCube()} whenever possible. Implementing/overriding is fine.
+func_149663_c,setTranslationKey,2,
 func_149666_a,getSubBlocks,0,"returns a list of blocks with the same ID, but different meta (eg: wood returns 4 blocks)"
 func_149667_c,isAssociatedBlock,2,
 func_149671_p,registerBlocks,2,
@@ -1278,30 +1278,30 @@ func_149679_a,quantityDroppedWithBonus,2,Get the quantity dropped based on the g
 func_149680_a,isEqualTo,2,
 func_149682_b,getIdFromBlock,2,
 func_149684_b,getBlockFromName,2,
-func_149686_d,isFullCube,2,
-func_149688_o,getMaterial,2,Get a material of block
+func_149686_d,isFullCube,2,@deprecated call via {@link IBlockState#isFullCube()} whenever possible. Implementing/overriding is fine.
+func_149688_o,getMaterial,2,Get a material of block\n@deprecated call via {@link IBlockState#getMaterial()} whenever possible. Implementing/overriding is fine.
 func_149698_L,requiresUpdates,2,
 func_149700_E,canSilkHarvest,2,
 func_149703_v,isCollidable,2,"Returns if this block is collidable. Only used by fire, although stairs return that of the block that the stair is made of (though nobody's going to make fire stairs, right?)"
-func_149708_J,getCreativeTabToDisplayOn,0,Returns the CreativeTab to display the given block on.
-func_149710_n,getUseNeighborBrightness,2,Should block use the brightest neighbor light value as its own
+func_149708_J,getCreativeTab,0,Returns the CreativeTab to display the given block on.
+func_149710_n,getUseNeighborBrightness,2,Should block use the brightest neighbor light value as its own\n@deprecated call via {@link IBlockState#useNeighborBrightness()} whenever possible. Implementing/overriding is fine.
 func_149711_c,setHardness,2,Sets how many hits it takes to break a block.
 func_149713_g,setLightOpacity,2,Sets how much light is blocked going through this block. Returns the object for convenience in constructing.
 func_149715_a,setLightLevel,2,Sets the light value that the block emits. Returns resulting block instance for constructing convenience.
 func_149716_u,hasTileEntity,2,
-func_149717_k,getLightOpacity,2,
-func_149721_r,isNormalCube,2,"Used for nearly all game logic (non-rendering) purposes. Use Forge-provided isNormalCube(IBlockAccess, BlockPos) instead."
+func_149717_k,getLightOpacity,2,Get how much light is subtracted for going through this block\n@deprecated prefer calling {@link IBlockState#getLightOpacity()}
+func_149721_r,isNormalCube,2,"Used for nearly all game logic (non-rendering) purposes. Use Forge-provided isNormalCube(IBlockAccess, BlockPos) instead.\n@deprecated call via {@link IBlockState#isNormalCube()} whenever possible. Implementing/overriding is fine."
 func_149722_s,setBlockUnbreakable,2,
 func_149729_e,getBlockById,2,
-func_149730_j,isFullBlock,2,@return true if the state occupies all of its 1x1x1 cube
+func_149730_j,isFullBlock,2,@return true if the state occupies all of its 1x1x1 cube\n@deprecated prefer calling {@link IBlockState#isFullBlock()}
 func_149732_F,getLocalizedName,2,Gets the localized name of this block. Used for the statistics page.
 func_149738_a,tickRate,2,How many world ticks before ticking
-func_149739_a,getUnlocalizedName,2,"Returns the unlocalized name of the block with ""tile."" appended to the front."
-func_149740_M,hasComparatorInputOverride,2,
-func_149744_f,canProvidePower,2,Can this block provide power. Only wire currently seems to have this change based on its state.
+func_149739_a,getTranslationKey,2,"Returns the unlocalized name of the block with ""tile."" appended to the front."
+func_149740_M,hasComparatorInputOverride,2,@deprecated call via {@link IBlockState#hasComparatorInputOverride()} whenever possible. Implementing/overriding is fine.
+func_149744_f,canProvidePower,2,Can this block provide power. Only wire currently seems to have this change based on its state.\n@deprecated call via {@link IBlockState#canProvidePower()} whenever possible. Implementing/overriding is fine.
 func_149745_a,quantityDropped,2,Returns the quantity of items to drop on block destruction.
-func_149750_m,getLightValue,2,
-func_149751_l,isTranslucent,0,Used in the renderer to apply ambient occlusion
+func_149750_m,getLightValue,2,Amount of light emitted\n@deprecated prefer calling {@link IBlockState#getLightValue()}
+func_149751_l,isTranslucent,0,Used in the renderer to apply ambient occlusion\n@deprecated prefer calling {@link IBlockState#isTranslucent()}
 func_149752_b,setResistance,2,Sets the the blocks resistance to explosions. Returns the object for convenience in constructing.
 func_149801_b,getLiquidHeightPercent,2,"Returns the percentage of the liquid block that is air, based on the given flow decay of the liquid"
 func_149829_a,onStartFalling,2,
@@ -1312,7 +1312,7 @@ func_149915_a,createNewTileEntity,2,Returns a new instance of a block's tile ent
 func_149917_c,isEnabled,2,"Get's the hopper's active status from the 8-bit of the metadata. Note that the metadata stores whether the block is powered, so this returns true when that bit is 0."
 func_149939_a,getDispensePosition,2,Get the position where the dispenser at the given Coordinates should dispense to.
 func_149940_a,getBehavior,2,
-func_150002_b,getUnlocalizedName,2,Returns the slab block name with the type associated with it
+func_150002_b,getTranslationKey,2,Returns the slab block name with the type associated with it
 func_150122_b,setGraphicsLevel,0,"Pass true to draw this block using fancy graphics, or false for fast graphics."
 func_150206_m,createDeepCopy,2,Creates a deep copy of this style.  No changes to this instance or its parent style will be reflected in the copy.
 func_150209_a,setHoverEvent,2,Sets the event that should be run when text of this ChatStyle is hovered over.
@@ -1352,7 +1352,7 @@ func_150269_b,initializeFromFormat,2,"Initializes the content of this component,
 func_150270_g,ensureInitialized,2,Ensures that all of the children are up to date with the most recent translation mapping.
 func_150271_j,getFormatArgs,2,Gets the object array that is used to translate the key.
 func_150272_a,getFormatArgumentAsComponent,2,
-func_150284_a,createNewByType,2,Creates a new NBTBase object that corresponds with the passed in id.
+func_150284_a,create,2,Creates a new NBTBase object that corresponds with the passed in id.
 func_150285_a_,getString,2,
 func_150286_g,getDouble,2,
 func_150287_d,getInt,2,
@@ -1480,7 +1480,7 @@ func_150954_l,getSerializableClazz,2,
 func_150959_a,getItem,0,
 func_150967_d,getUncookedSaturationModifier,2,Gets the saturation modifier to apply to the heal amount when the player eats the uncooked version of this fish.
 func_150970_e,getCookedHealAmount,2,Gets the amount that eating the cooked version of this fish should heal the player.
-func_150972_b,getUnlocalizedName,2,"Gets the value that this fish type uses to replace ""XYZ"" in: ""fish.XYZ.raw"" / ""fish.XYZ.cooked"" for the unlocalized name and ""fish_XYZ_raw"" / ""fish_XYZ_cooked"" for the icon string."
+func_150972_b,getTranslationKey,2,"Gets the value that this fish type uses to replace ""XYZ"" in: ""fish.XYZ.raw"" / ""fish.XYZ.cooked"" for the unlocalized name and ""fish_XYZ_raw"" / ""fish_XYZ_cooked"" for the icon string."
 func_150973_i,canCook,2,"Gets a value indicating whether this type of fish has ""raw"" and ""cooked"" variants."
 func_150974_a,byMetadata,2,"Gets the corresponding FishType value for the given item damage value of an ItemStack, defaulting to COD for unrecognized damage values."
 func_150975_c,getUncookedHealAmount,2,Gets the amount that eating the uncooked version of this fish should heal the player.
@@ -1538,7 +1538,7 @@ func_151238_b,clampedLerp,2,
 func_151239_c,log2,2,"Efficiently calculates the floor of the base-2 log of an integer value.  This is effectively the index of the highest bit that is set.  For example, if the number in binary is 0...100101, this will return 5."
 func_151240_a,nextFloat,2,
 func_151241_e,log2DeBruijn,2,"Uses a B(2, 5) De Bruijn sequence and a lookup table to efficiently calculate the log-base-two of the given value. Optimized for cases where the input value is a power-of-two. If the input value is not a power-of-two, then subtract 1 from the return value."
-func_151244_d,getIconItemStack,0,
+func_151244_d,getIcon,0,
 func_151246_b,isNullOrEmpty,2,Returns a value indicating whether the given string is null or empty.
 func_151247_a,sendToTracking,2,
 func_151248_b,sendToTrackingAndSelf,2,
@@ -1547,7 +1547,7 @@ func_151256_a,writeAndFlush,2,
 func_151259_a,sendPacketToTrackedPlayers,2,Send the given packet to all players tracking this entity.
 func_151260_c,createSpawnPacket,2,Creates a spawn packet for the entity managed by this entry.
 func_151261_b,sendToTrackingAndSelf,2,
-func_151265_a,addLanEndpoint,2,Adds a channel that listens on publicly accessible network ports
+func_151265_a,addEndpoint,2,Adds a channel that listens on publicly accessible network ports
 func_151267_d,getServer,2,
 func_151268_b,terminateEndpoints,2,Shuts down all open endpoints (with immediate effect?)
 func_151269_c,networkTick,2,"Will try to process the packets received by each NetworkManager, gracefully manage processing failures and cleans up dead connections"
@@ -1617,9 +1617,9 @@ func_151518_m,setDamageIsAbsolute,2,"Sets a value indicating whether the damage 
 func_151519_b,getDeathMessage,2,Gets the death message that is displayed when the player dies
 func_151521_b,getDeathMessage,2,
 func_151522_h,getDamageSrcDisplayName,2,
-func_151523_a,getDifficultyEnum,2,
-func_151525_a,getDifficultyId,2,
-func_151526_b,getDifficultyResourceKey,2,
+func_151523_a,byId,2,
+func_151525_a,getId,2,
+func_151526_b,getTranslationKey,2,
 func_151535_h,toNBTTagIntArray,2,
 func_151536_b,getLayerMaterialBlock,2,
 func_151559_a,getRandomCropType,2,
@@ -1713,10 +1713,10 @@ func_152606_n,getOppedPlayerNames,2,
 func_152607_e,canJoin,2,
 func_152608_h,getBannedPlayers,2,
 func_152610_b,removeOp,2,
-func_152611_a,setViewDistance,2,
+func_152611_a,setViewDistance,2,"Sets the view distance used on the server. For the dedicated server, this is the <code>view-distance</code> value in server.properties. For the integrated server, this is the host's render distance (which may change)."
 func_152612_a,getPlayerByUsername,2,
 func_152621_a,contains,2,
-func_152622_a,setPlayerViewRadius,2,
+func_152622_a,setPlayerViewRadius,2,"Called when the server's view distance changes, sending or rescinding chunks as needed.\n \n@param radius Radius in chunks"
 func_152634_a,skinAvailable,0,
 func_152640_f,getValue,2,
 func_152641_a,onSerialization,2,
@@ -1914,7 +1914,7 @@ func_174877_v,getPos,2,
 func_174878_a,setPos,2,
 func_174880_d,getStats,2,
 func_174882_b,executeCommand,2,
-func_174884_b,updateGameprofile,2,
+func_174884_b,updateGameProfile,2,
 func_174885_b,setField,2,
 func_174886_c,closeInventory,2,
 func_174887_a_,getField,2,
@@ -2330,7 +2330,7 @@ func_175681_c,unloadEntities,2,
 func_175682_a,spawnParticle,0,
 func_175684_a,scheduleUpdate,2,
 func_175685_c,notifyNeighborsOfStateChange,2,
-func_175687_A,isBlockIndirectlyGettingPowered,2,Checks if the specified block or its neighbors are powered by a neighboring block. Used by blocks like TNT and Doors.
+func_175687_A,getRedstonePowerFromNeighbors,2,Checks if the specified block or its neighbors are powered by a neighboring block. Used by blocks like TNT and Doors.
 func_175688_a,spawnParticle,2,
 func_175690_a,setTileEntity,2,
 func_175691_a,isBlockTickPending,2,
@@ -2365,7 +2365,7 @@ func_175722_b,notifyNeighborsRespectDebug,2,
 func_175723_af,getWorldBorder,2,
 func_175724_o,getLightBrightness,2,
 func_175725_q,getPrecipitationHeight,2,
-func_175726_f,getChunkFromBlockCoords,2,
+func_175726_f,getChunk,2,
 func_175727_C,isRainingAt,2,Check if precipitation is currently happening at a position
 func_175732_a,canCreatureTypeSpawnHere,2,
 func_175733_a,getEntityFromUuid,2,
@@ -2559,7 +2559,7 @@ func_176145_a,setBorderSize,2,Sets the border size
 func_176159_a,openPoint,2,Returns a mapped point or creates and adds one
 func_176163_a,postProcess,2,This method is called when all nodes have been processed and PathEntity is created.\n {@link net.minecraft.world.pathfinder.WalkNodeProcessor WalkNodeProcessor} uses this to change its field {@link net.minecraft.world.pathfinder.WalkNodeProcessor#avoidsWater avoidsWater}
 func_176194_O,getBlockState,2,
-func_176195_g,getBlockHardness,2,
+func_176195_g,getBlockHardness,2,"@deprecated call via {@link IBlockState#getBlockHardness(World,BlockPos)} whenever possible. Implementing/overriding is fine."
 func_176196_c,canPlaceBlockAt,2,Checks if this block can be placed exactly at the given position.
 func_176197_a,modifyAcceleration,2,
 func_176198_a,canPlaceBlockOnSide,2,"Check whether this Block can be placed at pos, while aiming at the specified side of an adjacent block"
@@ -2568,23 +2568,23 @@ func_176200_f,isReplaceable,2,Whether this Block can be replaced directly by oth
 func_176201_c,getMetaFromState,2,Convert the BlockState into the correct metadata value
 func_176203_a,getStateFromMeta,2,Convert the given metadata into a BlockState for this Block
 func_176205_b,isPassable,2,Determines if an entity can path through this block
-func_176206_d,onBlockDestroyedByPlayer,2,Called after a player destroys this Block - the posiiton pos may no longer hold the state indicated.
+func_176206_d,onPlayerDestroy,2,Called after a player destroys this Block - the posiiton pos may no longer hold the state indicated.
 func_176208_a,onBlockHarvested,2,Called before the Block is set to air in the world. Called regardless of if the player's tool can actually collect this block
 func_176209_a,canCollideCheck,2,
 func_176210_f,getStateId,2,"Get a unique ID for the given BlockState, containing both BlockID and metadata"
-func_176211_b,getStrongPower,2,
+func_176211_b,getStrongPower,2,"@deprecated call via {@link IBlockState#getStrongPower(IBlockAccess,BlockPos,EnumFacing)} whenever possible. Implementing/overriding is fine."
 func_176212_b,causesDownwardCurrent,2,Checks if an additional {@code -6} vertical drag should be applied to the entity. See {#link net.minecraft.block.BlockLiquid#getFlow()}
 func_176213_c,onBlockAdded,2,"Called after the block is set in the Chunk data, but before the Tile Entity is set"
-func_176214_u,causesSuffocation,2,
+func_176214_u,causesSuffocation,2,@deprecated call via {@link IBlockState#causesSuffocation()} whenever possible. Implementing/overriding is fine.
 func_176215_a,registerBlock,2,
 func_176216_a,onLanded,2,Called when an Entity lands on this Block. This method *must* update motionY because the entity will not do that on its own
 func_176218_Q,getOffsetType,2,Get the OffsetType for this Block. Determines if the model is rendered slightly offset.
 func_176219_a,registerBlock,2,
 func_176220_d,getStateById,2,Get a BlockState by it's ID (see getStateId)
 func_176221_a,getActualState,2,"Get the actual Block state of this Block at the given position. This applies properties not visible in the metadata, such as fence connections."
-func_176223_P,getDefaultState,2,
+func_176223_P,getDefaultState,2,Gets the default state for this block
 func_176224_k,fillWithRain,2,"Called similar to random ticks, but only when it is raining."
-func_176225_a,shouldSideBeRendered,0,
+func_176225_a,shouldSideBeRendered,0,"@deprecated call via {@link IBlockState#shouldSideBeRendered(IBlockAccess,BlockPos,EnumFacing)} whenever possible. Implementing/overriding is fine."
 func_176226_b,dropBlockAsItem,2,Spawn this Block's drops into the World as EntityItems
 func_176232_d,getSaplingDropChance,2,
 func_176233_b,getWoodType,2,
@@ -2750,20 +2750,20 @@ func_176604_a,makeAtlasSprite,0,
 func_176610_l,getName,2,
 func_176612_a,getMetadata,2,
 func_176613_a,byMetadata,2,
-func_176614_c,getUnlocalizedName,2,
+func_176614_c,getTranslationKey,2,
 func_176624_a,getMetadata,2,
 func_176625_a,byMetadata,2,
-func_176627_c,getUnlocalizedName,2,
+func_176627_c,getTranslationKey,2,
 func_176642_a,getMetadata,2,Returns the EnumType's metadata value.
 func_176643_a,byMetadata,2,Returns an EnumType for the BlockState from a metadata value.
-func_176644_c,getUnlocalizedName,2,
+func_176644_c,getTranslationKey,2,
 func_176657_a,getMetadata,2,
-func_176659_c,getUnlocalizedName,2,
+func_176659_c,getTranslationKey,2,
 func_176660_a,byMetadata,2,
 func_176673_a,byMetadata,2,Returns the matching EnumType for the given metadata.
 func_176675_a,getMetadata,2,
-func_176676_c,getUnlocalizedName,2,
-func_176685_d,getUnlocalizedName,2,
+func_176676_c,getTranslationKey,2,
+func_176685_d,getTranslationKey,2,
 func_176686_a,byMetadata,2,
 func_176687_c,getMapColor,2,
 func_176688_a,getMetadata,2,
@@ -2773,7 +2773,7 @@ func_176719_a,getName2,2,Like getName but doesn't override the method from Enum.
 func_176720_b,isVertical,2,If this Axis is on the vertical plane (Only true for Y)
 func_176722_c,isHorizontal,2,If this Axis is on the horizontal plane (true for X and Z)
 func_176730_m,getDirectionVec,0,Get a normalized Vector that points in the direction of this Facing.
-func_176731_b,getHorizontal,2,Gets the EnumFacing corresponding to the given horizontal index (0-3). Out of bounds values are wrapped around. The order is S-W-N-E.
+func_176731_b,byHorizontalIndex,2,Gets the EnumFacing corresponding to the given horizontal index (0-3). Out of bounds values are wrapped around. The order is S-W-N-E.
 func_176732_a,rotateAround,0,"Rotate this Facing around the given axis clockwise. If this facing cannot be rotated around the given axis, returns this facing without rotating."
 func_176733_a,fromAngle,2,"Get the EnumFacing corresponding to the given angle in degrees (0-360). Out of bounds values are wrapped around. An angle of 0 is SOUTH, an angle of 90 would be WEST."
 func_176734_d,getOpposite,2,Get the opposite Facing (e.g. DOWN => UP)
@@ -2789,7 +2789,7 @@ func_176743_c,getAxisDirection,2,Get the AxisDirection of this Facing.
 func_176744_n,rotateX,0,Rotate this Facing around the X axis (NORTH => DOWN => SOUTH => UP => NORTH)
 func_176745_a,getIndex,2,Get the Index of this Facing (0-5). The order is D-U-N-S-W-E
 func_176746_e,rotateY,2,Rotate this Facing around the Y axis clockwise (NORTH => EAST => SOUTH => WEST => NORTH)
-func_176762_d,getUnlocalizedName,2,
+func_176762_d,getTranslationKey,2,
 func_176764_b,byMetadata,2,
 func_176765_a,getMetadata,2,
 func_176766_a,byDyeDamage,2,
@@ -2797,14 +2797,14 @@ func_176767_b,getDyeDamage,2,
 func_176794_a,byMetadata,2,
 func_176796_a,getMetadata,2,
 func_176807_a,getMetadata,2,
-func_176809_c,getUnlocalizedName,2,
+func_176809_c,getTranslationKey,2,
 func_176810_a,byMetadata,2,
 func_176825_a,byMetadata,2,
 func_176827_a,getMetadata,2,
-func_176828_c,getUnlocalizedName,2,
+func_176828_c,getTranslationKey,2,
 func_176837_a,byMetadata,2,
 func_176839_a,getMetadata,2,
-func_176840_c,getUnlocalizedName,2,
+func_176840_c,getTranslationKey,2,
 func_176852_c,getFacing,2,
 func_176853_a,byMetadata,2,
 func_176855_a,getMetadata,2,
@@ -2813,20 +2813,20 @@ func_176870_a,fromFacingAxis,2,
 func_176878_a,forModelBlock,2,
 func_176879_a,byMetadata,2,
 func_176881_a,getMetadata,2,
-func_176882_c,getUnlocalizedName,2,
+func_176882_c,getTranslationKey,2,
 func_176883_d,getModelBlock,2,
 func_176895_a,byMetadata,2,
 func_176896_a,getMetadata,2,
 func_176915_a,getMetadata,2,
 func_176916_a,byMetadata,2,
-func_176918_c,getUnlocalizedName,2,
+func_176918_c,getTranslationKey,2,
 func_176924_a,byMetadata,2,
 func_176925_a,getMetadata,2,
-func_176927_c,getUnlocalizedName,2,
+func_176927_c,getTranslationKey,2,
 func_176936_a,getMeta,2,
 func_176938_a,byMetadata,2,
-func_176939_c,getUnlocalizedName,2,
-func_176963_d,getUnlocalizedName,2,
+func_176939_c,getTranslationKey,2,
+func_176963_d,getTranslationKey,2,
 func_176964_a,getBlockType,2,
 func_176966_a,getTypes,0,"Get all FlowerTypes that are applicable for the given Flower block (""yellow"", ""red"")"
 func_176967_a,getType,2,Get the given FlowerType from BlockType & metadata
@@ -2986,7 +2986,7 @@ func_177520_a,rotateVertex,0,
 func_177521_b,combineXY,0,
 func_177523_a,rotateFace,0,
 func_177524_a,getModelRotation,0,
-func_177525_a,getMatrix4d,0,
+func_177525_a,matrix,0,
 func_177552_f,getItemCameraTransforms,0,
 func_177554_e,getParticleTexture,0,
 func_177555_b,isAmbientOcclusion,0,
@@ -3192,7 +3192,7 @@ func_178089_a,getItemModel,0,
 func_178099_a,renderItem,0,
 func_178100_c,getMapAngleFromPitch,0,Return the angle to render the Map
 func_178101_a,rotateArroundXAndY,0,Rotate the render around X and Y
-func_178108_a,renderBlockInHand,0,Renders the given sprite over the player's view
+func_178108_a,renderSuffocationOverlay,0,Renders the given sprite over the player's view
 func_178113_a,getModelLocation,0,
 func_178119_d,registerAllBlocks,0,
 func_178120_a,getBlockStateMapper,0,
@@ -3503,7 +3503,7 @@ func_178943_e,getMinValue,0,
 func_178944_f,getMaxValue,0,
 func_178945_a,getFormatter,0,
 func_178950_a,getFilter,0,
-func_178962_a,putBrightness4,0,
+func_178962_a,putBrightness4,0,Set the brightness for the previously stored quad (4 vertices)
 func_178965_a,reset,0,
 func_178966_f,getByteBuffer,0,
 func_178968_d,putColor4,0,
@@ -3644,7 +3644,7 @@ func_179289_a,setCompressionThreshold,2,
 func_179290_a,sendPacket,2,
 func_179291_h,hasNoChannel,2,
 func_179292_f,isEncrypted,0,
-func_179293_l,checkDisconnected,2,
+func_179293_l,handleDisconnection,2,
 func_179299_a,setCompressionThreshold,2,
 func_179303_a,setCompressionThreshold,2,
 func_179318_a,cartesianProduct,2,Create the cartesian product. This method returns an Iterable of arrays of type clazz.
@@ -4039,32 +4039,32 @@ func_180630_a,findBiomePosition,2,
 func_180631_a,getBiome,2,Returns the biome generator
 func_180632_j,setDefaultState,2,
 func_180633_a,onBlockPlacedBy,2,"Called by ItemBlocks after a block is set in the world, to allow post-place logic"
-func_180634_a,onEntityCollidedWithBlock,2,Called When an Entity Collided with the Block
+func_180634_a,onEntityCollision,2,Called When an Entity Collided with the Block
 func_180635_a,spawnAsEntity,2,Spawns the given ItemStack as an EntityItem into the World at the given position
-func_180636_a,collisionRayTrace,2,Ray traces through the blocks collision from start vector to end vector returning a ray trace hit.
+func_180636_a,collisionRayTrace,2,"Ray traces through the blocks collision from start vector to end vector returning a ray trace hit.\n@deprecated call via {@link IBlockState#collisionRayTrace(World,BlockPos,Vec3d,Vec3d)} whenever possible. Implementing/overriding is fine."
 func_180637_b,dropXpOnBlockBreak,2,Spawns the given amount of experience into the World as XP orb entities
 func_180639_a,onBlockActivated,2,Called when the block is right clicked by a player.
-func_180640_a,getSelectedBoundingBox,0,Return an AABB (in world coords!) that should be highlighted when the player is targeting this Block
-func_180641_l,getComparatorInputOverride,2,
+func_180640_a,getSelectedBoundingBox,0,"Return an AABB (in world coords!) that should be highlighted when the player is targeting this Block\n@deprecated call via {@link IBlockState#getSelectedBoundingBox(World,BlockPos)} whenever possible. Implementing/overriding is fine."
+func_180641_l,getComparatorInputOverride,2,"@deprecated call via {@link IBlockState#getComparatorInputOverride(World,BlockPos)} whenever possible. Implementing/overriding is fine."
 func_180642_a,getStateForPlacement,2,"Called by ItemBlocks just before a block is actually set in the world, to allow for adjustments to the IBlockstate"
 func_180643_i,getSilkTouchDrop,2,
 func_180645_a,randomTick,2,"Called randomly when setTickRandomly is set to true (used by e.g. crops to grow, etc.)"
-func_180646_a,getCollisionBoundingBox,2,
-func_180647_a,getPlayerRelativeBlockHardness,2,Get the hardness of this Block relative to the ability of the given player
+func_180646_a,getCollisionBoundingBox,2,"@deprecated call via {@link IBlockState#getCollisionBoundingBox(IBlockAccess,BlockPos)} whenever possible. Implementing/overriding is fine."
+func_180647_a,getPlayerRelativeBlockHardness,2,"Get the hardness of this Block relative to the ability of the given player\n@deprecated call via {@link IBlockState#getPlayerRelativeBlockHardness(EntityPlayer,World,BlockPos)} whenever possible. Implementing/overriding is fine."
 func_180649_a,onBlockClicked,2,
 func_180650_b,updateTick,2,
 func_180651_a,damageDropped,2,Gets the metadata of the item this Block can drop. This method is called when the block gets destroyed. It returns the metadata of the dropped item based on the old metadata of the block.
-func_180652_a,onBlockDestroyedByExplosion,2,Called when this Block is destroyed by an Explosion
+func_180652_a,onExplosionDestroy,2,Called when this Block is destroyed by an Explosion
 func_180653_a,dropBlockAsItemWithChance,2,Spawns this Block's drops into the World as EntityItems.
 func_180655_c,randomDisplayTick,0,"Called periodically clientside on blocks near the player to show effects (like furnace fire particles). Note that this method is unrelated to {@link randomTick} and {@link #needsRandomTick}, and will always be called regardless of whether the block can receive random update ticks"
-func_180656_a,getWeakPower,2,
+func_180656_a,getWeakPower,2,"@deprecated call via {@link IBlockState#getWeakPower(IBlockAccess,BlockPos,EnumFacing)} whenever possible. Implementing/overriding is fine."
 func_180657_a,harvestBlock,2,Spawns the block's drops in the world. By the time this is called the Block has possibly been set to air via Block.removedByPlayer
 func_180658_a,onFallenUpon,2,Block's chance to react to a living entity falling on it.
-func_180659_g,getMapColor,2,Get the MapColor for this Block and the given BlockState
+func_180659_g,getMapColor,2,"Get the MapColor for this Block and the given BlockState\n@deprecated call via {@link IBlockState#getMapColor(IBlockAccess,BlockPos)} whenever possible. Implementing/overriding is fine."
 func_180660_a,getItemDropped,2,Get the Item that this Block should drop when harvested.
 func_180661_e,createBlockState,2,
 func_180663_b,breakBlock,2,"Called serverside after this block is replaced with another in Chunk, but before the Tile Entity is updated"
-func_180664_k,getBlockLayer,0,"Gets the render layer this block will render on. SOLID for solid blocks, CUTOUT or CUTOUT_MIPPED for on-off transparency (glass, reeds), TRANSLUCENT for fully blended transparency (stained glass)"
+func_180664_k,getRenderLayer,0,"Gets the render layer this block will render on. SOLID for solid blocks, CUTOUT or CUTOUT_MIPPED for on-off transparency (glass, reeds), TRANSLUCENT for fully blended transparency (stained glass)"
 func_180666_a,updateState,2,Updates the pressure plate when stepped on
 func_180669_e,computeRedstoneStrength,2,
 func_180670_a,canUseBonemeal,2,
@@ -4884,15 +4884,15 @@ func_185411_b,setSnowEnabled,2,
 func_185426_a,getSpikesForWorld,2,
 func_185428_a,getRegisteredBiome,2,
 func_185467_w,getSoundType,2,
-func_185471_a,withMirror,2,"Returns the blockstate with the given mirror of the passed blockstate. If inapplicable, returns the passed blockstate."
+func_185471_a,withMirror,2,"Returns the blockstate with the given mirror of the passed blockstate. If inapplicable, returns the passed blockstate.\n@deprecated call via {@link IBlockState#withMirror(Mirror)} whenever possible. Implementing/overriding is fine."
 func_185473_a,getItem,2,
 func_185477_a,addCollisionBoxToList,2,
-func_185481_k,isTopSolid,2,"Determines if the block is solid enough on the top side to support other blocks, like redstone components."
-func_185484_c,getPackedLightmapCoords,0,
-func_185485_f,getAmbientOcclusionLightValue,0,
-func_185492_a,addCollisionBoxToList,2,
-func_185496_a,getBoundingBox,2,
-func_185499_a,withRotation,2,"Returns the blockstate with the given rotation from the passed blockstate. If inapplicable, returns the passed blockstate."
+func_185481_k,isTopSolid,2,"Determines if the block is solid enough on the top side to support other blocks, like redstone components.\n@deprecated prefer calling {@link IBlockState#isTopSolid()} wherever possible"
+func_185484_c,getPackedLightmapCoords,0,"@deprecated call via {@link IBlockState#getPackedLightmapCoords(IBlockAccess,BlockPos)} whenever possible. Implementing/overriding is fine."
+func_185485_f,getAmbientOcclusionLightValue,0,@deprecated call via {@link IBlockState#getAmbientOcclusionLightValue()} whenever possible. Implementing/overriding is fine.
+func_185492_a,addCollisionBoxToList,2,"@deprecated call via {@link IBlockState#addCollisionBoxToList(World,BlockPos,AxisAlignedBB,List,Entity,boolean)} whenever possible. Implementing/overriding is fine."
+func_185496_a,getBoundingBox,2,"@deprecated call via {@link IBlockState#getBoundingBox(IBlockAccess,BlockPos)} whenever possible. Implementing/overriding is fine."
+func_185499_a,withRotation,2,"Returns the blockstate with the given rotation from the passed blockstate. If inapplicable, returns the passed blockstate.\n@deprecated call via {@link IBlockState#withRotation(Rotation)} whenever possible. Implementing/overriding is fine."
 func_185503_a,rayTrace,2,
 func_185507_b,playClickOnSound,2,
 func_185508_c,playClickOffSound,2,
@@ -4979,7 +4979,7 @@ func_185901_i,getRenderType,2,
 func_185902_a,withMirror,2,"Returns the blockstate mirrored in the given way. If inapplicable, returns itself."
 func_185903_a,getPlayerRelativeBlockHardness,2,
 func_185904_a,getMaterial,2,
-func_185905_o,getMobilityFlag,2,
+func_185905_o,getPushReaction,2,
 func_185906_d,getLightValue,2,
 func_185907_a,withRotation,2,"Returns the blockstate with the given rotation. If inapplicable, returns itself."
 func_185908_a,addCollisionBoxToList,2,
@@ -5070,7 +5070,7 @@ func_186095_a,setRespawnState,2,
 func_186096_a,processDragonDeath,2,
 func_186097_l,spawnNewGateway,2,
 func_186099_b,dragonUpdate,2,
-func_186100_j,updateplayers,2,
+func_186100_j,updatePlayers,2,
 func_186101_k,findAliveCrystals,2,
 func_186102_d,hasPreviouslyKilledDragon,2,
 func_186103_i,loadChunks,2,
@@ -5138,7 +5138,7 @@ func_186266_a,transformedBlockPos,2,
 func_186267_a,writeInts,2,
 func_186268_a,transformedBlockPos,2,
 func_186269_a,transformedVec3d,2,
-func_186274_m,getMobilityFlag,2,
+func_186274_m,getPushReaction,2,
 func_186281_c,distanceManhattan,2,
 func_186282_b,createFromBuffer,0,
 func_186283_a,cloneMove,2,
@@ -5522,10 +5522,10 @@ func_187248_x,savePlayerBanList,1,
 func_187249_y,loadIPBanList,1,
 func_187250_a,processRightClick,2,
 func_187251_a,processRightClickBlock,2,
-func_187252_a,setViewDistance,2,
+func_187252_a,setViewDistance,2,"Sets the view distance used on the server. For the dedicated server, this is the <code>view-distance</code> value in server.properties. For the integrated server, this is the host's render distance (which may change).\n \n@param distance Distance to track, in chunks"
 func_187253_a,getPositionLong,2,
 func_187254_a,updateServerPosition,0,
-func_187259_a,setMaxRange,2,
+func_187259_a,setMaxRange,2,"Sets the ""max track distance"" for this entity\n \n@param maxRangeIn Max track distance, in blocks"
 func_187260_b,getTrackedEntity,2,
 func_187261_c,resetPlayerVisibility,2,
 func_187264_a,getPos,2,
@@ -5736,7 +5736,7 @@ func_188224_a,updateLine,2,
 func_188228_i,getDistanceSq,0,
 func_188244_g,stopWorkerThreads,0,
 func_188245_a,uploadChunk,0,
-func_188247_f,hasChunkUpdates,0,
+func_188247_f,hasNoChunkUpdates,0,
 func_188248_h,hasNoFreeRenderBuilders,0,
 func_188251_a,process,2,
 func_188252_b,processFixes,2,
@@ -5959,7 +5959,7 @@ func_189533_g,setPos,2,
 func_189534_c,move,2,
 func_189535_a,setPos,0,
 func_189536_c,move,2,
-func_189539_a,eventReceived,2,"Called on server when World#addBlockEvent is called. If server returns true, then also called on the client. On the Server, this may perform additional changes to the world, like pistons replacing the block with an extended base. On the client, the update may involve replacing tile entities or effects such as sounds or particles"
+func_189539_a,eventReceived,2,"Called on server when World#addBlockEvent is called. If server returns true, then also called on the client. On the Server, this may perform additional changes to the world, like pistons replacing the block with an extended base. On the client, the update may involve replacing tile entities or effects such as sounds or particles\n@deprecated call via {@link IBlockState#onBlockEventReceived(World,BlockPos,int,int)} whenever possible. Implementing/overriding is fine."
 func_189540_a,neighborChanged,2,"Called when a neighboring block was changed and marks that this state should perform any checks during a neighbor change. Cases may include when redstone power is updated, cactus blocks popping off due to a neighboring solid block, etc."
 func_189541_b,updateState,2,
 func_189542_i,getDepth,2,
@@ -6131,7 +6131,7 @@ func_189863_a,teleportEntityToCoordinates,2,Teleports an entity to the specified
 func_189865_a,getDustColor,0,
 func_189868_a,registerFixes,2,
 func_189869_j,hasFrostWalkerEnchantment,2,Checks if the player has any armor enchanted with the frost walker enchantment. \n @return If player has equipment with frost walker
-func_189872_a,canEntitySpawn,2,
+func_189872_a,canEntitySpawn,2,@return true if the passed entity is allowed to spawn on this block.\n@deprecated prefer calling {@link IBlockState#canEntitySpawn(Entity)}
 func_189873_a,registerFixesJukebox,2,
 func_189874_a,trigger,2,
 func_189876_x,getDustColor,0,
@@ -6175,7 +6175,7 @@ func_189966_g,getOpenSet,0,
 func_189967_a,registerFixes,2,
 func_189972_c,getCenter,0,
 func_189973_a,intersects,0,
-func_189984_a,fromPitchYawVector,0,returns a Vec3d from given pitch and yaw degrees as Vec2f
+func_189984_a,fromPitchYaw,0,returns a Vec3d from given pitch and yaw degrees as Vec2f
 func_189985_c,lengthSquared,0,
 func_189986_a,fromPitchYaw,0,returns a Vec3d from given pitch and yaw degrees
 func_189988_a,dataFix,0,
@@ -6423,9 +6423,9 @@ func_190939_c,hasVanishingCurse,2,
 func_190942_a,rotate,2,
 func_190943_d,getFixedBiome,2,
 func_190944_c,isFixedBiome,2,
-func_190946_v,hasCustomBreakingProgress,0,
+func_190946_v,hasCustomBreakingProgress,0,@deprecated call via {@link IBlockState#hasCustomBreakingProgress()} whenever possible. Implementing/overriding is fine.
 func_190948_a,addInformation,0,
-func_190949_e,getOffset,2,
+func_190949_e,getOffset,2,"@deprecated call via {@link IBlockState#getOffset(IBlockAccess,BlockPos)} whenever possible. Implementing/overriding is fine."
 func_190951_a,canBePotted,2,
 func_190952_a,getBlockByColor,2,
 func_190953_b,getColoredItemStack,2,
@@ -6598,7 +6598,7 @@ func_191820_c,getY,0,
 func_191821_a,drawHover,0,
 func_191822_a,addGuiAdvancement,0,
 func_191823_d,getX,0,
-func_191824_a,getAdvancementProgress,0,
+func_191824_a,setAdvancementProgress,0,
 func_191825_b,attachToParent,0,
 func_191839_a,isVisible,0,
 func_191842_a,render,0,
@@ -6654,7 +6654,7 @@ func_191982_f,getAdvancementManager,0,
 func_191984_a,handleRecipeBookUpdate,2,
 func_191985_a,handleRecipePlacement,2,
 func_191986_a,travel,2,
-func_191987_a,setPartying,0,
+func_191987_a,setPartying,0,Called when a record starts or stops playing. Used to make parrots start or stop partying.\n \n@param pos The location the record is being played at (usually a jukebox)\n@param isPartying True if the record started; false if it stopped.
 func_191989_p,setMoveForward,2,
 func_191990_c,isPreventingPlayerRest,2,
 func_191991_a,startConverting,2,Starts conversion of this zombie villager to a villager\n \n@param conversionStarterIn The entity that started the conversion's UUID\n@param conversionTimeIn The time that it will take to finish conversion
@@ -6831,9 +6831,9 @@ func_192400_c,getIngredients,0,
 func_192402_a,deserializeIngredients,2,
 func_192403_f,getWidth,0,
 func_192404_g,getHeight,0,
-func_192405_a,deserializeItem,2,
+func_192405_a,deserializeItem,2,Returns an item json object as a Java ItemStack object.
 func_192407_a,patternFromJson,2,
-func_192408_a,deserializeKey,2,
+func_192408_a,deserializeKey,2,Returns a key json object as a Java HashMap.
 func_192413_b,findMatchingRecipe,2,
 func_192420_c,parseJsonRecipes,2,
 func_192425_e,tryTouchWater,2,
@@ -7027,7 +7027,7 @@ func_193049_f,getItemStack,2,
 func_193050_e,isHeadPiece,0,
 func_193051_a,setItemValues,2,
 func_193052_a,setColor,2,
-func_193054_a,setPartying,0,
+func_193054_a,setPartying,0,Called when a record starts or stops playing. Used to make parrots start or stop partying.\n \n@param worldIn The world in which the playback started or stopped\n@param pos The location the record is being played at (usually a jukebox)\n@param isPartying True if the record started; false if it stopped.
 func_193055_i,getRecipeUsed,2,
 func_193056_a,setRecipeUsed,2,
 func_193058_a,getFunction,2,
@@ -7130,8 +7130,8 @@ func_193355_a,addContainerRecipe,2,
 func_193356_a,addMix,2,
 func_193357_a,addMix,2,
 func_193358_e,getGroup,0,Recipes with equal group are combined into one button in the recipe book
-func_193361_a,deserializeIngredient,2,
-func_193362_a,deserialize,2,
+func_193361_a,deserializeIngredient,2,Returns an ingredient json element as a Java Ingredient object.
+func_193362_a,deserialize,2,Returns a shaped recipe json object as a Java ShapedRecipe object.
 func_193363_a,deserialize,2,
 func_193364_a,deserializeIngredients,2,
 func_193365_a,getMatchingStacks,0,
@@ -7146,7 +7146,7 @@ func_193376_a,parseRecipeJson,2,
 func_193377_a,init,2,
 func_193379_a,register,2,
 func_193382_c,isExceptBlockForAttachWithPiston,2,
-func_193383_a,getBlockFaceShape,2,"Get the geometry of the queried face at the given position and state. This is used to decide whether things like buttons are allowed to be placed on the face, or how glass panes connect to the face, among other things.\n<p>\nCommon values are {@code SOLID}, which is the default, and {@code UNDEFINED}, which represents something that does not fit the other descriptions and will generally cause other things not to connect to the face.\n\n@return an approximation of the form of the given face"
+func_193383_a,getBlockFaceShape,2,"Get the geometry of the queried face at the given position and state. This is used to decide whether things like buttons are allowed to be placed on the face, or how glass panes connect to the face, among other things.\n<p>\nCommon values are {@code SOLID}, which is the default, and {@code UNDEFINED}, which represents something that does not fit the other descriptions and will generally cause other things not to connect to the face.\n\n@return an approximation of the form of the given face\n@deprecated call via {@link IBlockState#getBlockFaceShape(IBlockAccess,BlockPos,EnumFacing)} whenever possible. Implementing/overriding is fine."
 func_193384_b,isExceptionBlockForAttaching,2,
 func_193385_b,isHeadPiece,0,
 func_193386_c,executeChain,2,
@@ -7235,7 +7235,7 @@ func_193577_a,getPathNodeType,2,
 func_193578_a,checkNeighborBlocks,2,
 func_193579_b,test,2,
 func_193580_a,from,2,
-func_193581_j,getTagTypeName,2,
+func_193581_j,getTypeName,2,
 func_193582_s,handleEscape,2,
 func_193584_a,toArray,2,
 func_193586_a,toArray,2,
@@ -7457,7 +7457,7 @@ func_70000_a,addServerStatsToSnooper,2,
 func_70001_b,addServerTypeToSnooper,2,
 func_70002_Q,isSnooperEnabled,2,Returns whether snooping is enabled or not.
 func_70003_b,canUseCommand,2,"Returns {@code true} if the CommandSender is allowed to execute the command, {@code false} if not"
-func_70005_c_,getName,2,Get the name of this object. For players this returns their username
+func_70005_c_,getName,2,"Gets the name of this thing. This method has slightly different behavior depending on the interface (for <a href=""https://github.com/ModCoderPack/MCPBot-Issues/issues/14"">technical reasons</a> the same method is used for both IWorldNameable and ICommandSender):\n \n<dl>\n<dt>{@link net.minecraft.util.INameable#getName() INameable.getName()}</dt>\n<dd>Returns the name of this inventory. If this {@linkplain net.minecraft.inventory#hasCustomName() has a custom name} then this <em>should</em> be a direct string; otherwise it <em>should</em> be a valid translation string.</dd>\n<dd>However, note that <strong>the translation string may be invalid</strong>, as is the case for {@link net.minecraft.tileentity.TileEntityBanner TileEntityBanner} (always returns nonexistent translation code <code>banner</code> without a custom name), {@link net.minecraft.block.BlockAnvil.Anvil BlockAnvil$Anvil} (always returns <code>anvil</code>), {@link net.minecraft.block.BlockWorkbench.InterfaceCraftingTable BlockWorkbench$InterfaceCraftingTable} (always returns <code>crafting_table</code>), {@link net.minecraft.inventory.InventoryCraftResult InventoryCraftResult} (always returns <code>Result</code>) and the {@link net.minecraft.entity.item.EntityMinecart EntityMinecart} family (uses the entity definition). This is not an exaustive list.</dd>\n<dd>In general, this method should be safe to use on tile entities that implement IInventory.</dd>\n<dt>{@link net.minecraft.command.ICommandSender#getName() ICommandSender.getName()} and {@link net.minecraft.entity.Entity#getName() Entity.getName()}</dt>\n<dd>Returns a valid, displayable name (which may be localized). For most entities, this is the translated version of its translation string (obtained via {@link net.minecraft.entity.EntityList#getEntityString EntityList.getEntityString}).</dd>\n<dd>If this entity has a custom name set, this will return that name.</dd>\n<dd>For some entities, this will attempt to translate a nonexistent translation string; see <a href=""https://bugs.mojang.com/browse/MC-68446"">MC-68446</a>. For {@linkplain net.minecraft.entity.player.EntityPlayer#getName() players} this returns the player's name. For {@linkplain net.minecraft.entity.passive.EntityOcelot ocelots} this may return the translation of <code>entity.Cat.name</code> if it is tamed. For {@linkplain net.minecraft.entity.item.EntityItem#getName() item entities}, this will attempt to return the name of the item in that item entity. In all cases other than players, the custom name will overrule this.</dd>\n<dd>For non-entity command senders, this will return some arbitrary name, such as ""Rcon"" or ""Server"".</dd>\n</dl>"
 func_70007_b,resetLog,1,Clears the RCon log
 func_70008_c,getLogContents,1,Gets the contents of the RCon log
 func_70011_f,getDistance,2,Gets the distance to the position.
@@ -7772,7 +7772,7 @@ func_71007_a,displayGUIChest,2,Displays the GUI for interacting with a chest inv
 func_71009_b,onCriticalHit,2,Called when the entity is dealt a critical hit.
 func_71015_k,addMountedMovementStat,2,"Adds a value to a mounted movement statistic field - by minecart, boat, or pig."
 func_71016_p,sendPlayerAbilities,2,Sends the player's abilities to the server (if there is one).
-func_71019_a,dropItem,2,Drops an item into the world.
+func_71019_a,dropItem,2,Drops an item into the world.\n \n@param unused Whether to trace the item to the player
 func_71020_j,addExhaustion,2,increases exhaustion level by supplied amount
 func_71023_q,addExperience,2,Add experience points to player.
 func_71024_bL,getFoodStats,2,Returns the player's FoodStats object.
@@ -7983,7 +7983,7 @@ func_72367_e,playerLoggedOut,2,Called when a player disconnects from the game. W
 func_72368_a,recreatePlayerEntity,2,Destroys the given player entity and recreates another in the given dimension. Used when respawning after death or returning from the End
 func_72369_d,getOnlinePlayerNames,2,Returns an array of the usernames of all the connected players.
 func_72371_a,setWhiteListEnabled,2,
-func_72372_a,getEntityViewDistance,2,
+func_72372_a,getEntityViewDistance,2,"Gets the ""max track distance"" for entities based on the current view distance."
 func_72373_m,getAvailablePlayerDat,2,Returns an array of usernames for which player.dat exists for.
 func_72374_b,onTick,2,self explanitory
 func_72375_a,preparePlayer,2,
@@ -7999,7 +7999,7 @@ func_72389_g,saveAllPlayerData,2,Saves all of the players' current states.
 func_72391_b,writePlayerData,2,also stores the NBTTags if this is an intergratedPlayerList
 func_72392_r,removeAllPlayers,2,"Kicks everyone with ""Server closed"" as reason."
 func_72394_k,getCurrentPlayerCount,2,Returns the number of players currently on the server.
-func_72395_o,getViewDistance,2,Gets the View Distance.
+func_72395_o,getViewDistance,2,"Gets the view distance, in chunks."
 func_72417_t,loadOpsList,1,
 func_72418_v,readWhiteList,1,
 func_72419_u,saveOpsList,1,
@@ -8008,12 +8008,12 @@ func_72429_b,getIntermediateWithXValue,2,"Returns a new vector with x value equa
 func_72430_b,dotProduct,2,
 func_72431_c,crossProduct,0,Returns a new vector with the result of this vector x the specified vector.
 func_72432_b,normalize,2,Normalizes the vector to a length of 1 (except if it is the zero vector)
-func_72433_c,lengthVector,2,Returns the length of the vector.
+func_72433_c,length,2,Returns the length of the vector.
 func_72434_d,getIntermediateWithZValue,2,"Returns a new vector with z value equal to the second parameter, along the line between this vector and the passed in vector, or null if not possible."
 func_72435_c,getIntermediateWithYValue,2,"Returns a new vector with y value equal to the second parameter, along the line between this vector and the passed in vector, or null if not possible."
 func_72436_e,squareDistanceTo,2,The square of the Euclidean distance between this and the specified vector.
 func_72438_d,distanceTo,2,"Euclidean distance between this and the specified vector, returned as double."
-func_72441_c,addVector,2,"Adds the specified x,y,z vector components to this vector and returns the resulting vector. Does not change this vector."
+func_72441_c,add,2,"Adds the specified x,y,z vector components to this vector and returns the resulting vector. Does not change this vector."
 func_72444_a,subtractReverse,2,Returns a new vector with the result of the specified vector minus this.
 func_72591_c,getRequestId,1,Returns the request ID provided by the client.
 func_72592_a,getRandomChallenge,1,Returns the random challenge number assigned to this auth
@@ -8061,7 +8061,7 @@ func_72672_a,toByteArray,1,Returns the contents of the output stream as a byte a
 func_72683_a,addPlayer,2,Adds an EntityPlayerMP to the PlayerManager and to all player instances within player visibility
 func_72684_a,overlaps,2,"Determine if two rectangles centered at the given points overlap for the provided radius. Arguments: x1, z1, x2, z2, radius."
 func_72685_d,updateMovingPlayer,2,Update chunks around a player that moved
-func_72686_a,getFurthestViewableBlock,2,Get the furthest viewable block given player's view distance
+func_72686_a,getFurthestViewableBlock,2,Gets the max entity track distance (in blocks) for the given view distance.\n \n@param distance The view distance in chunks
 func_72688_a,getWorldServer,2,Returns the WorldServer associated with this PlayerManager
 func_72693_b,tick,2,updates all the player instances that need to be updated
 func_72694_a,isPlayerWatchingChunk,2,
@@ -8081,7 +8081,7 @@ func_72785_a,track,2,"Args : Entity, trackingRange, updateFrequency, sendVelocit
 func_72786_a,track,2,
 func_72787_a,removePlayerFromTrackers,2,
 func_72788_a,tick,2,
-func_72790_b,untrack,2,
+func_72790_b,untrack,2,"Removes the given entity, sending removal packets to all players tracking it. Called when the entity is dead.\n \n@param entityIn The entity to untrack"
 func_72791_a,track,2,
 func_72800_K,getHeight,2,Returns maximum world height.
 func_72806_N,isEmpty,0,set by !chunk.getAreLevelsEmpty
@@ -8153,7 +8153,7 @@ func_72955_a,tickUpdates,2,Runs through the list of updates to run and ticks the
 func_72959_q,getBiomeProvider,2,
 func_72960_a,setEntityState,2,sends a Packet 38 (Entity Status) to all tracked players of that entity
 func_72963_a,initialize,2,
-func_72964_e,getChunkFromChunkCoords,2,Gets the chunk at the specified location.
+func_72964_e,getChunk,2,Gets the chunk at the specified location.
 func_72966_v,calculateInitialSkylight,2,Called on construction of the World class to setup the initial skylight values
 func_72967_a,calculateSkylightSubtracted,2,Returns the amount of skylight subtracted for the current time
 func_72970_h,createChunkProvider,2,Creates the chunk provider for this world. Called in the constructor. Retrieves provider from worldProvider?
@@ -8897,7 +8897,7 @@ func_77126_d,canBeCreated,0,Gets whether this WorldType can be used to generate 
 func_77127_a,getName,2,
 func_77128_b,getTranslationKey,0,Gets the translation key for the name of this world type.
 func_77129_f,setVersioned,2,Flags this world type as having an associated version.
-func_77130_a,parseWorldType,2,
+func_77130_a,byName,2,
 func_77131_c,getVersion,2,Returns generatorVersion.
 func_77132_a,getWorldTypeForGeneratorVersion,2,
 func_77142_a,getByName,0,"Gets the game type registered with the specified name. If no matches were found, survival will be returned."
@@ -8998,7 +8998,7 @@ func_77629_n_,shouldRotateAroundWhenRendering,0,Returns true if this item should
 func_77634_r,hasContainerItem,2,True if this Item has a container item (a.k.a. crafting result)
 func_77636_d,hasEffect,0,"Returns true if this item has an enchantment glint. By default, this returns <code>stack.isItemEnchanted()</code>, but other items can override it (for instance, written books always return true).\n \nNote that if you override this method, you generally want to also call the super version (on {@link Item}) to get the glint for enchanted items. Of course, that is unnecessary if the overwritten version always returns true."
 func_77637_a,setCreativeTab,2,returns this;
-func_77639_j,getItemStackLimit,2,Returns the maximum size of the stack for a specific item. *Isn't this more a Set than a Get?*
+func_77639_j,getItemStackLimit,2,Returns the maximum size of the stack for a specific item.
 func_77640_w,getCreativeTab,0,gets the CreativeTab this item is displayed on
 func_77642_a,setContainerItem,2,
 func_77643_m_,isMap,2,false for all Items except sub-classes of ItemMapBase
@@ -9008,16 +9008,16 @@ func_77647_b,getMetadata,2,Converts the given ItemStack damage value into a meta
 func_77651_p,getShareTag,2,"If this function returns true (or the item is damageable), the ItemStack's NBT tag will be sent to the client."
 func_77653_i,getItemStackDisplayName,2,
 func_77654_b,onItemUseFinish,2,Called when the player finishes using this Item (E.g. finishes eating.). Not called when the player stops using the Item before the action is complete.
-func_77655_b,setUnlocalizedName,2,"Sets the unlocalized name of this item to the string passed as the parameter, prefixed by ""item."""
+func_77655_b,setTranslationKey,2,"Sets the unlocalized name of this item to the string passed as the parameter, prefixed by ""item."""
 func_77656_e,setMaxDamage,2,set max damage of an Item
 func_77657_g,getUnlocalizedNameInefficiently,2,"Translates the unlocalized name of this item, but without the .name suffix, so the translation fails and the unlocalized name itself is returned."
-func_77658_a,getUnlocalizedName,2,Returns the unlocalized name of this item.
+func_77658_a,getTranslationKey,2,Returns the unlocalized name of this item.
 func_77659_a,onItemRightClick,2,Called when the equipped item is right clicked.
 func_77661_b,getItemUseAction,2,returns the action that specifies what animation to play when the items is being used
 func_77662_d,isFull3D,0,Returns True is the item is renderer in full 3D when hold.
 func_77663_a,onUpdate,2,Called each tick as long the item is on a player inventory. Uses by maps to check if is on a player hand and update it's contents.
 func_77664_n,setFull3D,2,Sets bFull3D to True and return the object.
-func_77667_c,getUnlocalizedName,2,Returns the unlocalized name of this item. This version accepts an ItemStack so different stacks can have different names based on their damage or NBT.
+func_77667_c,getTranslationKey,2,Returns the unlocalized name of this item. This version accepts an ItemStack so different stacks can have different names based on their damage or NBT.
 func_77668_q,getContainerItem,2,
 func_77828_a,validBookTagContents,2,
 func_77840_a,spawnCreature,2,"Spawns the creature specified by the egg's type in the location specified by the last three parameters. Parameters: world, entityID, x, y, z."
@@ -9053,7 +9053,7 @@ func_77973_b,getItem,2,Returns the object corresponding to the stack.
 func_77974_b,onPlayerStoppedUsing,2,Called when the player releases the use item button.
 func_77975_n,getItemUseAction,2,
 func_77976_d,getMaxStackSize,2,Returns maximum size of the stack.
-func_77977_a,getUnlocalizedName,2,
+func_77977_a,getTranslationKey,2,
 func_77978_p,getTagCompound,2,Returns the NBTTagCompound of the ItemStack.
 func_77979_a,splitStack,2,Splits off a stack of the given amount of this stack and reduces this stack by the amount.
 func_77980_a,onCrafting,2,
@@ -9073,15 +9073,15 @@ func_78000_c,getAttackDamage,2,Returns the damage against a given entity.
 func_78013_b,getTabLabel,0,
 func_78014_h,setNoTitle,2,
 func_78015_f,getBackgroundImageName,0,
-func_78016_d,getTabIconItem,0,
-func_78017_i,shouldHidePlayerInventory,0,
+func_78016_d,createIcon,0,
+func_78017_i,hasScrollbar,0,
 func_78018_a,displayAllRelevantItems,0,only shows items which have tabToDisplayOn == this
 func_78019_g,drawInForegroundOfTab,0,
-func_78020_k,getTabColumn,0,returns index % 6
-func_78021_a,getTabIndex,0,
+func_78020_k,getColumn,0,returns index % 6
+func_78021_a,getIndex,0,
 func_78022_j,setNoScrollbar,2,
-func_78023_l,isTabInFirstRow,0,returns tabIndex < 6
-func_78024_c,getTranslatedTabLabel,0,Gets the translated Label.
+func_78023_l,isOnTopRow,0,returns tabIndex < 6
+func_78024_c,getTranslationKey,0,Gets the translated Label.
 func_78025_a,setBackgroundImageName,2,
 func_78044_b,getDamageReductionAmount,2,"Return the damage reduction (each 1 point is a half a shield on gui) of the piece index passed (0 = helmet, 1 = plate, 2 = legs and 3 = boots)"
 func_78045_a,getEnchantability,2,Return the enchantability factor of the material.
@@ -9306,12 +9306,12 @@ func_82573_f,getWorldTotalTime,2,
 func_82574_x,getGameRulesInstance,2,Gets the GameRules class Instance.
 func_82580_o,removeTag,2,Remove the specified tag.
 func_82581_a,createCrashReport,2,Create a crash report which indicates a NBT read error.
-func_82582_d,hasNoTags,2,Return whether this compound has no tags.
+func_82582_d,isEmpty,2,Return whether this compound has no tags.
 func_82594_a,getObject,2,
 func_82595_a,putObject,2,Register an object on this registry.
-func_82599_e,getFrontOffsetZ,2,Gets the offset in the z direction to the block in front of this facing.
-func_82600_a,getFront,2,"Gets the EnumFacing corresponding to the given index (0-5). Out of bounds values are wrapped around. The order is D-U-N-S-W-E. ""Named getFront for legacy reasons."""
-func_82601_c,getFrontOffsetX,2,Gets the offset in the x direction to the block in front of this facing.
+func_82599_e,getZOffset,2,Gets the offset in the z direction to the block in front of this facing.
+func_82600_a,byIndex,2,Gets the EnumFacing corresponding to the given index (0-5). Out of bounds values are wrapped around. The order is D-U-N-S-W-E.
+func_82601_c,getXOffset,2,Gets the offset in the x direction to the block in front of this facing.
 func_82615_a,getX,2,
 func_82616_c,getZ,2,
 func_82617_b,getY,2,
@@ -9603,7 +9603,7 @@ func_96549_e,addObjective,2,
 func_96550_d,getCreatePackets,2,
 func_96551_b,markSaveDataDirty,2,
 func_96552_h,getObjectiveDisplaySlotCount,2,
-func_96559_d,getFrontOffsetY,2,Gets the offset in the y direction to the block in front of this facing.
+func_96559_d,getYOffset,2,Gets the offset in the y direction to the block in front of this facing.
 func_96560_a,getScoreMap,2,
 func_96631_a,attemptDamageItem,2,"Attempts to damage the ItemStack with par1 amount of damage, If the ItemStack has the Unbreaking enchantment there is a chance for each point of damage to be negated. Returns true if it takes more damage than getMaxDamage(). Returns false otherwise or if the ItemStack can't be damaged or if all points of damage are negated."
 func_96636_a,getName,2,
@@ -9632,7 +9632,7 @@ func_96679_b,getName,2,
 func_96680_c,getCriteria,2,
 func_96681_a,setDisplayName,2,
 func_96682_a,getScoreboard,0,
-func_98034_c,isInvisibleToPlayer,0,"Only used by renderer in EntityLivingBase subclasses.\nDetermines if an entity is visible or not to a specfic player, if the entity is normally invisible.\nFor EntityLivingBase subclasses, returning false when invisible will render the entity semitransparent."
+func_98034_c,isInvisibleToPlayer,0,"Only used by renderer in EntityLivingBase subclasses.\nDetermines if an entity is visible or not to a specific player, if the entity is normally invisible.\nFor EntityLivingBase subclasses, returning false when invisible will render the entity semi-transparent."
 func_98042_n,setTransferTicker,2,"Sets the transfer ticker, used to determine the delay between transfers."
 func_98043_aE,canTransfer,2,Returns whether the hopper cart can currently transfer an item.
 func_98052_bS,canPickUpLoot,2,

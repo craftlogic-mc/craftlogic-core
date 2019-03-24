@@ -1,7 +1,6 @@
 package ru.craftlogic.api.server;
 
 import com.google.common.collect.ImmutableSet;
-import jline.internal.Nullable;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.event.world.WorldEvent;
@@ -12,6 +11,7 @@ import ru.craftlogic.api.util.ServerManager;
 import ru.craftlogic.api.world.Dimension;
 import ru.craftlogic.api.world.World;
 
+import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;

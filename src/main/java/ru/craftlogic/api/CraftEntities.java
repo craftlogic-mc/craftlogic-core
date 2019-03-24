@@ -3,17 +3,11 @@ package ru.craftlogic.api;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.EntityCaveSpider;
-import net.minecraft.entity.monster.EntitySpider;
-import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.client.render.entity.RenderCaveSpider;
-import ru.craftlogic.client.render.entity.RenderChicken;
-import ru.craftlogic.client.render.entity.RenderSpider;
 import ru.craftlogic.client.render.entity.RenderThrownItem;
 import ru.craftlogic.common.entity.EntityThrownItem;
 
@@ -36,19 +30,16 @@ public class CraftEntities {
     @SideOnly(Side.CLIENT)
     private static void initClient() {
         registerEntityRenderer(EntityThrownItem.class, RenderThrownItem::new);
-        registerEntityRenderer(EntityChicken.class, RenderChicken::new);
-        registerEntityRenderer(EntitySpider.class, RenderSpider::new);
-        registerEntityRenderer(EntityCaveSpider.class, RenderCaveSpider::new);
     }
 
     public static <E extends Entity> void registerEntity(Class<E> type, String name, int trackingRange, int updateFrequency, boolean sendsVelocityUpdates) {
         ResourceLocation id = wrapWithActiveModId(name, MOD_ID);
-        EntityRegistry.registerModEntity(id, type, id.getResourcePath(), nextEntityId++, id.getResourceDomain(), trackingRange, updateFrequency, sendsVelocityUpdates);
+        EntityRegistry.registerModEntity(id, type, id.getPath(), nextEntityId++, id.getNamespace(), trackingRange, updateFrequency, sendsVelocityUpdates);
     }
 
     public static <E extends Entity> void registerEntity(Class<E> type, String name, int trackingRange, int updateFrequency, boolean sendsVelocityUpdates, int eggPrimary, int eggSecondary) {
         ResourceLocation id = wrapWithActiveModId(name, MOD_ID);
-        EntityRegistry.registerModEntity(id, type, id.getResourcePath(), nextEntityId++, id.getResourceDomain(), trackingRange, updateFrequency, sendsVelocityUpdates, eggPrimary, eggSecondary);
+        EntityRegistry.registerModEntity(id, type, id.getPath(), nextEntityId++, id.getNamespace(), trackingRange, updateFrequency, sendsVelocityUpdates, eggPrimary, eggSecondary);
     }
 
     @SideOnly(Side.CLIENT)

@@ -1,9 +1,7 @@
 package ru.craftlogic.mixin.item;
 
 import net.minecraft.block.Block;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.RegistryNamespaced;
 import org.spongepowered.asm.mixin.Final;
@@ -30,8 +28,8 @@ public class MixinItem {
      */
     @Overwrite
     private static void registerItem(int id, ResourceLocation name, Item item) {
-        if (name.getResourceDomain().equals("minecraft")) {
-            switch (name.getResourcePath()) {
+        if (name.getNamespace().equals("minecraft")) {
+            switch (name.getPath()) {
                 case "bowl": {
                     item = new ItemBowl();
                     break;
@@ -44,12 +42,6 @@ public class MixinItem {
                 }
                 case "milk_bucket": {
                     item = new ItemMilkBucket().setCreativeTab(null);
-                    break;
-                }
-            }
-            for (EnumDyeColor color : EnumDyeColor.values()) {
-                if (name.getResourcePath().equals(color.getName() + "_carpet")) {
-                    item = new ItemCarpet(((ItemBlock)item).getBlock());
                     break;
                 }
             }
@@ -71,6 +63,10 @@ public class MixinItem {
             case "minecraft:brown_mushroom":
             case "minecraft:red_mushroom": {
                 item = new ItemMushroom(block);
+                break;
+            }
+            case "carpet": {
+                item = new ItemCarpet(block);
                 break;
             }
         }

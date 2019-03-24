@@ -44,7 +44,7 @@ public class BlockBeeHive extends BlockBase implements ModelAutoReg {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public BlockRenderLayer getBlockLayer() {
+    public BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.CUTOUT;
     }
 

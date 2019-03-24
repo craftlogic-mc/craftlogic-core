@@ -12,7 +12,7 @@ public class FluidBase extends Fluid implements IForgeRegistryEntry<Fluid> {
     private ResourceLocation registryName;
 
     public FluidBase(ResourceLocation name, ResourceLocation still, ResourceLocation flowing, int color) {
-        super(name.getResourcePath(), still, flowing, color);
+        super(name.getPath(), still, flowing, color);
         this.registryName = name;
     }
 

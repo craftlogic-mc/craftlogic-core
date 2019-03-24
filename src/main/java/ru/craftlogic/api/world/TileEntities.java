@@ -14,7 +14,7 @@ public final class TileEntities {
     public static <T> T getTileEntity(IBlockAccess world, BlockPos pos, Class<T> type) {
         TileEntity tile = null;
         if (world instanceof World) {
-            Chunk chunk = ((World) world).getChunkFromBlockCoords(pos);
+            Chunk chunk = ((World) world).getChunk(pos);
             if (!chunk.isEmpty()) {
                 tile = chunk.getTileEntity(pos, ((World) world).isRemote ?
                         Chunk.EnumCreateEntityType.QUEUED : Chunk.EnumCreateEntityType.IMMEDIATE);

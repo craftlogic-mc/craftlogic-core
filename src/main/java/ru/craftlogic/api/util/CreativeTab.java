@@ -25,19 +25,19 @@ public class CreativeTab extends CreativeTabs {
     }
 
     @Override
-    public ItemStack getTabIconItem() {
+    public ItemStack createIcon() {
         return iconFactory.apply(this);
     }
 
     @Override
-    public ItemStack getIconItemStack() {
+    public ItemStack getIcon() {
         if (this.iconCaching) {
             if (this.cachedIcon == null) {
-                this.cachedIcon = this.getTabIconItem();
+                this.cachedIcon = this.createIcon();
             }
             return this.cachedIcon;
         } else {
-            return this.getTabIconItem();
+            return this.createIcon();
         }
     }
 }

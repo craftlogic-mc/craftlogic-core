@@ -19,7 +19,7 @@ public class ItemFoodBase extends ItemFood implements ModelAutoReg {
         this.name = name;
         this.setCreativeTab(tab);
         this.setRegistryName(name);
-        this.setUnlocalizedName(name);
+        this.setTranslationKey(name);
     }
 
     @Override

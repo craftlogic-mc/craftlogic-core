@@ -19,7 +19,7 @@ import ru.craftlogic.api.world.Player;
 public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlayer {
     @Shadow
     private long playerLastActiveTime;
-    @Shadow @Final public MinecraftServer mcServer;
+    @Shadow @Final public MinecraftServer server;
     private long firstPlayed;
     private long timePlayed;
 
@@ -63,6 +63,6 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
 
     @Override
     public Player wrapped() {
-        return Server.from(this.mcServer).getPlayerManager().getOnline(this.getUniqueID());
+        return Server.from(this.server).getPlayerManager().getOnline(this.getUniqueID());
     }
 }
