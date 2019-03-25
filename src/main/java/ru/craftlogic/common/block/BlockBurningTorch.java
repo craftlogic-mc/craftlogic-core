@@ -36,7 +36,7 @@ public class BlockBurningTorch extends BlockTorch implements ModelAutoReg {
         this.setHardness(0.0F);
         this.setLightLevel(0.9375F);
         this.setSoundType(SoundType.WOOD);
-        this.setUnlocalizedName("torch");
+        this.setTranslationKey("torch");
         this.setTickRandomly(true);
         this.setDefaultState(this.blockState.getBaseState()
             .withProperty(FACING, EnumFacing.UP)

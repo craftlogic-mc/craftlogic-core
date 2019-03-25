@@ -31,7 +31,7 @@ public class BlockCobblestone extends BlockFalling implements Mossable {
         this.setHardness(mossy ? 5F : 4F);
         this.setResistance(10F);
         this.setSoundType(SoundType.STONE);
-        this.setUnlocalizedName(mossy ? "stoneMoss" : "stonebrick");
+        this.setTranslationKey(mossy ? "stoneMoss" : "stonebrick");
         this.setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
         this.setTickRandomly(true);
     }

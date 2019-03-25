@@ -53,8 +53,8 @@ public abstract class MixinGuiContainerCreative extends GuiContainer {
     private int sortItems(ItemStack a, ItemStack b) {
         ResourceLocation idA = a.getItem().getRegistryName();
         ResourceLocation idB = b.getItem().getRegistryName();
-        String nameA = idA.getResourcePath();
-        String nameB = idB.getResourcePath();
+        String nameA = idA.getPath();
+        String nameB = idB.getPath();
         boolean bA = Block.REGISTRY.containsKey(idA);
         boolean bB = Block.REGISTRY.containsKey(idB);
         if (bA != bB) {
@@ -71,8 +71,8 @@ public abstract class MixinGuiContainerCreative extends GuiContainer {
                     return a.getItem().getClass().getName().compareTo(b.getItem().getClass().getName());
                 }
             }
-            /*if (!idA.getResourceDomain().equals(idB.getResourceDomain())) {
-                return idA.getResourceDomain().compareTo(idB.getResourceDomain());
+            /*if (!idA.getNamespace().equals(idB.getNamespace())) {
+                return idA.getNamespace().compareTo(idB.getNamespace());
             } else*/ if (!nameA.equals(nameB)) {
                 return nameA.compareTo(nameB);
             } else {

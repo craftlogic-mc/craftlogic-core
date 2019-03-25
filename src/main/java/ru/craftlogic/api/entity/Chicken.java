@@ -21,7 +21,7 @@ public interface Chicken extends Bird, Tameable {
 
         ChickenVariant(String texture) {
             ResourceLocation tx = wrapWithModId(texture, CraftAPI.MOD_ID);
-            this.texture = new ResourceLocation(tx.getResourceDomain(), "textures/entity/chicken/" + tx.getResourcePath() + ".png");
+            this.texture = new ResourceLocation(tx.getNamespace(), "textures/entity/chicken/" + tx.getPath() + ".png");
         }
 
         public ResourceLocation getTexture() {

@@ -26,7 +26,6 @@ import java.util.UUID;
 public class EntityThrownItem extends EntityThrowable {
     private static final DataParameter<ItemStack> ITEM = EntityDataManager.createKey(EntityThrownItem.class, DataSerializers.ITEM_STACK);
 
-    private ItemStack item;
     private boolean drop;
     private UUID owner;
 
@@ -37,9 +36,9 @@ public class EntityThrownItem extends EntityThrowable {
     public EntityThrownItem(World world, EntityLivingBase thrower, ItemStack item, boolean drop) {
         super(world, thrower);
         this.drop = drop;
-        this.item = item.copy();
-        this.item.setCount(1);
-        this.dataManager.set(ITEM, this.item);
+        ItemStack i = item.copy();
+        i.setCount(1);
+        this.dataManager.set(ITEM, i);
         if (thrower instanceof EntityPlayer) {
             this.owner = thrower.getUniqueID();
         }
@@ -48,9 +47,9 @@ public class EntityThrownItem extends EntityThrowable {
     public EntityThrownItem(World world, double x, double y, double z, ItemStack item, boolean drop) {
         super(world, x, y, z);
         this.drop = drop;
-        this.item = item.copy();
-        this.item.setCount(1);
-        this.dataManager.set(ITEM, this.item);
+        ItemStack i = item.copy();
+        i.setCount(1);
+        this.dataManager.set(ITEM, i);
     }
 
     @Override
@@ -65,7 +64,7 @@ public class EntityThrownItem extends EntityThrowable {
     @Override
     protected void entityInit() {
         super.entityInit();
-        this.dataManager.register(ITEM, this.item);
+        this.dataManager.register(ITEM, ItemStack.EMPTY);
     }
 
     public ItemStack getItem() {
@@ -129,9 +128,9 @@ public class EntityThrownItem extends EntityThrowable {
                 } else if (this.drop) {
                     this.entityDropItem(item.copy(), 0F);
                 }
+                this.setDead();
             }
         }
-        this.setDead();
     }
 
     @Nullable

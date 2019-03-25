@@ -134,13 +134,13 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
     @Overwrite
     public ICommand registerCommand(ICommand command) {
         ResourceLocation commandName = wrapWithActiveModId(command.getName(), "minecraft");
-        CommandContainer container = new CommandContainer(commandName.getResourceDomain(), command);
+        CommandContainer container = new CommandContainer(commandName.getNamespace(), command);
 
         this.registry.put(commandName, container);
-        this.aliases.computeIfAbsent(commandName.getResourcePath(), k -> new ArrayList<>()).add(commandName);
+        this.aliases.computeIfAbsent(commandName.getPath(), k -> new ArrayList<>()).add(commandName);
 
         for (String alias : command.getAliases()) {
-            this.registry.put(new ResourceLocation(commandName.getResourceDomain(), alias), container);
+            this.registry.put(new ResourceLocation(commandName.getNamespace(), alias), container);
             this.aliases.computeIfAbsent(alias, k -> new ArrayList<>()).add(commandName);
         }
 
@@ -201,7 +201,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
                         container = this.getCommand(cmds.get(cmds.size() - 1));
                     } else {
                         for (ResourceLocation c : cmds) {
-                            if (c.getResourceDomain().equalsIgnoreCase(modId)) {
+                            if (c.getNamespace().equalsIgnoreCase(modId)) {
                                 container = this.getCommand(c);
                                 break;
                             }
@@ -284,7 +284,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
         for (Map.Entry<ResourceLocation, CommandContainer> entry : this.registry.entrySet()) {
             ResourceLocation commandName = entry.getKey();
             CommandContainer container = entry.getValue();
-            this.aliases.computeIfAbsent(commandName.getResourcePath(), k -> new ArrayList<>()).add(commandName);
+            this.aliases.computeIfAbsent(commandName.getPath(), k -> new ArrayList<>()).add(commandName);
             for (String alias : container.command.getAliases()) {
                 this.aliases.computeIfAbsent(alias, k -> new ArrayList<>()).add(commandName);
             }

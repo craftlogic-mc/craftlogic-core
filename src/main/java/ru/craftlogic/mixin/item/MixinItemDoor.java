@@ -60,8 +60,8 @@ public class MixinItemDoor extends Item {
             ItemStack heldItem = player.getHeldItem(hand);
             if (player.canPlayerEdit(pos, side, heldItem) && this.block.canPlaceBlockAt(world, pos)) {
                 EnumFacing facing = EnumFacing.fromAngle((double)player.rotationYaw);
-                int ox = facing.getFrontOffsetX();
-                int oz = facing.getFrontOffsetZ();
+                int ox = facing.getXOffset();
+                int oz = facing.getZOffset();
                 boolean rightHinge = ox < 0 && hitZ < 0.5F || ox > 0 && hitZ > 0.5F || oz < 0 && hitX > 0.5F || oz > 0 && hitX < 0.5F;
                 EnumFacing handleDir = rightHinge ? facing.rotateY() : facing.rotateYCCW();
                 EnumFacing handleOppDir = handleDir.getOpposite();

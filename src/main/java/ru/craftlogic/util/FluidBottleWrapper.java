@@ -38,7 +38,7 @@ public class FluidBottleWrapper extends FluidHandlerItemStack {
         if (fluidStack == null) {
             this.container = new ItemStack(Items.GLASS_BOTTLE);
         } else {
-            if (fluidStack.tag == null || fluidStack.tag.hasNoTags()) {
+            if (fluidStack.tag == null || fluidStack.tag.isEmpty()) {
                 if (fluid == FluidRegistry.WATER) {
                     this.container = PotionUtils.addPotionToItemStack(new ItemStack(Items.POTIONITEM), PotionTypes.WATER);
                 }

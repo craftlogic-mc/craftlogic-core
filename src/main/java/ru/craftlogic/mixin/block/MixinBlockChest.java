@@ -132,7 +132,7 @@ public abstract class MixinBlockChest extends BlockContainer {
      */
     @Overwrite
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack item) {
-        EnumFacing facing = EnumFacing.getHorizontal(MathHelper.floor((double)(placer.rotationYaw * 4F / 360F) + 0.5D) & 3).getOpposite();
+        EnumFacing facing = EnumFacing.byHorizontalIndex(MathHelper.floor((double)(placer.rotationYaw * 4F / 360F) + 0.5D) & 3).getOpposite();
         state = state.withProperty(FACING, facing);
         if (!placer.isSneaking()) {
             BlockPos northPos = pos.north();
@@ -351,7 +351,7 @@ public abstract class MixinBlockChest extends BlockContainer {
     @Overwrite
     public IBlockState getStateFromMeta(int meta) {
         ChestPart part = meta >= 8 ? ChestPart.RIGHT : (meta >= 4 ? ChestPart.LEFT : ChestPart.SINGLE);
-        EnumFacing side = EnumFacing.getHorizontal(meta % 4);
+        EnumFacing side = EnumFacing.byHorizontalIndex(meta % 4);
         return this.getDefaultState().withProperty(FACING, side).withProperty(PART, part);
     }
 

@@ -2,7 +2,6 @@ package ru.craftlogic.api.server;
 
 import com.google.common.collect.ImmutableSet;
 import com.mojang.authlib.GameProfile;
-import jline.internal.Nullable;
 import net.minecraft.server.management.*;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -15,6 +14,7 @@ import ru.craftlogic.api.world.OfflinePlayer;
 import ru.craftlogic.api.world.Player;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;

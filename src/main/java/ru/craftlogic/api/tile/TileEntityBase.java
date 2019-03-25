@@ -122,9 +122,9 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
         if (this.getBlockType() instanceof BlockBase) {
             BlockBase block = (BlockBase) this.getBlockType();
             ItemStack stack = this.getDroppedItem();
-            return block.getUnlocalizedName(stack) + ".name";
+            return block.getTranslationKey(stack) + ".name";
         } else {
-            return this.getBlockType().getUnlocalizedName() + ".name";
+            return this.getBlockType().getTranslationKey() + ".name";
         }
     }
 

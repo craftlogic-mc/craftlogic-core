@@ -12,5 +12,5 @@ import ru.craftlogic.util.AdvancedProfiler;
 public class MixinMinecraft {
     private static final long PROFILER_WARN_TIME_MS = 50L;
     @Shadow @Final @Mutable
-    public Profiler mcProfiler = new AdvancedProfiler(PROFILER_WARN_TIME_MS * 1000_000L);
+    public Profiler profiler = new AdvancedProfiler(PROFILER_WARN_TIME_MS * 1000_000L);
 }

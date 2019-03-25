@@ -19,7 +19,7 @@ public class ItemMultiTexture extends ItemBase {
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack stack) {
+    public String getTranslationKey(ItemStack stack) {
         if (stack.getMetadata() < this.names.length) {
             return ("item." + this.prefix + "." + this.names[stack.getMetadata()]).replaceAll("/", ".");
         }

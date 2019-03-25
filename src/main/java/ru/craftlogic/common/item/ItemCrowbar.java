@@ -61,7 +61,7 @@ public class ItemCrowbar extends ItemBase {
             }
             Vec3d start = entity.getPositionEyes(1F);
             Vec3d look = entity.getLook(1F);
-            Vec3d end = start.addVector(look.x * distance, look.y * distance, look.z * distance);
+            Vec3d end = start.add(look.x * distance, look.y * distance, look.z * distance);
             RayTraceResult target = world.rayTraceBlocks(start, end, false, false, true);
             if (target != null && target.typeOfHit == RayTraceResult.Type.BLOCK) {
                 System.out.println("found block");

@@ -39,7 +39,7 @@ public abstract class MixinBlockDynamicLiquid extends BlockLiquid {
         if (world.isAreaLoaded(pos, this.getSlopeFindDistance(world))) {
             int i = state.getValue(LEVEL);
             int j = 1;
-            if (this.blockMaterial == Material.LAVA && !world.provider.doesWaterVaporize()) {
+            if (this.material == Material.LAVA && !world.provider.doesWaterVaporize()) {
                 j = 2;
             }
 
@@ -68,16 +68,16 @@ public abstract class MixinBlockDynamicLiquid extends BlockLiquid {
                     }
                 }
 
-                if (this.adjacentSourceBlocks >= 2 && ForgeEventFactory.canCreateFluidSource(world, pos, state, this.blockMaterial == Material.WATER)) {
+                if (this.adjacentSourceBlocks >= 2 && ForgeEventFactory.canCreateFluidSource(world, pos, state, this.material == Material.WATER)) {
                     IBlockState downState = world.getBlockState(pos.down());
                     if (downState.getMaterial().isSolid()) {
                         i1 = 0;
-                    } else if (downState.getMaterial() == this.blockMaterial && downState.getValue(LEVEL) == 0) {
+                    } else if (downState.getMaterial() == this.material && downState.getValue(LEVEL) == 0) {
                         i1 = 0;
                     }
                 }
 
-                if (this.blockMaterial == Material.LAVA && i < 8 && i1 < 8 && i1 > i && rand.nextInt(4) != 0) {
+                if (this.material == Material.LAVA && i < 8 && i1 < 8 && i1 > i && rand.nextInt(4) != 0) {
                     k *= 4;
                 }
 
@@ -100,7 +100,7 @@ public abstract class MixinBlockDynamicLiquid extends BlockLiquid {
 
             IBlockState downState = world.getBlockState(pos.down());
             if (this.canFlowInto(world, pos.down(), downState)) {
-                if (this.blockMaterial == Material.LAVA && world.getBlockState(pos.down()).getMaterial() == Material.WATER) {
+                if (this.material == Material.LAVA && world.getBlockState(pos.down()).getMaterial() == Material.WATER) {
                     world.setBlockState(pos.down(), Blocks.STONE.getDefaultState());
                     this.triggerMixEffects(world, pos.down());
                     return;
@@ -135,7 +135,7 @@ public abstract class MixinBlockDynamicLiquid extends BlockLiquid {
     }
 
     private Fluid getFluid() {
-        if (this.blockMaterial == Material.LAVA) {
+        if (this.material == Material.LAVA) {
             return FluidRegistry.LAVA;
         } else {
             return FluidRegistry.WATER;

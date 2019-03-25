@@ -38,7 +38,7 @@ public class BlockBeeHouse extends BlockBase implements TileEntityHolder<TileEnt
         super(Material.WOOD, plankType.getName() + "_bee_house", 2F, CreativeTabs.DECORATIONS);
         this.plankType = plankType;
         this.setSoundType(SoundType.WOOD);
-        this.setUnlocalizedName("bee_house");
+        this.setTranslationKey("bee_house");
         this.setDefaultState(this.getBlockState().getBaseState()
             .withProperty(COVERED, true)
             .withProperty(CLOSED, true)
@@ -102,7 +102,7 @@ public class BlockBeeHouse extends BlockBase implements TileEntityHolder<TileEnt
     @Override
     public IBlockState getStateFromMeta(int meta) {
         return this.getDefaultState()
-                .withProperty(FACING, EnumFacing.getHorizontal(meta & 3))
+                .withProperty(FACING, EnumFacing.byHorizontalIndex(meta & 3))
                 .withProperty(COVERED, (meta & 4) > 0)
                 .withProperty(CLOSED, (meta & 8) > 0);
     }

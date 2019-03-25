@@ -150,7 +150,7 @@ public abstract class MixinEntityZombie extends EntityMob implements Zombie {
         double dy = target.getEntityBoundingBox().minY + (double)(target.height / 3.0F) - arrow.posY;
         double dz = target.posZ - this.posZ;
         double distance = (double) MathHelper.sqrt(dx * dx + dz * dz);
-        arrow.shoot(dx, dy + distance * 0.20000000298023224D, dz, 1.6F, (float)(14 - this.world.getDifficulty().getDifficultyId() * 4));
+        arrow.shoot(dx, dy + distance * 0.20000000298023224D, dz, 1.6F, (float)(14 - this.world.getDifficulty().getId() * 4));
         this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRNG().nextFloat() * 0.4F + 0.8F));
         this.world.spawnEntity(arrow);
     }

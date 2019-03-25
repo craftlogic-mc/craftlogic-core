@@ -66,11 +66,11 @@ field_110444_H,LOCATION_MOJANG_PNG,0,
 field_110445_I,MAC_DISPLAY_MODES,0,
 field_110446_Y,fileAssets,0,
 field_110447_Z,launchedVersion,0,
-field_110448_aq,mcResourcePackRepository,0,
+field_110448_aq,resourcePackRepository,0,
 field_110449_ao,defaultResourcePacks,0,
-field_110450_ap,mcDefaultResourcePack,0,
-field_110451_am,mcResourceManager,0,
-field_110452_an,metadataSerializer_,0,
+field_110450_ap,defaultResourcePack,0,
+field_110451_am,resourceManager,0,
+field_110452_an,metadataSerializer,0,
 field_110453_aa,proxy,0,
 field_110456_c,serverProxy,2,
 field_110463_b,packFormat,0,
@@ -132,8 +132,8 @@ field_110619_e,repositoryEntriesAll,0,
 field_110620_b,rprDefaultResourcePack,0,
 field_110621_c,rprMetadataSerializer,0,
 field_110622_a,RESOURCE_PACK_FILTER,0,
-field_110625_b,resourcePath,2,
-field_110626_a,resourceDomain,2,
+field_110625_b,path,2,
+field_110626_a,namespace,2,
 field_110684_D,frontRightLeg,0,
 field_110685_E,frontRightShin,0,
 field_110686_F,frontRightHoof,0,
@@ -260,7 +260,7 @@ field_111100_b,z,2,
 field_111101_a,x,2,
 field_111113_b,defaultValue,2,
 field_111114_c,shouldWatch,2,
-field_111115_a,unlocalizedName,2,
+field_111115_a,translationKey,2,
 field_111118_b,maximumValue,2,
 field_111119_c,description,2,
 field_111120_a,minimumValue,2,
@@ -320,7 +320,7 @@ field_130079_a,LOC_FOLIAGE_PNG,0,
 field_130222_e,rotated,0,
 field_130223_c,width,0,
 field_130224_d,height,0,
-field_135017_as,mcLanguageManager,0,
+field_135017_as,languageManager,0,
 field_135019_a,languages,0,
 field_135029_d,unicode,0,
 field_135030_b,SPLITTER,0,"Splits on ""="""
@@ -854,10 +854,10 @@ field_147101_bU,respawnInvulnerabilityTicks,2,
 field_147102_bM,LOGGER,2,
 field_147103_bO,statsFile,2,
 field_147123_G,LOGGER,0,
-field_147124_at,framebufferMc,0,
+field_147124_at,framebuffer,0,
 field_147125_j,pointedEntity,0,
-field_147126_aw,mcMusicTicker,0,
-field_147127_av,mcSoundHandler,0,
+field_147126_aw,musicTicker,0,
+field_147127_av,soundHandler,0,
 field_147128_au,textureMapBlocks,0,
 field_147129_ai,jvm64bit,0,
 field_147141_M,resourcePackUrl,2,The texture pack for the server
@@ -913,7 +913,7 @@ field_147377_k,lastSentPingPacket,2,
 field_147378_h,keepAliveId,2,
 field_147379_i,lastPingTime,2,
 field_147384_b,networkManager,0,
-field_147385_a,mcServer,0,
+field_147385_a,server,0,
 field_147386_b,networkManager,2,
 field_147387_a,server,2,
 field_147393_d,networkManager,0,
@@ -1016,7 +1016,7 @@ field_147677_b,mc,0,
 field_147678_c,currentMusic,0,
 field_147679_a,rand,0,
 field_147694_f,sndManager,0,
-field_147695_g,mcResourceManager,0,
+field_147695_g,resourceManager,0,
 field_147696_d,TYPE,0,
 field_147697_e,soundRegistry,0,
 field_147698_b,LOGGER,0,
@@ -1512,9 +1512,9 @@ field_149632_a,matches,2,
 field_149758_A,hasTileEntity,2,true if the Block contains a Tile Entity
 field_149762_H,blockSoundType,2,Sound of stepping on the block
 field_149763_I,blockParticleGravity,2,
-field_149764_J,blockMaterial,2,
+field_149764_J,material,2,
 field_149765_K,slipperiness,2,Determines how much velocity is maintained while moving on top of this block
-field_149770_b,unlocalizedName,2,
+field_149770_b,translationKey,2,
 field_149771_c,REGISTRY,2,
 field_149772_a,displayOnCreativeTab,2,
 field_149781_w,blockResistance,2,Indicates how much this block can resist explosions
@@ -1863,7 +1863,7 @@ field_150885_f,lastStatRequest,2,
 field_150887_d,statsFile,2,
 field_150888_e,dirty,2,
 field_150889_b,LOGGER,2,
-field_150890_c,mcServer,2,
+field_150890_c,server,2,
 field_150901_e,REGISTRY,2,
 field_150907_b,cooked,2,"Indicates whether this fish is ""cooked"" or not."
 field_150908_b,crops,2,
@@ -1885,7 +1885,7 @@ field_150956_d,serializableClazz,2,
 field_150957_c,objectiveCriteria,2,
 field_150960_a,item,2,
 field_150980_f,meta,2,The item damage value on an ItemStack that represents this fish type
-field_150981_g,unlocalizedName,2,"The value that this fish type uses to replace ""XYZ"" in: ""fish.XYZ.raw"" / ""fish.XYZ.cooked"" for the unlocalized name and ""fish_XYZ_raw"" / ""fish_XYZ_cooked"" for the icon string."
+field_150981_g,translationKey,2,"The value that this fish type uses to replace ""XYZ"" in: ""fish.XYZ.raw"" / ""fish.XYZ.cooked"" for the unlocalized name and ""fish_XYZ_raw"" / ""fish_XYZ_cooked"" for the icon string."
 field_150983_e,META_LOOKUP,2,Maps an item damage value for an ItemStack to the corresponding FishType value.
 field_150987_n,cookable,2,"Indicates whether this type of fish has ""raw"" and ""cooked"" variants"
 field_150989_l,cookedHealAmount,2,The amount that eating the cooked version of this fish should heal the player.
@@ -2069,13 +2069,13 @@ field_151227_b,LOGGER,2,
 field_151228_a,DOWNLOAD_THREADS_STARTED,2,The number of download threads that we have started so far.
 field_151234_b,LOGGER,2,
 field_151242_b,MULTIPLY_DE_BRUIJN_BIT_POSITION,2,"Though it looks like an array, this is really more like a mapping.  Key (index of this array) is the upper 5 bits of the result of multiplying a 32-bit unsigned integer by the B(2, 5) De Bruijn sequence 0x077CB531.  Value (value stored in the array) is the unique index (from the right) of the leftmost one-bit in a 32-bit unsigned integer that can cause the upper 5 bits to get that value.  Used for highly optimized ""find the log-base-2 of this number"" calculations."
-field_151245_t,iconItemStack,2,
+field_151245_t,icon,2,
 field_151249_a,LOGGER,2,
 field_151257_b,networkSystem,2,
 field_151258_a,LOGGER,2,
 field_151262_p,LOGGER,2,
 field_151272_f,networkManagers,2,A list containing all NetworkManager instances of all endpoints
-field_151273_d,mcServer,2,Reference to the MinecraftServer object.
+field_151273_d,server,2,Reference to the MinecraftServer object.
 field_151274_e,endpoints,2,Contains all endpoints added to this NetworkSystem
 field_151275_b,LOGGER,2,
 field_151276_c,SERVER_NIO_EVENTLOOP,2,
@@ -2154,8 +2154,8 @@ field_151512_d,killEntityStat,2,
 field_151513_e,entityKilledByStat,2,
 field_151516_b,LOGGER,2,
 field_151520_r,damageIsAbsolute,2,Whether or not the damage ignores modification by potion effects or enchantments.
-field_151527_f,difficultyId,2,
-field_151528_g,difficultyResourceKey,2,
+field_151527_f,id,2,
+field_151528_g,translationKey,2,
 field_151530_e,ID_MAPPING,2,
 field_151546_e,allowedBiomes,2,
 field_151562_a,blockstate,2,
@@ -2254,7 +2254,7 @@ field_152176_i,serverResourcePacks,0,
 field_152177_g,time,0,
 field_152350_aA,skinManager,0,
 field_152351_aB,scheduledTasks,0,
-field_152352_aC,mcThread,0,
+field_152352_aC,thread,0,
 field_152354_ay,mojangLogo,0,
 field_152355_az,sessionService,0,
 field_152356_J,twitchDetails,0,
@@ -2935,26 +2935,26 @@ field_176605_b,interpolatedFrameData,0,
 field_176615_f,meta,2,
 field_176616_g,name,2,
 field_176618_e,META_LOOKUP,2,
-field_176622_h,unlocalizedName,2,
-field_176635_l,unlocalizedName,2,
+field_176622_h,translationKey,2,
+field_176635_l,translationKey,2,
 field_176637_j,meta,2,
 field_176638_k,name,2,
 field_176640_i,META_LOOKUP,2,
 field_176653_j,name,2,The EnumType's name.
-field_176654_k,unlocalizedName,2,
+field_176654_k,translationKey,2,
 field_176655_h,META_LOOKUP,2,Array of the Block's BlockStates
 field_176656_i,meta,2,The BlockState's metadata.
-field_176661_f,unlocalizedName,2,
+field_176661_f,translationKey,2,
 field_176663_d,meta,2,
 field_176664_e,name,2,
 field_176666_c,META_LOOKUP,2,
 field_176671_c,name,2,
 field_176677_f,name,2,
-field_176678_g,unlocalizedName,2,
+field_176678_g,translationKey,2,
 field_176679_d,META_LOOKUP,2,
 field_176680_e,metadata,2,
 field_176690_f,mapColor,2,
-field_176691_g,unlocalizedName,2,
+field_176691_g,translationKey,2,
 field_176692_d,meta,2,
 field_176693_e,name,2,
 field_176695_c,META_LOOKUP,2,
@@ -2973,7 +2973,7 @@ field_176758_k,axis,2,
 field_176759_h,opposite,2,Index of the opposite Facing in the VALUES array
 field_176760_i,horizontalIndex,2,Ordering index for the HORIZONTALS field (S-W-N-E)
 field_176761_p,NAME_LOOKUP,2,
-field_176785_v,unlocalizedName,2,
+field_176785_v,translationKey,2,
 field_176786_u,name,2,
 field_176787_t,dyeDamage,2,
 field_176788_s,meta,2,
@@ -2983,18 +2983,18 @@ field_176793_x,chatColor,2,
 field_176797_f,META_LOOKUP,2,
 field_176798_g,meta,2,
 field_176805_h,serializedName,2,
-field_176806_i,unlocalizedName,2,
+field_176806_i,translationKey,2,
 field_176811_f,name,2,
-field_176812_g,unlocalizedName,2,
+field_176812_g,translationKey,2,
 field_176813_d,META_LOOKUP,2,
 field_176814_e,meta,2,
 field_176820_d,name,2,
 field_176829_f,name,2,
-field_176830_g,unlocalizedName,2,
+field_176830_g,translationKey,2,
 field_176831_d,META_LOOKUP,2,
 field_176832_e,meta,2,
 field_176842_g,META_LOOKUP,2,
-field_176848_j,unlocalizedName,2,
+field_176848_j,translationKey,2,
 field_176850_h,meta,2,
 field_176851_i,name,2,
 field_176864_l,facing,2,
@@ -3003,7 +3003,7 @@ field_176867_k,name,2,
 field_176869_i,META_LOOKUP,2,
 field_176874_e,name,2,
 field_176885_g,META_LOOKUP,2,
-field_176891_j,unlocalizedName,2,
+field_176891_j,translationKey,2,
 field_176893_h,meta,2,
 field_176894_i,name,2,
 field_176905_n,META_LOOKUP,2,
@@ -3013,15 +3013,15 @@ field_176919_d,name,2,
 field_176921_b,META_LOOKUP,2,
 field_176922_c,meta,2,
 field_176928_f,name,2,
-field_176929_g,unlocalizedName,2,
+field_176929_g,translationKey,2,
 field_176930_d,METADATA_LOOKUP,2,
 field_176931_e,metadata,2,
 field_176941_g,META_LOOKUP,2,
-field_176947_j,unlocalizedName,2,
+field_176947_j,translationKey,2,
 field_176949_h,meta,2,
 field_176950_i,name,2,
 field_176976_n,name,2,
-field_176977_o,unlocalizedName,2,
+field_176977_o,translationKey,2,
 field_176978_l,blockType,2,
 field_176979_m,meta,2,
 field_176981_k,TYPES_FOR_BLOCK,2,
@@ -3168,7 +3168,7 @@ field_177515_a,world,2,
 field_177519_c,variant,0,
 field_177542_u,quartersY,0,
 field_177543_t,quartersX,0,
-field_177544_s,matrix4d,0,
+field_177544_s,matrix,0,
 field_177545_r,combinedXY,0,
 field_177546_q,MAP_ROTATIONS,0,
 field_177557_a,cameraTransforms,0,
@@ -3470,7 +3470,7 @@ field_178152_f,cookTime,2,
 field_178153_g,totalCookTime,2,
 field_178154_h,furnaceBurnTime,2,
 field_178155_i,currentItemBurnTime,2,
-field_178156_j,selfPosition,2,
+field_178156_j,pos,2,
 field_178164_f,renderChunks,0,
 field_178165_d,countChunksX,0,
 field_178166_e,countChunksZ,0,
@@ -3701,7 +3701,7 @@ field_178756_a,isDemo,0,
 field_178757_d,assetIndex,0,
 field_178758_b,resourcePacksDir,0,
 field_178759_c,assetsDir,0,
-field_178760_a,mcDataDir,0,
+field_178760_a,gameDir,0,
 field_178761_d,checkGlErrors,0,
 field_178762_b,height,0,
 field_178763_c,fullscreen,0,
@@ -4739,7 +4739,7 @@ field_185224_G,LONG_STRENGTH,2,
 field_185225_H,STRONG_STRENGTH,2,
 field_185226_I,WEAKNESS,2,
 field_185227_J,LONG_WEAKNESS,2,
-field_185228_K,CACHE,2,
+field_185228_K,CACHE,2,"During the registration process, contains all potions that have been registered so far (along with null) to avoid duplicates (and including null)."
 field_185229_a,EMPTY,2,
 field_185230_b,WATER,2,
 field_185231_c,MUNDANE,2,
@@ -5061,7 +5061,7 @@ field_185776_dc,REPEATING_COMMAND_BLOCK,2,
 field_185777_dd,CHAIN_COMMAND_BLOCK,2,
 field_185778_de,FROSTED_ICE,2,
 field_185779_df,STRUCTURE_BLOCK,2,
-field_185780_dg,CACHE,2,
+field_185780_dg,CACHE,2,"During the registration process, contains all blocks that have been registered so far (along with null) to avoid duplicates (and including null)."
 field_185807_d,name,2,
 field_185808_e,mirrorNames,2,
 field_185838_e,name,2,
@@ -5616,7 +5616,7 @@ field_187255_c,forwardKeyDown,0,
 field_187256_d,backKeyDown,0,
 field_187257_e,leftKeyDown,0,
 field_187258_f,rightKeyDown,0,
-field_187262_f,maxRange,2,
+field_187262_f,maxRange,2,"Max track distance, in blocks"
 field_187263_w,passengers,2,
 field_187281_a,LOGGER,2,
 field_187282_b,playerChunkMap,2,
@@ -7668,8 +7668,8 @@ field_194034_b,rightItr,0,
 field_194035_c,numbers,0,"A mapping of objects to unique numeric IDs, used to sort the list.\n<p>\nSince there's no good place to document how this class works, it basically just interleaves two iterators together, choosing the entry that has the lower numeric ID in this map."
 field_194036_d,left,0,Current element from {@link #leftItr}
 field_194037_e,right,0,Current element from {@link #rightItr}
-field_194044_a,byId,0,A {@link SuffixArray} that contains values keyed by the ID (as produced by {@link #idFunc}).
-field_194045_b,byName,0,A {@link SuffixArray} that contains values keyed by the name (as produced by {@link #nameFunc}).
+field_194044_a,byName,0,A {@link SuffixArray} that contains values keyed by the ID (as produced by {@link #idFunc}).
+field_194045_b,byId,0,A {@link SuffixArray} that contains values keyed by the name (as produced by {@link #nameFunc}).
 field_194046_c,nameFunc,0,"A function that takes a <code>T</code> and returns a list of Strings describing it normally.\n<p>\nFor both items and recipes, this is implemented via {@link net.minecraft.item.ItemStack#getTooltip() ItemStack.getTooltip} (with NORMAL tooltip flags), with formatting codes stripped, text trimmed, and empty lines removed.\n \nThe result does not need to be corrected for"
 field_194047_d,idFunc,0,"A function that takes a <code>T</code> and returns a list of {@link ResourceLocation}s describing it.\n<p>\nFor both items and recipes, this is implemented via <code>Item.REGISTRY.getNameForObject</code>. (In the case of registries, it is applied to all results)"
 field_194048_e,contents,0,All entries in the search tree.
@@ -8061,7 +8061,7 @@ field_71109_bG,cameraYaw,2,
 field_71130_g,entityRemoveQueue,2,This is a queue that contains the entity IDs of entties that need to be removed on the client. Adding an entity ID to this queue will cause a SPacketDestroyEntities to be sent to the client.
 field_71131_d,managedPosX,2,player X position as seen by PlayerManager
 field_71132_e,managedPosZ,2,player Z position as seen by PlayerManager
-field_71133_b,mcServer,2,Reference to the MinecraftServer object.
+field_71133_b,server,2,Reference to the MinecraftServer object.
 field_71134_c,interactionManager,2,The player interaction manager for this player
 field_71135_a,connection,2,The NetServerHandler assigned to this player by the ServerConfigurationManager.
 field_71136_j,queuedEndExit,2,"True when the player has left the End using an the exit portal, but has not yet been respawned in the overworld"
@@ -8136,7 +8136,7 @@ field_71346_p,isPublic,0,
 field_71348_o,isGamePaused,0,
 field_71349_l,mc,0,The Minecraft instance.
 field_71350_m,worldSettings,0,
-field_71412_D,mcDataDir,0,
+field_71412_D,gameDir,0,
 field_71415_G,inGameHasFocus,0,Does the actual gameplay have focus. If so then mouse and keys will effect the player instead of menus.
 field_71417_B,mouseHelper,0,Mouse helper instance.
 field_71419_L,debugUpdateTime,0,Approximate time (in ms) of last update to debug string
@@ -8144,7 +8144,7 @@ field_71420_M,fpsCounter,0,holds the current fps
 field_71421_N,prevFrameTime,0,
 field_71422_O,currentServerData,0,
 field_71423_H,systemTime,0,
-field_71424_I,mcProfiler,0,The profiler instance
+field_71424_I,profiler,0,The profiler instance
 field_71425_J,running,0,Set to true to keep the game loop running. Set to false by shutdown() to allow the game loop to exit cleanly.
 field_71426_K,debug,0,String that shows the debug information
 field_71427_U,usageSnooper,0,Instance of PlayerUsageSnooper.
@@ -8168,7 +8168,7 @@ field_71445_n,isGamePaused,0,
 field_71446_o,renderEngine,0,The RenderEngine instance used by Minecraft
 field_71449_j,session,0,
 field_71452_i,effectRenderer,0,
-field_71453_ak,myNetworkManager,0,
+field_71453_ak,networkManager,0,
 field_71454_w,skipRenderWorld,0,Skip render world
 field_71455_al,integratedServerIsRunning,0,
 field_71456_v,ingameGUI,0,
@@ -8205,9 +8205,9 @@ field_72337_e,maxY,2,The maximum Y coordinate of this bounding box. Guaranteed t
 field_72338_b,minY,2,The minimum Y coordinate of this bounding box. Guaranteed to always be less than or equal to {@link #maxY}.
 field_72339_c,minZ,2,The minimum Y coordinate of this bounding box. Guaranteed to always be less than or equal to {@link #maxZ}.
 field_72340_a,minX,2,The minimum X coordinate of this bounding box. Guaranteed to always be less than or equal to {@link #maxX}.
-field_72400_f,mcServer,2,Reference to the MinecraftServer object.
+field_72400_f,server,2,Reference to the MinecraftServer object.
 field_72401_g,bannedPlayers,2,
-field_72402_d,viewDistance,2,
+field_72402_d,viewDistance,2,View distance in chunks.
 field_72403_e,DATE_FORMAT,2,
 field_72404_b,playerEntityList,2,A list of player entities that exist on this server.
 field_72405_c,maxPlayers,2,The maximum number of players that can be connected at a time.
@@ -8264,7 +8264,7 @@ field_72666_a,HEX_DIGITS,1,Translation array of decimal to hex digits
 field_72673_b,output,1,ByteArrayOutputStream wrapper
 field_72674_a,byteArrayOutput,1,Output stream
 field_72697_d,dirtyEntries,2,the playerInstances(chunks) that need to be updated
-field_72698_e,playerViewRadius,2,Number of chunks the server sends to the client. Valid 3<=x<=15. In server.properties.
+field_72698_e,playerViewRadius,2,"Player view distance, in chunks."
 field_72699_b,players,2,players in the current instance
 field_72700_c,entryMap,2,the hash of all playerInstances created
 field_72701_a,world,2,
@@ -8283,8 +8283,8 @@ field_72773_u,cloudTickCounter,0,counts the cloud render updates. Used with mod 
 field_72777_q,mc,0,A reference to the Minecraft object.
 field_72781_x,glSkyList2,0,OpenGL sky list 2
 field_72782_b,world,2,The WorldServer object.
-field_72783_a,mcServer,2,Reference to the MinecraftServer object.
-field_72792_d,maxTrackingDistanceThreshold,2,
+field_72783_a,server,2,Reference to the MinecraftServer object.
+field_72792_d,maxTrackingDistanceThreshold,2,"""Max track distance"", measured in blocks."
 field_72793_b,entries,2,"List of tracked entities, used for iteration operations on tracked entities."
 field_72794_c,trackedEntityHashTable,2,Used for identity lookup of tracked entities.
 field_72795_a,world,2,
@@ -8328,7 +8328,7 @@ field_73036_L,entitySpawnQueue,0,Contains all entities for this client that were
 field_73037_M,mc,0,
 field_73038_N,previousActiveChunkSet,0,
 field_73058_d,disableLevelSaving,2,Whether level saving is disabled or not
-field_73061_a,mcServer,2,
+field_73061_a,server,2,
 field_73062_L,entityTracker,2,The entity tracker for this server world.
 field_73063_M,playerChunkMap,2,The player chunk map for this server world.
 field_73064_N,pendingTickListEntriesHashSet,2,
@@ -8355,7 +8355,7 @@ field_73126_f,encodedPosZ,2,The encoded entity Z position.
 field_73127_g,encodedRotationYaw,2,The encoded entity yaw rotation.
 field_73128_d,encodedPosX,2,The encoded entity X position.
 field_73129_e,encodedPosY,2,The encoded entity Y position.
-field_73130_b,range,2,
+field_73130_b,range,2,Track distance in blocks
 field_73131_c,updateFrequency,2,check for sync when ticks % updateFrequency==0
 field_73132_a,trackedEntity,2,The entity that this EntityTrackerEntry tracks.
 field_73133_n,playerEntitiesUpdated,2,
@@ -8388,11 +8388,11 @@ field_73229_q,mapFeaturesEnabled,2,are map structures going to be generated (e.g
 field_73230_p,world,2,Reference to the World object.
 field_73231_z,biomesForGeneration,2,The biomes that are used to generate the chunk
 field_73235_d,world,0,Reference to the World object.
-field_73236_b,chunkMapping,0,The mapping between ChunkCoordinates and Chunks that ChunkProviderClient maintains.
+field_73236_b,loadedChunks,0,The mapping between ChunkCoordinates and Chunks that ChunkProviderClient maintains.
 field_73238_a,blankChunk,0,The completely empty chunk used by ChunkProviderClient when chunkMapping doesn't contain the requested coordinates.
-field_73244_f,id2ChunkMap,2,map of chunk Id's to Chunk instances
+field_73244_f,loadedChunks,2,map of chunk Id's to Chunk instances
 field_73247_e,chunkLoader,2,
-field_73248_b,droppedChunksSet,2,
+field_73248_b,droppedChunks,2,
 field_73251_h,world,2,
 field_73672_b,serverProperties,1,The server properties object.
 field_73673_c,serverPropertiesFile,1,The server properties file.
@@ -8710,7 +8710,7 @@ field_75329_f,watchedClass,2,
 field_75330_d,lookTime,2,
 field_75331_e,chance,2,
 field_75332_b,entity,2,
-field_75333_c,maxDistanceForPlayer,2,This is the Maximum distance that the AI will look for the Entity
+field_75333_c,maxDistance,2,This is the Maximum distance that the AI will look for the Entity
 field_75334_a,closestEntity,2,The closest entity which is being watched by this one.
 field_75335_b,villager,2,
 field_75336_f,followSpeed,2,
@@ -8997,7 +8997,7 @@ field_76235_G,canBurn,2,Bool defining if the block can burn or not.
 field_76239_H,replaceable,2,"Determines whether blocks with this material can be ""overwritten"" by other blocks when placed - eg snow, vines and tall grass."
 field_76240_I,isTranslucent,2,Indicates if the material is translucent
 field_76241_J,requiresNoTool,2,Determines if the material can be harvested without a tool (or with the wrong tool)
-field_76242_K,mobilityFlag,2,"Mobility information flag. 0 indicates that this block is normal, 1 indicates that it can't push other blocks, 2 indicates that it can't be pushed."
+field_76242_K,pushReaction,2,"Mobility information flag. 0 indicates that this block is normal, 1 indicates that it can't push other blocks, 2 indicates that it can't be pushed."
 field_76281_a,COLORS,2,"Holds all the 16 colors used on maps, very similar of a pallete system."
 field_76290_q,colorIndex,2,Holds the index of the color used on map.
 field_76291_p,colorValue,2,Holds the color in RGB value that will be rendered on maps.
@@ -9058,7 +9058,7 @@ field_76422_e,HASTE,2,
 field_76424_c,SPEED,2,
 field_76426_n,FIRE_RESISTANCE,2,The fire resistance Potion object.
 field_76427_o,WATER_BREATHING,2,The water breathing Potion object.
-field_76428_l,REGENERATION,2,The regeneration Potion object.
+field_76428_l,REGENERATION,2,None
 field_76429_m,RESISTANCE,2,
 field_76430_j,JUMP_BOOST,2,
 field_76431_k,NAUSEA,2,
@@ -9335,7 +9335,7 @@ field_77697_d,itemRand,2,The RNG used by the Item subclasses.
 field_77699_b,maxDamage,2,Maximum damage an item can handle.
 field_77700_c,containerItem,2,
 field_77701_a,tabToDisplayOn,2,
-field_77774_bZ,unlocalizedName,2,The unlocalized name of this item.
+field_77774_bZ,translationKey,2,The unlocalized name of this item.
 field_77777_bU,maxStackSize,2,Maximum size of the stack.
 field_77787_bX,hasSubtypes,2,"Some items (like dyes) have multiple subtypes on same item, this is field define this behavior"
 field_77789_bW,bFull3D,2,"If true, render the object in full 3D, like weapons and tools."
@@ -9359,7 +9359,7 @@ field_77880_c,renderIndex,2,"Used on RenderPlayer to select the correspondent ar
 field_77881_a,armorType,2,"Stores the armor type: 0 is helmet, 1 is plate, 2 is legs and 3 is boots"
 field_77882_bY,MAX_DAMAGE_ARRAY,2,Holds the 'base' maxDamage that each armorType have.
 field_77934_f,rarityName,2,Rarity name.
-field_77937_e,rarityColor,2,The color assigned to this rarity type.
+field_77937_e,color,2,The color assigned to this rarity type.
 field_77990_d,stackTagCompound,2,An NBTTagCompound containing data about an ItemStack.
 field_77991_e,itemDamage,2,
 field_77992_b,animationsToGo,2,"Number of animation frames to go when receiving an item (by walking into it, for example)."
@@ -9376,7 +9376,7 @@ field_78029_e,TRANSPORTATION,2,
 field_78030_b,BUILDING_BLOCKS,2,
 field_78031_c,DECORATIONS,2,
 field_78032_a,CREATIVE_TAB_ARRAY,2,
-field_78033_n,tabIndex,2,
+field_78033_n,index,2,
 field_78034_o,tabLabel,2,
 field_78035_l,MATERIALS,2,
 field_78036_m,INVENTORY,2,
@@ -9588,7 +9588,7 @@ field_78521_m,fogColorBuffer,0,Fog color buffer
 field_78526_w,mouseFilterYAxis,0,
 field_78527_v,mouseFilterXAxis,0,
 field_78528_u,pointedEntity,0,Pointed entity
-rainSoundCounter,rendererUpdateCount,0,Entity renderer update count
+field_78529_t,rendererUpdateCount,0,Entity renderer update count
 field_78530_s,farPlaneDistance,0,
 field_78531_r,mc,0,A reference to the Minecraft object.
 field_78534_ac,rainSoundCounter,0,Rain sound counter
@@ -9948,7 +9948,7 @@ field_96543_b,scoreObjectiveCriterias,2,Map of IScoreObjectiveCriteria objects t
 field_96544_c,entitiesScoreObjectives,2,Map of entities name to ScoreObjective objects.
 field_96545_a,scoreObjectives,2,Map of objective names to ScoreObjective objects.
 field_96553_b,addedObjectives,2,
-field_96555_a,scoreboardMCServer,2,
+field_96555_a,server,2,
 field_96561_g,attackIntervalMin,2,
 field_96562_i,attackRadius,2,
 field_96566_b,HAS_INVENTORY,2,

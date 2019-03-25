@@ -31,7 +31,7 @@ public class ItemMilkBucket extends Item {
     }
 
     @Override
-    public String getUnlocalizedName() {
+    public String getTranslationKey() {
         return "item.forge.bucketFilled.milk";
     }
 

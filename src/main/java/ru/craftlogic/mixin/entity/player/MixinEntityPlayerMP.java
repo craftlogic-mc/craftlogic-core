@@ -19,7 +19,7 @@ import ru.craftlogic.api.world.Player;
 public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlayer {
     @Shadow
     private long playerLastActiveTime;
-    @Shadow @Final public MinecraftServer mcServer;
+    @Shadow @Final public MinecraftServer server;
     private long firstPlayed;
     private long timePlayed;
 
@@ -39,6 +39,13 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
         compound.setLong("firstPlayed", this.firstPlayed);
         compound.setLong("lastPlayed", this.playerLastActiveTime);
         compound.setLong("timePlayed", this.timePlayed);
+    }
+
+    @Inject(method = "copyFrom", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/event/ForgeEventFactory;onPlayerClone(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/entity/player/EntityPlayer;Z)V", remap = false))
+    public void onCopy(EntityPlayerMP from, boolean death, CallbackInfo info) {
+        AdvancedPlayer oldAp = (AdvancedPlayer) from;
+        this.setFirstPlayed(oldAp.getFirstPlayed());
+        this.setTimePlayed(oldAp.getTimePlayed());
     }
 
     @Override
@@ -63,6 +70,6 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
 
     @Override
     public Player wrapped() {
-        return Server.from(this.mcServer).getPlayerManager().getOnline(this.getUniqueID());
+        return Server.from(this.server).getPlayerManager().getOnline(this.getUniqueID());
     }
 }

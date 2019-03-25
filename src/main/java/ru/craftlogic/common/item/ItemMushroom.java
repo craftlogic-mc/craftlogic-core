@@ -18,12 +18,12 @@ public class ItemMushroom extends ItemFood {
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack stack) {
-        return this.block.getUnlocalizedName();
+    public String getTranslationKey(ItemStack stack) {
+        return this.block.getTranslationKey();
     }
 
     @Override
-    public String getUnlocalizedName() {
-        return this.block.getUnlocalizedName();
+    public String getTranslationKey() {
+        return this.block.getTranslationKey();
     }
 }

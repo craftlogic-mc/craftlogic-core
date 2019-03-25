@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.block.Colored;
 import ru.craftlogic.api.model.ModelAutoReg;
 import ru.craftlogic.api.model.ModelManager;
@@ -12,6 +13,19 @@ import ru.craftlogic.api.model.ModelManager;
 public class ItemCarpet extends ItemBlock implements Colored, ModelAutoReg {
     public ItemCarpet(Block block) {
         super(block);
+        this.setMaxDamage(0);
+        this.setHasSubtypes(true);
+        this.setTranslationKey("woolCarpet");
+    }
+
+    @Override
+    public int getMetadata(int meta) {
+        return meta;
+    }
+
+    @Override
+    public String getTranslationKey(ItemStack item) {
+        return super.getTranslationKey() + "." + EnumDyeColor.byMetadata(item.getMetadata()).getTranslationKey();
     }
 
     @Override
@@ -22,7 +36,8 @@ public class ItemCarpet extends ItemBlock implements Colored, ModelAutoReg {
     @Override
     public void registerModel(ModelManager modelManager) {
         modelManager.registerCustomMeshDefinition(this, stack ->
-            new ModelResourceLocation("craftlogic:carpet", "inventory")
+            new ModelResourceLocation(CraftAPI.MOD_ID + ":carpet", "inventory")
         );
+        modelManager.registerItemVariants(this, CraftAPI.MOD_ID + ":carpet");
     }
 }

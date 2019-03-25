@@ -40,7 +40,7 @@ public class BlockStoneBrick extends BlockFalling implements Mossable {
         this.setHardness(1.5F);
         this.setResistance(10F);
         this.setSoundType(SoundType.STONE);
-        this.setUnlocalizedName("stonebricksmooth");
+        this.setTranslationKey("stonebricksmooth");
         this.setDefaultState(this.blockState.getBaseState().withProperty(VARIANT, EnumType.DEFAULT));
     }
 

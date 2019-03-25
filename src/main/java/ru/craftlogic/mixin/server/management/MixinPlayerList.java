@@ -25,7 +25,6 @@ import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.apache.logging.log4j.Logger;
-import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -47,7 +46,7 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
     private static Logger LOGGER;
 
     @Shadow @Final
-    private MinecraftServer mcServer;
+    private MinecraftServer server;
 
     @Shadow
     private IPlayerFileData playerDataManager;
@@ -96,7 +95,7 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
     @Overwrite(remap = false)
     public void initializeConnectionToPlayer(NetworkManager netManager, EntityPlayerMP player, NetHandlerPlayServer netHandler) {
         GameProfile profile = player.getGameProfile();
-        PlayerProfileCache profileCache = this.mcServer.getPlayerProfileCache();
+        PlayerProfileCache profileCache = this.server.getPlayerProfileCache();
         GameProfile cachedProfile = profileCache.getProfileByUUID(profile.getId());
         String username = cachedProfile == null ? profile.getName() : cachedProfile.getName();
         profileCache.addEntry(profile);
@@ -107,11 +106,11 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
                 ap.setFirstPlayed(System.currentTimeMillis());
             }
         }
-        player.setWorld(this.mcServer.getWorld(player.dimension));
-        World playerWorld = this.mcServer.getWorld(player.dimension);
+        player.setWorld(this.server.getWorld(player.dimension));
+        World playerWorld = this.server.getWorld(player.dimension);
         if (playerWorld == null) {
             player.dimension = 0;
-            playerWorld = this.mcServer.getWorld(0);
+            playerWorld = this.server.getWorld(0);
             BlockPos spawnPoint = playerWorld.provider.getRandomizedSpawnPoint();
             player.setPositionAndUpdate((double)spawnPoint.getX(), (double)spawnPoint.getY(), (double)spawnPoint.getZ());
         }
@@ -124,7 +123,7 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
         }
 
         LOGGER.info("{}[{}] logged in with entity id {} at ({}, {}, {})", player.getName(), s1, player.getEntityId(), player.posX, player.posY, player.posZ);
-        WorldServer world = this.mcServer.getWorld(player.dimension);
+        WorldServer world = this.server.getWorld(player.dimension);
         WorldInfo worldInfo = world.getWorldInfo();
         this.setPlayerGameTypeBasedOnOther(player, null, world);
         player.connection = netHandler;
@@ -137,7 +136,7 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
         player.getStatFile().markAllDirty();
         player.getRecipeBook().init(player);
         this.sendScoreboard((ServerScoreboard)world.getScoreboard(), player);
-        this.mcServer.refreshStatusNextTick();
+        this.server.refreshStatusNextTick();
 
         TextComponentTranslation message;
         if (player.getName().equalsIgnoreCase(username)) {
@@ -156,8 +155,8 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
         this.playerLoggedIn(player);
         netHandler.setPlayerLocation(player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
         this.updateTimeAndWeatherForPlayer(player, world);
-        if (!this.mcServer.getResourcePackUrl().isEmpty()) {
-            player.loadResourcePack(this.mcServer.getResourcePackUrl(), this.mcServer.getResourcePackHash());
+        if (!this.server.getResourcePackUrl().isEmpty()) {
+            player.loadResourcePack(this.server.getResourcePackUrl(), this.server.getResourcePackHash());
         }
 
         for (PotionEffect potioneffect : player.getActivePotionEffects()) {
@@ -193,15 +192,6 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
 
         player.addSelfToInternalCraftingInventory();
         FMLCommonHandler.instance().firePlayerLoggedIn(player);
-    }
-
-    @Redirect(method = "recreatePlayerEntity", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/EntityPlayerMP;connection:Lnet/minecraft/network/NetHandlerPlayServer;", opcode = Opcodes.PUTFIELD))
-    public void setConnection(EntityPlayerMP player, NetHandlerPlayServer connection) {
-        AdvancedPlayer newAp = (AdvancedPlayer) player;
-        AdvancedPlayer oldAp = (AdvancedPlayer) connection.player;
-        newAp.setFirstPlayed(oldAp.getFirstPlayed());
-        newAp.setTimePlayed(oldAp.getTimePlayed());
-        player.connection = connection;
     }
 
     @Override

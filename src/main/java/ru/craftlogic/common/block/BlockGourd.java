@@ -80,7 +80,7 @@ public class BlockGourd extends BlockBase implements Colored, Growable {
     }
 
     @Override
-    public BlockRenderLayer getBlockLayer() {
+    public BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.CUTOUT_MIPPED;
     }
 
@@ -114,7 +114,7 @@ public class BlockGourd extends BlockBase implements Colored, Growable {
     @Override
     public IBlockState getStateFromMeta(int meta) {
         return this.getDefaultState()
-                .withProperty(FACING, EnumFacing.getHorizontal(meta & 3))
+                .withProperty(FACING, EnumFacing.byHorizontalIndex(meta & 3))
                 .withProperty(AGE, meta / 4);
     }
 

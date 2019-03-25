@@ -21,13 +21,13 @@ public class ModelManager {
     public void init() {
         for (Block block : Block.REGISTRY) {
             if (block instanceof ModelAutoReg) {
-                this.activeDomain = block.getRegistryName().getResourceDomain();
+                this.activeDomain = block.getRegistryName().getNamespace();
                 ((ModelAutoReg) block).registerModel(this);
             }
         }
         for (Item item : Item.REGISTRY) {
             if (!(item instanceof ItemBlockBase) && item instanceof ModelAutoReg) {
-                this.activeDomain = item.getRegistryName().getResourceDomain();
+                this.activeDomain = item.getRegistryName().getNamespace();
                 ((ModelAutoReg) item).registerModel(this);
             }
         }

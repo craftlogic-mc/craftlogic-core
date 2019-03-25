@@ -26,7 +26,7 @@ public interface Zombie extends IRangedAttackMob {
 
         ZombieVariant(String texture, int bowRarity) {
             ResourceLocation tx = wrapWithModId(texture, MOD_ID);
-            this.texture = new ResourceLocation(tx.getResourceDomain(), "textures/entity/zombie/" + tx.getResourcePath() + ".png");
+            this.texture = new ResourceLocation(tx.getNamespace(), "textures/entity/zombie/" + tx.getPath() + ".png");
             this.bowRarity = bowRarity;
         }
 
