@@ -14,15 +14,15 @@
   <component name="McpModuleSettings">
     <option name="mappingFiles">
       <set>
-        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_snapshot\20180324\1.12.2\srgs\mcp.exc" />
-        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_snapshot\20180324\1.12.2\srgs\notch-mcp.srg" />
-        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_snapshot\20180324\1.12.2\srgs\mcp-srg.srg" />
-        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_snapshot\20180324\1.12.2\srgs\mcp-notch.srg" />
-        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_snapshot\20180324\1.12.2\srgs\notch-srg.srg" />
-        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_snapshot\20180324\1.12.2\srgs\srg.exc" />
+        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_stable\39\1.12.2\srgs\mcp-srg.srg" />
+        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_stable\39\1.12.2\srgs\notch-srg.srg" />
+        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_stable\39\1.12.2\srgs\mcp-notch.srg" />
+        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_stable\39\1.12.2\srgs\srg.exc" />
+        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_stable\39\1.12.2\srgs\notch-mcp.srg" />
+        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_stable\39\1.12.2\srgs\mcp.exc" />
       </set>
     </option>
-    <option name="mcpVersion" value="snapshot_20180324" />
+    <option name="mcpVersion" value="stable_39" />
     <option name="minecraftVersion" value="1.12.2" />
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
@@ -39,18 +39,18 @@
     <orderEntry type="library" name="Gradle: org.codehaus.groovy:groovy:2.4.4" level="project" />
     <orderEntry type="library" name="Gradle: org.spongepowered:mixin:0.7.7-SNAPSHOT" level="project" />
     <orderEntry type="module-library">
-      <library name="Gradle: CTM-MC1.12-0.2.3.12">
+      <library name="Gradle: CTM-MC1.12.2-0.3.3.22">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/CTM-MC1.12-0.2.3.12.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/CTM-MC1.12.2-0.3.3.22.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
-      <library name="Gradle: DynamicTrees-1.12.2-0.7.6">
+      <library name="Gradle: DynamicTrees-1.12.2-0.9.4">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/DynamicTrees-1.12.2-0.7.6.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/DynamicTrees-1.12.2-0.9.4.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -83,7 +83,7 @@
     <orderEntry type="library" name="Gradle: org.apache.logging.log4j:log4j-core:2.8.1" level="project" />
     <orderEntry type="library" name="Gradle: com.mojang:text2speech:1.10.3" level="project" />
     <orderEntry type="library" name="Gradle: net.minecraft:launchwrapper:1.12" level="project" />
-    <orderEntry type="library" name="Gradle: jline:jline:2.13" level="project" />
+    <orderEntry type="library" name="Gradle: org.jline:jline:3.5.1" level="project" />
     <orderEntry type="library" name="Gradle: org.ow2.asm:asm-debug-all:5.2" level="project" />
     <orderEntry type="library" name="Gradle: com.typesafe.akka:akka-actor_2.11:2.3.3" level="project" />
     <orderEntry type="library" name="Gradle: com.typesafe:config:1.2.1" level="project" />
@@ -109,7 +109,6 @@
     <orderEntry type="library" name="Gradle: org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209" level="project" />
     <orderEntry type="library" name="Gradle: java3d:vecmath:1.5.2" level="project" />
     <orderEntry type="library" name="Gradle: ca.weblite:java-objc-bridge:1.0.0" level="project" />
-    <orderEntry type="library" name="Gradle: org.fusesource.jansi:jansi:1.11" level="project" />
     <orderEntry type="library" name="Gradle: org.scala-lang:scala-actors:2.11.0" level="project" />
     <orderEntry type="library" name="Gradle: org.codehaus.plexus:plexus-utils:3.1.0" level="project" />
     <orderEntry type="library" name="Gradle: net.java.jinput:jinput-platform:2.0.5:natives-linux" level="project" />
@@ -118,11 +117,11 @@
     <orderEntry type="library" name="Gradle: org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209:natives-windows" level="project" />
     <orderEntry type="library" name="Gradle: org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209:natives-linux" level="project" />
     <orderEntry type="library" name="Gradle: org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209:natives-osx" level="project" />
-    <orderEntry type="library" name="Gradle: net.minecraftforge:forgeBin:1.12.2-14.23.4.2703-PROJECT(CraftLogic)" level="project" />
+    <orderEntry type="library" name="Gradle: net.minecraftforge:forgeBin:1.12.2-14.23.5.2768-PROJECT(CraftLogic)" level="project" />
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="file://$USER_HOME$/.gradle/caches/minecraft/net/minecraftforge/forge/1.12.2-14.23.4.2703/start" />
+          <root url="file://$USER_HOME$/.gradle/caches/minecraft/net/minecraftforge/forge/1.12.2-14.23.5.2768/start" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

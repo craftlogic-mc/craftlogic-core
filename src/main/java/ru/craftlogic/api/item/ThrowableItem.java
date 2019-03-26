@@ -55,14 +55,14 @@ public interface ThrowableItem {
         if (cooldown > 0) {
             player.getCooldownTracker().setCooldown(item.getItem(), cooldown);
         }
-        if (!player.capabilities.isCreativeMode) {
-            item.shrink(1);
-        }
         if (!world.isRemote) {
             playerLocation.playSound(SoundEvents.ENTITY_EGG_THROW, SoundCategory.PLAYERS, 0.5F, 0.4F / (world.rand.nextFloat() * 0.4F + 0.8F));
             EntityThrownItem entity = new EntityThrownItem(world, player, item, !player.capabilities.isCreativeMode);
             entity.shoot(player, player.rotationPitch, player.rotationYaw, 0F, 0.5F, 1F);
             world.spawnEntity(entity);
+            if (!player.capabilities.isCreativeMode) {
+                item.shrink(1);
+            }
             player.addStat(StatList.getObjectUseStats(item.getItem()));
         }
         return new ActionResult<>(EnumActionResult.SUCCESS, item);

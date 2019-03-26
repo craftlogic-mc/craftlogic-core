@@ -18,7 +18,6 @@ import net.minecraftforge.fluids.*;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.api.block.Mossable;
-import ru.craftlogic.api.tile.TileEntityBase;
 import ru.craftlogic.api.world.Location;
 
 import javax.annotation.Nonnull;
@@ -80,6 +79,7 @@ public class BarrelModeFluid extends BarrelMode {
                             if (mossable != null) {
                                 if (mossable.growMoss(l)) {
                                     this.tank.drain(100, true);
+                                    barrel.markForUpdate();
                                     break;
                                 }
                             }
@@ -89,6 +89,7 @@ public class BarrelModeFluid extends BarrelMode {
                     }
                     if (location.offset(EnumFacing.UP).canBlockSeeSky() && location.getWorld().isDaytime()) {
                         this.tank.drain(100, true);
+                        barrel.markForUpdate();
                     }
                 }
             }
@@ -130,8 +131,8 @@ public class BarrelModeFluid extends BarrelMode {
             this.tank.setFluid(new FluidStack(fluid, this.tank.getFluidAmount()));
         } else {
             this.tank.fill(new FluidStack(fluid, thundering ? 250 : 100), true);
-            barrel.markForUpdate();
         }
+        barrel.markForUpdate();
     }
 
     @Override
@@ -187,16 +188,12 @@ public class BarrelModeFluid extends BarrelMode {
                     if (!player.addItemStackToInventory(drop)) {
                         player.dropItem(drop, false);
                     }
-                    if (barrel instanceof TileEntityBase) {
-                        ((TileEntityBase) barrel).markForUpdate();
-                    }
+                    barrel.markForUpdate();
                 }
             } else if (heldItem.hasCapability(FLUID_HANDLER_ITEM_CAPABILITY, null)) {
                 if (!player.world.isRemote) {
                     if (FluidUtil.interactWithFluidHandler(player, hand, this.tank)) {
-                        if (barrel instanceof TileEntityBase) {
-                            ((TileEntityBase) barrel).markForUpdate();
-                        }
+                        barrel.markForUpdate();
                     }
                 }
             }
