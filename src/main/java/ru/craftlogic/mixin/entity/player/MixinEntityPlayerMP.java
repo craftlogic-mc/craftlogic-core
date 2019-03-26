@@ -41,6 +41,13 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
         compound.setLong("timePlayed", this.timePlayed);
     }
 
+    @Inject(method = "copyFrom", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/event/ForgeEventFactory;onPlayerClone(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/entity/player/EntityPlayer;Z)V", remap = false))
+    public void onCopy(EntityPlayerMP from, boolean death, CallbackInfo info) {
+        AdvancedPlayer oldAp = (AdvancedPlayer) from;
+        this.setFirstPlayed(oldAp.getFirstPlayed());
+        this.setTimePlayed(oldAp.getTimePlayed());
+    }
+
     @Override
     public long getFirstPlayed() {
         return firstPlayed;

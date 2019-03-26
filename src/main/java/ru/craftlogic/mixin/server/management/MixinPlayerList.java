@@ -25,7 +25,6 @@ import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.apache.logging.log4j.Logger;
-import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -193,15 +192,6 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
 
         player.addSelfToInternalCraftingInventory();
         FMLCommonHandler.instance().firePlayerLoggedIn(player);
-    }
-
-    @Redirect(method = "recreatePlayerEntity", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/EntityPlayerMP;connection:Lnet/minecraft/network/NetHandlerPlayServer;", opcode = Opcodes.PUTFIELD))
-    public void setConnection(EntityPlayerMP player, NetHandlerPlayServer connection) {
-        AdvancedPlayer newAp = (AdvancedPlayer) player;
-        AdvancedPlayer oldAp = (AdvancedPlayer) connection.player;
-        newAp.setFirstPlayed(oldAp.getFirstPlayed());
-        newAp.setTimePlayed(oldAp.getTimePlayed());
-        player.connection = connection;
     }
 
     @Override
