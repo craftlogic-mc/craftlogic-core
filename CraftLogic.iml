@@ -4,7 +4,9 @@
     <facet type="minecraft" name="Minecraft">
       <configuration>
         <autoDetectTypes>
+          <platformType>FORGE</platformType>
           <platformType>MIXIN</platformType>
+          <platformType>MCP</platformType>
         </autoDetectTypes>
       </configuration>
     </facet>
@@ -115,13 +117,7 @@
     <orderEntry type="library" name="Gradle: org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209:natives-windows" level="project" />
     <orderEntry type="library" name="Gradle: org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209:natives-linux" level="project" />
     <orderEntry type="library" name="Gradle: org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209:natives-osx" level="project" />
-    <orderEntry type="module-library">
-      <library name="Gradle: forgeBin-1.12.2-14.23.5.2768-PROJECT(CraftLogic):2768-PROJECT(CraftLogic)">
-        <CLASSES />
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
+    <orderEntry type="library" name="Gradle: net.minecraftforge:forgeBin:1.12.2-14.23.5.2768-PROJECT(CraftLogic)" level="project" />
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
