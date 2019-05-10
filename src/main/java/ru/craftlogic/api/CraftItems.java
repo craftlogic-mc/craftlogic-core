@@ -26,7 +26,8 @@ public class CraftItems {
     public static Item MILK_BOTTLE;
     public static Item MILK_BOWL;
     public static Item WATER_BOWL;
-    public static Item ICON_QUESTION, ICON_FOOD, ICON_EQUIPMENT, ICON_RESOURCES;
+    public static Item CREEPER_OYSTERS;
+    public static Item STRAW;
 
     static void init(Side side) {
         ASH = registerItem(new ItemBase("ash", CreativeTabs.MATERIALS));
@@ -50,12 +51,10 @@ public class CraftItems {
         }
         CROWBAR = registerItem(new ItemCrowbar());
         MILK_BOTTLE = registerItem(new ItemMilkBottle());
-        ICON_QUESTION = registerItem(new ItemBase("icon_question", CreativeTabs.TOOLS));
-        ICON_FOOD = registerItem(new ItemBase("icon_food", CreativeTabs.TOOLS));
-        ICON_EQUIPMENT = registerItem(new ItemBase("icon_equipment", CreativeTabs.TOOLS));
-        ICON_RESOURCES = registerItem(new ItemBase("icon_resources", CreativeTabs.TOOLS));
         MILK_BOWL = registerItem(new ItemFluidBowl(CraftFluids.MILK));
         WATER_BOWL = registerItem(new ItemFluidBowl(FluidRegistry.WATER));
+        CREEPER_OYSTERS = registerItem(new ItemCreeperOysters());
+        STRAW = registerItem(new ItemBase("straw", CreativeTabs.MATERIALS));
     }
 
     public static Item registerItem(@Nonnull Item item) {

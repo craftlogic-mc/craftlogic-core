@@ -136,7 +136,7 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
                 this.playSound(SoundEvents.ENTITY_CHICKEN_EGG, 1F, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1F);
                 ItemStack egg = new ItemStack(Items.EGG);
                 NBTTagCompound compound = new NBTTagCompound();
-                NBTTagCompound data = egg.getSubCompound("BirdData");
+                NBTTagCompound data = egg.getOrCreateSubCompound("BirdData");
                 data.setString("id", EntityRegistry.getEntry(getClass()).getRegistryName().toString());
                 data.setInteger("variant", this.getVariant().ordinal());
                 compound.setTag("BirdData", data);
