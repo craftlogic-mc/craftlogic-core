@@ -28,7 +28,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
 import ru.craftlogic.api.item.ItemBlockBase;
-import ru.craftlogic.api.model.ModelAutoReg;
+import ru.craftlogic.api.model.ModelRegistrar;
 import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.tile.TileEntityBase;
 import ru.craftlogic.api.world.Location;
@@ -37,7 +37,7 @@ import ru.craftlogic.api.world.LocationReadOnly;
 import javax.annotation.Nullable;
 import java.util.Random;
 
-public class BlockBase extends Block implements ModelAutoReg {
+public class BlockBase extends Block implements ModelRegistrar {
     private boolean hasSubtypes;
 
     public BlockBase(Material material, String name, float hardness, CreativeTabs tab) {

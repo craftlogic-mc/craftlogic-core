@@ -21,14 +21,14 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.api.model.ModelAutoReg;
+import ru.craftlogic.api.model.ModelRegistrar;
 import ru.craftlogic.api.model.ModelManager;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class BlockLitPumpkin extends BlockPumpkin implements ModelAutoReg {
+public class BlockLitPumpkin extends BlockPumpkin implements ModelRegistrar {
     public static final PropertyBool LIT = BlockBurningTorch.LIT;
 
     public BlockLitPumpkin() {

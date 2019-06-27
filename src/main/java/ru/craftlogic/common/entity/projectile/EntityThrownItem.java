@@ -1,4 +1,4 @@
-package ru.craftlogic.common.entity;
+package ru.craftlogic.common.entity.projectile;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.EntityLivingBase;
@@ -147,7 +147,6 @@ public class EntityThrownItem extends EntityThrowable {
     @Override
     public void onUpdate() {
         if (this.getItem() == ItemStack.EMPTY) {
-            System.out.println("Killing empty-stack throwable");
             this.setDead();
         } else {
             super.onUpdate();

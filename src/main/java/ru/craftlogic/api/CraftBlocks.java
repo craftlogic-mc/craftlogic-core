@@ -30,6 +30,7 @@ public class CraftBlocks {
     public static BlockGourd MELON, PUMPKIN;
     public static Block BEE_HIVE;
     public static BiMap<BlockPlanks.EnumType, Block> BEE_HOUSE = HashBiMap.create(BlockPlanks.EnumType.values().length);
+    public static Block MUSHROOM_GRASS;
 
     static void init(Side side) {
         if (CraftConfig.blocks.enableBarrels) {
@@ -49,6 +50,8 @@ public class CraftBlocks {
         for (BlockPlanks.EnumType plankType : BlockPlanks.EnumType.values()) {
             BEE_HOUSE.put(plankType, registerBlockWithItem(new BlockBeeHouse(plankType)));
         }
+
+        MUSHROOM_GRASS = registerBlock(new BlockMushroomGrass());
     }
 
     public static <B extends Block> B registerBlock(@Nonnull B block) {

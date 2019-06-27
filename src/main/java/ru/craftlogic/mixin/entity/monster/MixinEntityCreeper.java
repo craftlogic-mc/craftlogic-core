@@ -3,15 +3,11 @@ package ru.craftlogic.mixin.entity.monster;
 import net.minecraft.entity.ai.EntityAICreeperSwell;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemShears;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,7 +23,7 @@ public abstract class MixinEntityCreeper extends EntityMob implements Creeper {
     @Shadow
     public abstract void setCreeperState(int state);
 
-    private static final DataParameter<Boolean> DEPRESSED = EntityDataManager.createKey(EntityZombie.class, DataSerializers.BOOLEAN);
+    @Shadow public abstract int getCreeperState();
 
     public MixinEntityCreeper(World world) {
         super(world);
@@ -35,22 +31,16 @@ public abstract class MixinEntityCreeper extends EntityMob implements Creeper {
 
     @Override
     public boolean isDepressed() {
-        return this.dataManager.get(DEPRESSED);
-    }
-
-    @Inject(method = "entityInit", at = @At("RETURN"))
-    protected void onInit(CallbackInfo info) {
-        this.dataManager.register(DEPRESSED, false);
+        return this.getCreeperState() == 0;
     }
 
     @Override
     protected boolean processInteract(EntityPlayer player, EnumHand hand) {
-        if (!player.world.isRemote && !this.dataManager.get(DEPRESSED)) {
+        if (!player.world.isRemote && !isDepressed()) {
             ItemStack heldItem = player.getHeldItem(hand);
             if (heldItem.getItem() instanceof ItemShears) {
                 heldItem.damageItem(1, player);
-                this.dataManager.set(DEPRESSED, true);
-                this.setCreeperState(-1);
+                this.setCreeperState(0);
                 this.tasks.taskEntries.removeIf(e -> e.action instanceof EntityAICreeperSwell);
                 this.playSound(SoundEvents.ENTITY_CREEPER_HURT, 1F, 0.5F);
                 this.dropItem(CraftItems.CREEPER_OYSTERS, 1);
@@ -62,11 +52,13 @@ public abstract class MixinEntityCreeper extends EntityMob implements Creeper {
 
     @Inject(method = "readEntityFromNBT", at = @At("RETURN"))
     public void onNbtRead(NBTTagCompound compound, CallbackInfo info) {
-        this.dataManager.set(DEPRESSED, compound.getBoolean("depressed"));
+        if (compound.getBoolean("depressed")) {
+            this.setCreeperState(0);
+        }
     }
 
     @Inject(method = "writeEntityToNBT", at = @At("RETURN"))
     public void onNbtWrite(NBTTagCompound compound, CallbackInfo info) {
-        compound.setBoolean("depressed", this.dataManager.get(DEPRESSED));
+        compound.setBoolean("depressed", isDepressed());
     }
 }

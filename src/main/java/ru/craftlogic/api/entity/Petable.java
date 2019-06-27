@@ -8,9 +8,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
-public interface Tameable {
-    boolean isTamed();
-    void setTamed(boolean tamed);
+public interface Petable extends Tamable {
     @Nullable
     UUID getOwnerId();
     void setOwnerId(@Nullable UUID id);

@@ -20,15 +20,15 @@ public class ModelManager {
 
     public void init() {
         for (Block block : Block.REGISTRY) {
-            if (block instanceof ModelAutoReg) {
+            if (block instanceof ModelRegistrar) {
                 this.activeDomain = block.getRegistryName().getNamespace();
-                ((ModelAutoReg) block).registerModel(this);
+                ((ModelRegistrar) block).registerModel(this);
             }
         }
         for (Item item : Item.REGISTRY) {
-            if (!(item instanceof ItemBlockBase) && item instanceof ModelAutoReg) {
+            if (!(item instanceof ItemBlockBase) && item instanceof ModelRegistrar) {
                 this.activeDomain = item.getRegistryName().getNamespace();
-                ((ModelAutoReg) item).registerModel(this);
+                ((ModelRegistrar) item).registerModel(this);
             }
         }
         this.activeDomain = CraftAPI.MOD_ID;

@@ -42,7 +42,6 @@ public class CraftAPI {
         CraftItems.init(side);
         CraftTileEntities.init(side);
         CraftEntities.init(side);
-        CraftPlants.init(side);
         CraftBarrelModes.init(side);
         CraftRecipes.init(side);
     }

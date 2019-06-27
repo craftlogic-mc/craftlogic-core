@@ -2,13 +2,16 @@ package ru.craftlogic.common;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.event.terraingen.OreGenEvent;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
+import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.CraftFluids;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
@@ -74,6 +77,19 @@ public class ProxyCommon extends AdvancedMessageHandler {
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void registerFluid(FluidRegistry.FluidRegisterEvent event) {
         CraftFluids.FLUID_NAME_TO_ID.put(event.getFluidName(), event.getFluidID());
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void generateOre(OreGenEvent.GenerateMinable event) {
+        if (CraftConfig.tweaks.enableStoneUnification) {
+            switch (event.getType()) {
+                case GRANITE:
+                case DIORITE:
+                case ANDESITE:
+                    event.setResult(Event.Result.DENY);
+                    break;
+            }
+        }
     }
 
     protected AdvancedMessage handleServerStop(MessageServerStop message, MessageContext context) {

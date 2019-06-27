@@ -7,10 +7,10 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.block.Colored;
-import ru.craftlogic.api.model.ModelAutoReg;
+import ru.craftlogic.api.model.ModelRegistrar;
 import ru.craftlogic.api.model.ModelManager;
 
-public class ItemCarpet extends ItemBlock implements Colored, ModelAutoReg {
+public class ItemCarpet extends ItemBlock implements Colored, ModelRegistrar {
     public ItemCarpet(Block block) {
         super(block);
         this.setMaxDamage(0);

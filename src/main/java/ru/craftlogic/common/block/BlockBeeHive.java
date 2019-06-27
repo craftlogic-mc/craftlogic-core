@@ -11,10 +11,10 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.api.block.BlockBase;
-import ru.craftlogic.api.model.ModelAutoReg;
+import ru.craftlogic.api.model.ModelRegistrar;
 import ru.craftlogic.api.model.ModelManager;
 
-public class BlockBeeHive extends BlockBase implements ModelAutoReg {
+public class BlockBeeHive extends BlockBase implements ModelRegistrar {
     public static PropertyBool INHABITED = PropertyBool.create("inhabited");
 
     public BlockBeeHive() {

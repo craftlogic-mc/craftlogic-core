@@ -85,6 +85,9 @@ public class CraftConfig {
         @Config.Comment("Enable fancy gourd blocks growing stages (pumpkins & melons)")
         @Config.RequiresMcRestart
         public boolean enableFancyGourd = true;
+        @Config.Comment("Enable stone unification (removes granite, andesite & diorite)")
+        @Config.RequiresWorldRestart
+        public boolean enableStoneUnification = true;
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID)

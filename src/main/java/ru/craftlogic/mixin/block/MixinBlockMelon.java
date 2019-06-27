@@ -13,13 +13,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.asm.mixin.Mixin;
-import ru.craftlogic.api.model.ModelAutoReg;
+import ru.craftlogic.api.model.ModelRegistrar;
 import ru.craftlogic.api.model.ModelManager;
 
 import static net.minecraft.block.BlockHorizontal.FACING;
 
 @Mixin(BlockMelon.class)
-public class MixinBlockMelon extends Block implements ModelAutoReg {
+public class MixinBlockMelon extends Block implements ModelRegistrar {
     public MixinBlockMelon(Material material) {
         super(material);
     }

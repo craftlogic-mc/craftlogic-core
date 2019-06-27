@@ -22,14 +22,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.CraftConfig;
-import ru.craftlogic.api.model.ModelAutoReg;
+import ru.craftlogic.api.model.ModelRegistrar;
 import ru.craftlogic.api.model.ModelManager;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class BlockBurningTorch extends BlockTorch implements ModelAutoReg {
+public class BlockBurningTorch extends BlockTorch implements ModelRegistrar {
     public static final PropertyBool LIT = PropertyBool.create("lit");
 
     public BlockBurningTorch() {

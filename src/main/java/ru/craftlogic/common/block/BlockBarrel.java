@@ -14,7 +14,7 @@ import ru.craftlogic.api.barrel.BarrelMode;
 import ru.craftlogic.api.barrel.BarrelModeFluid;
 import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
-import ru.craftlogic.api.model.ModelAutoReg;
+import ru.craftlogic.api.model.ModelRegistrar;
 import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.common.tileentity.TileEntityBarrel;
@@ -23,7 +23,7 @@ import static net.minecraft.init.SoundEvents.BLOCK_WOODEN_TRAPDOOR_CLOSE;
 import static net.minecraft.init.SoundEvents.BLOCK_WOODEN_TRAPDOOR_OPEN;
 import static ru.craftlogic.api.CraftAPI.MOD_ID;
 
-public abstract class BlockBarrel extends BlockBase implements TileEntityHolder<TileEntityBarrel>, ModelAutoReg {
+public abstract class BlockBarrel extends BlockBase implements TileEntityHolder<TileEntityBarrel>, ModelRegistrar {
     public static final PropertyBool CLOSED = PropertyBool.create("closed");
     public static final AxisAlignedBB BOUNDING = new AxisAlignedBB(0.0625, 0, 0.0625, 0.9375, 1, 0.9375);
 

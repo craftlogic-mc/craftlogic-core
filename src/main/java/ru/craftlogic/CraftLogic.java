@@ -31,6 +31,7 @@ public class CraftLogic {
     public void preInit(FMLPreInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(PROXY);
+        MinecraftForge.ORE_GEN_BUS.register(PROXY);
         PROXY.preInit();
     }
 

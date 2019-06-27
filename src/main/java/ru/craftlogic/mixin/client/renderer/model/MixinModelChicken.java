@@ -55,8 +55,8 @@ public class MixinModelChicken extends ModelBase {
         this.head.mirror = true;
         this.setRotation(head, 0F, 0F, 0F);
         this.wattleAndComb = new ModelRenderer(this, 10, -5);
-        this.wattleAndComb.addBox(0F, -6.5F, -2F, 0, 6, 5);
-        this.wattleAndComb.setRotationPoint(0F, 19.5F, -5F);
+        this.wattleAndComb.addBox(0F, -7F, -2F, 0, 6, 5);
+        this.wattleAndComb.setRotationPoint(0F, 20F, -5F);
         this.wattleAndComb.setTextureSize(64, 32);
         this.wattleAndComb.mirror = true;
         this.setRotation(wattleAndComb, 0F, 0F, 0F);

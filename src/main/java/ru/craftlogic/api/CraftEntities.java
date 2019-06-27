@@ -8,8 +8,10 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import ru.craftlogic.client.render.entity.RenderSpiderSpit;
 import ru.craftlogic.client.render.entity.RenderThrownItem;
-import ru.craftlogic.common.entity.EntityThrownItem;
+import ru.craftlogic.common.entity.projectile.EntitySpiderSpit;
+import ru.craftlogic.common.entity.projectile.EntityThrownItem;
 
 import java.util.function.Function;
 
@@ -22,6 +24,7 @@ public class CraftEntities {
 
     static void init(Side side) {
         registerEntity(EntityThrownItem.class, "thrown_item", 64, 10, true);
+        registerEntity(EntitySpiderSpit.class, "spider_spit", 64, 10, true);
         if (side == Side.CLIENT) {
             initClient();
         }
@@ -29,6 +32,7 @@ public class CraftEntities {
 
     @SideOnly(Side.CLIENT)
     private static void initClient() {
+        registerEntityRenderer(EntitySpiderSpit.class, RenderSpiderSpit::new);
         registerEntityRenderer(EntityThrownItem.class, RenderThrownItem::new);
     }
 

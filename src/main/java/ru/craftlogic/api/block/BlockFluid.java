@@ -8,12 +8,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fluids.BlockFluidClassic;
 import net.minecraftforge.fluids.Fluid;
-import ru.craftlogic.api.model.ModelAutoReg;
+import ru.craftlogic.api.model.ModelRegistrar;
 import ru.craftlogic.api.model.ModelManager;
 
 import javax.annotation.Nullable;
 
-public class BlockFluid extends BlockFluidClassic implements ModelAutoReg {
+public class BlockFluid extends BlockFluidClassic implements ModelRegistrar {
     public BlockFluid(String name, Fluid fluid, Material material) {
         super(fluid, material);
         this.setTranslationKey(name);

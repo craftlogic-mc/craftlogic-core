@@ -23,13 +23,24 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.*;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 @Mixin(CraftingManager.class)
 public class MixinCraftingManager {
     @Shadow @Final
     private static Logger LOGGER;
+
+    private static List<String> DISABLED_RECIPES = Arrays.asList(
+        "minecraft:diorite",
+        "minecraft:andesite",
+        "minecraft:granite",
+        "minecraft:polished_diorite",
+        "minecraft:polished_andesite",
+        "minecraft:polished_granite"
+    );
 
     /**
      * @author Radviger
@@ -105,6 +116,6 @@ public class MixinCraftingManager {
     private static IRecipe parseRecipeJson(JsonObject json) { return null; }
 
     private static boolean isRecipeReplaced(ResourceLocation id) {
-        return false;
+        return DISABLED_RECIPES.contains(id.toString());
     }
 }

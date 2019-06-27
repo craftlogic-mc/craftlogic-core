@@ -5,15 +5,21 @@ import net.minecraft.block.BlockStone;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.CraftItems;
 
@@ -27,6 +33,12 @@ public abstract class MixinBlockStone extends Block {
         super(Material.ROCK);
     }
 
+    @Inject(method = "<init>", at = @At("RETURN"))
+    public void constructor(CallbackInfo info) {
+        this.setHardness(8F);
+        this.setResistance(50F);
+    }
+
     /**
      * @author Radviger
      * @reason Rocks
@@ -36,7 +48,11 @@ public abstract class MixinBlockStone extends Block {
         if (CraftConfig.items.enableRocks) {
             return CraftItems.ROCK;
         } else {
-            return state.getValue(VARIANT) == BlockStone.EnumType.STONE ? Item.getItemFromBlock(Blocks.COBBLESTONE) : Item.getItemFromBlock(Blocks.STONE);
+            if (CraftConfig.tweaks.enableStoneUnification || state.getValue(VARIANT) == BlockStone.EnumType.STONE) {
+                return Item.getItemFromBlock(Blocks.COBBLESTONE);
+            } else {
+                return Item.getItemFromBlock(this);
+            }
         }
     }
 
@@ -63,6 +79,19 @@ public abstract class MixinBlockStone extends Block {
                     && !world.isSideSolid(pos.down(), EnumFacing.UP)) {
                 world.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState());
             }
+        }
+    }
+
+    /**
+     * @author Radviger
+     * @reason Stone types unification
+     */
+    @Overwrite
+    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> blocks) {
+        if (CraftConfig.tweaks.enableStoneUnification) {
+            blocks.add(new ItemStack(this, 1, 0));
+        } else {
+            super.getSubBlocks(tab, blocks);
         }
     }
 }

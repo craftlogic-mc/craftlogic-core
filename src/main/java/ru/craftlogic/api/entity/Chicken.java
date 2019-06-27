@@ -6,7 +6,7 @@ import ru.craftlogic.api.util.Nameable;
 
 import static ru.craftlogic.api.CraftAPI.wrapWithModId;
 
-public interface Chicken extends Bird, Tameable {
+public interface Chicken extends Bird, Tamable {
     ChickenVariant getVariant();
 
     enum ChickenVariant implements Nameable {

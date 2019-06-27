@@ -68,7 +68,7 @@ public class ItemMilkBucket extends Item {
                     }
 
                     player.addStat(StatList.getObjectUseStats(this));
-                    return !player.capabilities.isCreativeMode ? new ActionResult<>(EnumActionResult.SUCCESS, new ItemStack(Items.BUCKET)) : new ActionResult(EnumActionResult.SUCCESS, heldItem);
+                    return !player.capabilities.isCreativeMode ? new ActionResult<>(EnumActionResult.SUCCESS, new ItemStack(Items.BUCKET)) : new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
                 } else {
                     return new ActionResult<>(EnumActionResult.FAIL, heldItem);
                 }

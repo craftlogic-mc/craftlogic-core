@@ -4,10 +4,10 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemFood;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.api.model.ModelAutoReg;
+import ru.craftlogic.api.model.ModelRegistrar;
 import ru.craftlogic.api.model.ModelManager;
 
-public class ItemFoodBase extends ItemFood implements ModelAutoReg {
+public class ItemFoodBase extends ItemFood implements ModelRegistrar {
     protected final String name;
 
     public ItemFoodBase(String name, CreativeTabs tab, int heal, boolean petFood) {

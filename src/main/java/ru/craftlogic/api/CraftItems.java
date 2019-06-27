@@ -13,6 +13,7 @@ import ru.craftlogic.common.item.*;
 import javax.annotation.Nonnull;
 
 public class CraftItems {
+    public static Item SPIT;
     public static Item ASH;
     public static Item ROCK;
     public static Item MOSS;
@@ -30,6 +31,7 @@ public class CraftItems {
     public static Item STRAW;
 
     static void init(Side side) {
+        SPIT = registerItem(new ItemBase("spit", CreativeTabs.MISC));
         ASH = registerItem(new ItemBase("ash", CreativeTabs.MATERIALS));
         if (CraftConfig.items.enableRocks) {
             ROCK = registerItem(new ItemRock());

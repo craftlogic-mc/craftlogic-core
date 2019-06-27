@@ -13,10 +13,10 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.api.model.ModelAutoReg;
+import ru.craftlogic.api.model.ModelRegistrar;
 import ru.craftlogic.api.model.ModelManager;
 
-public class ItemBase extends Item implements ModelAutoReg {
+public class ItemBase extends Item implements ModelRegistrar {
     protected final String name;
 
     public ItemBase(String name, CreativeTabs tab) {

@@ -9,7 +9,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import ru.craftlogic.api.item.ItemBase;
 import ru.craftlogic.api.item.ThrowableItem;
-import ru.craftlogic.common.entity.EntityThrownItem;
+import ru.craftlogic.common.entity.projectile.EntityThrownItem;
 
 public class ItemRock extends ItemBase implements ThrowableItem {
     public ItemRock() {

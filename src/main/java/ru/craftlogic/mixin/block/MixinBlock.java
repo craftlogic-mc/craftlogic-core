@@ -78,6 +78,10 @@ public class MixinBlock {
                 }
                 break;
             }
+            case "minecraft:web": {
+                block.setHardness(2F);
+                break;
+            }
             case "minecraft:nether_brick_fence":
             case "minecraft:fence":
             case "minecraft:spruce_fence":
@@ -94,6 +98,10 @@ public class MixinBlock {
                     b.blockSoundType = old.blockSoundType;
                     b.translationKey = old.translationKey;
                 }
+                break;
+            }
+            case "minecraft:dirt": {
+                block.setHardness(3F);
                 break;
             }
         }

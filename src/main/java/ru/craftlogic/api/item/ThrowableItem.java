@@ -15,7 +15,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 import ru.craftlogic.api.world.Location;
-import ru.craftlogic.common.entity.EntityThrownItem;
+import ru.craftlogic.common.entity.projectile.EntityThrownItem;
 
 public interface ThrowableItem {
     default boolean onProjectileHit(EntityThrownItem entity, RayTraceResult target) {
