@@ -80,6 +80,7 @@ public class BarrelModeFluid extends BarrelMode {
                                 if (mossable.growMoss(l)) {
                                     this.tank.drain(100, true);
                                     barrel.markForUpdate();
+                                    barrel.markForRenderUpdate();
                                     break;
                                 }
                             }
@@ -90,6 +91,7 @@ public class BarrelModeFluid extends BarrelMode {
                     if (location.offset(EnumFacing.UP).canBlockSeeSky() && location.getWorld().isDaytime()) {
                         this.tank.drain(100, true);
                         barrel.markForUpdate();
+                        barrel.markForRenderUpdate();
                     }
                 }
             }
@@ -133,6 +135,7 @@ public class BarrelModeFluid extends BarrelMode {
             this.tank.fill(new FluidStack(fluid, thundering ? 250 : 100), true);
         }
         barrel.markForUpdate();
+        barrel.markForRenderUpdate();
     }
 
     @Override
@@ -189,11 +192,13 @@ public class BarrelModeFluid extends BarrelMode {
                         player.dropItem(drop, false);
                     }
                     barrel.markForUpdate();
+                    barrel.markForRenderUpdate();
                 }
             } else if (heldItem.hasCapability(FLUID_HANDLER_ITEM_CAPABILITY, null)) {
                 if (!player.world.isRemote) {
                     if (FluidUtil.interactWithFluidHandler(player, hand, this.tank)) {
                         barrel.markForUpdate();
+                        barrel.markForRenderUpdate();
                     }
                 }
             }

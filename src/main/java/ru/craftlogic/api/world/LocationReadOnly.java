@@ -44,12 +44,17 @@ public class LocationReadOnly extends Location {
     }
 
     @Override
-    protected IBlockAccess getBlockAccessor() {
+    public IBlockAccess getBlockAccessor() {
         return this.blockAccessor;
     }
 
     @Override
     public boolean setBlockState(IBlockState state) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected Location add(double x, double y, double z) {
+        return new LocationReadOnly(blockAccessor, getPos().add(x, y, z), null);
     }
 }

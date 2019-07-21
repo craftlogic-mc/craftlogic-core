@@ -47,11 +47,7 @@ public class CraftFluids {
     }
 
     public static int getFluidId(Fluid fluid) {
-        if (fluid == null || !FLUID_NAME_TO_ID.containsKey(fluid.getName())) {
-            return -1;
-        } else {
-            return FLUID_NAME_TO_ID.get(fluid.getName());
-        }
+        return fluid == null ? -1 : FLUID_NAME_TO_ID.getOrDefault(fluid.getName(), -1);
     }
 
     public static Fluid getFluidById(int id) {

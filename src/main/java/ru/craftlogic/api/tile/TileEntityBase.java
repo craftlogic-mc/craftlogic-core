@@ -22,11 +22,14 @@ import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.wrapper.InvWrapper;
+import net.minecraftforge.items.wrapper.SidedInvWrapper;
 import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.fluid.FluidHolder;
 import ru.craftlogic.api.inventory.InventoryFieldHolder;
 import ru.craftlogic.api.inventory.InventoryFieldHolder.InventoryFieldAdder;
 import ru.craftlogic.api.inventory.InventoryHolder;
+import ru.craftlogic.api.inventory.SidedInventoryHolder;
 import ru.craftlogic.api.world.Locatable;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.api.world.WorldNameable;
@@ -106,6 +109,12 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
         if (this.world != null && !this.world.isRemote) {
             IBlockState state = this.world.getBlockState(this.getPos());
             this.world.notifyBlockUpdate(this.getPos(), state, state, 3);
+        }
+    }
+
+    public void markForRenderUpdate() {
+        if (this.world != null) {
+            this.world.markBlockRangeForRenderUpdate(this.pos, this.pos);
         }
     }
 
@@ -204,7 +213,22 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
 
     @Override
     public void onDataPacket(NetworkManager networkManager, SPacketUpdateTileEntity packet) {
-        this.readFromPacket(packet.getNbtCompound());
+        try {
+            this.readFromPacket(packet.getNbtCompound());
+        } catch (Throwable t) {
+            System.out.println("Error reading " + getClass() + " from packet: ");
+            t.printStackTrace();
+        }
+    }
+
+    @Override
+    public void handleUpdateTag(NBTTagCompound data) {
+        try {
+            super.handleUpdateTag(data);
+        } catch (Throwable t) {
+            System.out.println("Error handling update tag for " + getClass() + ": ");
+            t.printStackTrace();
+        }
     }
 
     protected NBTTagCompound writeToPacket(NBTTagCompound compound) {
@@ -231,7 +255,9 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
             return (T) this;
         }
         if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY && this instanceof InventoryHolder) {
-            return (T) this;
+            return this instanceof SidedInventoryHolder
+                    ? (T) new SidedInvWrapper((SidedInventoryHolder) this, side)
+                    : (T) new InvWrapper((InventoryHolder) this);
         }
         return super.getCapability(capability, side);
     }

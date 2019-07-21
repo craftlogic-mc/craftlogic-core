@@ -146,7 +146,7 @@ public class BlockDiagonalFence extends BlockFence {
     public boolean isConnectedFrom(IBlockAccess world, BlockPos pos, PropertyBool direction) {
         DiagonalFacing from = DiagonalFacing.getFromProperty(direction);
 
-        for (DiagonalFacing f : from.getIncomptibles()) {
+        for (DiagonalFacing f : from.getIncompatibles()) {
             if (canPotentiallyConnectTo(world, pos, f)) {
                 return false;
             }
@@ -204,23 +204,18 @@ public class BlockDiagonalFence extends BlockFence {
 
     public static boolean isConnectedTo(IBlockAccess blockAccessor, BlockPos pos, DiagonalFacing facing) {
         if (facing.getRequiresOverhaul()) {
-            Iterator<DiagonalFacing> var3 = facing.getIncomptibles().iterator();
-
-            DiagonalFacing fromFacing;
-            do {
-                if (!var3.hasNext()) {
-                    BlockPos targetPos = pos.add(facing.getOffset());
-                    fromFacing = facing.getReverse();
-                    Block block = blockAccessor.getBlockState(targetPos).getBlock();
-                    if (block instanceof BlockDiagonalFence) {
-                        return ((BlockDiagonalFence) block).isConnectedFrom(blockAccessor, targetPos, fromFacing.getProperty());
-                    }
-
+            for (DiagonalFacing inc : facing.getIncompatibles()) {
+                if (canPotentiallyConnectTo(blockAccessor, pos, inc)) {
                     return false;
                 }
+            }
 
-                fromFacing = var3.next();
-            } while (!canPotentiallyConnectTo(blockAccessor, pos, fromFacing));
+            BlockPos targetPos = pos.add(facing.getOffset());
+            DiagonalFacing fromFacing = facing.getReverse();
+            Block block = blockAccessor.getBlockState(targetPos).getBlock();
+            if (block instanceof BlockDiagonalFence) {
+                return ((BlockDiagonalFence) block).isConnectedFrom(blockAccessor, targetPos, fromFacing.getProperty());
+            }
 
             return false;
         } else {
@@ -254,7 +249,7 @@ public class BlockDiagonalFence extends BlockFence {
                     mat = block.getMaterial(state);
                     return mat.isOpaque() && block.isFullCube(state) && mat != Material.GOURD;
                 }
-            } else if (!(block instanceof BlockDiagonalFence) && !(block instanceof BlockFence) && !(block instanceof BlockFenceGate)) {
+            } else if (!(block instanceof BlockFence) && !(block instanceof BlockFenceGate)) {
                 mat = block.getMaterial(state);
                 return mat.isOpaque() && block.isFullCube(state) && mat != Material.GOURD;
             } else {
@@ -316,7 +311,7 @@ public class BlockDiagonalFence extends BlockFence {
             return this.property;
         }
 
-        public List<DiagonalFacing> getIncomptibles() {
+        public List<DiagonalFacing> getIncompatibles() {
             return this.incompatibleFacings;
         }
 

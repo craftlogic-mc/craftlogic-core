@@ -27,7 +27,7 @@ public class CraftAPI {
     public static final String MOD_VERSION = "{@mod:version}";
     public static final AdvancedNetwork NETWORK = new AdvancedNetwork(MOD_ID);
 
-    private static boolean init;
+    private static boolean init, postInit;
 
     public static void init(Side side) {
         if (init) {
@@ -44,6 +44,15 @@ public class CraftAPI {
         CraftEntities.init(side);
         CraftBarrelModes.init(side);
         CraftRecipes.init(side);
+    }
+
+    public static void postInit(Side side) {
+        if (postInit) {
+            throw new IllegalStateException("API has already been post-initialized!");
+        }
+        postInit = true;
+
+        CraftRecipes.postInit(side);
     }
 
     public static String getActiveModId() {

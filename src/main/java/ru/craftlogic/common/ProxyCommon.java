@@ -76,6 +76,7 @@ public class ProxyCommon extends AdvancedMessageHandler {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void registerFluid(FluidRegistry.FluidRegisterEvent event) {
+        System.out.println("Registered fluid '" + event.getFluidName() + "' with id: " + event.getFluidID());
         CraftFluids.FLUID_NAME_TO_ID.put(event.getFluidName(), event.getFluidID());
     }
 
@@ -86,6 +87,8 @@ public class ProxyCommon extends AdvancedMessageHandler {
                 case GRANITE:
                 case DIORITE:
                 case ANDESITE:
+                case GRAVEL:
+                case DIRT:
                     event.setResult(Event.Result.DENY);
                     break;
             }

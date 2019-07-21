@@ -10,4 +10,5 @@ public interface Barrel extends Locatable {
     boolean isEmpty();
     boolean isClosed();
     void markForUpdate();
+    void markForRenderUpdate();
 }

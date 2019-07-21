@@ -63,7 +63,9 @@ public class CraftRecipes {
                 );
             }
         });
+    }
 
+    static void postInit(Side side) {
         for (Map.Entry<String, Pair<Class<? extends RecipeGrid>, RecipeFactory>> entry : LOADABLE_TYPES.entrySet()) {
             String type = entry.getKey();
             Class<? extends RecipeGrid> grid = entry.getValue().first();

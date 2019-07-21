@@ -29,7 +29,7 @@ public class RenderBarrel extends TileEntitySpecialRenderer<TileEntityBarrel> {
                 TextureAtlasSprite texture = mode.getTexture(mc, barrel);
 
                 GlStateManager.pushMatrix();
-                GlStateManager.enableAlpha();
+                GlStateManager.enableBlend();
                 GlStateManager.translate(x, y, z);
 
                 double minU = (double) texture.getMinU();

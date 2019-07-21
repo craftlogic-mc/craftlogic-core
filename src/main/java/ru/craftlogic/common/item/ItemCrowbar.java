@@ -15,7 +15,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -29,9 +28,6 @@ public class ItemCrowbar extends ItemBase {
     public ItemCrowbar() {
         super("crowbar", CreativeTabs.TOOLS);
         this.setMaxStackSize(1);
-        this.addPropertyOverride(new ResourceLocation("blocking"), (item, world, entity) ->
-            entity != null && entity.isHandActive() && entity.getActiveItemStack() == item ? 1F : 0F
-        );
     }
 
     @Override

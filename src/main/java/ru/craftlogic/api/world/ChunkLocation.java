@@ -37,7 +37,7 @@ public class ChunkLocation {
         this.z = z;
     }
 
-    protected IBlockAccess getBlockAccessor() {
+    public IBlockAccess getBlockAccessor() {
         return this.getWorld();
     }
 

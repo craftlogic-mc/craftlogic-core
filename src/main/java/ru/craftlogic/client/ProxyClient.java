@@ -104,14 +104,12 @@ public class ProxyClient extends ProxyCommon {
     @SubscribeEvent
     public void onItemColorRegister(ColorHandlerEvent.Item event) {
         for (Item item : Item.REGISTRY) {
-            if (item instanceof Colored) {
-                if (item instanceof ItemBlockBase) {
-                    Block block = Block.getBlockFromItem(item);
-                    if (block instanceof Colored) {
-                        event.getItemColors().registerItemColorHandler(((Colored) block)::getItemColor, block);
-                        continue;
-                    }
+            if (item instanceof ItemBlockBase) {
+                Block block = Block.getBlockFromItem(item);
+                if (block instanceof Colored) {
+                    event.getItemColors().registerItemColorHandler(((Colored) block)::getItemColor, block);
                 }
+            } else if (item instanceof Colored) {
                 event.getItemColors().registerItemColorHandler(((Colored) item)::getItemColor, item);
             }
         }

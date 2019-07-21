@@ -98,6 +98,7 @@
     "client.renderer.entity.MixinRenderChicken",
     "client.renderer.entity.MixinRenderZombie",
     "client.renderer.entity.MixinRenderPigZombie",
+    "client.renderer.entity.MixinRenderSpider",
     "client.renderer.entity.MixinRenderCreeper",
     "client.renderer.model.box.MixinModelBox",
     "client.renderer.model.MixinModelChicken",

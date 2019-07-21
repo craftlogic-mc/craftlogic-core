@@ -89,7 +89,7 @@ public abstract class MixinEntityZombie extends EntityMob implements Zombie {
 
     /**
      * @author Radviger
-     * @reason
+     * @reason Random-sized zombies
      */
     @Overwrite
     public float getEyeHeight() {
