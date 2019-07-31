@@ -14,10 +14,10 @@
   <component name="McpModuleSettings">
     <option name="mappingFiles">
       <set>
-        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_stable\39\1.12.2\srgs\notch-srg.srg" />
         <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_stable\39\1.12.2\srgs\mcp-srg.srg" />
-        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_stable\39\1.12.2\srgs\srg.exc" />
+        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_stable\39\1.12.2\srgs\notch-srg.srg" />
         <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_stable\39\1.12.2\srgs\mcp-notch.srg" />
+        <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_stable\39\1.12.2\srgs\srg.exc" />
         <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_stable\39\1.12.2\srgs\mcp.exc" />
         <option value="C:\Users\Виктор\.gradle\caches\minecraft\de\oceanlabs\mcp\mcp_stable\39\1.12.2\srgs\notch-mcp.srg" />
       </set>
@@ -36,9 +36,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Gradle: org.codehaus.groovy:groovy:2.4.4" level="project" />
-    <orderEntry type="library" name="Gradle: org.spongepowered:mixin:0.7.7-SNAPSHOT" level="project" />
-    <orderEntry type="module-library">
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.codehaus.groovy:groovy:2.4.4" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.spongepowered:mixin:0.7.7-SNAPSHOT" level="project" />
+    <orderEntry type="module-library" scope="PROVIDED">
       <library name="Gradle: CTM-MC1.12.2-0.3.3.22">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/libs/CTM-MC1.12.2-0.3.3.22.jar!/" />
@@ -47,7 +47,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
+    <orderEntry type="module-library" scope="PROVIDED">
       <library name="Gradle: DynamicTrees-1.12.2-0.9.4">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/libs/DynamicTrees-1.12.2-0.9.4.jar!/" />
@@ -56,8 +56,8 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="Gradle: compileDummy" level="project" />
-    <orderEntry type="library" name="Gradle: providedDummy" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: compileDummy" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: providedDummy" level="project" />
     <orderEntry type="library" name="Gradle: com.google.code.findbugs:jsr305:3.0.1" level="project" />
     <orderEntry type="library" name="Gradle: com.mojang:patchy:1.1" level="project" />
     <orderEntry type="library" name="Gradle: oshi-project:oshi-core:1.1" level="project" />
@@ -118,6 +118,28 @@
     <orderEntry type="library" name="Gradle: org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209:natives-linux" level="project" />
     <orderEntry type="library" name="Gradle: org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209:natives-osx" level="project" />
     <orderEntry type="library" name="Gradle: net.minecraftforge:forgeBin:1.12.2-14.23.5.2768-PROJECT(CraftLogic)" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.codehaus.groovy:groovy:2.4.4" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.spongepowered:mixin:0.7.7-SNAPSHOT" level="project" />
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library name="Gradle: CTM-MC1.12.2-0.3.3.22">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/CTM-MC1.12.2-0.3.3.22.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="RUNTIME">
+      <library name="Gradle: DynamicTrees-1.12.2-0.9.4">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/DynamicTrees-1.12.2-0.9.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: compileDummy" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: providedDummy" level="project" />
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
@@ -127,5 +149,27 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" scope="TEST" name="Gradle: org.codehaus.groovy:groovy:2.4.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.spongepowered:mixin:0.7.7-SNAPSHOT" level="project" />
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Gradle: CTM-MC1.12.2-0.3.3.22">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/CTM-MC1.12.2-0.3.3.22.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" scope="TEST">
+      <library name="Gradle: DynamicTrees-1.12.2-0.9.4">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/libs/DynamicTrees-1.12.2-0.9.4.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" scope="TEST" name="Gradle: compileDummy" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: providedDummy" level="project" />
   </component>
 </module>
