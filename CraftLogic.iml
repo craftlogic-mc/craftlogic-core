@@ -37,7 +37,7 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="Gradle: org.codehaus.groovy:groovy:2.4.4" level="project" />
-    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.spongepowered:mixin:0.7.7-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="PROVIDED" name="Gradle: org.spongepowered:mixin:0.7.8-SNAPSHOT" level="project" />
     <orderEntry type="module-library" scope="PROVIDED">
       <library name="Gradle: CTM-MC1.12.2-0.3.3.22">
         <CLASSES>
@@ -48,9 +48,9 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="PROVIDED">
-      <library name="Gradle: DynamicTrees-1.12.2-0.9.4">
+      <library name="Gradle: DynamicTrees-1.12.2-0.9.5">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/DynamicTrees-1.12.2-0.9.4.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/DynamicTrees-1.12.2-0.9.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -117,9 +117,9 @@
     <orderEntry type="library" name="Gradle: org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209:natives-windows" level="project" />
     <orderEntry type="library" name="Gradle: org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209:natives-linux" level="project" />
     <orderEntry type="library" name="Gradle: org.lwjgl.lwjgl:lwjgl-platform:2.9.4-nightly-20150209:natives-osx" level="project" />
-    <orderEntry type="library" name="Gradle: net.minecraftforge:forgeBin:1.12.2-14.23.5.2768-PROJECT(CraftLogic)" level="project" />
+    <orderEntry type="library" name="Gradle: net.minecraftforge:forgeBin:1.12.2-14.23.5.2838-PROJECT(CraftLogic)" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Gradle: org.codehaus.groovy:groovy:2.4.4" level="project" />
-    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.spongepowered:mixin:0.7.7-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Gradle: org.spongepowered:mixin:0.7.8-SNAPSHOT" level="project" />
     <orderEntry type="module-library" scope="RUNTIME">
       <library name="Gradle: CTM-MC1.12.2-0.3.3.22">
         <CLASSES>
@@ -130,9 +130,9 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="RUNTIME">
-      <library name="Gradle: DynamicTrees-1.12.2-0.9.4">
+      <library name="Gradle: DynamicTrees-1.12.2-0.9.5">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/DynamicTrees-1.12.2-0.9.4.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/DynamicTrees-1.12.2-0.9.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -143,14 +143,14 @@
     <orderEntry type="module-library" scope="RUNTIME">
       <library>
         <CLASSES>
-          <root url="file://$USER_HOME$/.gradle/caches/minecraft/net/minecraftforge/forge/1.12.2-14.23.5.2768/start" />
+          <root url="file://$USER_HOME$/.gradle/caches/minecraft/net/minecraftforge/forge/1.12.2-14.23.5.2838/start" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="library" scope="TEST" name="Gradle: org.codehaus.groovy:groovy:2.4.4" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: org.spongepowered:mixin:0.7.7-SNAPSHOT" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: org.spongepowered:mixin:0.7.8-SNAPSHOT" level="project" />
     <orderEntry type="module-library" scope="TEST">
       <library name="Gradle: CTM-MC1.12.2-0.3.3.22">
         <CLASSES>
@@ -161,9 +161,9 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="TEST">
-      <library name="Gradle: DynamicTrees-1.12.2-0.9.4">
+      <library name="Gradle: DynamicTrees-1.12.2-0.9.5">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/libs/DynamicTrees-1.12.2-0.9.4.jar!/" />
+          <root url="jar://$MODULE_DIR$/libs/DynamicTrees-1.12.2-0.9.5.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

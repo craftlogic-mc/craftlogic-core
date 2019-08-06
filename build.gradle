@@ -92,7 +92,7 @@ task deobfJar(type: Jar) {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.spongepowered/mixin
-    extend (group: 'org.spongepowered', name: 'mixin', version: '0.7.7-SNAPSHOT') {
+    extend (group: 'org.spongepowered', name: 'mixin', version: project.mixin_version) {
         exclude module: 'launchwrapper'
         exclude module: 'guava'
         exclude module: 'gson'

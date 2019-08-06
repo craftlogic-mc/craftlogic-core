@@ -43,6 +43,7 @@
     "item.MixinItemTool",
     "item.MixinItemHoe",
     "item.MixinItemSword",
+    "inventory.MixinContainerPlayer",
     "item.crafting.MixinCraftingManager",
     "tileentity.MixinTileEntity",
     "tileentity.MixinTileEntityChest",

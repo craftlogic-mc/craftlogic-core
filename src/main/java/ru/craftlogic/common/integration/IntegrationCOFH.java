@@ -6,7 +6,7 @@ import ru.craftlogic.api.integration.ModIntegration;
 
 import java.lang.reflect.Field;
 
-public class CofhIntegration implements ModIntegration {
+public class IntegrationCOFH implements ModIntegration {
     @Override
     public String getModId() {
         return "cofhcore";

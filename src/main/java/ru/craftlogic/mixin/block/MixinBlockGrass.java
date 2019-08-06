@@ -25,11 +25,6 @@ public class MixinBlockGrass extends Block {
         super(material);
     }
 
-    @Inject(method = "<init>", at = @At("RETURN"))
-    public void constructor(CallbackInfo info) {
-        this.setHardness(3F);
-    }
-
     /**
      * @author Radviger
      * @reason Weed growth

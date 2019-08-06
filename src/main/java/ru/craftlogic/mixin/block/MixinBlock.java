@@ -100,6 +100,7 @@ public class MixinBlock {
                 }
                 break;
             }
+            case "minecraft:grass":
             case "minecraft:dirt": {
                 block.setHardness(3F);
                 break;

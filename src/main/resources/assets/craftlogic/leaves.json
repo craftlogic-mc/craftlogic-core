@@ -1,0 +1,10 @@
+{
+  "dead": {
+    "leaves": {
+      "bop": "dead"
+    },
+    "color": "#ffffff",
+    "cellkit": "craftlogic:sparse",
+    "smother": 1
+  }
+}

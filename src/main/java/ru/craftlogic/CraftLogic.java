@@ -16,7 +16,7 @@ import ru.craftlogic.common.ProxyCommon;
 
 import static ru.craftlogic.api.CraftAPI.MOD_ID;
 
-@Mod(modid = MOD_ID, version = CraftAPI.MOD_VERSION)
+@Mod(modid = MOD_ID, version = CraftAPI.MOD_VERSION, dependencies = "after:dynamictrees")
 public class CraftLogic {
     @SidedProxy(clientSide = "ru.craftlogic.client.ProxyClient", serverSide = "ru.craftlogic.common.ProxyCommon")
     public static ProxyCommon PROXY;
