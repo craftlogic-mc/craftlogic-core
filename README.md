@@ -24,3 +24,4 @@ LICENSE: CC BY-NC-SA https://creativecommons.org/licenses/by-nc-sa/4.0/
 * Tallgrass can spread slowly.
 * Eggs do not spawn chicks when thrown. They drop broken eggs instead.
 * Compasses are now able to locate iron ores by their "magnetic fields".
+* Doors can only be placed when there are two support blocks at their binding.
