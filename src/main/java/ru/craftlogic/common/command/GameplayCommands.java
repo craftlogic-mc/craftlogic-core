@@ -16,6 +16,7 @@ import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.util.WrappedPlayerEnderchest;
 import ru.craftlogic.api.util.WrappedPlayerInventory;
 import ru.craftlogic.api.world.*;
+import ru.craftlogic.common.inventory.InterfaceVirtualWorkbench;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -219,8 +220,7 @@ public class GameplayCommands implements CommandRegistrar {
     }, opLevel = 1)
     public static void commandCraft(CommandContext ctx) throws CommandException {
         Player target = ctx.has("target") ? ctx.get("target").asPlayer() : ctx.senderAsPlayer();
-        Location location = target.getLocation();
-        target.openInteraction(new BlockWorkbench.InterfaceCraftingTable(location.getWorld(), location.getPos()));
+        target.openInteraction(new InterfaceVirtualWorkbench(target.getWorld().unwrap()));
     }
 
     @Command(name = "inventory", aliases = "inv", syntax = {
