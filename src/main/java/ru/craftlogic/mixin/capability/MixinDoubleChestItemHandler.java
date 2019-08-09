@@ -3,7 +3,9 @@ package ru.craftlogic.mixin.capability;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -40,15 +42,33 @@ public abstract class MixinDoubleChestItemHandler extends WeakReference<TileEnti
         BlockPos pos = chest.getPos();
         if (world != null && pos != null && world.isBlockLoaded(pos)) {
             IBlockState state = world.getBlockState(pos);
-            ChestPart part = state.getValue(PART);
-            if (part != ChestPart.SINGLE) {
+            if (state.getPropertyKeys().contains(PART)) {
+                ChestPart part = state.getValue(PART);
+                if (part != ChestPart.SINGLE) {
+                    Block blockType = chest.getBlockType();
+                    BlockPos offsetPos = pos.offset(part.rotate(state.getValue(BlockChest.FACING)));
+                    IBlockState offsetState = world.getBlockState(offsetPos);
+                    if (offsetState.getBlock() == blockType && offsetState.getValue(PART) == part) {
+                        TileEntityChest otherChest = TileEntities.getTileEntity(world, offsetPos, TileEntityChest.class);
+                        if (otherChest != null) {
+                            return new VanillaDoubleChestItemHandler(chest, otherChest, part == ChestPart.RIGHT);
+                        }
+                    }
+                }
+            } else {
                 Block blockType = chest.getBlockType();
-                BlockPos offsetPos = pos.offset(part.rotate(state.getValue(BlockChest.FACING)));
-                IBlockState offsetState = world.getBlockState(offsetPos);
-                if (offsetState.getBlock() == blockType && offsetState.getValue(PART) == part) {
-                    TileEntityChest otherChest = TileEntities.getTileEntity(world, offsetPos, TileEntityChest.class);
-                    if (otherChest != null) {
-                        return new VanillaDoubleChestItemHandler(chest, otherChest, part == ChestPart.RIGHT);
+                EnumFacing[] horizontals = EnumFacing.HORIZONTALS;
+
+                for(int i = horizontals.length - 1; i >= 0; --i) {
+                    EnumFacing side = horizontals[i];
+                    BlockPos p = pos.offset(side);
+                    Block block = world.getBlockState(p).getBlock();
+                    if (block == blockType) {
+                        TileEntity otherTE = world.getTileEntity(p);
+                        if (otherTE instanceof TileEntityChest) {
+                            TileEntityChest otherChest = (TileEntityChest)otherTE;
+                            return new VanillaDoubleChestItemHandler(chest, otherChest, side != EnumFacing.WEST && side != EnumFacing.NORTH);
+                        }
                     }
                 }
             }
