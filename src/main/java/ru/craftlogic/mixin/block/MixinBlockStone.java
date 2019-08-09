@@ -72,12 +72,31 @@ public abstract class MixinBlockStone extends Block {
         }
     }
 
+    private int getSupportLevel(World world, BlockPos pos, EnumFacing omit, boolean deep) {
+        int support = 0;
+        for (EnumFacing side : EnumFacing.values()) {
+            if (side != omit) {
+                if (world.isSideSolid(pos, side)) {
+                    if (world.isSideSolid(pos, EnumFacing.DOWN) && world.isSideSolid(pos.offset(EnumFacing.DOWN), EnumFacing.UP)) {
+                        support += 2;
+                    } else if (deep) {
+                        support += Math.max(0, getSupportLevel(world, pos.offset(side), side.getOpposite(), false) - 1);
+                    }
+                }
+            }
+        }
+        return support;
+    }
+
     @Override
     public void updateTick(World world, BlockPos pos, IBlockState state, Random random) {
-        if (!world.isRemote && random.nextInt(5) == 0 && state.getBlock() == this && CraftConfig.tweaks.enableStoneCracking) {
+        if (!world.isRemote && state.getBlock() == this && CraftConfig.tweaks.enableStoneCracking) {
             if (state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE
                     && !world.isSideSolid(pos.down(), EnumFacing.UP)) {
-                world.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState());
+                int support = getSupportLevel(world, pos, null, true);
+                if (support < 2 && random.nextInt(support + 1) == 0) {
+                    world.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState());
+                }
             }
         }
     }
