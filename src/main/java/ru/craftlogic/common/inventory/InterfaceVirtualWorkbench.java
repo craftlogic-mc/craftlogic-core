@@ -16,6 +16,16 @@ public class InterfaceVirtualWorkbench extends BlockWorkbench.InterfaceCraftingT
     }
 
     @Override
+    public String getName() {
+        return "virtual_workbench";
+    }
+
+    @Override
+    public String getGuiID() {
+        return "craftlogic:virtual_workbench";
+    }
+
+    @Override
     public Container createContainer(InventoryPlayer playerInv, EntityPlayer player) {
         return new ContainerVirtualWorkbench(playerInv, this.world);
     }

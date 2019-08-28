@@ -83,6 +83,7 @@
     "MixinCommandHandler"
   ],
   "client": [
+    "client.entity.MixinEntityPlayerSP",
     "client.particle.MixinParticleManager",
     "client.renderer.MixinBufferBuilder",
     "client.renderer.MixinModelBakery",
