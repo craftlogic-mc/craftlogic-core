@@ -1,6 +1,5 @@
 package ru.craftlogic.mixin.entity.passive;
 
-import net.minecraft.block.BlockBeetroot;
 import net.minecraft.block.BlockCrops;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityPig;
@@ -27,9 +26,9 @@ public abstract class MixinEntityPig extends EntityAnimal implements Pig {
     @Inject(method = "initEntityAI", at = @At("RETURN"))
     protected void onAiInit(CallbackInfo info) {
         this.cropsEatAI = new EntityAIEatCrops<>(this, 1.2F, 16, (pos, state) ->
-            state.getBlock() == Blocks.POTATOES && state.getValue(BlockCrops.AGE) == ((BlockCrops) Blocks.POTATOES).getMaxAge()
-            || state.getBlock() == Blocks.CARROTS && state.getValue(BlockCrops.AGE) == ((BlockCrops) Blocks.CARROTS).getMaxAge()
-            || state.getBlock() == Blocks.BEETROOTS && state.getValue(BlockBeetroot.BEETROOT_AGE) == ((BlockBeetroot) Blocks.BEETROOTS).getMaxAge()
+            state.getBlock() == Blocks.POTATOES && ((BlockCrops)state.getBlock()).isMaxAge(state)
+            || state.getBlock() == Blocks.CARROTS && ((BlockCrops)state.getBlock()).isMaxAge(state)
+            || state.getBlock() == Blocks.BEETROOTS && ((BlockCrops)state.getBlock()).isMaxAge(state)
             || state.getBlock() == Blocks.RED_FLOWER
             || state.getBlock() == Blocks.YELLOW_FLOWER
             || state.getBlock() == Blocks.RED_MUSHROOM
