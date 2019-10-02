@@ -34,7 +34,7 @@ public class EntityAIEatCrops<A extends EntityAnimal & HebivorousAnimal> extends
 
     private void onCropEaten(BlockPos pos, IBlockState state) {
         if (state.getBlock() instanceof BlockCrops) {
-            this.entity.world.setBlockState(pos, state.withProperty(BlockCrops.AGE, 0));
+            this.entity.world.setBlockState(pos, ((BlockCrops)state.getBlock()).withAge(0));
         } else {
             this.entity.world.destroyBlock(pos, false);
         }
