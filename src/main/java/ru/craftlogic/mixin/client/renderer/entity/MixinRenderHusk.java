@@ -14,13 +14,13 @@ import org.spongepowered.asm.mixin.Overwrite;
 import ru.craftlogic.api.entity.Zombie;
 
 @Mixin(RenderHusk.class)
-public abstract class MixinRenderHusk extends RenderBiped<EntityHusk> {
+public abstract class MixinRenderHusk extends RenderBiped<EntityZombie> {
     public MixinRenderHusk(RenderManager renderManager, ModelBiped model, float shadowSize) {
         super(renderManager, model, shadowSize);
     }
 
-    @Override
-    protected void preRenderCallback(EntityHusk husk, float p_preRenderCallback_2_) {
+    @Overwrite
+    protected void preRenderCallback(EntityZombie husk, float p_preRenderCallback_2_) {
         float size = husk.getRenderSizeModifier();
         GlStateManager.scale(1.0625F * size, 1.0625F * size, 1.0625F * size);
     }
