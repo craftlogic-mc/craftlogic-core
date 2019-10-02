@@ -93,6 +93,7 @@
     "client.renderer.tileentity.MixinTileEntityChestRenderer",
     "client.renderer.entity.MixinRenderChicken",
     "client.renderer.entity.MixinRenderZombie",
+    "client.renderer.entity.MixinRenderHusk",
     "client.renderer.entity.MixinRenderPigZombie",
     "client.renderer.entity.MixinRenderSpider",
     "client.renderer.entity.MixinRenderCreeper",
