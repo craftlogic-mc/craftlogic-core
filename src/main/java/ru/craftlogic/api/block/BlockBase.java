@@ -297,6 +297,15 @@ public class BlockBase extends Block implements ModelRegistrar {
     }
 
     @Override final
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+        return this.getPickBlock(new LocationReadOnly(world, pos, state), target, player);
+    }
+
+    protected ItemStack getPickBlock(Location location, RayTraceResult target, EntityPlayer player) {
+        return this.getItem(location.getWorld(), location.getPos(), location.getBlockState());
+    }
+
+    @Override final
     public void fillWithRain(World world, BlockPos pos) {
         this.fillWithRain(world, pos, FluidRegistry.WATER);
     }
