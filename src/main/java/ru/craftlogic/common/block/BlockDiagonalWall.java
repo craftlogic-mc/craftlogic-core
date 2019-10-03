@@ -1,20 +1,16 @@
 package ru.craftlogic.common.block;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFence;
 import net.minecraft.block.BlockFenceGate;
-import net.minecraft.block.material.MapColor;
+import net.minecraft.block.BlockWall;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.Mirror;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -24,24 +20,30 @@ import net.minecraft.world.World;
 import ru.craftlogic.api.block.DiagonalFacing;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class BlockDiagonalFence extends BlockFence {
+public class BlockDiagonalWall extends BlockWall {
     public static final PropertyBool NORTH_WEST = PropertyBool.create("north_west");
     public static final PropertyBool NORTH_EAST = PropertyBool.create("north_east");
     public static final PropertyBool SOUTH_WEST = PropertyBool.create("south_west");
     public static final PropertyBool SOUTH_EAST = PropertyBool.create("south_east");
 
     private static final AxisAlignedBB[] BOUNDING_BOXES = new AxisAlignedBB[]{
-        new AxisAlignedBB(0.375, 0, 0.375, 0.625, 1, 0.625), new AxisAlignedBB(0.375, 0, 0.375, 0.625, 1, 1),
-        new AxisAlignedBB(0, 0, 0.375, 0.625, 1, 0.625), new AxisAlignedBB(0, 0, 0.375, 0.625, 1, 1),
-        new AxisAlignedBB(0.375, 0, 0, 0.625, 1, 0.625), new AxisAlignedBB(0.375, 0, 0, 0.625, 1, 1),
-        new AxisAlignedBB(0, 0, 0, 0.625, 1, 0.625), new AxisAlignedBB(0, 0, 0, 0.625, 1, 1),
-        new AxisAlignedBB(0.375, 0, 0.375, 1, 1, 0.625), new AxisAlignedBB(0.375, 0, 0.375, 1, 1, 1),
-        new AxisAlignedBB(0, 0, 0.375, 1, 1, 0.625), new AxisAlignedBB(0, 0, 0.375, 1, 1, 1),
-        new AxisAlignedBB(0.375, 0, 0, 1, 1, 0.625), new AxisAlignedBB(0.375, 0, 0, 1, 1, 1),
-        new AxisAlignedBB(0, 0, 0, 1, 1, 0.625), new AxisAlignedBB(0, 0, 0, 1, 1, 1)
+        new AxisAlignedBB(0.25, 0, 0.25, 0.75, 1, 0.75), new AxisAlignedBB(0.25, 0, 0.25, 0.75, 1, 1),
+        new AxisAlignedBB(0, 0, 0.25, 0.75, 1, 0.75), new AxisAlignedBB(0, 0, 0.25, 0.75, 1, 1),
+        new AxisAlignedBB(0.25, 0, 0, 0.75, 1, 0.75), new AxisAlignedBB(0.25, 0, 0, 0.75, 1, 1),
+        new AxisAlignedBB(0, 0, 0, 0.75, 1, 0.75), new AxisAlignedBB(0, 0, 0, 0.75, 1, 1),
+        new AxisAlignedBB(0.25, 0, 0.25, 1, 1, 0.75), new AxisAlignedBB(0.25, 0, 0.25, 1, 1, 1),
+        new AxisAlignedBB(0, 0, 0.25, 1, 1, 0.75), new AxisAlignedBB(0, 0, 0.25, 1, 1, 1),
+        new AxisAlignedBB(0.25, 0, 0, 1, 1, 0.75), new AxisAlignedBB(0.25, 0, 0, 1, 1, 1),
+        new AxisAlignedBB(0, 0, 0, 1, 1, 0.75), new AxisAlignedBB(0, 0, 0, 1, 1, 1)
     };
+    private static final AxisAlignedBB PILLAR_AABB = new AxisAlignedBB(0.25, 0.0, 0.25, 0.75, 1.5, 0.75);
+    private static final AxisAlignedBB SOUTH_AABB = new AxisAlignedBB(0.25, 0.0, 0.75, 0.75, 1.5, 1.0);
+    private static final AxisAlignedBB WEST_AABB = new AxisAlignedBB(0.0, 0.0, 0.25, 0.25, 1.5, 0.75);
+    private static final AxisAlignedBB NORTH_AABB = new AxisAlignedBB(0.25, 0.0, 0.0, 0.75, 1.5, 0.25);
+    private static final AxisAlignedBB EAST_AABB = new AxisAlignedBB(0.75, 0.0, 0.25, 1.0, 1.5, 0.75);
     private static final AxisAlignedBB[][] COLLISION_BOXES = new AxisAlignedBB[][]{
         {NORTH_AABB}, {SOUTH_AABB},
         {EAST_AABB}, {WEST_AABB},
@@ -52,9 +54,12 @@ public class BlockDiagonalFence extends BlockFence {
         NORTH, SOUTH, EAST, WEST, NORTH_EAST, NORTH_WEST, SOUTH_EAST, SOUTH_WEST
     };
 
-    public BlockDiagonalFence(Material material, MapColor color) {
-        super(material, color);
+    public BlockDiagonalWall(Block block) {
+        super(block);
+        this.setTranslationKey("cobbleWall");
         this.setDefaultState(this.blockState.getBaseState()
+            .withProperty(VARIANT, EnumType.NORMAL)
+            .withProperty(UP, false)
             .withProperty(NORTH, false).withProperty(SOUTH, false)
             .withProperty(WEST, false).withProperty(EAST, false)
             .withProperty(NORTH_EAST, false).withProperty(NORTH_WEST, false)
@@ -140,16 +145,26 @@ public class BlockDiagonalFence extends BlockFence {
     @Override
     public IBlockState getActualState(IBlockState state, IBlockAccess blockAccessor, BlockPos pos) {
         List<DiagonalFacing> acceptedFacings = new ArrayList<>();
+        List<DiagonalFacing> connectedFacings = new ArrayList<>();
 
-        IBlockState blankState = this.getDefaultState();
+        IBlockState blankState = this.getDefaultState().withProperty(VARIANT, state.getValue(VARIANT));
 
         for (DiagonalFacing facing : DiagonalFacing.values()) {
             if (!facing.isIncompatible(acceptedFacings) && isConnectedWithoutConflictsTo(blockAccessor, pos, facing)) {
                 blankState = blankState.withProperty(PROPERTIES[facing.ordinal()], true);
+                connectedFacings.add(facing);
             }
         }
 
-        return blankState;
+        boolean up = true;
+
+        if (connectedFacings.size() == 2) {
+            up = connectedFacings.get(0).getOpposite() != connectedFacings.get(1) && !connectedFacings.get(0).isDiagonal();
+        }
+
+        IBlockState downBlock = blockAccessor.getBlockState(pos.down());
+
+        return blankState.withProperty(UP, up || downBlock.getBlock() instanceof BlockWall && downBlock.getValue(UP));
     }
 
     public boolean isConnectedFrom(IBlockAccess world, BlockPos pos, PropertyBool direction) {
@@ -162,24 +177,6 @@ public class BlockDiagonalFence extends BlockFence {
         }
 
         return true;
-    }
-
-    @Override
-    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> items) {
-        String id = this.getRegistryName().toString();
-        if (id.startsWith("minecraft:") && id.endsWith("fence")) {
-            if (this == Blocks.OAK_FENCE) {
-                items.add(new ItemStack(Blocks.NETHER_BRICK_FENCE));
-                items.add(new ItemStack(Blocks.OAK_FENCE));
-                items.add(new ItemStack(Blocks.SPRUCE_FENCE));
-                items.add(new ItemStack(Blocks.BIRCH_FENCE));
-                items.add(new ItemStack(Blocks.JUNGLE_FENCE));
-                items.add(new ItemStack(Blocks.ACACIA_FENCE));
-                items.add(new ItemStack(Blocks.DARK_OAK_FENCE));
-            }
-        } else {
-            items.add(new ItemStack(this));
-        }
     }
 
     @Override
@@ -208,7 +205,7 @@ public class BlockDiagonalFence extends BlockFence {
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, NORTH, SOUTH, WEST, EAST, NORTH_WEST, NORTH_EAST, SOUTH_WEST, SOUTH_EAST);
+        return new BlockStateContainer(this, VARIANT, UP, NORTH, SOUTH, WEST, EAST, NORTH_WEST, NORTH_EAST, SOUTH_WEST, SOUTH_EAST);
     }
 
     public static boolean isConnectedTo(IBlockAccess blockAccessor, BlockPos pos, DiagonalFacing facing) {
@@ -222,8 +219,8 @@ public class BlockDiagonalFence extends BlockFence {
             BlockPos targetPos = pos.add(facing.getOffset());
             DiagonalFacing fromFacing = facing.getOpposite();
             Block block = blockAccessor.getBlockState(targetPos).getBlock();
-            if (block instanceof BlockDiagonalFence) {
-                return ((BlockDiagonalFence) block).isConnectedFrom(blockAccessor, targetPos, PROPERTIES[fromFacing.ordinal()]);
+            if (block instanceof BlockDiagonalWall) {
+                return ((BlockDiagonalWall) block).isConnectedFrom(blockAccessor, targetPos, PROPERTIES[fromFacing.ordinal()]);
             }
 
             return false;
@@ -237,7 +234,7 @@ public class BlockDiagonalFence extends BlockFence {
             BlockPos targetPos = pos.add(facing.getOffset());
             DiagonalFacing fromFacing = facing.getOpposite();
             Block block = world.getBlockState(targetPos).getBlock();
-            return block instanceof BlockDiagonalFence && ((BlockDiagonalFence) block).isConnectedFrom(world, targetPos, PROPERTIES[fromFacing.ordinal()]);
+            return block instanceof BlockDiagonalWall && ((BlockDiagonalWall) block).isConnectedFrom(world, targetPos, PROPERTIES[fromFacing.ordinal()]);
         } else {
             return canPotentiallyConnectTo(world, pos, facing);
         }
@@ -252,13 +249,13 @@ public class BlockDiagonalFence extends BlockFence {
         } else {
             Material mat;
             if (facing.isDiagonal()) {
-                if (block instanceof BlockDiagonalFence) {
+                if (block instanceof BlockDiagonalWall) {
                     return true;
                 } else {
                     mat = block.getMaterial(state);
                     return mat.isOpaque() && block.isFullCube(state) && mat != Material.GOURD;
                 }
-            } else if (block instanceof BlockFence || block instanceof BlockFenceGate) {
+            } else if (block instanceof BlockWall || block instanceof BlockFenceGate) {
                 return true;
             } else {
                 mat = block.getMaterial(state);
@@ -266,5 +263,4 @@ public class BlockDiagonalFence extends BlockFence {
             }
         }
     }
-
 }

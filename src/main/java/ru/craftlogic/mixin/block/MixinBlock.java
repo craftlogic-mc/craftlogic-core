@@ -100,6 +100,12 @@ public class MixinBlock {
                 }
                 break;
             }
+            case "minecraft:cobblestone_wall": {
+                if (CraftConfig.tweaks.enableDiagonalFences) {
+                    block = new BlockDiagonalWall(Block.REGISTRY.getObject(new ResourceLocation("minecraft:cobblestone")));
+                }
+                break;
+            }
             case "minecraft:grass":
             case "minecraft:dirt": {
                 block.setHardness(3F);

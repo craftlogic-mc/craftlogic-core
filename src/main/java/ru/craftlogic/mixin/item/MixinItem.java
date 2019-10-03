@@ -65,7 +65,7 @@ public class MixinItem {
                 item = new ItemMushroom(block);
                 break;
             }
-            case "carpet": {
+            case "minecraft:carpet": {
                 item = new ItemCarpet(block);
                 break;
             }
