@@ -70,7 +70,6 @@ public class CraftRecipes {
             String type = entry.getKey();
             Class<? extends RecipeGrid> grid = entry.getValue().first();
             RecipeFactory factory = entry.getValue().second();
-            LOGGER.info("Searching JSON recipes of type " + type);
             parseJsonRecipes(type, (name, raw) -> {
                 LOGGER.info("Registered " + type + " recipe: " + name);
                 registerRecipe(grid, factory.parse(name, raw));

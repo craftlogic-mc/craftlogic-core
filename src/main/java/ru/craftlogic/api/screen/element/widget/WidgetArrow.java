@@ -43,7 +43,7 @@ public class WidgetArrow extends Widget {
                 this.drawTexturedRect(x + progressWidth, y, width, height, 17 + progressWidth, 1 + offset);
             }
             if (progressWidth > 0) {
-                this.drawTexturedRect(x, y, progressWidth, height, 43, 18 + offset);
+                this.drawTexturedRect(x, y, progressWidth, height, 17, 18 + offset);
             }
         }
     }
