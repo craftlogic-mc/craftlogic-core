@@ -231,8 +231,9 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
         }
     }
 
+    @Nonnull
     protected NBTTagCompound writeToPacket(NBTTagCompound compound) {
-        return null;
+        return compound;
     }
 
     protected void readFromPacket(NBTTagCompound compound) {}
