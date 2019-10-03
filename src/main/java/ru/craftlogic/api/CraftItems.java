@@ -2,7 +2,6 @@ package ru.craftlogic.api;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
-import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import ru.craftlogic.CraftConfig;
@@ -25,8 +24,6 @@ public class CraftItems {
     public static Item CHAIN_MESH;
     public static Item CROWBAR;
     public static Item MILK_BOTTLE;
-    public static Item MILK_BOWL;
-    public static Item WATER_BOWL;
     public static Item CREEPER_OYSTERS;
     public static Item STRAW;
 
@@ -53,8 +50,6 @@ public class CraftItems {
         }
         CROWBAR = registerItem(new ItemCrowbar());
         MILK_BOTTLE = registerItem(new ItemMilkBottle());
-        MILK_BOWL = registerItem(new ItemFluidBowl(CraftFluids.MILK));
-        WATER_BOWL = registerItem(new ItemFluidBowl(FluidRegistry.WATER));
         CREEPER_OYSTERS = registerItem(new ItemCreeperOysters());
         STRAW = registerItem(new ItemBase("straw", CreativeTabs.MATERIALS));
     }

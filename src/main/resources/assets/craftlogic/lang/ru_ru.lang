@@ -37,6 +37,9 @@ item.egg_fried.name=Жареное яйцо
 item.chain_links.name=Цепные звенья
 item.chain_mesh.name=Цепная сеть
 item.milk_bottle.name=Колба молока
+item.straw.name=Солома
+item.creeper_oysters.name=Устрицы крипера
+item.spit.name=Плевок паутины
 
 commands.generic.unknownFailure=Неизвестная ошибка! Смотрите делали в консоли.
 commands.generic.noPermission=У вас нет необходимого разрешения: %s
