@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -17,7 +18,6 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.*;
 import net.minecraft.world.Explosion;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
@@ -228,6 +228,10 @@ public class Location extends ChunkLocation {
 
     public AxisAlignedBB getBlockBounding() {
         return getBlockState().getBoundingBox(getWorld(), getPos());
+    }
+
+    public BlockFaceShape getBlockFaceShape(EnumFacing side) {
+        return getBlockState().getBlockFaceShape(getBlockAccessor(), getPos(), side);
     }
 
     public Biome getBiome() {
