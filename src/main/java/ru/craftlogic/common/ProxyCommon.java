@@ -64,6 +64,7 @@ public class ProxyCommon extends AdvancedMessageHandler {
     }
 
     public void postInit() {
+        CraftAPI.postInit(FMLCommonHandler.instance().getSide());
         for (Block block : Block.REGISTRY) {
             if (block instanceof TileEntityHolder) {
                 ((TileEntityHolder) block).registerTileEntity();
