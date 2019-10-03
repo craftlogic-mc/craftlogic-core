@@ -43,13 +43,12 @@ public class CraftRecipes {
     static void init(Side side) {
         registerGridType(RecipeGridAlloying.class, "alloying", RecipeAlloying::new);
         registerGridType(RecipeGridBarrel.class, "composting", RecipeBarrelCompost::new);
-
-        if (CraftConfig.items.enableRocks && CraftConfig.items.enableStoneBricks) {
-            FurnaceRecipes.instance().addSmelting(CraftItems.ROCK, new ItemStack(CraftItems.STONE_BRICK), 0.15F);
-        }
     }
 
     static void postInit(Side side) {
+        if (CraftConfig.items.enableRocks && CraftConfig.items.enableStoneBricks) {
+            FurnaceRecipes.instance().addSmelting(CraftItems.ROCK, new ItemStack(CraftItems.STONE_BRICK), 0.15F);
+        }
         parseJsonRecipes("smelting", (name, raw) -> {
             Object rawInput = parseItem(raw.get("input"));
             List<ItemStack> input = rawInput instanceof ItemStack ?

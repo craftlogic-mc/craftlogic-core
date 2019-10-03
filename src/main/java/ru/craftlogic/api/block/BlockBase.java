@@ -168,13 +168,22 @@ public class BlockBase extends Block implements ModelRegistrar {
         }
     }
 
-    @Override
+    @Override final
     public boolean canPlaceBlockAt(World world, BlockPos pos) {
         return this.canPlaceBlockAt(new LocationReadOnly(world, pos, null));
     }
 
-    public boolean canPlaceBlockAt(Location location) {
-        return true;
+    protected boolean canPlaceBlockAt(Location location) {
+        return location.getBlock().isReplaceable(location.getWorld(), location.getPos());
+    }
+
+    @Override final
+    public boolean canPlaceBlockOnSide(World world, BlockPos pos, EnumFacing side) {
+        return canPlaceBlockOnSide(new LocationReadOnly(world, pos, null), side);
+    }
+
+    protected boolean canPlaceBlockOnSide(Location location, EnumFacing side) {
+        return canPlaceBlockAt(location);
     }
 
     @Override final
