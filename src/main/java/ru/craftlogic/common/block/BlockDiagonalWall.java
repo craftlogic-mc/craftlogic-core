@@ -159,7 +159,7 @@ public class BlockDiagonalWall extends BlockWall {
         boolean up = true;
 
         if (connectedFacings.size() == 2) {
-            up = connectedFacings.get(0).getOpposite() != connectedFacings.get(1) && !connectedFacings.get(0).isDiagonal();
+            up = connectedFacings.get(0).getOpposite() != connectedFacings.get(1) || connectedFacings.get(0).isDiagonal();
         }
 
         IBlockState downBlock = blockAccessor.getBlockState(pos.down());
