@@ -47,7 +47,9 @@ public class CraftRecipes {
         if (CraftConfig.items.enableRocks && CraftConfig.items.enableStoneBricks) {
             FurnaceRecipes.instance().addSmelting(CraftItems.ROCK, new ItemStack(CraftItems.STONE_BRICK), 0.15F);
         }
+    }
 
+    static void postInit(Side side) {
         parseJsonRecipes("smelting", (name, raw) -> {
             Object rawInput = parseItem(raw.get("input"));
             List<ItemStack> input = rawInput instanceof ItemStack ?
@@ -58,14 +60,11 @@ public class CraftRecipes {
 
             for (ItemStack i : input) {
                 FurnaceRecipes.instance().addSmeltingRecipe(
-                    i, (ItemStack)parseItem(raw.get("output")),
-                    JsonUtils.getFloat(raw, "exp", 0F)
+                        i, (ItemStack)parseItem(raw.get("output")),
+                        JsonUtils.getFloat(raw, "exp", 0F)
                 );
             }
         });
-    }
-
-    static void postInit(Side side) {
         for (Map.Entry<String, Pair<Class<? extends RecipeGrid>, RecipeFactory>> entry : LOADABLE_TYPES.entrySet()) {
             String type = entry.getKey();
             Class<? extends RecipeGrid> grid = entry.getValue().first();
