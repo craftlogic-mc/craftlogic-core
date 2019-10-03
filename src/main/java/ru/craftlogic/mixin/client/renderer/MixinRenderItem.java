@@ -15,6 +15,10 @@ import org.spongepowered.asm.mixin.Shadow;
 public class MixinRenderItem {
     @Shadow @Final private ItemModelMesher itemModelMesher;
 
+    /**
+     * @author Radviger
+     * @reason Custom carpet models
+     */
     @Overwrite
     protected void registerBlock(Block block, int meta, String model) {
         if (block == Blocks.CARPET) {
@@ -23,6 +27,10 @@ public class MixinRenderItem {
         this.registerItem(Item.getItemFromBlock(block), meta, model);
     }
 
+    /**
+     * @author Radviger
+     * @reason Custom carpet models
+     */
     @Overwrite
     protected void registerItem(Item item, int meta, String model) {
         this.itemModelMesher.register(item, meta, new ModelResourceLocation(model, "inventory"));

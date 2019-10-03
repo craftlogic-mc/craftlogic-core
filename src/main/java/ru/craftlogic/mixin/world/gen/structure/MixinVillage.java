@@ -21,7 +21,7 @@ import ru.craftlogic.common.block.BlockBurningTorch;
 public abstract class MixinVillage extends StructureComponent {
     @Shadow protected boolean isZombieInfested;
     @Shadow protected int structureType;
-    @Shadow protected StructureVillagePieces.Start startPiece;
+    @Shadow(remap = false) protected StructureVillagePieces.Start startPiece;
 
     /**
      * @author Radviger

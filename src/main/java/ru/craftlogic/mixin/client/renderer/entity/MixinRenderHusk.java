@@ -5,13 +5,9 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderBiped;
 import net.minecraft.client.renderer.entity.RenderHusk;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.entity.RenderZombie;
-import net.minecraft.entity.monster.EntityHusk;
 import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.util.ResourceLocation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
-import ru.craftlogic.api.entity.Zombie;
 
 @Mixin(RenderHusk.class)
 public abstract class MixinRenderHusk extends RenderBiped<EntityZombie> {
@@ -19,6 +15,10 @@ public abstract class MixinRenderHusk extends RenderBiped<EntityZombie> {
         super(renderManager, model, shadowSize);
     }
 
+    /**
+     * @author Radviger
+     * @reason Custom zombies
+     */
     @Overwrite
     protected void preRenderCallback(EntityZombie husk, float p_preRenderCallback_2_) {
         float size = husk.getRenderSizeModifier();
