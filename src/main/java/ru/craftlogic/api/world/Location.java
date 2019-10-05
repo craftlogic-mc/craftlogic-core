@@ -440,6 +440,10 @@ public class Location extends ChunkLocation {
         return getBlock().getLightOpacity(getBlockState(), getWorld(), getPos());
     }
 
+    public boolean canBlockBeConnectedTo(EnumFacing side) {
+        return getBlock().canBeConnectedTo(getBlockAccessor(), getPos(), side);
+    }
+
     public int getLight() {
         return getWorld().getLight(getPos());
     }
