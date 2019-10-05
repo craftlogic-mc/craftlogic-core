@@ -26,7 +26,7 @@ public class MixinBlockLeavesOld extends Block {
      */
     @Overwrite
     protected void dropApple(World world, BlockPos pos, IBlockState state, int chance) {
-        if (world.rand.nextFloat() < 0.1F) {
+        if (world.rand.nextFloat() < 0.15F) {
             spawnAsEntity(world, pos, new ItemStack(Items.STICK));
         }
     }
