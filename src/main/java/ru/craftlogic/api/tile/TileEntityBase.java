@@ -106,41 +106,41 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
     public void randomDisplayTick(Random random) {}
 
     public void markForUpdate() {
-        if (this.world != null && !this.world.isRemote) {
-            IBlockState state = this.world.getBlockState(this.getPos());
-            this.world.notifyBlockUpdate(this.getPos(), state, state, 3);
+        if (world != null && !world.isRemote) {
+            IBlockState state = world.getBlockState(getPos());
+            world.notifyBlockUpdate(getPos(), state, state, 3);
         }
     }
 
     public void markForRenderUpdate() {
-        if (this.world != null) {
-            this.world.markBlockRangeForRenderUpdate(this.pos, this.pos);
+        if (world != null) {
+            world.markBlockRangeForRenderUpdate(getPos(), getPos());
         }
     }
 
     public IBlockState getState() {
-        return this.getBlockType().getStateFromMeta(this.getBlockMetadata());
+        return this.getBlockType().getStateFromMeta(getBlockMetadata());
     }
 
     public ItemStack getDroppedItem() {
-        return new ItemStack(this.getBlockType(), 1, this.getBlockMetadata());
+        return new ItemStack(getBlockType(), 1, getBlockMetadata());
     }
 
     @Override
     public String getName() {
         if (this.getBlockType() instanceof BlockBase) {
             BlockBase block = (BlockBase) this.getBlockType();
-            ItemStack stack = this.getDroppedItem();
+            ItemStack stack = getDroppedItem();
             return block.getTranslationKey(stack) + ".name";
         } else {
-            return this.getBlockType().getTranslationKey() + ".name";
+            return getBlockType().getTranslationKey() + ".name";
         }
     }
 
     @Nonnull
     @Override
     public ITextComponent getDisplayName() {
-        return new TextComponentTranslation(this.getName());
+        return new TextComponentTranslation(getName());
     }
 
     @Override
@@ -168,7 +168,7 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
 
     @Override
     public boolean isInvalid() {
-        if (this.world != null && this.pos != null && !this.getLocation().isSameBlock(this.blockType)) {
+        if (world != null && pos != null && !getLocation().isSameBlock(blockType)) {
             return true;
         }
         return super.isInvalid();
@@ -179,7 +179,7 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
     public final void onLoad() {}
 
     protected boolean isLoaded() {
-        return this.loaded;
+        return loaded;
     }
 
     protected void onLoaded() {}
@@ -202,21 +202,21 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
     @Override
     public final NBTTagCompound getUpdateTag() {
         NBTTagCompound data = super.getUpdateTag();
-        this.writeToPacket(data);
+        writeToPacket(data);
         return data;
     }
 
     @Nullable
     @Override
     public final SPacketUpdateTileEntity getUpdatePacket() {
-        NBTTagCompound compound = this.getUpdateTag();
+        NBTTagCompound compound = getUpdateTag();
         return new SPacketUpdateTileEntity(this.pos, 0, compound);
     }
 
     @Override
     public void onDataPacket(NetworkManager networkManager, SPacketUpdateTileEntity packet) {
         try {
-            this.readFromPacket(packet.getNbtCompound());
+            readFromPacket(packet.getNbtCompound());
         } catch (Throwable t) {
             System.out.println("Error reading " + getClass() + " from packet: ");
             t.printStackTrace();

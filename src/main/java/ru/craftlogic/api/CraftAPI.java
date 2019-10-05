@@ -11,6 +11,8 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.relauncher.Side;
 import ru.craftlogic.api.block.holders.ScreenHolder;
+import ru.craftlogic.api.inventory.InventoryFieldHolder;
+import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.api.network.AdvancedNetwork;
 import ru.craftlogic.network.message.MessageShowScreen;
 
@@ -19,6 +21,8 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -136,7 +140,18 @@ public class CraftAPI {
                     playerMP.closeContainer();
                     int windowId = playerMP.currentWindowId;
 
-                    NETWORK.sendTo(player, new MessageShowScreen(screenHolder, windowId, subId));
+                    List<Integer> fields = new ArrayList<>();
+                    if (screenHolder instanceof InventoryHolder) {
+                        InventoryFieldHolder fieldHolder = ((InventoryHolder) screenHolder).getFieldHolder();
+                        if (fieldHolder != null) {
+                            for (int i = 0; i < fieldHolder.getInvFieldCount(); i++) {
+                                int v = fieldHolder.getInvFieldValue(i);
+                                fields.add(v);
+                            }
+                        }
+                    }
+
+                    NETWORK.sendTo(player, new MessageShowScreen(screenHolder, windowId, subId, fields));
 
                     container.windowId = windowId;
                     container.addListener(playerMP);

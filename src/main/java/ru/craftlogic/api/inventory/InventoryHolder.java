@@ -96,7 +96,7 @@ public interface InventoryHolder extends IInventory, WorldNameable {
     }
 
     default double getReachDistanceSq(EntityPlayer player) {
-        double d = player.getEntityAttribute(EntityPlayer.REACH_DISTANCE).getAttributeValue() + 0.5;
+        double d = player.getEntityAttribute(EntityPlayer.REACH_DISTANCE).getAttributeValue() + 1.5;
         return d * d;
     }
 

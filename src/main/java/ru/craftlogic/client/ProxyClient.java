@@ -27,6 +27,8 @@ import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.api.block.Colored;
 import ru.craftlogic.api.block.holders.ScreenHolder;
+import ru.craftlogic.api.inventory.InventoryFieldHolder;
+import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.api.item.ItemBlockBase;
 import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.network.AdvancedMessage;
@@ -42,6 +44,7 @@ import ru.craftlogic.network.message.*;
 import ru.craftlogic.util.ReflectiveUsage;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -212,6 +215,15 @@ public class ProxyClient extends ProxyCommon {
                 syncTask(context, () -> {
                     EntityPlayer player = getPlayer(context);
                     ScreenHolder screenHolder = message.getLocation().getTileEntity(ScreenHolder.class);
+                    List<Integer> fields = message.getFields();
+                    if (!fields.isEmpty()) {
+                        InventoryFieldHolder fieldHolder = ((InventoryHolder) screenHolder).getFieldHolder();
+                        if (fieldHolder != null) {
+                            for (int i = 0; i < fields.size(); i++) {
+                                fieldHolder.setInvFieldValue(i, fields.get(i));
+                            }
+                        }
+                    }
                     CraftAPI.showScreen(screenHolder, player, message.getExtraData());
                     player.openContainer.windowId = message.getWindowId();
                 });
@@ -222,6 +234,15 @@ public class ProxyClient extends ProxyCommon {
                     EntityPlayer player = getPlayer(context);
                     Entity entity = player.world.getEntityByID(message.getEntityId());
                     if (entity instanceof ScreenHolder) {
+                        List<Integer> fields = message.getFields();
+                        if (!fields.isEmpty()) {
+                            InventoryFieldHolder fieldHolder = ((InventoryHolder) entity).getFieldHolder();
+                            if (fieldHolder != null) {
+                                for (int i = 0; i < fields.size(); i++) {
+                                    fieldHolder.setInvFieldValue(i, fields.get(i));
+                                }
+                            }
+                        }
                         CraftAPI.showScreen((ScreenHolder) entity, player, message.getExtraData());
                         player.openContainer.windowId = message.getWindowId();
                     }

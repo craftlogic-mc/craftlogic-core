@@ -9,20 +9,25 @@ import ru.craftlogic.api.world.Locatable;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.util.ReflectiveUsage;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MessageShowScreen extends AdvancedMessage {
     private HolderType type;
     private Location location;
     private int windowId;
     private int extraData;
+    private List<Integer> fields;
     private int entityId;
 
     @Deprecated
     @ReflectiveUsage
     public MessageShowScreen() {}
 
-    public MessageShowScreen(ScreenHolder screenHolder, int windowId, int extraData) {
+    public MessageShowScreen(ScreenHolder screenHolder, int windowId, int extraData, List<Integer> fields) {
         this.windowId = windowId;
         this.extraData = extraData;
+        this.fields = fields;
         if (screenHolder instanceof Entity) {
             this.entityId = ((Entity) screenHolder).getEntityId();
             this.type = HolderType.ENTITY;
@@ -52,34 +57,52 @@ public class MessageShowScreen extends AdvancedMessage {
         return extraData;
     }
 
+    public List<Integer> getFields() {
+        return fields;
+    }
+
     @Override
     protected void read(AdvancedBuffer buf) {
-        this.type = buf.readEnumValue(HolderType.class);
-        this.windowId = buf.readInt();
-        switch (this.type) {
+        type = buf.readEnumValue(HolderType.class);
+        windowId = buf.readInt();
+        fields = new ArrayList<>();
+        int fieldCount = buf.readInt();
+        if (fieldCount > 0) {
+            for (int i = 0; i < fieldCount; i++) {
+                fields.add((int) buf.readShort());
+            }
+        }
+        switch (type) {
             case TILE:
-                this.location = buf.readBlockLocation();
+                location = buf.readBlockLocation();
                 break;
             case ENTITY:
-                this.entityId = buf.readVarInt();
+                entityId = buf.readVarInt();
                 break;
         }
-        this.extraData = buf.readInt();
+        extraData = buf.readInt();
     }
 
     @Override
     protected void write(AdvancedBuffer buf) {
-        buf.writeEnumValue(this.type);
-        buf.writeInt(this.windowId);
-        switch (this.type) {
+        buf.writeEnumValue(type);
+        buf.writeInt(windowId);
+        int fieldCount = fields.size();
+        buf.writeInt(fieldCount);
+        if (fieldCount > 0) {
+            for (int field : fields) {
+                buf.writeShort(field);
+            }
+        }
+        switch (type) {
             case TILE:
-                buf.writeBlockLocation(this.location);
+                buf.writeBlockLocation(location);
                 break;
             case ENTITY:
-                buf.writeVarInt(this.entityId);
+                buf.writeVarInt(entityId);
                 break;
         }
-        buf.writeInt(this.extraData);
+        buf.writeInt(extraData);
     }
 
     public enum HolderType {
