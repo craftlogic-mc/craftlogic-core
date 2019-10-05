@@ -52,10 +52,10 @@ public class TileEntityBarrel extends TileEntityBase implements Barrel, Updatabl
 
     @Override
     public void clear() {
-        if (this.mode != null) {
-            this.mode = null;
-            if (!this.world.isRemote) {
-                this.markForUpdate();
+        if (mode != null) {
+            mode = null;
+            if (!world.isRemote) {
+                markForUpdate();
             }
         }
     }
@@ -96,7 +96,7 @@ public class TileEntityBarrel extends TileEntityBase implements Barrel, Updatabl
         if (mode != null) {
             boolean result = mode.interact(this, player, hand);
             if (!world.isRemote && mode.isEmpty(this)) {
-                this.clear();
+                clear();
             }
             return result;
         } else {
@@ -106,7 +106,7 @@ public class TileEntityBarrel extends TileEntityBase implements Barrel, Updatabl
                 if (!world.isRemote) {
                     recipe.consume(grid);
                     this.mode = recipe.getMode().createMode(this, recipe);
-                    this.markForUpdate();
+                    markForUpdate();
                 }
                 return true;
             } else if (heldItem.hasCapability(FLUID_HANDLER_ITEM_CAPABILITY, null)) {
@@ -117,7 +117,7 @@ public class TileEntityBarrel extends TileEntityBase implements Barrel, Updatabl
                         this.mode = CraftBarrelModes.FLUID.createMode(this);
                         this.mode.interact(this, player, hand);
                         if (!world.isRemote && this.mode.isEmpty(this)) {
-                            this.clear();
+                            clear();
                         }
                         return true;
                     }
@@ -129,7 +129,7 @@ public class TileEntityBarrel extends TileEntityBase implements Barrel, Updatabl
 
     @Override
     public void randomTick(Random random) {
-        BarrelMode mode = this.getMode();
+        BarrelMode mode = getMode();
         if (mode != null) {
             mode.randomTick(this, random);
         }
@@ -138,7 +138,7 @@ public class TileEntityBarrel extends TileEntityBase implements Barrel, Updatabl
     @Override
     @SideOnly(Side.CLIENT)
     public void randomDisplayTick(Random random) {
-        BarrelMode mode = this.getMode();
+        BarrelMode mode = getMode();
         if (mode != null) {
             mode.randomDisplayTick(this, random);
         }
@@ -146,7 +146,7 @@ public class TileEntityBarrel extends TileEntityBase implements Barrel, Updatabl
 
     @Override
     public void fillWithRain(Fluid fluid) {
-        if (!this.isClosed()) {
+        if (!isClosed()) {
             BarrelMode mode = getMode();
             if (mode == null) {
                 this.mode = mode = CraftBarrelModes.FLUID.createMode(this);
@@ -161,7 +161,7 @@ public class TileEntityBarrel extends TileEntityBase implements Barrel, Updatabl
         if (mode != null) {
             if (mode.isEmpty(this)) {
                 if (!world.isRemote) {
-                    this.clear();
+                    clear();
                 }
             } else {
                 mode.update(this);
@@ -172,25 +172,26 @@ public class TileEntityBarrel extends TileEntityBase implements Barrel, Updatabl
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         compound = super.writeToNBT(compound);
-        writeMode(this.mode, compound, "mode");
+        writeMode(mode, compound, "mode");
         return compound;
     }
 
     @Override
     public void readFromNBT(NBTTagCompound compound) {
         super.readFromNBT(compound);
-        this.mode = readMode(compound, this, "mode");
+        mode = readMode(compound, this, "mode");
     }
 
     @Override
     protected NBTTagCompound writeToPacket(NBTTagCompound compound) {
-        writeMode(this.mode, compound, "mode");
+        writeMode(mode, compound, "mode");
         return compound;
     }
 
     @Override
     protected void readFromPacket(NBTTagCompound compound) {
-        this.mode = readMode(compound, this, "mode");
+        mode = readMode(compound, this, "mode");
+        markForRenderUpdate();
     }
 
     public static BarrelMode readMode(NBTTagCompound compound, Barrel barrel, String key) {

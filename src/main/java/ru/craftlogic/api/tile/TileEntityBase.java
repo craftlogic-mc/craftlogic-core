@@ -201,14 +201,16 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
 
     @Override
     public final NBTTagCompound getUpdateTag() {
-        return this.writeToPacket(new NBTTagCompound());
+        NBTTagCompound data = super.getUpdateTag();
+        this.writeToPacket(data);
+        return data;
     }
 
     @Nullable
     @Override
     public final SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound compound = this.getUpdateTag();
-        return compound != null ? new SPacketUpdateTileEntity(this.pos, 0, compound) : super.getUpdatePacket();
+        return new SPacketUpdateTileEntity(this.pos, 0, compound);
     }
 
     @Override

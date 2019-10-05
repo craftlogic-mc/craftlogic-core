@@ -36,7 +36,7 @@ public interface InventoryHolder extends IInventory, WorldNameable {
         if (this instanceof Locatable) {
             Location location = ((Locatable) this).getLocation();
             double distance = player.getDistanceSqToCenter(location.getPos());
-            return distance <= this.getReachDistanceSq();
+            return distance <= getReachDistanceSq(player);
         }
         return true;
     }
@@ -95,8 +95,9 @@ public interface InventoryHolder extends IInventory, WorldNameable {
         return 0;
     }
 
-    default double getReachDistanceSq() {
-        return 25.0;
+    default double getReachDistanceSq(EntityPlayer player) {
+        double d = player.getEntityAttribute(EntityPlayer.REACH_DISTANCE).getAttributeValue();
+        return d * d;
     }
 
     @Override
