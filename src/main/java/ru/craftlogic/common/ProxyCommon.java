@@ -21,7 +21,6 @@ import ru.craftlogic.api.network.AdvancedMessage;
 import ru.craftlogic.api.network.AdvancedMessageHandler;
 import ru.craftlogic.api.world.Player;
 import ru.craftlogic.common.integration.IntegrationCOFH;
-import ru.craftlogic.common.integration.IntegrationDynamicTrees;
 import ru.craftlogic.network.message.*;
 
 import java.util.ArrayList;
@@ -32,8 +31,7 @@ import static ru.craftlogic.api.CraftAPI.NETWORK;
 
 public class ProxyCommon extends AdvancedMessageHandler {
     private List<ModIntegration> integrations = new ArrayList<>(Arrays.asList(
-        new IntegrationCOFH(),
-        new IntegrationDynamicTrees()
+        new IntegrationCOFH()
     ));
 
     public void preInit() {

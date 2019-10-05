@@ -41,8 +41,6 @@ public class CraftAPI {
         CraftBlocks.init(side);
         CraftItems.init(side);
         CraftTileEntities.init(side);
-        if (Loader.isModLoaded("dynamictrees"))
-            CraftTrees.init(side);
         CraftEntities.init(side);
         CraftBarrelModes.init(side);
         CraftRecipes.init(side);

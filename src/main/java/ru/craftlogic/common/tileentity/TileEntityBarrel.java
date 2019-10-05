@@ -50,11 +50,18 @@ public class TileEntityBarrel extends TileEntityBase implements Barrel, Updatabl
         return mode;
     }
 
+    public void setMode(BarrelMode mode) {
+        this.mode = mode;
+        if (world.isRemote) {
+            markForUpdate();
+        }
+    }
+
     @Override
     public void clear() {
         if (mode != null) {
             mode = null;
-            if (!world.isRemote) {
+            if (world.isRemote) {
                 markForUpdate();
             }
         }
