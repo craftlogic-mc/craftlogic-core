@@ -55,8 +55,8 @@ public class BlockGourd extends BlockBase implements Colored, Growable {
     }
 
     @Override
-    public float getBlockHardness(IBlockState state, World world, BlockPos pos) {
-        return 0.2F * (state.getValue(AGE) + 1);
+    public float getBlockHardness(Location location) {
+        return 0.2F * (location.getBlockProperty(AGE) + 1);
     }
 
     @Override

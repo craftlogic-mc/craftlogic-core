@@ -23,6 +23,8 @@ import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.common.tileentity.TileEntityBeeHouse;
 
+import javax.annotation.Nullable;
+
 import static net.minecraft.init.SoundEvents.BLOCK_WOODEN_TRAPDOOR_CLOSE;
 import static net.minecraft.init.SoundEvents.BLOCK_WOODEN_TRAPDOOR_OPEN;
 import static ru.craftlogic.api.CraftAPI.MOD_ID;
@@ -95,7 +97,7 @@ public class BlockBeeHouse extends BlockBase implements TileEntityHolder<TileEnt
     }
 
     @Override
-    public IBlockState getStateForPlacement(Location location, RayTraceResult target, int meta, EntityLivingBase placer) {
+    public IBlockState getStateForPlacement(Location location, RayTraceResult target, int meta, EntityLivingBase placer, @Nullable EnumHand hand) {
         return this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
     }
 

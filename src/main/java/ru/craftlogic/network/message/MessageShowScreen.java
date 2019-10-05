@@ -3,6 +3,8 @@ package ru.craftlogic.network.message;
 import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import ru.craftlogic.api.block.holders.ScreenHolder;
+import ru.craftlogic.api.inventory.InventoryFieldHolder;
+import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.api.network.AdvancedBuffer;
 import ru.craftlogic.api.network.AdvancedMessage;
 import ru.craftlogic.api.world.Locatable;
@@ -17,23 +19,31 @@ public class MessageShowScreen extends AdvancedMessage {
     private Location location;
     private int windowId;
     private int extraData;
-    private List<Integer> fields;
+    private List<Integer> fields = new ArrayList<>();
     private int entityId;
 
     @Deprecated
     @ReflectiveUsage
     public MessageShowScreen() {}
 
-    public MessageShowScreen(ScreenHolder screenHolder, int windowId, int extraData, List<Integer> fields) {
+    public MessageShowScreen(ScreenHolder screenHolder, int windowId, int extraData) {
         this.windowId = windowId;
         this.extraData = extraData;
-        this.fields = fields;
         if (screenHolder instanceof Entity) {
-            this.entityId = ((Entity) screenHolder).getEntityId();
-            this.type = HolderType.ENTITY;
+            entityId = ((Entity) screenHolder).getEntityId();
+            type = HolderType.ENTITY;
         } else if (screenHolder instanceof TileEntity && screenHolder instanceof Locatable) {
-            this.location = ((Locatable) screenHolder).getLocation();
-            this.type = HolderType.TILE;
+            location = ((Locatable) screenHolder).getLocation();
+            type = HolderType.TILE;
+        }
+        if (screenHolder instanceof InventoryHolder) {
+            InventoryFieldHolder fieldHolder = ((InventoryHolder) screenHolder).getFieldHolder();
+            if (fieldHolder != null) {
+                for (int i = 0; i < fieldHolder.getInvFieldCount(); i++) {
+                    int v = fieldHolder.getInvFieldValue(i);
+                    fields.add(v);
+                }
+            }
         }
     }
 
@@ -65,7 +75,6 @@ public class MessageShowScreen extends AdvancedMessage {
     protected void read(AdvancedBuffer buf) {
         type = buf.readEnumValue(HolderType.class);
         windowId = buf.readInt();
-        fields = new ArrayList<>();
         int fieldCount = buf.readInt();
         if (fieldCount > 0) {
             for (int i = 0; i < fieldCount; i++) {

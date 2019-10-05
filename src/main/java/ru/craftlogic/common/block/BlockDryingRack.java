@@ -12,6 +12,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceResult;
@@ -23,6 +24,8 @@ import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.util.TileEntityInfo;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.common.tileentity.TileEntityDryingRack;
+
+import javax.annotation.Nullable;
 
 public class BlockDryingRack extends BlockBase implements TileEntityHolder<TileEntityDryingRack> {
     public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.create("axis", EnumFacing.Axis.class, a -> a != EnumFacing.Axis.Y);
@@ -42,7 +45,7 @@ public class BlockDryingRack extends BlockBase implements TileEntityHolder<TileE
     }
 
     @Override
-    public IBlockState getStateForPlacement(Location location, RayTraceResult target, int meta, EntityLivingBase placer) {
+    public IBlockState getStateForPlacement(Location location, RayTraceResult target, int meta, EntityLivingBase placer, @Nullable EnumHand hand) {
         return this.getDefaultState()
                 .withProperty(VARIANT, BlockPlanks.EnumType.byMetadata(meta & 7))
                 .withProperty(AXIS, placer.getHorizontalFacing().getAxis());
