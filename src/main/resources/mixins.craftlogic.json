@@ -20,6 +20,7 @@
     "block.MixinBlockDropper",
     "block.MixinBlockObserver",
     "block.MixinBlockRedstoneTorch",
+    "block.MixinBlockRailBase",
     "block.MixinBlockDoor",
     "block.MixinBlockCarpet",
     "block.MixinBlockChest",

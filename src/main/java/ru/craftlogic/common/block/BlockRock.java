@@ -42,4 +42,9 @@ public class BlockRock extends BlockNarrow {
     protected AxisAlignedBB getBoundingBox(Location location) {
         return BOUNDING;
     }
+
+    @Override
+    public boolean isPassable(Location location) {
+        return true;
+    }
 }
