@@ -58,6 +58,8 @@ public class CraftConfig {
         @Config.Comment("Reconnect delay on server crash")
         public int crashReconnectDelay = 60;
 
+        @Config.Comment("Enable visual snow layer tweaks (for flowers, tallgrass, rocks, etc.)")
+        public boolean enableVisualSnowTweaks = true;
         @Config.Comment("Enable hiding full HUD bars")
         public boolean enableHidingFullHUDBars = false;
         @Config.Comment("Enable cobblestone gravity")

@@ -1,0 +1,56 @@
+{
+	"textures": {
+		"texture": "craftlogic:blocks/stone_snowy",
+		"particle": "craftlogic:blocks/stone_snowy"
+	},
+	"elements": [
+		{
+			"from": [7, 0, 6],
+			"to": [12, 2, 13],
+			"rotation": {"angle": 0, "axis": "y", "origin": [11, 8, 9]},
+			"faces": {
+				"north": {"uv": [0, 0, 5, 2], "texture": "#texture"},
+				"east": {"uv": [0, 0, 7, 2], "texture": "#texture"},
+				"south": {"uv": [0, 0, 5, 2], "texture": "#texture"},
+				"west": {"uv": [0, 0, 7, 2], "texture": "#texture"},
+				"up": {"uv": [0, 0, 5, 7], "texture": "#texture"}
+			}
+		},
+		{
+			"from": [8, 0, 11],
+			"to": [14, 3, 14],
+			"rotation": {"angle": 0, "axis": "y", "origin": [11, 8, 9]},
+			"faces": {
+				"north": {"uv": [0, 0, 6, 3], "texture": "#texture"},
+				"east": {"uv": [0, 0, 3, 3], "texture": "#texture"},
+				"south": {"uv": [0, 0, 6, 3], "texture": "#texture"},
+				"west": {"uv": [0, 0, 3, 3], "texture": "#texture"},
+				"up": {"uv": [0, 0, 6, 3], "texture": "#texture"}
+			}
+		},
+		{
+			"from": [6, 0, 10],
+			"to": [10, 4, 15],
+			"rotation": {"angle": 0, "axis": "y", "origin": [11, 8, 9]},
+			"faces": {
+				"north": {"uv": [0, 0, 4, 4], "texture": "#texture"},
+				"east": {"uv": [0, 0, 5, 4], "texture": "#texture"},
+				"south": {"uv": [0, 0, 4, 4], "texture": "#texture"},
+				"west": {"uv": [0, 0, 5, 4], "texture": "#texture"},
+				"up": {"uv": [0, 0, 4, 5], "texture": "#texture"}
+			}
+		},
+		{
+			"from": [3, 0, 1],
+			"to": [6, 3, 4],
+			"rotation": {"angle": 0, "axis": "y", "origin": [11, 8, 9]},
+			"faces": {
+				"north": {"uv": [0, 0, 3, 3], "texture": "#texture"},
+				"east": {"uv": [0, 0, 3, 3], "texture": "#texture"},
+				"south": {"uv": [0, 0, 3, 3], "texture": "#texture"},
+				"west": {"uv": [0, 0, 3, 3], "texture": "#texture"},
+				"up": {"uv": [0, 0, 3, 3], "texture": "#texture"}
+			}
+		}
+	]
+}

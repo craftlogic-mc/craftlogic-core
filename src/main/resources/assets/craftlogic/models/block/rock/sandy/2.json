@@ -1,0 +1,43 @@
+{
+	"textures": {
+		"stone": "craftlogic:blocks/stone_sandy",
+		"particle": "craftlogic:blocks/stone_sandy"
+	},
+	"elements": [
+		{
+			"from": [7, 0, 4],
+			"to": [12, 3, 11],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7, 8, 9]},
+			"faces": {
+				"north": {"uv": [0, 0, 5, 3], "texture": "#stone"},
+				"east": {"uv": [0, 0, 7, 3], "texture": "#stone"},
+				"south": {"uv": [0, 0, 5, 3], "texture": "#stone"},
+				"west": {"uv": [0, 0, 7, 3], "texture": "#stone"},
+				"up": {"uv": [0, 0, 5, 7], "texture": "#stone"}
+			}
+		},
+		{
+			"from": [5, 0, 8],
+			"to": [9, 2, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7, 8, 9]},
+			"faces": {
+				"north": {"uv": [0, 0, 4, 2], "texture": "#stone"},
+				"east": {"uv": [0, 0, 4, 2], "texture": "#stone"},
+				"south": {"uv": [0, 0, 4, 2], "texture": "#stone"},
+				"west": {"uv": [0, 0, 4, 2], "texture": "#stone"},
+				"up": {"uv": [0, 0, 4, 4], "texture": "#stone"}
+			}
+		},
+		{
+			"from": [4, 0, 6],
+			"to": [9, 1, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7, 8, 9]},
+			"faces": {
+				"north": {"uv": [0, 0, 5, 1], "texture": "#stone"},
+				"south": {"uv": [0, 0, 5, 1], "texture": "#stone"},
+				"west": {"uv": [0, 0, 3, 1], "texture": "#stone"},
+				"up": {"uv": [0, 0, 5, 3], "texture": "#stone"}
+			}
+		}
+	]
+}

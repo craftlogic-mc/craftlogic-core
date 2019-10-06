@@ -92,6 +92,7 @@
     "client.renderer.MixinRenderItem",
     "client.renderer.MixinBlockModelShapes$3",
     "client.renderer.MixinBlockModelShapes$4",
+    "client.renderer.MixinBlockRendererDispatcher",
     "client.renderer.tileentity.MixinTileEntityChestRenderer",
     "client.renderer.entity.MixinRenderChicken",
     "client.renderer.entity.MixinRenderZombie",
