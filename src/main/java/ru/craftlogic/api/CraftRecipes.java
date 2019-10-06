@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.util.JsonUtils;
@@ -47,7 +48,7 @@ public class CraftRecipes {
 
     static void postInit(Side side) {
         if (CraftConfig.items.enableRocks && CraftConfig.items.enableStoneBricks) {
-            FurnaceRecipes.instance().addSmelting(CraftItems.ROCK, new ItemStack(CraftItems.STONE_BRICK), 0.15F);
+            FurnaceRecipes.instance().addSmelting(Item.getItemFromBlock(CraftBlocks.ROCK), new ItemStack(CraftItems.STONE_BRICK), 0.15F);
         }
         parseJsonRecipes("smelting", (name, raw) -> {
             Object rawInput = parseItem(raw.get("input"));

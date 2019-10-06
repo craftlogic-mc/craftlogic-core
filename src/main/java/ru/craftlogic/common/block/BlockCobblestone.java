@@ -16,6 +16,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.CraftConfig;
+import ru.craftlogic.api.CraftBlocks;
 import ru.craftlogic.api.CraftItems;
 import ru.craftlogic.api.block.Mossable;
 import ru.craftlogic.api.world.Location;
@@ -119,7 +120,7 @@ public class BlockCobblestone extends BlockFalling implements Mossable {
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
         if (CraftConfig.items.enableRocks) {
-            return CraftItems.ROCK;
+            return Item.getItemFromBlock(CraftBlocks.ROCK);
         } else {
             return super.getItemDropped(state, rand, fortune);
         }

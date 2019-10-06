@@ -14,7 +14,6 @@ import javax.annotation.Nonnull;
 public class CraftItems {
     public static Item SPIT;
     public static Item ASH;
-    public static Item ROCK;
     public static Item MOSS;
     public static Item STONE_BRICK;
     public static Item RAW_EGG;
@@ -30,9 +29,6 @@ public class CraftItems {
     static void init(Side side) {
         SPIT = registerItem(new ItemBase("spit", CreativeTabs.MISC));
         ASH = registerItem(new ItemBase("ash", CreativeTabs.MATERIALS));
-        if (CraftConfig.items.enableRocks) {
-            ROCK = registerItem(new ItemRock());
-        }
         if (CraftConfig.items.enableMoss) {
             MOSS = registerItem(new ItemMoss());
         }

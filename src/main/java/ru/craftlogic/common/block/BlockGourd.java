@@ -24,7 +24,7 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.api.CraftBlocks;
-import ru.craftlogic.api.block.BlockBase;
+import ru.craftlogic.api.block.BlockNarrow;
 import ru.craftlogic.api.block.Colored;
 import ru.craftlogic.api.block.Growable;
 import ru.craftlogic.api.world.Location;
@@ -34,7 +34,7 @@ import javax.annotation.Nullable;
 import java.util.Random;
 import java.util.function.Supplier;
 
-public class BlockGourd extends BlockBase implements Colored, Growable {
+public class BlockGourd extends BlockNarrow implements Colored, Growable {
     public static final PropertyDirection FACING = BlockHorizontal.FACING;
     public static final PropertyInteger AGE = PropertyInteger.create("age", 0, 2);
 
@@ -57,26 +57,6 @@ public class BlockGourd extends BlockBase implements Colored, Growable {
     @Override
     public float getBlockHardness(Location location) {
         return 0.2F * (location.getBlockProperty(AGE) + 1);
-    }
-
-    @Override
-    public boolean isFullBlock(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isTopSolid(IBlockState state) {
-        return false;
     }
 
     @Override

@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "normal": [
+      { "model": "craftlogic:rock1" },
+      { "model": "craftlogic:rock1", "y": 90 },
+      { "model": "craftlogic:rock1", "y": 180 },
+      { "model": "craftlogic:rock1", "y": 270 },
+      { "model": "craftlogic:rock2" },
+      { "model": "craftlogic:rock2", "y": 90 },
+      { "model": "craftlogic:rock2", "y": 180 },
+      { "model": "craftlogic:rock2", "y": 270 },
+      { "model": "craftlogic:rock3" },
+      { "model": "craftlogic:rock3", "y": 90 },
+      { "model": "craftlogic:rock3", "y": 180 },
+      { "model": "craftlogic:rock3", "y": 270 },
+      { "model": "craftlogic:rock4" },
+      { "model": "craftlogic:rock4", "y": 90 },
+      { "model": "craftlogic:rock4", "y": 180 },
+      { "model": "craftlogic:rock4", "y": 270 }
+    ]
+  }
+}

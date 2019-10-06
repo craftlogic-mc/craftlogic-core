@@ -15,6 +15,7 @@ import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.item.ItemBlockBase;
 import ru.craftlogic.common.block.*;
+import ru.craftlogic.common.item.ItemRock;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -31,6 +32,7 @@ public class CraftBlocks {
     public static Block BEE_HIVE;
     public static BiMap<BlockPlanks.EnumType, Block> BEE_HOUSE = HashBiMap.create(BlockPlanks.EnumType.values().length);
     public static Block MUSHROOM_GRASS;
+    public static Block ROCK;
 
     static void init(Side side) {
         if (CraftConfig.blocks.enableBarrels) {
@@ -52,6 +54,10 @@ public class CraftBlocks {
         }
 
         MUSHROOM_GRASS = registerBlock(new BlockMushroomGrass());
+
+        if (CraftConfig.items.enableRocks) {
+            ROCK = registerBlockWithItem(new BlockRock(), ItemRock::new);
+        }
     }
 
     public static <B extends Block> B registerBlock(@Nonnull B block) {

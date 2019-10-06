@@ -12,7 +12,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.fluids.FluidStack;
 import ru.craftlogic.api.barrel.BarrelMode;
 import ru.craftlogic.api.barrel.BarrelModeFluid;
-import ru.craftlogic.api.block.BlockBase;
+import ru.craftlogic.api.block.BlockNarrow;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
 import ru.craftlogic.api.model.ModelRegistrar;
 import ru.craftlogic.api.util.TileEntityInfo;
@@ -23,7 +23,7 @@ import static net.minecraft.init.SoundEvents.BLOCK_WOODEN_TRAPDOOR_CLOSE;
 import static net.minecraft.init.SoundEvents.BLOCK_WOODEN_TRAPDOOR_OPEN;
 import static ru.craftlogic.api.CraftAPI.MOD_ID;
 
-public abstract class BlockBarrel extends BlockBase implements TileEntityHolder<TileEntityBarrel>, ModelRegistrar {
+public abstract class BlockBarrel extends BlockNarrow implements TileEntityHolder<TileEntityBarrel>, ModelRegistrar {
     public static final PropertyBool CLOSED = PropertyBool.create("closed");
     public static final AxisAlignedBB BOUNDING = new AxisAlignedBB(0.0625, 0, 0.0625, 0.9375, 1, 0.9375);
 
@@ -45,26 +45,6 @@ public abstract class BlockBarrel extends BlockBase implements TileEntityHolder<
         } else {
             return super.onBlockActivated(location, player, hand, target);
         }
-    }
-
-    @Override
-    public boolean isFullBlock(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isTopSolid(IBlockState state) {
-        return false;
     }
 
     @Override

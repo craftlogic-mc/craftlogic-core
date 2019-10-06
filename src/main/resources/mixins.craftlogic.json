@@ -51,6 +51,7 @@
     "tileentity.MixinTileEntityDispenser",
     "entity.MixinEntity",
     "entity.MixinEntityLiving",
+    "entity.MixinEntityLivingBase",
     "entity.player.MixinEntityPlayer",
     "entity.player.MixinEntityPlayerMP",
     "entity.passive.MixinEntitySheep",

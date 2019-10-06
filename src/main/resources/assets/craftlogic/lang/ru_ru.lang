@@ -19,6 +19,7 @@ entity.MinecartFurnace.name=Самоходная вагонетка
 item.forge.bucketFilled.milk=Ведро молока
 item.forge.bucketFilled.oil=Ведро сырой нефти
 
+tile.rock.name=Камень
 tile.bee_hive.name=Пчелиный улей
 tile.bee_house.name=Пчелиный домик
 tile.barrel_wood.name=Деревянная бочка
@@ -28,7 +29,6 @@ tile.drying_rack.name=Сушилка
 item.crowbar.name=Монтировка
 item.wool_card.name=Чесалка
 item.ash.name=Пепел
-item.rock.name=Камень
 item.stone_brick.name=Каменный кирпич
 item.moss.name=Мох
 item.thermometer.name=Термометр

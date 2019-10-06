@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.craftlogic.CraftConfig;
-import ru.craftlogic.api.CraftItems;
+import ru.craftlogic.api.CraftBlocks;
 
 import java.util.Random;
 
@@ -46,7 +46,7 @@ public abstract class MixinBlockStone extends Block {
     @Overwrite
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
         if (CraftConfig.items.enableRocks) {
-            return CraftItems.ROCK;
+            return Item.getItemFromBlock(CraftBlocks.ROCK);
         } else {
             if (CraftConfig.tweaks.enableStoneUnification || state.getValue(VARIANT) == BlockStone.EnumType.STONE) {
                 return Item.getItemFromBlock(Blocks.COBBLESTONE);

@@ -19,6 +19,7 @@ entity.MinecartFurnace.name=Minecart Furnace
 item.forge.bucketFilled.milk=Milk Bucket
 item.forge.bucketFilled.oil=Crude Oil Bucket
 
+tile.rock.name=Rock
 tile.bee_hive.name=Bee Hive
 tile.bee_house.name=Bee House
 tile.barrel_wood.name=Wooden Barrel
@@ -28,7 +29,6 @@ tile.drying_rack.name=Drying Rack
 item.crowbar.name=Crowbar
 item.wool_card.name=Wool Card
 item.ash.name=Ash
-item.rock.name=Rock
 item.stone_brick.name=Stone Brick
 item.moss.name=Moss
 item.thermometer.name=Thermometer

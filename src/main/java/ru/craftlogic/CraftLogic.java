@@ -8,11 +8,13 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.common.ProxyCommon;
+import ru.craftlogic.common.world.CraftWorldGenerator;
 
 import static ru.craftlogic.api.CraftAPI.MOD_ID;
 
@@ -32,6 +34,7 @@ public class CraftLogic {
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(PROXY);
         MinecraftForge.ORE_GEN_BUS.register(PROXY);
+        GameRegistry.registerWorldGenerator(new CraftWorldGenerator(), 0);
         PROXY.preInit();
     }
 

@@ -1,7 +1,6 @@
 package ru.craftlogic.common.item;
 
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,13 +13,10 @@ import net.minecraft.stats.StatList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.CraftFluids;
 import ru.craftlogic.api.item.ItemBase;
-import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.util.FluidBottleWrapper;
 
 import javax.annotation.Nullable;
@@ -69,13 +65,5 @@ public class ItemMilkBottle extends ItemBase {
     @Override
     public ICapabilityProvider initCapabilities(ItemStack item, @Nullable NBTTagCompound compound) {
         return new FluidBottleWrapper(item, CraftFluids.MILK, 250);
-    }
-
-    @Override
-    public void registerModel(ModelManager modelManager) {
-        modelManager.registerCustomMeshDefinition(this, stack ->
-            new ModelResourceLocation(new ResourceLocation(CraftAPI.MOD_ID, "fluid_bottle"), "inventory")
-        );
-        modelManager.registerItemVariants(this, "fluid_bottle");
     }
 }

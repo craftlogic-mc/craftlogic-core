@@ -10,36 +10,16 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.api.block.BlockBase;
-import ru.craftlogic.api.model.ModelRegistrar;
+import ru.craftlogic.api.block.BlockNarrow;
 import ru.craftlogic.api.model.ModelManager;
+import ru.craftlogic.api.model.ModelRegistrar;
 
-public class BlockBeeHive extends BlockBase implements ModelRegistrar {
+public class BlockBeeHive extends BlockNarrow implements ModelRegistrar {
     public static PropertyBool INHABITED = PropertyBool.create("inhabited");
 
     public BlockBeeHive() {
         super(Material.GRASS, "bee_hive", 1.5F, CreativeTabs.DECORATIONS);
         this.setSoundType(SoundType.PLANT);
-    }
-
-    @Override
-    public boolean isFullBlock(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isTopSolid(IBlockState state) {
-        return false;
     }
 
     @Override

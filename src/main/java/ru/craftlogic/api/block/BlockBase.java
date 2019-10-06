@@ -137,12 +137,12 @@ public class BlockBase extends Block implements ModelRegistrar {
 
     @Override final
     public boolean isSideSolid(IBlockState state, IBlockAccess blockAccessor, BlockPos pos, EnumFacing side) {
-        return this.getBlockFaceShape(blockAccessor, state, pos, side) == BlockFaceShape.SOLID;
+        return getBlockFaceShape(blockAccessor, state, pos, side) == BlockFaceShape.SOLID;
     }
 
     @Override final
     public BlockFaceShape getBlockFaceShape(IBlockAccess blockAccessor, IBlockState state, BlockPos pos, EnumFacing side) {
-        return this.getBlockFaceShape(new LocationReadOnly(blockAccessor, pos, state), side);
+        return getBlockFaceShape(new LocationReadOnly(blockAccessor, pos, state), side);
     }
 
     protected BlockFaceShape getBlockFaceShape(Location location, EnumFacing side) {
@@ -151,7 +151,7 @@ public class BlockBase extends Block implements ModelRegistrar {
 
     @Override final
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess blockAccessor, BlockPos pos) {
-        return state.getBlock() == this ? this.getBoundingBox(new LocationReadOnly(blockAccessor, pos, state)) : FULL_BLOCK_AABB;
+        return state.getBlock() == this ? getBoundingBox(new LocationReadOnly(blockAccessor, pos, state)) : FULL_BLOCK_AABB;
     }
 
     protected AxisAlignedBB getBoundingBox(Location location) {
@@ -159,19 +159,19 @@ public class BlockBase extends Block implements ModelRegistrar {
     }
 
     @Nullable
-    @Override
+    @Override final
     public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess blockAccessor, BlockPos pos) {
-        return this.getCollisionBoundingBox(new LocationReadOnly(blockAccessor, pos, state));
+        return getCollisionBoundingBox(new LocationReadOnly(blockAccessor, pos, state));
     }
 
     @Nullable
     public AxisAlignedBB getCollisionBoundingBox(Location location) {
-        return this.getBoundingBox(location);
+        return getBoundingBox(location);
     }
 
     @Override final
     public void randomTick(World world, BlockPos pos, IBlockState state, Random rand) {
-        this.randomTick(new Location(world, pos), rand);
+        randomTick(new Location(world, pos), rand);
     }
 
     protected void randomTick(Location location, Random rand) {

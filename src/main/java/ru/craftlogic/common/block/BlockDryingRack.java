@@ -18,7 +18,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.api.block.BlockBase;
+import ru.craftlogic.api.block.BlockNarrow;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
 import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.util.TileEntityInfo;
@@ -27,7 +27,7 @@ import ru.craftlogic.common.tileentity.TileEntityDryingRack;
 
 import javax.annotation.Nullable;
 
-public class BlockDryingRack extends BlockBase implements TileEntityHolder<TileEntityDryingRack> {
+public class BlockDryingRack extends BlockNarrow implements TileEntityHolder<TileEntityDryingRack> {
     public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.create("axis", EnumFacing.Axis.class, a -> a != EnumFacing.Axis.Y);
     public static final PropertyEnum<BlockPlanks.EnumType> VARIANT = BlockPlanks.VARIANT;
 
@@ -49,26 +49,6 @@ public class BlockDryingRack extends BlockBase implements TileEntityHolder<TileE
         return this.getDefaultState()
                 .withProperty(VARIANT, BlockPlanks.EnumType.byMetadata(meta & 7))
                 .withProperty(AXIS, placer.getHorizontalFacing().getAxis());
-    }
-
-    @Override
-    public boolean isFullBlock(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isTopSolid(IBlockState state) {
-        return false;
     }
 
     @Override

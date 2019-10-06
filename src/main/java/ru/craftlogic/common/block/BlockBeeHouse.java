@@ -16,7 +16,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.api.block.BlockBase;
+import ru.craftlogic.api.block.BlockNarrow;
 import ru.craftlogic.api.block.holders.TileEntityHolder;
 import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.util.TileEntityInfo;
@@ -29,7 +29,7 @@ import static net.minecraft.init.SoundEvents.BLOCK_WOODEN_TRAPDOOR_CLOSE;
 import static net.minecraft.init.SoundEvents.BLOCK_WOODEN_TRAPDOOR_OPEN;
 import static ru.craftlogic.api.CraftAPI.MOD_ID;
 
-public class BlockBeeHouse extends BlockBase implements TileEntityHolder<TileEntityBeeHouse> {
+public class BlockBeeHouse extends BlockNarrow implements TileEntityHolder<TileEntityBeeHouse> {
     public static final PropertyBool COVERED = PropertyBool.create("covered");
     public static final PropertyBool CLOSED = PropertyBool.create("closed");
     public static final PropertyDirection FACING = BlockHorizontal.FACING;
@@ -73,26 +73,6 @@ public class BlockBeeHouse extends BlockBase implements TileEntityHolder<TileEnt
         } else if (!location.getBlockProperty(COVERED)) {
             return super.onBlockActivated(location, player, hand, target);
         }
-        return false;
-    }
-
-    @Override
-    public boolean isFullBlock(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isTopSolid(IBlockState state) {
         return false;
     }
 

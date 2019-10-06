@@ -1,10 +1,14 @@
 package ru.craftlogic.api;
 
 import com.google.gson.JsonElement;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
@@ -26,6 +30,13 @@ public class CraftAPI {
     public static final String MOD_ID = "{@mod:id}";
     public static final String MOD_VERSION = "{@mod:version}";
     public static final AdvancedNetwork NETWORK = new AdvancedNetwork(MOD_ID);
+
+    public static final DamageSource DAMAGE_SOURCE_FALL_INTO_LEAVES = new DamageSource("fallintoleaves") {
+        @Override
+        public ITextComponent getDeathMessage(EntityLivingBase entity) {
+            return new TextComponentTranslation(MOD_ID + ".death.fallintoleaves", entity.getDisplayName());
+        }
+    };
 
     private static boolean init, postInit;
 
@@ -81,7 +92,7 @@ public class CraftAPI {
         if (e instanceof Number) {
             return ((Number) e).intValue();
         }
-        String color = ((String)e).toLowerCase();
+        String color = ((String) e).toLowerCase();
 
         if (color.startsWith("#")) {
             color = color.substring(1);
