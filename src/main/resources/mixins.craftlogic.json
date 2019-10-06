@@ -69,6 +69,7 @@
     "entity.monster.MixinEntityZombie",
     "entity.monster.MixinEntityCreeper",
     "entity.monster.MixinEntitySpider",
+    "world.MixinBiomeManager",
     "world.gen.structure.MixinVillage",
     "world.gen.structure.MixinJungleTemple",
     "world.storage.MixinSaveHandler",

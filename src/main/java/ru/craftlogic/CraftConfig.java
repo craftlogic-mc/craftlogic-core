@@ -90,6 +90,9 @@ public class CraftConfig {
         @Config.Comment("Enable stone unification (removes granite, andesite & diorite)")
         @Config.RequiresWorldRestart
         public boolean enableStoneUnification = true;
+        @Config.Comment("Disable roofed (dark) forest")
+        @Config.RequiresWorldRestart
+        public boolean disableRoofedForest = true;
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID)
