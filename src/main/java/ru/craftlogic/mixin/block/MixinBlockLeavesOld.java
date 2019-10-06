@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import ru.craftlogic.api.CraftBlocks;
 
 @Mixin(BlockOldLeaf.class)
 public class MixinBlockLeavesOld extends Block {
@@ -43,5 +44,7 @@ public class MixinBlockLeavesOld extends Block {
         items.add(new ItemStack(Blocks.LEAVES, 1, 3));
         items.add(new ItemStack(Blocks.LEAVES2, 1, 0));
         items.add(new ItemStack(Blocks.LEAVES2, 1, 1));
+        items.add(new ItemStack(CraftBlocks.LEAVES3, 1, 0));
+        items.add(new ItemStack(CraftBlocks.LEAVES3, 1, 1));
     }
 }

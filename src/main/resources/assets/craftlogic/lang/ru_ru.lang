@@ -25,6 +25,14 @@ tile.bee_house.name=Пчелиный домик
 tile.barrel_wood.name=Деревянная бочка
 tile.barrel_stone.name=Каменная бочка
 tile.drying_rack.name=Сушилка
+tile.leaves.pine.name=Сосновые листья
+tile.leaves.willow.name=Ивовые листья
+tile.log.pine.name=Сосна
+tile.log.willow.name=Ива
+tile.sapling.pine.name=Саженец сосны
+tile.sapling.willow.name=Саженец ивы
+tile.planks.pine.name=Сосновые доски
+tile.planks.willow.name=Ивовые доски
 
 item.crowbar.name=Монтировка
 item.wool_card.name=Чесалка

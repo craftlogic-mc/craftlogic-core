@@ -1,4 +1,4 @@
-package ru.craftlogic.mixin;
+package ru.craftlogic.mixin.world;
 
 import com.google.common.base.Throwables;
 import net.minecraft.command.*;

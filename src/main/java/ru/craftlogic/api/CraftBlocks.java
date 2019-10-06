@@ -15,7 +15,10 @@ import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.item.ItemBlockBase;
 import ru.craftlogic.common.block.*;
+import ru.craftlogic.common.item.ItemLeaves3;
+import ru.craftlogic.common.item.ItemLog3;
 import ru.craftlogic.common.item.ItemRock;
+import ru.craftlogic.common.item.ItemSapling2;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -33,6 +36,10 @@ public class CraftBlocks {
     public static BiMap<BlockPlanks.EnumType, Block> BEE_HOUSE = HashBiMap.create(BlockPlanks.EnumType.values().length);
     public static Block MUSHROOM_GRASS;
     public static Block ROCK;
+    public static Block LOG3;
+    public static Block LEAVES3;
+    public static Block SAPLING2;
+    public static Block PLANKS2;
 
     static void init(Side side) {
         if (CraftConfig.blocks.enableBarrels) {
@@ -58,6 +65,11 @@ public class CraftBlocks {
         if (CraftConfig.items.enableRocks) {
             ROCK = registerBlockWithItem(new BlockRock(), ItemRock::new);
         }
+
+        LOG3 = registerBlockWithItem(new BlockLog3(), ItemLog3::new);
+        LEAVES3 = registerBlockWithItem(new BlockLeaves3(), ItemLeaves3::new);
+        SAPLING2 = registerBlockWithItem(new BlockSapling2(), ItemSapling2::new);
+        PLANKS2 = registerBlockWithItem(new BlockPlanks2());
     }
 
     public static <B extends Block> B registerBlock(@Nonnull B block) {

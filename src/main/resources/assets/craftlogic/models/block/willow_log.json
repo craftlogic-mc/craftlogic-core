@@ -1,0 +1,7 @@
+{
+    "parent": "block/cube_column",
+    "textures": {
+        "end": "craftlogic:blocks/log_willow_top",
+        "side": "craftlogic:blocks/log_willow"
+    }
+}

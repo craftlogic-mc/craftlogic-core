@@ -14,6 +14,7 @@
     "block.MixinBlockTallGrass",
     "block.MixinBlockMushroom",
     "block.MixinBlockStone",
+    "block.MixinBlockSapling",
     "block.MixinBlockGrass",
     "block.MixinBlockLever",
     "block.MixinBlockDispenser",
@@ -27,7 +28,10 @@
     "block.MixinBlockTNT",
     "block.MixinBlockLeavesOld",
     "block.MixinBlockLeavesNew",
+    "block.MixinBlockLogOld",
+    "block.MixinBlockLogNew",
     "block.MixinBlockLeaves",
+    "block.MixinBlockPlanks",
     "block.MixinBlockMelon",
     "block.MixinBlockPistonBase",
     "block.MixinBlockFluidClassic",
@@ -69,7 +73,9 @@
     "entity.monster.MixinEntityZombie",
     "entity.monster.MixinEntityCreeper",
     "entity.monster.MixinEntitySpider",
-    "world.MixinBiomeManager",
+    "world.biome.MixinBiomeSwamp",
+    "world.biome.MixinBiomeTaiga",
+    "world.biome.MixinBiomeManager",
     "world.gen.structure.MixinVillage",
     "world.gen.structure.MixinJungleTemple",
     "world.storage.MixinSaveHandler",
@@ -83,7 +89,7 @@
     "util.text.MixinITextComponent$Serializer",
     "forge.MixinUsernameCache",
     "forge.MixinCraftingHelper",
-    "MixinCommandHandler"
+    "world.MixinCommandHandler"
   ],
   "client": [
     "client.entity.MixinEntityPlayerSP",

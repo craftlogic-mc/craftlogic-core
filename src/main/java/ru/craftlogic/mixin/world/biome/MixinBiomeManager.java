@@ -1,4 +1,4 @@
-package ru.craftlogic.mixin.world;
+package ru.craftlogic.mixin.world.biome;
 
 import net.minecraft.init.Biomes;
 import net.minecraftforge.common.BiomeManager;

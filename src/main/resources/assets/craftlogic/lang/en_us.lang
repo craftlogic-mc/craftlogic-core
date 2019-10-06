@@ -25,6 +25,14 @@ tile.bee_house.name=Bee House
 tile.barrel_wood.name=Wooden Barrel
 tile.barrel_stone.name=Stone Barrel
 tile.drying_rack.name=Drying Rack
+tile.leaves.pine.name=Pine Leaves
+tile.leaves.willow.name=Willow Leaves
+tile.log.pine.name=Pine Log
+tile.log.willow.name=Willow Log
+tile.sapling.pine.name=Pine Sapling
+tile.sapling.willow.name=Willow Sapling
+tile.planks.pine.name=Pine Planks
+tile.planks.willow.name=Willow Planks
 
 item.crowbar.name=Crowbar
 item.wool_card.name=Wool Card
