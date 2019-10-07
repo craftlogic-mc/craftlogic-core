@@ -57,11 +57,11 @@ public class BlockSapling2 extends BlockBush implements Growable, ModelRegistrar
 
     @Override
     public String getLocalizedName() {
-        return I18n.translateToLocal(getTranslationKey() + "." + BlockPlanks2.PlanksType2.PINE.getTranslationKey() + ".name");
+        return I18n.translateToLocal(getTranslationKey() + "." + BlockPlanks2.PlanksType2.PINE.getName() + ".name");
     }
 
     public String getTranslationKey(ItemStack item) {
-        return BlockPlanks2.PlanksType2.byMetadata(item.getMetadata() & 3).getTranslationKey();
+        return BlockPlanks2.PlanksType2.byMetadata(item.getMetadata() & 3).getName();
     }
 
     @Override
@@ -157,11 +157,7 @@ public class BlockSapling2 extends BlockBush implements Growable, ModelRegistrar
     }
 
     @Override
-    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> items) {
-        for (BlockPlanks2.PlanksType2 type : BlockPlanks2.PlanksType2.values()) {
-            items.add(new ItemStack(this, 1, type.getMetadata()));
-        }
-    }
+    public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> items) {}
 
     @Override
     public boolean canGrow(Location location, boolean isClient) {

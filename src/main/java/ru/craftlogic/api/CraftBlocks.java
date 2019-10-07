@@ -5,9 +5,11 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPlanks;
+import net.minecraft.block.BlockSlab;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
@@ -15,10 +17,8 @@ import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.block.BlockBase;
 import ru.craftlogic.api.item.ItemBlockBase;
 import ru.craftlogic.common.block.*;
-import ru.craftlogic.common.item.ItemLeaves3;
-import ru.craftlogic.common.item.ItemLog3;
-import ru.craftlogic.common.item.ItemRock;
-import ru.craftlogic.common.item.ItemSapling2;
+import ru.craftlogic.common.block.BlockPlanks2.PlanksType2;
+import ru.craftlogic.common.item.*;
 
 import javax.annotation.Nonnull;
 import java.util.Arrays;
@@ -40,6 +40,14 @@ public class CraftBlocks {
     public static Block LEAVES3;
     public static Block SAPLING2;
     public static Block PLANKS2;
+    public static Block PINE_FENCE;
+    public static Block WILLOW_FENCE;
+    public static Block PINE_FENCE_GATE;
+    public static Block WILLOW_FENCE_GATE;
+    public static BlockSlab DOUBLE_WOODEN_SLAB2;
+    public static BlockSlab WOODEN_SLAB2;
+    public static Block PINE_STAIRS;
+    public static Block WILLOW_STAIRS;
 
     static void init(Side side) {
         if (CraftConfig.blocks.enableBarrels) {
@@ -70,6 +78,14 @@ public class CraftBlocks {
         LEAVES3 = registerBlockWithItem(new BlockLeaves3(), ItemLeaves3::new);
         SAPLING2 = registerBlockWithItem(new BlockSapling2(), ItemSapling2::new);
         PLANKS2 = registerBlockWithItem(new BlockPlanks2());
+        PINE_FENCE = registerBlockWithItem(new BlockDiagonalFence2(PlanksType2.PINE), ItemBlock::new);
+        WILLOW_FENCE = registerBlockWithItem(new BlockDiagonalFence2(PlanksType2.WILLOW), ItemBlock::new);
+        PINE_FENCE_GATE = registerBlockWithItem(new BlockFenceGate2(PlanksType2.PINE), ItemBlock::new);
+        WILLOW_FENCE_GATE = registerBlockWithItem(new BlockFenceGate2(PlanksType2.WILLOW), ItemBlock::new);
+        DOUBLE_WOODEN_SLAB2 = registerBlock(new BlockWoodSlab2(true));
+        WOODEN_SLAB2 = registerBlockWithItem(new BlockWoodSlab2(false), ItemSlab2::new);
+        PINE_STAIRS = registerBlockWithItem(new BlockStairs2(PlanksType2.PINE), ItemBlock::new);
+        WILLOW_STAIRS = registerBlockWithItem(new BlockStairs2(PlanksType2.WILLOW), ItemBlock::new);
     }
 
     public static <B extends Block> B registerBlock(@Nonnull B block) {

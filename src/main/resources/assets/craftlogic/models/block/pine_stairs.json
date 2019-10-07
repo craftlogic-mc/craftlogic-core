@@ -1,0 +1,8 @@
+{
+    "parent": "block/stairs",
+    "textures": {
+        "bottom": "craftlogic:blocks/planks_pine",
+        "top": "craftlogic:blocks/planks_pine",
+        "side": "craftlogic:blocks/planks_pine"
+    }
+}

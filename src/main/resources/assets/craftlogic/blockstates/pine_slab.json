@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "half=bottom": { "model": "craftlogic:half_slab_pine" },
+        "half=top": { "model": "craftlogic:upper_slab_pine" }
+    }
+}

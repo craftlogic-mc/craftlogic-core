@@ -21,10 +21,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import ru.craftlogic.api.CraftBlocks;
 import ru.craftlogic.api.block.DiagonalFacing;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BlockDiagonalFence extends BlockFence {
     public static final PropertyBool NORTH_WEST = PropertyBool.create("north_west");
@@ -176,6 +178,8 @@ public class BlockDiagonalFence extends BlockFence {
                 items.add(new ItemStack(Blocks.JUNGLE_FENCE));
                 items.add(new ItemStack(Blocks.ACACIA_FENCE));
                 items.add(new ItemStack(Blocks.DARK_OAK_FENCE));
+                items.add(new ItemStack(CraftBlocks.PINE_FENCE));
+                items.add(new ItemStack(CraftBlocks.WILLOW_FENCE));
             }
         } else {
             items.add(new ItemStack(this));

@@ -33,6 +33,14 @@ tile.sapling.pine.name=Pine Sapling
 tile.sapling.willow.name=Willow Sapling
 tile.planks.pine.name=Pine Planks
 tile.planks.willow.name=Willow Planks
+tile.fence.pine.name=Pine Fence
+tile.fence.willow.name=Willow Fence
+tile.fence_gate.pine.name=Pine Fence Gate
+tile.fence_gate.willow.name=Willow Fence Gate
+tile.wooden_slab.pine.name=Pine Slab
+tile.wooden_slab.willow.name=Willow Slab
+tile.wooden_stairs.pine.name=Pine Stairs
+tile.wooden_stairs.willow.name=Willow Stairs
 
 item.crowbar.name=Crowbar
 item.wool_card.name=Wool Card

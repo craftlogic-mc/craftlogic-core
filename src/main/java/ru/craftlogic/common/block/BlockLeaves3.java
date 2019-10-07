@@ -155,7 +155,7 @@ public class BlockLeaves3 extends BlockLeaves implements ModelRegistrar, Colored
     }
 
     public String getTranslationKey(ItemStack item) {
-        return BlockPlanks2.PlanksType2.byMetadata(item.getMetadata() & 3).getTranslationKey();
+        return BlockPlanks2.PlanksType2.byMetadata(item.getMetadata() & 3).getName();
     }
 
     @Override

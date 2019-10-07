@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "half=bottom": { "model": "craftlogic:half_slab_willow" },
+        "half=top": { "model": "craftlogic:upper_slab_willow" }
+    }
+}

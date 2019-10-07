@@ -55,7 +55,7 @@ public class BlockPlanks2 extends BlockBase {
 
     @Override
     public String getTranslationKey(ItemStack item) {
-        return "tile.planks." + BlockPlanks2.PlanksType2.byMetadata(item.getMetadata() & 3).getTranslationKey();
+        return "tile.planks." + BlockPlanks2.PlanksType2.byMetadata(item.getMetadata() & 3).getName();
     }
 
     @Override
@@ -98,10 +98,6 @@ public class BlockPlanks2 extends BlockBase {
 
         public static PlanksType2 byMetadata(int meta) {
             return values()[meta % values().length];
-        }
-
-        public String getTranslationKey() {
-            return getName();
         }
     }
 }

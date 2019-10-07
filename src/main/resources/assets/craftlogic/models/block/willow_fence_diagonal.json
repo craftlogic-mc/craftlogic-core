@@ -1,0 +1,6 @@
+{
+    "parent": "block/fence_diagonal",
+    "textures": {
+        "texture": "craftlogic:blocks/planks_willow"
+    }
+}

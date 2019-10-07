@@ -1,0 +1,29 @@
+{
+    "multipart": [
+        {   "apply": { "model": "craftlogic:willow_fence_post" }},
+        {   "when": { "north": true },
+            "apply": { "model": "craftlogic:willow_fence_side", "uvlock": true }
+        },
+        {   "when": { "east": true },
+            "apply": { "model": "craftlogic:willow_fence_side", "y": 90, "uvlock": true }
+        },
+        {   "when": { "south": true },
+            "apply": { "model": "craftlogic:willow_fence_side", "y": 180, "uvlock": true }
+        },
+        {   "when": { "west": true },
+            "apply": { "model": "craftlogic:willow_fence_side", "y": 270, "uvlock": true }
+        },
+        {   "when": { "north_east": true },
+            "apply": { "model": "craftlogic:willow_fence_diagonal"}
+        },
+        {   "when": { "south_east": true },
+            "apply": { "model": "craftlogic:willow_fence_diagonal", "y": 90 }
+        },
+        {   "when": { "south_west": true },
+            "apply": { "model": "craftlogic:willow_fence_diagonal", "y": 180 }
+        },
+        {   "when": { "north_west": true },
+            "apply": { "model": "craftlogic:willow_fence_diagonal", "y": 270 }
+        }
+    ]
+}

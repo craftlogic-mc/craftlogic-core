@@ -48,7 +48,7 @@ public class BlockLog3 extends net.minecraft.block.BlockLog implements ModelRegi
     }
 
     public String getTranslationKey(ItemStack item) {
-        return BlockPlanks2.PlanksType2.byMetadata(item.getMetadata() & 3).getTranslationKey();
+        return BlockPlanks2.PlanksType2.byMetadata(item.getMetadata() & 3).getName();
     }
 
     @Override

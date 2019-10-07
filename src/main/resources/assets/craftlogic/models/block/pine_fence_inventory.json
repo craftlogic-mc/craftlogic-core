@@ -1,0 +1,6 @@
+{
+    "parent": "block/fence_inventory",
+    "textures": {
+        "texture": "craftlogic:blocks/planks_pine"
+    }
+}

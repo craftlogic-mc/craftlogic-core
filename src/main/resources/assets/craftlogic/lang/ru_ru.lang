@@ -33,6 +33,14 @@ tile.sapling.pine.name=Саженец сосны
 tile.sapling.willow.name=Саженец ивы
 tile.planks.pine.name=Сосновые доски
 tile.planks.willow.name=Ивовые доски
+tile.fence.pine.name=Сосновый забор
+tile.fence.willow.name=Ивовый забор
+tile.fence_gate.pine.name=Сосновая калитка
+tile.fence_gate.willow.name=Ивовая калитка
+tile.wooden_slab.pine.name=Сосновая плита
+tile.wooden_slab.willow.name=Ивовая плита
+tile.wooden_stairs.pine.name=Сосновые ступеньки
+tile.wooden_stairs.willow.name=Ивовые ступеньки
 
 item.crowbar.name=Монтировка
 item.wool_card.name=Чесалка
