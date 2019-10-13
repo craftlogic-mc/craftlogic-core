@@ -4,11 +4,11 @@ buildscript {
         mavenCentral()
         maven {
             name = 'forge'
-            url = "http://files.minecraftforge.net/maven" 
+            url = "https://files.minecraftforge.net/maven"
         }
         maven {
             name = 'sponge'
-            url = 'http://repo.spongepowered.org/maven'
+            url = 'https://repo.spongepowered.org/maven'
         }
     }
     dependencies {
@@ -53,6 +53,14 @@ repositories {
     maven {
         name = 'spongepowered'
         url = 'https://repo.spongepowered.org/maven/'
+    }
+    maven {
+        name = 'jei maven'
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        name = 'mod maven'
+        url = "https://modmaven.k-4u.nl"
     }
     mavenCentral()
 }
@@ -101,6 +109,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy
     compile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.4'
 
+    deobfCompile  "mezz.jei:jei_${project.minecraft_version}:${project.jei_version}:api"
+    runtime "mezz.jei:jei_${project.minecraft_version}:${project.jei_version}"
+
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
@@ -123,7 +134,6 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
     configurations.compile.extendsFrom(configurations.extend)
-
 }
 
 processResources {
