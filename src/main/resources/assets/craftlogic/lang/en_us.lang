@@ -53,9 +53,10 @@ item.egg_fried.name=Fried Egg
 item.chain_links.name=Chain Links
 item.chain_mesh.name=Chain Mesh
 item.milk_bottle.name=Milk Bottle
-item.straw.name=Straw
+item.grass.name=Grass
 item.creeper_oysters.name=Creeper Oysters
 item.spit.name=Cobweb Spit
+item.stone_axe_heading.name=Stone Axe Heading
 
 commands.stop.delayed=Stopping the server in %s
 

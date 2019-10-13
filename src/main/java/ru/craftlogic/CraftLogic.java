@@ -18,7 +18,7 @@ import ru.craftlogic.common.world.CraftWorldGenerator;
 
 import static ru.craftlogic.api.CraftAPI.MOD_ID;
 
-@Mod(modid = MOD_ID, version = CraftAPI.MOD_VERSION, dependencies = "after:dynamictrees")
+@Mod(modid = MOD_ID, version = CraftAPI.MOD_VERSION)
 public class CraftLogic {
     @SidedProxy(clientSide = "ru.craftlogic.client.ProxyClient", serverSide = "ru.craftlogic.common.ProxyCommon")
     public static ProxyCommon PROXY;
@@ -34,6 +34,7 @@ public class CraftLogic {
         MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.register(PROXY);
         MinecraftForge.ORE_GEN_BUS.register(PROXY);
+        MinecraftForge.TERRAIN_GEN_BUS.register(PROXY);
         GameRegistry.registerWorldGenerator(new CraftWorldGenerator(), 0);
         PROXY.preInit();
     }

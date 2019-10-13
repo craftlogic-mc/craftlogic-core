@@ -2,7 +2,9 @@ package ru.craftlogic.common;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.terraingen.OreGenEvent;
+import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
@@ -94,6 +96,16 @@ public class ProxyCommon extends AdvancedMessageHandler {
                     break;
             }
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void generateWaterfall(DecorateBiomeEvent.Decorate event) {
+        if (event.getType() == DecorateBiomeEvent.Decorate.EventType.LAKE_WATER) event.setResult(Event.Result.DENY);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public void generateLake(PopulateChunkEvent.Populate event) {
+        if (event.getType() == PopulateChunkEvent.Populate.EventType.LAKE) event.setResult(Event.Result.DENY);
     }
 
     protected AdvancedMessage handleServerStop(MessageServerStop message, MessageContext context) {

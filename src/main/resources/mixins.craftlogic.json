@@ -28,6 +28,7 @@
     "block.MixinBlockTNT",
     "block.MixinBlockLeavesOld",
     "block.MixinBlockLeavesNew",
+    "block.MixinBlockLog",
     "block.MixinBlockLogOld",
     "block.MixinBlockLogNew",
     "block.MixinBlockLeaves",

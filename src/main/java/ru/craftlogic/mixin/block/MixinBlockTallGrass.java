@@ -53,16 +53,16 @@ public class MixinBlockTallGrass extends BlockBush {
 
     /**
      * @author Radviger
-     * @reason Straw drop
+     * @reason Grass drop
      */
     @Overwrite
     public Item getItemDropped(IBlockState state, Random random, int fortune) {
-        return CraftItems.STRAW;
+        return CraftItems.GRASS;
     }
 
     /**
      * @author Radviger
-     * @reason Straw drop
+     * @reason Grass drop
      */
     @Overwrite(remap = false)
     public void getDrops(NonNullList<ItemStack> drops, IBlockAccess blockAccessor, BlockPos pos, IBlockState state, int fortune) {

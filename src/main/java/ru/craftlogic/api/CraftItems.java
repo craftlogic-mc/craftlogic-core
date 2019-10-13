@@ -24,7 +24,8 @@ public class CraftItems {
     public static Item CROWBAR;
     public static Item MILK_BOTTLE;
     public static Item CREEPER_OYSTERS;
-    public static Item STRAW;
+    public static Item GRASS;
+    public static Item STONE_AXE_HEADING;
 
     static void init(Side side) {
         SPIT = registerItem(new ItemBase("spit", CreativeTabs.MISC));
@@ -47,7 +48,8 @@ public class CraftItems {
         CROWBAR = registerItem(new ItemCrowbar());
         MILK_BOTTLE = registerItem(new ItemMilkBottle());
         CREEPER_OYSTERS = registerItem(new ItemCreeperOysters());
-        STRAW = registerItem(new ItemBase("straw", CreativeTabs.MATERIALS));
+        GRASS = registerItem(new ItemBase("grass", CreativeTabs.MATERIALS));
+        STONE_AXE_HEADING = registerItem(new ItemBase("stone_axe_heading", CreativeTabs.TOOLS).setMaxStackSize(1));
     }
 
     public static Item registerItem(@Nonnull Item item) {
