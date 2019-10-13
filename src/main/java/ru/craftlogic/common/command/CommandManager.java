@@ -29,7 +29,6 @@ public class CommandManager extends ConfigurableManager {
     private final CommandHandler commandHandler;
     private Map<String, Map<String, CommandContainer>> commands = new HashMap<>();
     private Map<String, ArgType> completers = new HashMap<>();
-    private Map<Class<? extends CommandRegistrar>, List<ICommand>> typedCommands = new HashMap<>();
     private boolean loaded;
 
     public CommandManager(Server server, Path settingsDirectory) {
