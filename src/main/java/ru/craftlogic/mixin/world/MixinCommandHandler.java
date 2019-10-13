@@ -53,7 +53,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
         try {
             if (container == null) {
                 sender.sendMessage(Text.translation("commands.generic.notFound").red().build());
-            } else if (container.checkPermission(getServer(), sender, args)) {
+            } else if (container.checkPermission(getServer(), sender, args, false)) {
                 ICommand command = container.command;
                 int usernameIndex = getUsernameIndex(command, args);
                 CommandEvent event = new CommandEvent(command, sender, args);
@@ -190,6 +190,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
             commandName = rawCommandName.substring(colonIdx);
         }
         if (args.length == 1) {
+            args = dropFirstString(args);
             Set<String> result = new HashSet<>();
 
             for (Map.Entry<String, List<ResourceLocation>> entry : aliases.entrySet()) {
@@ -207,7 +208,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
                             }
                         }
                     }
-                    if (container != null && container.command.checkPermission(getServer(), sender)) {
+                    if (container != null && container.checkPermission(getServer(), sender, args, true)) {
                         result.add(s);
                     }
                 }
@@ -216,9 +217,9 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
             return new ArrayList<>(result);
         } else {
             CommandContainer container = getCommand(rawCommandName);
-            if (container != null && container.command.checkPermission(getServer(), sender)) {
+            if (container != null && container.checkPermission(getServer(), sender, args, true)) {
                 try {
-                    return container.command.getTabCompletions(getServer(), sender, dropFirstString(args), targetBlockPos);
+                    return container.command.getTabCompletions(getServer(), sender, args, targetBlockPos);
                 } catch (Throwable t) {
                     if (t.getCause() instanceof CommandException) {
                         sender.sendMessage(Text.translation((CommandException)t.getCause()).red().build());
@@ -242,7 +243,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
         Set<ICommand> result = new HashSet<>();
 
         for (CommandContainer container : registry.values()) {
-            if (!result.contains(container.command) && container.command.checkPermission(getServer(), sender)) {
+            if (!result.contains(container.command) && container.checkPermission(getServer(), sender, new String[0], true)) {
                 result.add(container.command);
             }
         }

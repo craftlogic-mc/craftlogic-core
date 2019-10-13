@@ -178,9 +178,9 @@ public class CommandManager extends ConfigurableManager {
             this.command = command;
         }
 
-        public boolean checkPermission(MinecraftServer server, ICommandSender sender, String[] args) {
+        public boolean checkPermission(MinecraftServer server, ICommandSender sender, String[] args, boolean partial) {
             if (command instanceof CommandBase) {
-                return ((CommandBase) command).checkPermission(server, sender, args);
+                return ((CommandBase) command).checkPermission(server, sender, args, partial);
             } else {
                 return command.checkPermission(server, sender);
             }

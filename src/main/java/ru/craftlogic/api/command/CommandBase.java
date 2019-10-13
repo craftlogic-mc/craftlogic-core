@@ -67,19 +67,14 @@ public abstract class CommandBase implements ICommand {
         Server server = Server.from(_server);
         for (ArgPattern pattern : patterns) {
             if (pattern.matches(rawArgs) == MatchLevel.FULL) {
-                CommandSender sender = CommandSender.from(server, _sender);
-                if (sender.hasPermission(pattern.permission, opLevel)) {
-                    CommandContext ctx = pattern.parse(server, _sender, this, rawArgs);
-                    try {
-                        execute(ctx);
-                    } catch (CommandException e) {
-                        throw e;
-                    } catch (Throwable t) {
-                        CommandManager.LOGGER.error("Error occurred while executing command '" + getName() + "'", t);
-                        throw new CommandException("commands.generic.unknownFailure", t.getMessage());
-                    }
-                } else {
-                    throw new CommandException("commands.generic.permission");
+                CommandContext ctx = pattern.parse(server, _sender, this, rawArgs);
+                try {
+                    execute(ctx);
+                } catch (CommandException e) {
+                    throw e;
+                } catch (Throwable t) {
+                    CommandManager.LOGGER.error("Error occurred while executing command '" + getName() + "'", t);
+                    throw new CommandException("commands.generic.unknownFailure", t.getMessage());
                 }
                 return;
             }
@@ -89,16 +84,17 @@ public abstract class CommandBase implements ICommand {
 
     protected abstract void execute(CommandContext context) throws Throwable;
 
-    public final boolean checkPermission(MinecraftServer _server, ICommandSender _sender, String[] rawArgs) {
-        if (!_server.isDedicatedServer() && _sender.getName().equals(_server.getServerOwner())) {
+    public final boolean checkPermission(MinecraftServer _server, ICommandSender _sender, String[] rawArgs, boolean partial) {
+        if (_server.isSinglePlayer() && _sender.getName().equalsIgnoreCase(_server.getServerOwner())) {
             return true;
         }
         Server server = Server.from(_server);
-        CommandSender from = CommandSender.from(Server.from(_server), _sender);
+        CommandSender from = CommandSender.from(server, _sender);
         PermissionManager permissionManager = server.getPermissionManager();
         if (permissionManager.isEnabled()) {
             for (ArgPattern pattern : patterns) {
-                if (pattern.matches(rawArgs) == MatchLevel.FULL) {
+                MatchLevel match = pattern.matches(rawArgs);
+                if (partial ? match != MatchLevel.NONE : match == MatchLevel.FULL) {
                     CommandSender sender = CommandSender.from(server, _sender);
                     if (sender.hasPermission(pattern.permission, opLevel)) {
                         return true;
@@ -113,18 +109,13 @@ public abstract class CommandBase implements ICommand {
 
     @Override
     public final boolean checkPermission(MinecraftServer _server, ICommandSender _sender) {
-        if (!_server.isDedicatedServer() && _sender.getName().equals(_server.getServerOwner())) {
+        if (_server.isSinglePlayer() && _sender.getName().equalsIgnoreCase(_server.getServerOwner())) {
             return true;
         }
         Server server = Server.from(_server);
-        CommandSender from = CommandSender.from(Server.from(_server), _sender);
+        CommandSender from = CommandSender.from(server, _sender);
         PermissionManager permissionManager = server.getPermissionManager();
         if (permissionManager.isEnabled()) {
-            for (Syntax s : syntax) {
-                if (from.hasPermission(s.permission, opLevel)) {
-                    return true;
-                }
-            }
             return false;
         } else {
             return from.getOperatorLevel() >= opLevel;
