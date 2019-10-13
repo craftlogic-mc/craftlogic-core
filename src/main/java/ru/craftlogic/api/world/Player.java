@@ -159,6 +159,16 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
         entity.sendPlayerAbilities();
     }
 
+    public boolean isInvulnerable() {
+        return getEntity().capabilities.disableDamage;
+    }
+
+    public void setInvulnerable(boolean invulnerable) {
+        EntityPlayerMP entity = getEntity();
+        entity.capabilities.disableDamage = invulnerable;
+        entity.sendPlayerAbilities();
+    }
+
     public boolean isDead() {
         return getEntity().isDead;
     }

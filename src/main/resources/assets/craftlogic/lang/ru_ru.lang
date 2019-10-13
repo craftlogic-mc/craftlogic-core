@@ -135,9 +135,15 @@ commands.enderchest.usage=/enderchest [player] - Открыть сундук к�
 
 commands.fly.usage=/fly [игрок] <on|off> - Включить/выключить режим полёта
 commands.fly.self=Режим полёта %s
-commands.fly.off.other=Режим полёта %s для игрока %s
+commands.fly.other=Режим полёта %s для игрока %s
 commands.fly.on=включен
 commands.fly.off=выключен
+
+commands.god.usage=/god [игрок] <on|off> - Включить/выключить режим бессмертия
+commands.god.self=Режим бессмертия %s
+commands.god.other=Режим бессмертия %s для игрока %s
+commands.god.on=включен
+commands.god.off=выключен
 
 commands.gamemode.usage=/gamemode <s|c|a|sp> [игрок]
 commands.gamemode.set.self=Игровой режим изменен на %s

@@ -75,6 +75,7 @@ public class CommandManager extends ConfigurableManager {
         commandManager.registerCommand(new CommandHome());
         commandManager.registerCommand(new CommandGameMode());
         commandManager.registerCommand(new CommandFly());
+        commandManager.registerCommand(new CommandGod());
         commandManager.registerCommand(new CommandHeal());
         commandManager.registerCommand(new CommandFeed());
         commandManager.registerCommand(new CommandCraft());

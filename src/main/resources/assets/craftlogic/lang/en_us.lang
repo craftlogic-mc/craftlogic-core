@@ -135,9 +135,15 @@ commands.enderchest.usage=/enderchest [player] - Open player's enderchest
 
 commands.fly.usage=/fly [player] <on|off> - Enable/disable flight mode
 commands.fly.self=Flight mode %s
-commands.fly.off.other=Flight mode %s for %s
+commands.fly.other=Flight mode %s for %s
 commands.fly.on=enabled
 commands.fly.off=disabled
+
+commands.god.usage=/god [player] <on|off> - Enable/disable invulnerability mode
+commands.god.self=Invulnerability mode %s
+commands.god.other=Invulnerability mode %s for %s
+commands.god.on=enabled
+commands.god.off=disabled
 
 commands.gamemode.usage=/gamemode <s|c|a|sp> [player] - Change player's game mode
 commands.gamemode.set.self=Gamemode set to %s
