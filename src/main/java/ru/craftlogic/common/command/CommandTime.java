@@ -14,7 +14,7 @@ import java.util.Set;
 
 public final class CommandTime extends CommandBase {
     CommandTime() {
-        super("fly", 2,
+        super("time", 2,
             "day|night",
             "day|night <world:World>",
             "set <value>",
