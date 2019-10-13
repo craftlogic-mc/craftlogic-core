@@ -46,16 +46,16 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
         String commandName = args[0];
         args = dropFirstString(args);
 
-        CommandContainer container = this.getCommand(commandName);
+        CommandContainer container = getCommand(commandName);
 
         int i = 0;
 
         try {
             if (container == null) {
                 sender.sendMessage(Text.translation("commands.generic.notFound").red().build());
-            } else if (container.command.checkPermission(this.getServer(), sender)) {
+            } else if (container.checkPermission(getServer(), sender, args)) {
                 ICommand command = container.command;
-                int usernameIndex = this.getUsernameIndex(command, args);
+                int usernameIndex = getUsernameIndex(command, args);
                 CommandEvent event = new CommandEvent(command, sender, args);
                 if (MinecraftForge.EVENT_BUS.post(event)) {
                     if (event.getException() != null) {
@@ -79,7 +79,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
 
                     for (Entity entity : entities) {
                         args[usernameIndex] = entity.getCachedUniqueIdString();
-                        if (this.tryExecute(sender, args, command, rawString)) {
+                        if (tryExecute(sender, args, command, rawString)) {
                             ++i;
                         }
                     }
@@ -87,7 +87,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
                     args[usernameIndex] = s1;
                 } else {
                     sender.setCommandStat(Type.AFFECTED_ENTITIES, 1);
-                    if (this.tryExecute(sender, args, command, rawString)) {
+                    if (tryExecute(sender, args, command, rawString)) {
                         ++i;
                     }
                 }
@@ -109,7 +109,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
     @Overwrite
     protected boolean tryExecute(ICommandSender sender, String[] args, ICommand command, String rawCommand) {
         try {
-            command.execute(this.getServer(), sender, args);
+            command.execute(getServer(), sender, args);
             return true;
         } catch (WrongUsageException exc) {
             sender.sendMessage(
@@ -136,12 +136,12 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
         ResourceLocation commandName = wrapWithActiveModId(command.getName(), "minecraft");
         CommandContainer container = new CommandContainer(commandName.getNamespace(), command);
 
-        this.registry.put(commandName, container);
-        this.aliases.computeIfAbsent(commandName.getPath(), k -> new ArrayList<>()).add(commandName);
+        registry.put(commandName, container);
+        aliases.computeIfAbsent(commandName.getPath(), k -> new ArrayList<>()).add(commandName);
 
         for (String alias : command.getAliases()) {
-            this.registry.put(new ResourceLocation(commandName.getNamespace(), alias), container);
-            this.aliases.computeIfAbsent(alias, k -> new ArrayList<>()).add(commandName);
+            registry.put(new ResourceLocation(commandName.getNamespace(), alias), container);
+            aliases.computeIfAbsent(alias, k -> new ArrayList<>()).add(commandName);
         }
 
         LOGGER.debug("Registered command " + commandName);
@@ -152,12 +152,12 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
     @Override
     public boolean unregisterCommand(ICommand command) {
         boolean dirty = false;
-        Iterator<Map.Entry<ResourceLocation, CommandContainer>> reg = this.registry.entrySet().iterator();
+        Iterator<Map.Entry<ResourceLocation, CommandContainer>> reg = registry.entrySet().iterator();
         while (reg.hasNext()) {
             Map.Entry<ResourceLocation, CommandContainer> entry = reg.next();
             CommandContainer container = entry.getValue();
             if (container.command == command) {
-                Iterator<List<ResourceLocation>> als = this.aliases.values().iterator();
+                Iterator<List<ResourceLocation>> als = aliases.values().iterator();
                 while (als.hasNext()) {
                     List<ResourceLocation> aliases = als.next();
                     dirty |= aliases.removeIf(name -> name.equals(entry.getKey()));
@@ -169,7 +169,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
             }
         }
         if (dirty) {
-            this.refreshAliases();
+            refreshAliases();
         }
         return dirty;
     }
@@ -192,22 +192,22 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
         if (args.length == 1) {
             Set<String> result = new HashSet<>();
 
-            for (Map.Entry<String, List<ResourceLocation>> entry : this.aliases.entrySet()) {
+            for (Map.Entry<String, List<ResourceLocation>> entry : aliases.entrySet()) {
                 String s = entry.getKey();
                 List<ResourceLocation> cmds = entry.getValue();
                 if (CommandBase.doesStringStartWith(commandName, s) && cmds != null && !cmds.isEmpty()) {
                     CommandContainer container = null;
                     if (modId == null) {
-                        container = this.getCommand(cmds.get(cmds.size() - 1));
+                        container = getCommand(cmds.get(cmds.size() - 1));
                     } else {
                         for (ResourceLocation c : cmds) {
                             if (c.getNamespace().equalsIgnoreCase(modId)) {
-                                container = this.getCommand(c);
+                                container = getCommand(c);
                                 break;
                             }
                         }
                     }
-                    if (container != null && container.command.checkPermission(this.getServer(), sender)) {
+                    if (container != null && container.command.checkPermission(getServer(), sender)) {
                         result.add(s);
                     }
                 }
@@ -215,10 +215,10 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
 
             return new ArrayList<>(result);
         } else {
-            CommandContainer container = this.getCommand(rawCommandName);
-            if (container != null && container.command.checkPermission(this.getServer(), sender)) {
+            CommandContainer container = getCommand(rawCommandName);
+            if (container != null && container.command.checkPermission(getServer(), sender)) {
                 try {
-                    return container.command.getTabCompletions(this.getServer(), sender, dropFirstString(args), targetBlockPos);
+                    return container.command.getTabCompletions(getServer(), sender, dropFirstString(args), targetBlockPos);
                 } catch (Throwable t) {
                     if (t.getCause() instanceof CommandException) {
                         sender.sendMessage(Text.translation((CommandException)t.getCause()).red().build());
@@ -241,8 +241,8 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
     public List<ICommand> getPossibleCommands(ICommandSender sender) {
         Set<ICommand> result = new HashSet<>();
 
-        for (CommandContainer container : this.registry.values()) {
-            if (!result.contains(container.command) && container.command.checkPermission(this.getServer(), sender)) {
+        for (CommandContainer container : registry.values()) {
+            if (!result.contains(container.command) && container.command.checkPermission(getServer(), sender)) {
                 result.add(container.command);
             }
         }
@@ -257,7 +257,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
     @Overwrite
     public Map<String, ICommand> getCommands() {
         Map<String, ICommand> result = new HashMap<>();
-        for (Map.Entry<ResourceLocation, CommandContainer> entry : this.registry.entrySet()) {
+        for (Map.Entry<ResourceLocation, CommandContainer> entry : registry.entrySet()) {
             CommandContainer container = entry.getValue();
             result.put(entry.getKey().toString(), container.command);
         }
@@ -265,28 +265,28 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
     }
 
     private CommandContainer getCommand(ResourceLocation name) {
-        return this.registry.get(name);
+        return registry.get(name);
     }
 
     private CommandContainer getCommand(String name) {
         if (name.contains(":")) {
-            return this.getCommand(new ResourceLocation(name));
+            return getCommand(new ResourceLocation(name));
         }
         List<ResourceLocation> aliases = this.aliases.get(name);
         if (aliases != null && !aliases.isEmpty()) {
-            return this.getCommand(aliases.get(aliases.size() - 1));
+            return getCommand(aliases.get(aliases.size() - 1));
         }
         return null;
     }
 
     private void refreshAliases() {
-        this.aliases.clear();
-        for (Map.Entry<ResourceLocation, CommandContainer> entry : this.registry.entrySet()) {
+        aliases.clear();
+        for (Map.Entry<ResourceLocation, CommandContainer> entry : registry.entrySet()) {
             ResourceLocation commandName = entry.getKey();
             CommandContainer container = entry.getValue();
-            this.aliases.computeIfAbsent(commandName.getPath(), k -> new ArrayList<>()).add(commandName);
+            aliases.computeIfAbsent(commandName.getPath(), k -> new ArrayList<>()).add(commandName);
             for (String alias : container.command.getAliases()) {
-                this.aliases.computeIfAbsent(alias, k -> new ArrayList<>()).add(commandName);
+                aliases.computeIfAbsent(alias, k -> new ArrayList<>()).add(commandName);
             }
         }
     }

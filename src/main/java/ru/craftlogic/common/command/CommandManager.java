@@ -3,6 +3,8 @@ package ru.craftlogic.common.command;
 import com.google.gson.JsonObject;
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.ICommand;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.GameType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -175,6 +177,14 @@ public class CommandManager extends ConfigurableManager {
         public CommandContainer(String modId, ICommand command) {
             this.modId = modId;
             this.command = command;
+        }
+
+        public boolean checkPermission(MinecraftServer server, ICommandSender sender, String[] args) {
+            if (command instanceof CommandBase) {
+                return ((CommandBase) command).checkPermission(server, sender, args);
+            } else {
+                return command.checkPermission(server, sender);
+            }
         }
     }
 
