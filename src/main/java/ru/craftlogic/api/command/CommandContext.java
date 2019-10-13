@@ -79,6 +79,10 @@ public class CommandContext {
         }
     }
 
+    public Player senderAsPlayerOrArg(String name) throws CommandException {
+        return has(name) ? get(name).asPlayer() : senderAsPlayer();
+    }
+
     public String action(int index) {
         return this.get("action:" + index).asString();
     }

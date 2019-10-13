@@ -9,14 +9,14 @@ import ru.craftlogic.api.world.Player;
 
 import javax.annotation.Nullable;
 
-public class ArgumentCompletionContext {
+public class ArgCompletionContext {
     private final Server server;
     private final String type;
     private final CommandSender sender;
     private final String partialName;
     private final Location targetBlock;
 
-    public ArgumentCompletionContext(Server server, String type, CommandSender sender, String partialName, @Nullable Location targetBlock) {
+    public ArgCompletionContext(Server server, String type, CommandSender sender, String partialName, @Nullable Location targetBlock) {
         this.server = server;
         this.type = type;
         this.sender = sender;

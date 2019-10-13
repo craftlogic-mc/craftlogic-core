@@ -32,7 +32,7 @@ compileJava {
 minecraft {
     version = project.forge_version
     runDir = "run"
-    
+
     // the mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   snapshot are built nightly.
     // stable_#            stables are built at the discretion of the MCP team.
@@ -79,11 +79,11 @@ task repack {
 
     doLast {
         for (dependencyFile in configurations.extend) {
-            ant.mkdir( dir: unzipDir )
-            ant.unzip( src: dependencyFile, dest: unzipDir )
-            ant.delete( file: "$unzipDir/META-INF/MANIFEST.MF")
-            ant.delete( file: "$unzipDir/META-INF/MUMFREY.SF")
-            ant.delete( file: "$unzipDir/META-INF/MUMFREY.RSA")
+            ant.mkdir(dir: unzipDir)
+            ant.unzip(src: dependencyFile, dest: unzipDir)
+            ant.delete(file: "$unzipDir/META-INF/MANIFEST.MF")
+            ant.delete(file: "$unzipDir/META-INF/MUMFREY.SF")
+            ant.delete(file: "$unzipDir/META-INF/MUMFREY.RSA")
         }
     }
 }
@@ -100,7 +100,7 @@ task deobfJar(type: Jar) {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.spongepowered/mixin
-    extend (group: 'org.spongepowered', name: 'mixin', version: project.mixin_version) {
+    extend(group: 'org.spongepowered', name: 'mixin', version: project.mixin_version) {
         exclude module: 'launchwrapper'
         exclude module: 'guava'
         exclude module: 'gson'
@@ -109,14 +109,14 @@ dependencies {
     // https://mvnrepository.com/artifact/org.codehaus.groovy/groovy
     compile group: 'org.codehaus.groovy', name: 'groovy', version: '2.4.4'
 
-    deobfCompile  "mezz.jei:jei_${project.minecraft_version}:${project.jei_version}:api"
+    deobfCompile "mezz.jei:jei_${project.minecraft_version}:${project.jei_version}:api"
     runtime "mezz.jei:jei_${project.minecraft_version}:${project.jei_version}"
 
     // you may put jars on which you depend on in ./libs
     // or you may define them like so..
     //compile "some.group:artifact:version:classifier"
     //compile "some.group:artifact:version"
-      
+
     // real examples
     //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
     //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
@@ -144,11 +144,11 @@ processResources {
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-                
+
         // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'version': project.version, 'mcversion': project.minecraft.version
     }
-        
+
     // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
@@ -158,18 +158,18 @@ processResources {
 jar {
     manifest {
         def a = [
-            'FMLAT': 'craftlogic_at.cfg',
-            'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
-            'TweakOrder': '0',
-            'MixinConfigs': 'mixins.craftlogic.json',
-            'FMLCorePlugin': 'ru.craftlogic.coremod.CraftLogicCoremod'
+                'FMLAT'        : 'craftlogic_at.cfg',
+                'TweakClass'   : 'org.spongepowered.asm.launch.MixinTweaker',
+                'TweakOrder'   : '0',
+                'MixinConfigs' : 'mixins.craftlogic.json',
+                'FMLCorePlugin': 'ru.craftlogic.coremod.CraftLogicCoremod'
         ]
         if (!gradle.startParameter.taskNames.contains('runClient')) {
             println 'Not running'
             a['FMLCorePluginContainsFMLMod'] = 'true'
             a['ForceLoadAsMod'] = 'true'
         }
-        attributes (a)
+        attributes(a)
     }
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
