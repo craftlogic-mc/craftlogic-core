@@ -150,7 +150,7 @@ public class MixinModelChicken extends ModelBase {
 
     /**
      * @author Radviger
-     * @reason Custom chicken model
+     * @reason Proper bird looking animation at a right angle (by their eye, not beak)
      */
     @Overwrite
     public void setRotationAngles(float limbSwing, float limbSingMod, float rotation, float yaw, float pitch, float scale, Entity chicken) {

@@ -113,6 +113,7 @@
     "client.renderer.entity.MixinRenderCreeper",
     "client.renderer.model.box.MixinModelBox",
     "client.renderer.model.MixinModelChicken",
+    "client.renderer.model.MixinModelParrot",
     "client.renderer.model.MixinModelCow",
     "client.renderer.model.MixinModelPig",
     "client.renderer.model.MixinModelSpider",
