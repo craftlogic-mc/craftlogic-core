@@ -1,12 +1,15 @@
 package ru.craftlogic.mixin.block;
 
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockLeaves;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.MobEffects;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -14,13 +17,15 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.entity.Creature;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @Mixin(BlockLeaves.class)
-public class MixinBlockLeaves extends Block {
+public abstract class MixinBlockLeaves extends Block {
     public MixinBlockLeaves(Material material) {
         super(material);
     }
@@ -72,5 +77,14 @@ public class MixinBlockLeaves extends Block {
                 }
             }
         }
+    }
+
+    /**
+     * @author Radviger
+     * @reason No shearable leaves
+     */
+    @Overwrite(remap = false)
+    public boolean isShearable(@Nonnull ItemStack item, IBlockAccess world, BlockPos pos) {
+        return false;
     }
 }

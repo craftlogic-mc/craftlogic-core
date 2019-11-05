@@ -53,7 +53,7 @@ public class MixinBlockMushroom extends BlockBush implements IShearable {
     @Nonnull
     @Override
     public List<ItemStack> onSheared(@Nonnull ItemStack tool, IBlockAccess blockAccessor, BlockPos pos, int i) {
-        return Collections.singletonList(new ItemStack(Item.getItemFromBlock(this)));
+        return Collections.singletonList(new ItemStack(Item.REGISTRY.getObject(getRegistryName())));
     }
 
     @Override

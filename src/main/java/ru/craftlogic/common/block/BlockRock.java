@@ -20,7 +20,7 @@ public class BlockRock extends BlockNarrow {
 
     @Override
     public void neighborChanged(Location selfLocation, Location neighborLocation, Block neighborBlock) {
-        if (!canPlaceBlockAt(selfLocation)) {
+        if (!selfLocation.offset(EnumFacing.DOWN).isSideSolid(EnumFacing.UP)) {
             selfLocation.setBlockToAir(true);
         }
     }
