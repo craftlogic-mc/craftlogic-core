@@ -13,6 +13,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -72,15 +74,28 @@ public abstract class MixinBlockDoublePlant extends BlockBush {
         }
     }
 
+    private static boolean RENDERING_EFFECTS = false;
+
     @Override
+    @SideOnly(Side.CLIENT)
     public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager manager) {
-        IBlockState upper = world.getBlockState(pos.up());
-        if (upper.getBlock() == this && upper.getValue(HALF) == BlockDoublePlant.EnumBlockHalf.UPPER) {
-            manager.addBlockDestroyEffects(pos.up(), upper);
-        } else {
+        if (RENDERING_EFFECTS) {
+            return false;
+        }
+        IBlockState state = world.getBlockState(pos);
+        if (state.getValue(HALF) == BlockDoublePlant.EnumBlockHalf.UPPER) {
             IBlockState lower = world.getBlockState(pos.down());
             if (lower.getBlock() == this && lower.getValue(HALF) == BlockDoublePlant.EnumBlockHalf.LOWER) {
+                RENDERING_EFFECTS = true;
                 manager.addBlockDestroyEffects(pos.down(), lower);
+                RENDERING_EFFECTS = false;
+            }
+        } else {
+            IBlockState upper = world.getBlockState(pos.up());
+            if (upper.getBlock() == this && upper.getValue(HALF) == BlockDoublePlant.EnumBlockHalf.UPPER) {
+                RENDERING_EFFECTS = true;
+                manager.addBlockDestroyEffects(pos.up(), upper);
+                RENDERING_EFFECTS = false;
             }
         }
         return false;
