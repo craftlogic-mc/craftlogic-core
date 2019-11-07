@@ -54,7 +54,7 @@ public class BlockLeaves3 extends BlockLeaves implements ModelRegistrar, Colored
 
     @Override
     public boolean isOpaqueCube(IBlockState state) {
-        return Blocks.LEAVES.isOpaqueCube(Blocks.LEAVES.getDefaultState());
+        return Blocks.LEAVES.getDefaultState().isOpaqueCube();
     }
 
     @SideOnly(Side.CLIENT)
