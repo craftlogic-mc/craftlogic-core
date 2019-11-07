@@ -16,8 +16,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
 import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.entity.Creature;
 
@@ -26,8 +29,20 @@ import javax.annotation.Nullable;
 
 @Mixin(BlockLeaves.class)
 public abstract class MixinBlockLeaves extends Block {
+    @Shadow protected boolean leavesFancy;
+
     public MixinBlockLeaves(Material material) {
         super(material);
+    }
+
+    /**
+     * @author Radviger
+     * @reason No more leaves x-ray
+     */
+    @SideOnly(Side.CLIENT)
+    @Overwrite
+    public void setGraphicsLevel(boolean fancy) {
+        this.leavesFancy = true;
     }
 
     @Override
