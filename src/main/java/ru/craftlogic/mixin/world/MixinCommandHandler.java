@@ -190,7 +190,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
             commandName = rawCommandName.substring(colonIdx);
         }
         args = dropFirstString(args);
-        if (args.length == 1) {
+        if (args.length == 0) {
             Set<String> result = new HashSet<>();
 
             for (Map.Entry<String, List<ResourceLocation>> entry : aliases.entrySet()) {
