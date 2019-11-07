@@ -11,6 +11,7 @@
     "block.MixinBlockBed",
     "block.MixinBlockFenceGate",
     "block.MixinBlockWeb",
+    "block.MixinBlockDoublePlant",
     "block.MixinBlockTallGrass",
     "block.MixinBlockMushroom",
     "block.MixinBlockStone",
