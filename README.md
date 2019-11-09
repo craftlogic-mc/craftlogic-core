@@ -25,3 +25,6 @@ LICENSE: CC BY-NC-SA https://creativecommons.org/licenses/by-nc-sa/4.0/
 * Eggs do not spawn chicks when thrown. They drop broken eggs instead.
 * Compasses are now able to locate iron ores by their "magnetic fields".
 * Doors can only be placed when there are two support blocks at their binding.
+* Willow oaks in spampland are replaced by natural willow trees as also the pine trees in taiga.
+* Waterlilies and leaves are passable now.
+* Vines are mo more climable.
