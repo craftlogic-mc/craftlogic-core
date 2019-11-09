@@ -7,6 +7,8 @@ tooltip.server_stop=Сервер выключается...
 tooltip.home_teleport=Телепортация домой...
 tooltip.home_teleport.other=Телепортация домой к %s...
 
+death.fallIntoLeaves=%1$s упал в листву и был пронзён ветками
+
 gui.reconnect.stop=Сервер остановился
 gui.reconnect.crash=Сервер аварийно закрылся
 gui.reconnect.in=Повтор соединения через %s...
@@ -20,8 +22,6 @@ item.forge.bucketFilled.milk=Ведро молока
 item.forge.bucketFilled.oil=Ведро сырой нефти
 
 tile.rock.name=Камень
-tile.bee_hive.name=Пчелиный улей
-tile.bee_house.name=Пчелиный домик
 tile.barrel_wood.name=Деревянная бочка
 tile.barrel_stone.name=Каменная бочка
 tile.drying_rack.name=Сушилка

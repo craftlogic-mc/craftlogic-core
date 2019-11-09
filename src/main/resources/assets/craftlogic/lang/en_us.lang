@@ -7,6 +7,8 @@ tooltip.server_stop=Server is stopping...
 tooltip.home_teleport=Teleporting to home...
 tooltip.home_teleport.other=Teleporting to %s's home...
 
+death.fallIntoLeaves=%1$s fell into leaves and was impaled by branches
+
 gui.reconnect.stop=Server is stopped
 gui.reconnect.crash=Server is crashed
 gui.reconnect.in=Reconnect in %s...
@@ -20,8 +22,6 @@ item.forge.bucketFilled.milk=Milk Bucket
 item.forge.bucketFilled.oil=Crude Oil Bucket
 
 tile.rock.name=Rock
-tile.bee_hive.name=Bee Hive
-tile.bee_house.name=Bee House
 tile.barrel_wood.name=Wooden Barrel
 tile.barrel_stone.name=Stone Barrel
 tile.drying_rack.name=Drying Rack

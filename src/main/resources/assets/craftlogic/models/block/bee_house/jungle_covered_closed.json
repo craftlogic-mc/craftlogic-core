@@ -1,8 +1,0 @@
-{
-    "parent": "craftlogic:block/bee_house/_covered_closed",
-    "textures": {
-        "planks": "blocks/planks_jungle",
-        "log": "blocks/log_jungle",
-        "log_top": "blocks/log_jungle_top"
-    }
-}

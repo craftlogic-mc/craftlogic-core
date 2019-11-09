@@ -31,10 +31,10 @@ public class CraftAPI {
     public static final String MOD_VERSION = "{@mod:version}";
     public static final AdvancedNetwork NETWORK = new AdvancedNetwork(MOD_ID);
 
-    public static final DamageSource DAMAGE_SOURCE_FALL_INTO_LEAVES = new DamageSource("fallintoleaves") {
+    public static final DamageSource DAMAGE_SOURCE_FALL_INTO_LEAVES = new DamageSource("fallIntoLeaves") {
         @Override
         public ITextComponent getDeathMessage(EntityLivingBase entity) {
-            return new TextComponentTranslation(MOD_ID + ".death.fallintoleaves", entity.getDisplayName());
+            return new TextComponentTranslation("death.fallIntoLeaves", entity.getDisplayName());
         }
     };
 
