@@ -8,6 +8,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import org.spongepowered.asm.mixin.Mixin;
+import ru.craftlogic.api.CraftBlocks;
 
 @Mixin(BlockFenceGate.class)
 public abstract class MixinBlockFenceGate extends BlockHorizontal {
@@ -26,6 +27,8 @@ public abstract class MixinBlockFenceGate extends BlockHorizontal {
                 items.add(new ItemStack(Blocks.JUNGLE_FENCE_GATE));
                 items.add(new ItemStack(Blocks.ACACIA_FENCE_GATE));
                 items.add(new ItemStack(Blocks.DARK_OAK_FENCE_GATE));
+                items.add(new ItemStack(CraftBlocks.PINE_FENCE_GATE));
+                items.add(new ItemStack(CraftBlocks.WILLOW_FENCE_GATE));
             }
         } else {
             items.add(new ItemStack(this));
