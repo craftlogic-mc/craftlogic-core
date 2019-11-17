@@ -1,6 +1,7 @@
 package ru.craftlogic.mixin.item;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockFlower;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.RegistryNamespaced;
@@ -8,10 +9,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import ru.craftlogic.common.item.ItemBowl;
-import ru.craftlogic.common.item.ItemCarpet;
-import ru.craftlogic.common.item.ItemMilkBucket;
-import ru.craftlogic.common.item.ItemMushroom;
+import ru.craftlogic.common.item.*;
 
 import java.util.Map;
 
@@ -59,15 +57,25 @@ public class MixinItem {
     @Overwrite
     protected static void registerItemBlock(Block block, Item item) {
         ResourceLocation name = Block.REGISTRY.getNameForObject(block);
-        switch (name.toString()) {
-            case "minecraft:brown_mushroom":
-            case "minecraft:red_mushroom": {
-                item = new ItemMushroom(block);
-                break;
-            }
-            case "minecraft:carpet": {
-                item = new ItemCarpet(block);
-                break;
+        if (name.getNamespace().equals("minecraft")) {
+            switch (name.getPath()) {
+                case "brown_mushroom":
+                case "red_mushroom": {
+                    item = new ItemMushroom(block);
+                    break;
+                }
+                case "carpet": {
+                    item = new ItemCarpet(block);
+                    break;
+                }
+                case "yellow_flower": {
+                    item = new ItemFlower(BlockFlower.EnumFlowerColor.YELLOW);
+                    break;
+                }
+                case "red_flower": {
+                    item = new ItemFlower(BlockFlower.EnumFlowerColor.RED);
+                    break;
+                }
             }
         }
         registerItem(Block.getIdFromBlock(block), name, item);
