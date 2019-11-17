@@ -83,19 +83,21 @@ public abstract class MixinBlockDoublePlant extends BlockBush {
             return false;
         }
         IBlockState state = world.getBlockState(pos);
-        if (state.getValue(HALF) == BlockDoublePlant.EnumBlockHalf.UPPER) {
-            IBlockState lower = world.getBlockState(pos.down());
-            if (lower.getBlock() == this && lower.getValue(HALF) == BlockDoublePlant.EnumBlockHalf.LOWER) {
-                RENDERING_EFFECTS = true;
-                manager.addBlockDestroyEffects(pos.down(), lower);
-                RENDERING_EFFECTS = false;
-            }
-        } else {
-            IBlockState upper = world.getBlockState(pos.up());
-            if (upper.getBlock() == this && upper.getValue(HALF) == BlockDoublePlant.EnumBlockHalf.UPPER) {
-                RENDERING_EFFECTS = true;
-                manager.addBlockDestroyEffects(pos.up(), upper);
-                RENDERING_EFFECTS = false;
+        if (state.getBlock() == this) {
+            if (state.getValue(HALF) == BlockDoublePlant.EnumBlockHalf.UPPER) {
+                IBlockState lower = world.getBlockState(pos.down());
+                if (lower.getBlock() == this && lower.getValue(HALF) == BlockDoublePlant.EnumBlockHalf.LOWER) {
+                    RENDERING_EFFECTS = true;
+                    manager.addBlockDestroyEffects(pos.down(), lower);
+                    RENDERING_EFFECTS = false;
+                }
+            } else {
+                IBlockState upper = world.getBlockState(pos.up());
+                if (upper.getBlock() == this && upper.getValue(HALF) == BlockDoublePlant.EnumBlockHalf.UPPER) {
+                    RENDERING_EFFECTS = true;
+                    manager.addBlockDestroyEffects(pos.up(), upper);
+                    RENDERING_EFFECTS = false;
+                }
             }
         }
         return false;
