@@ -1,0 +1,19 @@
+{
+  "type": "crafting_shaped",
+  "group": "wooden_stairs",
+  "pattern": [
+    "#  ",
+    "## ",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "craftlogic:planks2",
+      "data": 1
+    }
+  },
+  "result": {
+    "item": "craftlogic:willow_stairs",
+    "count": 4
+  }
+}
