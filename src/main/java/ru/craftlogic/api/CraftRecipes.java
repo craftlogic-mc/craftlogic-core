@@ -12,6 +12,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -44,6 +45,17 @@ public class CraftRecipes {
     static void init(Side side) {
         registerGridType(RecipeGridAlloying.class, "alloying", RecipeAlloying::new);
         registerGridType(RecipeGridBarrel.class, "composting", RecipeBarrelCompost::new);
+
+        OreDictionary.registerOre("logWood", new ItemStack(CraftBlocks.PLANKS2, 1, OreDictionary.WILDCARD_VALUE));
+        OreDictionary.registerOre("plankWood", new ItemStack(CraftBlocks.PLANKS2, 1, OreDictionary.WILDCARD_VALUE));
+        OreDictionary.registerOre("stairWood", new ItemStack(CraftBlocks.PINE_STAIRS));
+        OreDictionary.registerOre("stairWood", new ItemStack(CraftBlocks.WILLOW_STAIRS));
+        OreDictionary.registerOre("fenceWood", new ItemStack(CraftBlocks.PINE_FENCE));
+        OreDictionary.registerOre("fenceWood", new ItemStack(CraftBlocks.WILLOW_FENCE));
+        OreDictionary.registerOre("fenceGateWood", new ItemStack(CraftBlocks.PINE_FENCE_GATE));
+        OreDictionary.registerOre("fenceGateWood", new ItemStack(CraftBlocks.WILLOW_FENCE_GATE));
+        OreDictionary.registerOre("treeSapling", new ItemStack(CraftBlocks.SAPLING2, 1, OreDictionary.WILDCARD_VALUE));
+        OreDictionary.registerOre("treeLeaves", new ItemStack(CraftBlocks.LEAVES3, 1, OreDictionary.WILDCARD_VALUE));
     }
 
     static void postInit(Side side) {
