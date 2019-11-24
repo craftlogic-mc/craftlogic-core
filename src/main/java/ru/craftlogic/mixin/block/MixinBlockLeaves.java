@@ -21,6 +21,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.entity.Creature;
 
@@ -33,6 +36,11 @@ public abstract class MixinBlockLeaves extends Block {
 
     public MixinBlockLeaves(Material material) {
         super(material);
+    }
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    public void constructor(CallbackInfo ci) {
+        setHardness(0.8F);
     }
 
     /**

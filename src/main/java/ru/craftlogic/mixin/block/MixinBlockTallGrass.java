@@ -107,7 +107,7 @@ public class MixinBlockTallGrass extends BlockBush {
         if (entity instanceof EntityLivingBase) {
             EntityLivingBase livingEntity = (EntityLivingBase)entity;
 
-            if (world.getTotalWorldTime() % 12 == 0 && (entity.posX != entity.prevPosX || entity.posY != entity.prevPosY || entity.posZ != entity.prevPosZ)) {
+            if (world.getTotalWorldTime() % 6 == 0 && (entity.posX != entity.prevPosX || entity.posY != entity.prevPosY || entity.posZ != entity.prevPosZ)) {
                 entity.playSound(SoundEvents.BLOCK_GRASS_HIT, SoundType.PLANT.getVolume() * 0.5f, SoundType.PLANT.getPitch() * 0.45f);
             }
 

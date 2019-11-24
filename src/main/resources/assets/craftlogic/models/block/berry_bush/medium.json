@@ -1,0 +1,60 @@
+{
+	"ambientocclusion": false,
+	"parent": "block/thin_block",
+	"textures": {
+		"leaf": "blocks/leaves_birch",
+		"branch": "blocks/log_oak",
+		"branch_top": "blocks/log_oak_top",
+		"particle": "blocks/leaves_birch"
+	},
+	"elements": [
+		{
+			"from": [3, 3, 3],
+			"to": [13, 13, 13],
+			"faces": {
+				"north": {"uv": [3, 3, 13, 13], "texture": "#leaf", "tintindex": 0},
+				"east": {"uv": [3, 3, 13, 13], "texture": "#leaf", "tintindex": 0},
+				"south": {"uv": [3, 3, 13, 13], "texture": "#leaf", "tintindex": 0},
+				"west": {"uv": [3, 3, 13, 13], "texture": "#leaf", "tintindex": 0},
+				"up": {"uv": [3, 3, 13, 13], "rotation": 90, "texture": "#leaf", "tintindex": 0},
+				"down": {"uv": [3, 3, 13, 13], "rotation": 270, "texture": "#leaf", "tintindex": 0}
+			}
+		},
+		{
+			"from": [7, 0, 7],
+			"to": [9, 2, 9],
+			"faces": {
+				"north": {"uv": [2, 12, 4, 14], "texture": "#branch"},
+				"east": {"uv": [2, 14, 4, 16], "texture": "#branch"},
+				"south": {"uv": [2, 12, 4, 14], "texture": "#branch"},
+				"west": {"uv": [2, 14, 4, 16], "texture": "#branch"},
+				"up": {"uv": [0, 12, 2, 14], "rotation": 90, "texture": "#branch"},
+				"down": {"uv": [3, 3, 5, 5], "rotation": 270, "texture": "#branch_top"}
+			}
+		},
+		{
+			"from": [9, 2, 7],
+			"to": [10, 5, 9],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 3], "texture": "#branch"},
+				"east": {"uv": [0, 3, 2, 6], "texture": "#branch"},
+				"south": {"uv": [0, 0, 1, 3], "texture": "#branch"},
+				"west": {"uv": [0, 0, 2, 3], "texture": "#branch"},
+				"up": {"uv": [0, 0, 2, 1], "rotation": 90, "texture": "#branch"},
+				"down": {"uv": [0, 0, 2, 1], "rotation": 270, "texture": "#branch"}
+			}
+		},
+		{
+			"from": [6, 2, 7],
+			"to": [7, 5, 9],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 3], "texture": "#branch"},
+				"east": {"uv": [0, 0, 2, 3], "texture": "#branch"},
+				"south": {"uv": [0, 0, 1, 3], "texture": "#branch"},
+				"west": {"uv": [0, 3, 2, 6], "texture": "#branch"},
+				"up": {"uv": [0, 0, 2, 1], "rotation": 90, "texture": "#branch"},
+				"down": {"uv": [0, 0, 2, 1], "rotation": 270, "texture": "#branch"}
+			}
+		}
+	]
+}

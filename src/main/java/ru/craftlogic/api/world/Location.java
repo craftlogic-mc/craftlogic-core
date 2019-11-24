@@ -22,6 +22,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.IPlantable;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.api.math.Bounding;
 import ru.craftlogic.api.math.CenteredBounding;
 
@@ -235,7 +237,7 @@ public class Location extends ChunkLocation {
     }
 
     public Biome getBiome() {
-        return this.getWorld().getBiome(this.getPos());
+        return this.getBlockAccessor().getBiome(this.getPos());
     }
 
     public float getBiomeTemperature() {
@@ -449,6 +451,42 @@ public class Location extends ChunkLocation {
     }
 
     @Override
+    public boolean isWithinWorldBorder() {
+        return getWorld().getWorldBorder().contains(getPos());
+    }
+
+    public boolean canBlockSeeSky() {
+        return getWorld().canBlockSeeSky(getPos());
+    }
+
+    public boolean canBlockFreeze(boolean def) {
+        return getWorld().canBlockFreeze(getPos(), def);
+    }
+
+    public boolean isHeightValid() {
+        int y = getPos().getY();
+        return y >= 0 && y < 256;
+    }
+
+    public boolean isAir() {
+        return this.getBlockMaterial() == Material.AIR;
+    }
+
+    @SideOnly(Side.CLIENT)
+    public int getFoliageColor() {
+        return getBiome().getFoliageColorAtPos(getPos());
+    }
+
+    public double distance(Location other) {
+        double sq = this.distanceSq(other);
+        return Math.sqrt(sq);
+    }
+
+    public double distanceSq(Location other) {
+        return this.getDimensionId() != other.getDimensionId() ? Double.POSITIVE_INFINITY : this.getPos().distanceSq(other.getPos());
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Location)) {
@@ -482,36 +520,5 @@ public class Location extends ChunkLocation {
         result = 31 * result + (yaw != 0 ? Float.floatToIntBits(yaw) : 0);
         result = 31 * result + (pitch != 0 ? Float.floatToIntBits(pitch) : 0);
         return result;
-    }
-
-    @Override
-    public boolean isWithinWorldBorder() {
-        return getWorld().getWorldBorder().contains(getPos());
-    }
-
-    public boolean canBlockSeeSky() {
-        return getWorld().canBlockSeeSky(getPos());
-    }
-
-    public boolean canBlockFreeze(boolean def) {
-        return getWorld().canBlockFreeze(getPos(), def);
-    }
-
-    public boolean isHeightValid() {
-        int y = getPos().getY();
-        return y >= 0 && y < 256;
-    }
-
-    public boolean isAir() {
-        return this.getBlockMaterial() == Material.AIR;
-    }
-
-    public double distance(Location other) {
-        double sq = this.distanceSq(other);
-        return Math.sqrt(sq);
-    }
-
-    public double distanceSq(Location other) {
-        return this.getDimensionId() != other.getDimensionId() ? Double.POSITIVE_INFINITY : this.getPos().distanceSq(other.getPos());
     }
 }

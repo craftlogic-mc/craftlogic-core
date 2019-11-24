@@ -12,6 +12,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.client.event.ColorHandlerEvent;
@@ -29,7 +30,6 @@ import ru.craftlogic.api.block.Colored;
 import ru.craftlogic.api.block.holders.ScreenHolder;
 import ru.craftlogic.api.inventory.InventoryFieldHolder;
 import ru.craftlogic.api.inventory.InventoryHolder;
-import ru.craftlogic.api.item.ItemBlockBase;
 import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.network.AdvancedMessage;
 import ru.craftlogic.api.screen.Elements;
@@ -107,7 +107,7 @@ public class ProxyClient extends ProxyCommon {
     @SubscribeEvent
     public void onItemColorRegister(ColorHandlerEvent.Item event) {
         for (Item item : Item.REGISTRY) {
-            if (item instanceof ItemBlockBase) {
+            if (item instanceof ItemBlock) {
                 Block block = Block.getBlockFromItem(item);
                 if (block instanceof Colored) {
                     event.getItemColors().registerItemColorHandler(((Colored) block)::getItemColor, block);

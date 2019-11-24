@@ -1,0 +1,47 @@
+{
+	"ambientocclusion": false,
+	"parent": "block/thin_block",
+	"textures": {
+		"leaf": "blocks/leaves_birch",
+		"branch": "blocks/log_oak",
+		"branch_top": "blocks/log_oak_top",
+		"particle": "blocks/leaves_birch"
+	},
+	"elements": [
+		{
+			"from": [5, 1, 5],
+			"to": [11, 7, 11],
+			"faces": {
+				"north": {"uv": [4, 4, 10, 10], "texture": "#leaf", "tintindex": 0},
+				"east": {"uv": [4, 4, 10, 10], "texture": "#leaf", "tintindex": 0},
+				"south": {"uv": [4, 4, 10, 10], "texture": "#leaf", "tintindex": 0},
+				"west": {"uv": [4, 4, 10, 10], "texture": "#leaf", "tintindex": 0},
+				"up": {"uv": [4, 4, 10, 10], "rotation": 90, "texture": "#leaf", "tintindex": 0},
+				"down": {"uv": [4, 4, 10, 10], "rotation": 270, "texture": "#leaf", "tintindex": 0}
+			}
+		},
+		{
+			"from": [7, 0, 7],
+			"to": [9, 1, 9],
+			"faces": {
+				"north": {"uv": [3, 15, 5, 16], "texture": "#branch"},
+				"east": {"uv": [4, 15, 6, 16], "texture": "#branch"},
+				"south": {"uv": [3, 15, 5, 16], "texture": "#branch"},
+				"west": {"uv": [4, 15, 6, 16], "texture": "#branch"},
+				"up": {"uv": [7, 11, 9, 13], "texture": "#branch"},
+				"down": {"uv": [3, 7, 5, 9], "texture": "#branch_top"}
+			}
+		},
+		{
+			"from": [7, 1, 7],
+			"to": [8, 2, 9],
+			"faces": {
+				"north": {"uv": [11, 7, 12, 8], "texture": "#branch"},
+				"east": {"uv": [0, 0, 2, 1], "texture": "#branch"},
+				"south": {"uv": [11, 7, 12, 8], "texture": "#branch"},
+				"west": {"uv": [0, 0, 2, 1], "texture": "#branch"},
+				"up": {"uv": [0, 0, 2, 1], "rotation": 270, "texture": "#branch"}
+			}
+		}
+	]
+}

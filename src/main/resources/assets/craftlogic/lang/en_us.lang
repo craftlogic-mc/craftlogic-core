@@ -41,6 +41,7 @@ tile.wooden_slab.pine.name=Pine Slab
 tile.wooden_slab.willow.name=Willow Slab
 tile.wooden_stairs.pine.name=Pine Stairs
 tile.wooden_stairs.willow.name=Willow Stairs
+tile.berry_bush.name=Berry Bush
 
 item.crowbar.name=Crowbar
 item.wool_card.name=Wool Card
@@ -57,6 +58,7 @@ item.grass.name=Grass
 item.creeper_oysters.name=Creeper Oysters
 item.spit.name=Cobweb Spit
 item.stone_axe_heading.name=Stone Axe Heading
+item.berry.name=Berries
 
 commands.stop.delayed=Stopping the server in %s
 

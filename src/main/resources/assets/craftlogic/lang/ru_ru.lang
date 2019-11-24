@@ -41,6 +41,7 @@ tile.wooden_slab.pine.name=Сосновая плита
 tile.wooden_slab.willow.name=Ивовая плита
 tile.wooden_stairs.pine.name=Сосновые ступеньки
 tile.wooden_stairs.willow.name=Ивовые ступеньки
+tile.berry_bush.name=Ягодный куст
 
 item.crowbar.name=Монтировка
 item.wool_card.name=Чесалка
@@ -57,6 +58,7 @@ item.grass.name=Трава
 item.creeper_oysters.name=Устрицы крипера
 item.spit.name=Плевок паутины
 item.stone_axe_heading.name=Изголовье каменного топора
+item.berry.name=Ягоды
 
 commands.generic.unknownFailure=Неизвестная ошибка! Смотрите делали в консоли.
 commands.generic.noPermission=У вас нет необходимого разрешения: %s
