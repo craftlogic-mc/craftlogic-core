@@ -12,7 +12,7 @@ import static ru.craftlogic.api.CraftAPI.MOD_ID;
 public class CraftConfig {
     @Config.Comment("Default maven repositories for remote dependencies")
     public static String[] mavenMirrors = {
-        "http://central.maven.org/maven2"
+        "https://central.maven.org/maven2"
     };
 
     public static String banDateFormat = "yyyy-MM-dd HH:mm:ss Z";

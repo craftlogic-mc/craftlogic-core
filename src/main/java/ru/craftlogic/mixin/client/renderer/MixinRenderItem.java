@@ -20,7 +20,7 @@ public class MixinRenderItem {
      * @reason Custom carpet models
      */
     @Overwrite
-    protected void registerBlock(Block block, int meta, String model) {
+    public void registerBlock(Block block, int meta, String model) {
         if (block == Blocks.CARPET) {
             return;
         }
@@ -32,7 +32,7 @@ public class MixinRenderItem {
      * @reason Custom carpet models
      */
     @Overwrite
-    protected void registerItem(Item item, int meta, String model) {
+    public void registerItem(Item item, int meta, String model) {
         this.itemModelMesher.register(item, meta, new ModelResourceLocation(model, "inventory"));
     }
 }
