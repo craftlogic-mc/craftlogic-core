@@ -107,9 +107,7 @@ public class AdvancedProfiler extends Profiler {
                 }
             }
 
-            for (String s3 : this.profilingData.keySet()) {
-                this.profilingData.put(s3, this.profilingData.get(s3) * 999L / 1000L);
-            }
+            this.profilingData.replaceAll((s, v) -> this.profilingData.get(s) * 999L / 1000L);
 
             if ((float)k > f) {
                 results.add(new AdvancedProfiler.Result("unspecified", (double)((float)k - f) * 100D / (double)k, (double)((float)k - f) * 100D / (double)rootTime));

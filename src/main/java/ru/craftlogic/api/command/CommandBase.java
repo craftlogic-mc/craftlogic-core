@@ -86,16 +86,18 @@ public abstract class CommandBase implements ICommand {
 
     public final ArgPattern getPattern(MinecraftServer _server, ICommandSender _sender, String[] rawArgs, boolean partial, boolean firstPermitted) throws CommandException {
         Server server = Server.from(_server);
+        ArgPattern any = null;
         for (ArgPattern pattern : patterns) {
             MatchLevel match = pattern.matches(rawArgs);
             if (partial ? match != MatchLevel.NONE : match == MatchLevel.FULL) {
+                any = pattern;
                 CommandSender sender = CommandSender.from(server, _sender);
                 if (!firstPermitted || sender.hasPermission(pattern.permission, opLevel)) {
                     return pattern;
                 }
             }
         }
-        if (firstPermitted) {
+        if (firstPermitted && any != null) {
             return null;
         } else {
             throw new WrongUsageException(getUsage(_sender));
