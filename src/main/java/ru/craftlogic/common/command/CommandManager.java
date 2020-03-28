@@ -1,6 +1,7 @@
 package ru.craftlogic.common.command;
 
 import com.google.gson.JsonObject;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -178,7 +179,7 @@ public class CommandManager extends ConfigurableManager {
             this.command = command;
         }
 
-        public boolean checkPermission(MinecraftServer server, ICommandSender sender, String[] args, boolean partial) {
+        public boolean checkPermission(MinecraftServer server, ICommandSender sender, String[] args, boolean partial) throws CommandException {
             if (command instanceof CommandBase) {
                 return ((CommandBase) command).checkPermission(server, sender, args, partial);
             } else {

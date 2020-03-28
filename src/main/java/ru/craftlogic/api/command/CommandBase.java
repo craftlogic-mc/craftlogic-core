@@ -84,7 +84,25 @@ public abstract class CommandBase implements ICommand {
 
     protected abstract void execute(CommandContext context) throws Throwable;
 
-    public final boolean checkPermission(MinecraftServer _server, ICommandSender _sender, String[] rawArgs, boolean partial) {
+    public final ArgPattern getPattern(MinecraftServer _server, ICommandSender _sender, String[] rawArgs, boolean partial, boolean firstPermitted) throws CommandException {
+        Server server = Server.from(_server);
+        for (ArgPattern pattern : patterns) {
+            MatchLevel match = pattern.matches(rawArgs);
+            if (partial ? match != MatchLevel.NONE : match == MatchLevel.FULL) {
+                CommandSender sender = CommandSender.from(server, _sender);
+                if (!firstPermitted || sender.hasPermission(pattern.permission, opLevel)) {
+                    return pattern;
+                }
+            }
+        }
+        if (firstPermitted) {
+            return null;
+        } else {
+            throw new WrongUsageException(getUsage(_sender));
+        }
+    }
+
+    public final boolean checkPermission(MinecraftServer _server, ICommandSender _sender, String[] rawArgs, boolean partial) throws CommandException {
         if (_server.isSinglePlayer() && _sender.getName().equalsIgnoreCase(_server.getServerOwner())) {
             return true;
         }
@@ -92,16 +110,7 @@ public abstract class CommandBase implements ICommand {
         CommandSender from = CommandSender.from(server, _sender);
         PermissionManager permissionManager = server.getPermissionManager();
         if (permissionManager.isEnabled()) {
-            for (ArgPattern pattern : patterns) {
-                MatchLevel match = pattern.matches(rawArgs);
-                if (partial ? match != MatchLevel.NONE : match == MatchLevel.FULL) {
-                    CommandSender sender = CommandSender.from(server, _sender);
-                    if (sender.hasPermission(pattern.permission, opLevel)) {
-                        return true;
-                    }
-                }
-            }
-            return false;
+            return getPattern(_server, _sender, rawArgs, partial, true) != null;
         } else {
             return from.getOperatorLevel() >= opLevel;
         }

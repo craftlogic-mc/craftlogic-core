@@ -92,7 +92,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
                     }
                 }
             } else {
-                sender.sendMessage(Text.translation("commands.generic.permission").red().build());
+                throw new CommandException("commands.generic.permission");
             }
         } catch (CommandException exc) {
             sender.sendMessage(Text.translation(exc).red().build());
@@ -190,48 +190,47 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
             commandName = rawCommandName.substring(colonIdx);
         }
         args = dropFirstString(args);
-        if (args.length == 0) {
-            Set<String> result = new HashSet<>();
+        try {
+            if (args.length == 0) {
+                Set<String> result = new HashSet<>();
 
-            for (Map.Entry<String, List<ResourceLocation>> entry : aliases.entrySet()) {
-                String s = entry.getKey();
-                List<ResourceLocation> cmds = entry.getValue();
-                if (CommandBase.doesStringStartWith(commandName, s) && cmds != null && !cmds.isEmpty()) {
-                    CommandContainer container = null;
-                    if (modId == null) {
-                        container = getCommand(cmds.get(cmds.size() - 1));
-                    } else {
-                        for (ResourceLocation c : cmds) {
-                            if (c.getNamespace().equalsIgnoreCase(modId)) {
-                                container = getCommand(c);
-                                break;
+                for (Map.Entry<String, List<ResourceLocation>> entry : aliases.entrySet()) {
+                    String s = entry.getKey();
+                    List<ResourceLocation> cmds = entry.getValue();
+                    if (CommandBase.doesStringStartWith(commandName, s) && cmds != null && !cmds.isEmpty()) {
+                        CommandContainer container = null;
+                        if (modId == null) {
+                            container = getCommand(cmds.get(cmds.size() - 1));
+                        } else {
+                            for (ResourceLocation c : cmds) {
+                                if (c.getNamespace().equalsIgnoreCase(modId)) {
+                                    container = getCommand(c);
+                                    break;
+                                }
                             }
                         }
-                    }
-                    if (container != null && container.checkPermission(getServer(), sender, args, true)) {
-                        result.add(s);
+                        if (container != null && container.checkPermission(getServer(), sender, args, true)) {
+                            result.add(s);
+                        }
                     }
                 }
-            }
 
-            return new ArrayList<>(result);
-        } else {
-            CommandContainer container = getCommand(rawCommandName);
-            if (container != null && container.checkPermission(getServer(), sender, args, true)) {
-                try {
+                return new ArrayList<>(result);
+            } else {
+                CommandContainer container = getCommand(rawCommandName);
+                if (container != null && container.checkPermission(getServer(), sender, args, true)) {
                     return container.command.getTabCompletions(getServer(), sender, args, targetBlockPos);
-                } catch (Throwable t) {
-                    if (t.getCause() instanceof CommandException) {
-                        sender.sendMessage(Text.translation((CommandException)t.getCause()).red().build());
-                    } else {
-                        sender.sendMessage(Text.translation("commands.generic.exception").red().build());
-                        LOGGER.warn("Couldn't process command completion: " + rawCommandName, t);
-                    }
                 }
             }
-
-            return Collections.emptyList();
+        } catch (Throwable t) {
+            if (t.getCause() instanceof CommandException) {
+                sender.sendMessage(Text.translation((CommandException)t.getCause()).red().build());
+            } else {
+                sender.sendMessage(Text.translation("commands.generic.exception").red().build());
+                LOGGER.warn("Couldn't process command completion: " + rawCommandName, t);
+            }
         }
+        return Collections.emptyList();
     }
 
     /**
@@ -242,12 +241,20 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
     public List<ICommand> getPossibleCommands(ICommandSender sender) {
         Set<ICommand> result = new HashSet<>();
 
-        for (CommandContainer container : registry.values()) {
-            if (!result.contains(container.command) && container.checkPermission(getServer(), sender, new String[0], true)) {
-                result.add(container.command);
+        try {
+            for (CommandContainer container : registry.values()) {
+                if (!result.contains(container.command) && container.checkPermission(getServer(), sender, new String[0], true)) {
+                    result.add(container.command);
+                }
+            }
+        } catch (Throwable t) {
+            if (t.getCause() instanceof CommandException) {
+                sender.sendMessage(Text.translation((CommandException)t.getCause()).red().build());
+            } else {
+                sender.sendMessage(Text.translation("commands.generic.exception").red().build());
+                LOGGER.warn("Couldn't process possible commands", t);
             }
         }
-
         return new ArrayList<>(result);
     }
 

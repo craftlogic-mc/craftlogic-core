@@ -105,7 +105,7 @@ public class RemoteDependencyTransformer implements ObfuscatedClassTransformer {
                 }
                 return errorCounter;
             } catch (Exception e) {
-                LOGGER.warn("Failed: " + e.getMessage());
+                LOGGER.warn("Failed: " + e.toString());
                 errorCounter++;
             }
         }

@@ -1,17 +1,21 @@
 package ru.craftlogic.mixin.entity.player;
 
+import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.UserListOpsEntry;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.craftlogic.api.entity.AdvancedPlayer;
+import ru.craftlogic.api.permission.PermissionManager;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.world.Player;
 
@@ -71,5 +75,41 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
     @Override
     public Player wrapped() {
         return Server.from(this.server).getPlayerManager().getOnline(this.getUniqueID());
+    }
+
+    /**
+     * @author Radviger
+     * @reason command permissions
+     */
+    @Overwrite
+    public boolean canUseCommand(int permLevel, String commandName) {
+        switch (commandName) {
+            case "tell":
+            case "help":
+            case "me":
+            case "trigger":
+                return true;
+            case "seed":
+                if (!this.server.isDedicatedServer()) {
+                    return true;
+                }
+            default:
+                GameProfile profile = ((EntityPlayerMP) (Object) this).getGameProfile();
+                Server server = Server.from(this.server);
+                PermissionManager permissionManager = server.getPermissionManager();
+                if (permissionManager.isEnabled() && permissionManager.hasPermission(profile, "commands." + commandName)) {
+                    return true;
+                } else if (this.server.getPlayerList().canSendCommands(profile)) {
+                    UserListOpsEntry opEntry = this.server.getPlayerList().getOppedPlayers().getEntry(profile);
+
+                    if (opEntry != null) {
+                        return opEntry.getPermissionLevel() >= permLevel;
+                    } else {
+                        return this.server.getOpPermissionLevel() >= permLevel;
+                    }
+                } else {
+                    return false;
+                }
+        }
     }
 }
