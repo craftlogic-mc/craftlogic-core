@@ -64,10 +64,6 @@ public class MixinItem {
                     item = new ItemMushroom(block);
                     break;
                 }
-                case "carpet": {
-                    item = new ItemCarpet(block);
-                    break;
-                }
                 case "yellow_flower": {
                     item = new ItemFlower(BlockFlower.EnumFlowerColor.YELLOW);
                     break;

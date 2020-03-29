@@ -101,8 +101,6 @@
     "client.entity.MixinEntityPlayerSP",
     "client.particle.MixinParticleManager",
     "client.renderer.MixinBufferBuilder",
-    "client.renderer.MixinModelBakery",
-    "client.renderer.MixinRenderItem",
     "client.renderer.MixinBlockModelShapes$3",
     "client.renderer.MixinBlockModelShapes$4",
     "client.renderer.MixinBlockRendererDispatcher",
