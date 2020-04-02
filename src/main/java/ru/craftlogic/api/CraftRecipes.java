@@ -62,21 +62,23 @@ public class CraftRecipes {
         if (CraftConfig.items.enableRocks && CraftConfig.items.enableStoneBricks) {
             FurnaceRecipes.instance().addSmelting(Item.getItemFromBlock(CraftBlocks.ROCK), new ItemStack(CraftItems.STONE_BRICK), 0.15F);
         }
-        parseJsonRecipes("smelting", (name, raw) -> {
-            Object rawInput = parseItem(raw.get("input"));
-            List<ItemStack> input = rawInput instanceof ItemStack ?
-                    Collections.singletonList((ItemStack)rawInput) :
-                    ((DictStack)rawInput).getAllVariants();
+        if (!LOADABLE_TYPES.containsKey("smelting")) {
+            parseJsonRecipes("smelting", (name, raw) -> {
+                Object rawInput = parseItem(raw.get("input"));
+                List<ItemStack> input = rawInput instanceof ItemStack ?
+                    Collections.singletonList((ItemStack) rawInput) :
+                    ((DictStack) rawInput).getAllVariants();
 
-            LOGGER.info("Registered smelting recipe: " + name);
+                LOGGER.info("Registered smelting recipe: " + name);
 
-            for (ItemStack i : input) {
-                FurnaceRecipes.instance().addSmeltingRecipe(
-                        i, (ItemStack)parseItem(raw.get("output")),
+                for (ItemStack i : input) {
+                    FurnaceRecipes.instance().addSmeltingRecipe(
+                        i, (ItemStack) parseItem(raw.get("output")),
                         JsonUtils.getFloat(raw, "exp", 0F)
-                );
-            }
-        });
+                    );
+                }
+            });
+        }
         for (Map.Entry<String, Pair<Class<? extends RecipeGrid>, RecipeFactory>> entry : LOADABLE_TYPES.entrySet()) {
             String type = entry.getKey();
             Class<? extends RecipeGrid> grid = entry.getValue().first();
