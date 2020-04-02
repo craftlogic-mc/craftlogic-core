@@ -1,7 +1,9 @@
 package ru.craftlogic.api.network;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -39,6 +41,15 @@ public class AdvancedNetwork {
     @SideOnly(Side.CLIENT)
     public void sendToServer(IMessage message) {
         net.sendToServer(message);
+    }
+
+    public void sendToEntityWatchers(Entity entity, IMessage message) {
+        for (EntityPlayer player : ((WorldServer) entity.getEntityWorld()).getEntityTracker().getTrackingPlayers(entity)) {
+            sendTo((EntityPlayerMP) player, message);
+        }
+        if (entity instanceof EntityPlayerMP) {
+            sendTo((EntityPlayerMP) entity, message);
+        }
     }
 
     public void broadcast(IMessage message) {
