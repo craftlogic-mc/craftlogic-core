@@ -30,6 +30,7 @@ import ru.craftlogic.api.inventory.InventoryFieldHolder;
 import ru.craftlogic.api.inventory.InventoryFieldHolder.InventoryFieldAdder;
 import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.api.inventory.SidedInventoryHolder;
+import ru.craftlogic.api.util.Identifiable;
 import ru.craftlogic.api.world.Locatable;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.api.world.WorldNameable;
@@ -37,12 +38,14 @@ import ru.craftlogic.api.world.WorldNameable;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Random;
+import java.util.UUID;
 
-public class TileEntityBase extends TileEntity implements Locatable, WorldNameable, InventoryFieldAdder {
+public class TileEntityBase extends TileEntity implements Locatable, WorldNameable, InventoryFieldAdder, Identifiable {
     protected int ticksExisted;
     private boolean loaded;
     private InventoryFieldHolder fieldHolder = new InventoryFieldHolder(this);
     private int blockMeta;
+    private UUID uuid = UUID.randomUUID();
 
     protected TileEntityBase(World world, IBlockState state) {
         this.setWorldCreate(world);
@@ -214,6 +217,19 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
     }
 
     @Override
+    public void readFromNBT(NBTTagCompound compound) {
+        super.readFromNBT(compound);
+        uuid = compound.getUniqueId("uuid");
+    }
+
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+        compound = super.writeToNBT(compound);
+        compound.setUniqueId("uuid", uuid);
+        return compound;
+    }
+
+    @Override
     public void onDataPacket(NetworkManager networkManager, SPacketUpdateTileEntity packet) {
         try {
             readFromPacket(packet.getNbtCompound());
@@ -263,5 +279,11 @@ public class TileEntityBase extends TileEntity implements Locatable, WorldNameab
                     : (T) new InvWrapper((InventoryHolder) this);
         }
         return super.getCapability(capability, side);
+    }
+
+    @Nonnull
+    @Override
+    public UUID getUUID() {
+        return uuid;
     }
 }
