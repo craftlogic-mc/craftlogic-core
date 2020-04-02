@@ -44,7 +44,6 @@ public class CraftAPI {
         if (init) {
             throw new IllegalStateException("API has already been initialized!");
         }
-        init = true;
 
         NETWORK.openChannel();
         CraftSounds.init(side);
@@ -55,15 +54,23 @@ public class CraftAPI {
         CraftEntities.init(side);
         CraftBarrelModes.init(side);
         CraftRecipes.init(side);
+        init = true;
+    }
+
+    public static boolean isInit() {
+        return init;
     }
 
     public static void postInit(Side side) {
         if (postInit) {
             throw new IllegalStateException("API has already been post-initialized!");
         }
-        postInit = true;
-
         CraftRecipes.postInit(side);
+        postInit = true;
+    }
+
+    public static boolean isPostInit() {
+        return postInit;
     }
 
     public static String getActiveModId() {

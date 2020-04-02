@@ -17,9 +17,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.craftlogic.CraftConfig;
-import ru.craftlogic.api.recipe.DictStack;
 import ru.craftlogic.api.recipe.Recipe;
 import ru.craftlogic.api.recipe.RecipeGrid;
+import ru.craftlogic.api.recipe.RecipeGridSmelting;
+import ru.craftlogic.api.recipe.RecipeSmelting;
 import ru.craftlogic.api.util.Pair;
 import ru.craftlogic.common.recipe.RecipeAlloying;
 import ru.craftlogic.common.recipe.RecipeBarrelCompost;
@@ -34,7 +35,6 @@ import java.util.*;
 import java.util.function.BiConsumer;
 
 import static ru.craftlogic.api.CraftAPI.walkModResources;
-import static ru.craftlogic.api.recipe.Recipe.parseItem;
 
 public class CraftRecipes {
     private static final Map<Class<? extends RecipeGrid>, Map<ResourceLocation, Recipe>> RECIPES = new HashMap<>();
@@ -59,25 +59,17 @@ public class CraftRecipes {
     }
 
     static void postInit(Side side) {
+        registerGridType(RecipeGridSmelting.class, "smelting", RecipeSmelting::new);
         if (CraftConfig.items.enableRocks && CraftConfig.items.enableStoneBricks) {
-            FurnaceRecipes.instance().addSmelting(Item.getItemFromBlock(CraftBlocks.ROCK), new ItemStack(CraftItems.STONE_BRICK), 0.15F);
+            ItemStack input = new ItemStack(Item.getItemFromBlock(CraftBlocks.ROCK));
+            ItemStack output = new ItemStack(CraftItems.STONE_BRICK);
+            FurnaceRecipes.instance().addSmeltingRecipe(input, output, 0.15F);
         }
-        if (!LOADABLE_TYPES.containsKey("smelting")) {
-            parseJsonRecipes("smelting", (name, raw) -> {
-                Object rawInput = parseItem(raw.get("input"));
-                List<ItemStack> input = rawInput instanceof ItemStack ?
-                    Collections.singletonList((ItemStack) rawInput) :
-                    ((DictStack) rawInput).getAllVariants();
-
-                LOGGER.info("Registered smelting recipe: " + name);
-
-                for (ItemStack i : input) {
-                    FurnaceRecipes.instance().addSmeltingRecipe(
-                        i, (ItemStack) parseItem(raw.get("output")),
-                        JsonUtils.getFloat(raw, "exp", 0F)
-                    );
-                }
-            });
+        for (Map.Entry<ItemStack, ItemStack> recipe : FurnaceRecipes.instance().getSmeltingList().entrySet()) {
+            ItemStack input = recipe.getKey();
+            ItemStack output = recipe.getValue();
+            float experience = FurnaceRecipes.instance().getSmeltingExperience(input);
+            registerSmeltingCompat(input, output, experience);
         }
         for (Map.Entry<String, Pair<Class<? extends RecipeGrid>, RecipeFactory>> entry : LOADABLE_TYPES.entrySet()) {
             String type = entry.getKey();
@@ -114,6 +106,10 @@ public class CraftRecipes {
                 }
             );
         }
+    }
+
+    public static <G extends RecipeGrid, R extends Recipe<G>> Map<ResourceLocation, R> getAllRecipes(Class<G> gridType) {
+        return (Map<ResourceLocation, R>) (Object) RECIPES.getOrDefault(gridType, Collections.emptyMap());
     }
 
     public static <G extends RecipeGrid> void registerGridType(Class<G> gridType, String gridName, RecipeFactory<? extends Recipe<G>> factory) {
@@ -180,5 +176,18 @@ public class CraftRecipes {
             }
         }
         return false;
+    }
+
+    public static void registerSmeltingCompat(ItemStack input, ItemStack output, float experience) {
+        int i = 0;
+        ResourceLocation name;
+        do {
+            ResourceLocation registryName = Objects.requireNonNull(input.getItem().getRegistryName(),
+                "Tried to register a smelting recipe for an unregistered item: " + input);
+            name = new ResourceLocation(registryName.getNamespace(), registryName.getPath() + (i == 0 ? "" : "_" + i));
+            i += 1;
+        } while (getByName(RecipeGridSmelting.class, name) != null);
+        RecipeSmelting recipe = new RecipeSmelting(name, 200, experience, input, output);
+        registerRecipe(RecipeGridSmelting.class, recipe);
     }
 }
