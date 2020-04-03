@@ -65,12 +65,6 @@ public class CraftRecipes {
             ItemStack output = new ItemStack(CraftItems.STONE_BRICK);
             FurnaceRecipes.instance().addSmeltingRecipe(input, output, 0.15F);
         }
-        for (Map.Entry<ItemStack, ItemStack> recipe : FurnaceRecipes.instance().getSmeltingList().entrySet()) {
-            ItemStack input = recipe.getKey();
-            ItemStack output = recipe.getValue();
-            float experience = FurnaceRecipes.instance().getSmeltingExperience(input);
-            registerSmeltingCompat(input, output, experience);
-        }
         for (Map.Entry<String, Pair<Class<? extends RecipeGrid>, RecipeFactory>> entry : LOADABLE_TYPES.entrySet()) {
             String type = entry.getKey();
             Class<? extends RecipeGrid> grid = entry.getValue().first();

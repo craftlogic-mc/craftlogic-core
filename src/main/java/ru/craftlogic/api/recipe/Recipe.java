@@ -11,7 +11,7 @@ import net.minecraft.util.JsonUtils;
 import net.minecraft.util.ResourceLocation;
 import ru.craftlogic.api.util.Json2NBT;
 
-public interface Recipe<G extends RecipeGrid> extends Comparable<Recipe> {
+public interface Recipe<G extends RecipeGrid> extends Comparable<Recipe<G>> {
     ResourceLocation getName();
     int getTimeRequired();
     boolean matches(G grid);

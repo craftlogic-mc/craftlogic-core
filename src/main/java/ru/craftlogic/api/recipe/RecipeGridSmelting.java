@@ -4,9 +4,7 @@ import net.minecraft.item.ItemStack;
 import ru.craftlogic.api.inventory.manager.InventoryManager;
 import ru.craftlogic.api.inventory.manager.OneSlotInventoryManager;
 
-public interface RecipeGridSmelting extends RecipeGrid {
-    ItemStack getInput();
-
+public interface RecipeGridSmelting extends RecipeGridProcessingMachine {
     class Dummy implements RecipeGridSmelting {
         private final ItemStack input;
 
@@ -17,11 +15,6 @@ public interface RecipeGridSmelting extends RecipeGrid {
         @Override
         public ItemStack getInput() {
             return input;
-        }
-
-        @Override
-        public int getGridSize() {
-            return 1;
         }
 
         @Override
