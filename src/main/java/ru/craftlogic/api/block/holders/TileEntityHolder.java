@@ -23,7 +23,7 @@ public interface TileEntityHolder<T extends TileEntity> extends ITileEntityProvi
             if (this instanceof BlockBase) {
                 return (T) ((BlockBase)this).createTileEntity(world, state);
             } else {
-                TileEntityInfo<T> type = this.getTileEntityInfo(state);
+                TileEntityInfo<? extends T> type = this.getTileEntityInfo(state);
                 return type == null ? null : type.create(world, state);
             }
         }
@@ -34,7 +34,7 @@ public interface TileEntityHolder<T extends TileEntity> extends ITileEntityProvi
         return ((Block)this).getRegistryName();
     }
 
-    TileEntityInfo<T> getTileEntityInfo(IBlockState state);
+    TileEntityInfo<? extends T> getTileEntityInfo(IBlockState state);
 
     default void registerTileEntity() {
         Block block = (Block)this;

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
@@ -65,6 +66,7 @@ public class CraftRecipes {
             ItemStack output = new ItemStack(CraftItems.STONE_BRICK);
             FurnaceRecipes.instance().addSmeltingRecipe(input, output, 0.15F);
         }
+        FurnaceRecipes.instance().addSmeltingRecipeForBlock(CraftBlocks.LOG3, new ItemStack(Items.COAL, 1, 1), 0.15F);
         for (Map.Entry<String, Pair<Class<? extends RecipeGrid>, RecipeFactory>> entry : LOADABLE_TYPES.entrySet()) {
             String type = entry.getKey();
             Class<? extends RecipeGrid> grid = entry.getValue().first();

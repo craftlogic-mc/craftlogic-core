@@ -95,12 +95,12 @@ public abstract class ContainerBase<I extends InventoryHolder> extends Container
     protected void addPlayerSlots(InventoryPlayer inv, int x, int y) {
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 9; ++j) {
-                this.addSlotToContainer(new Slot(inv, j + i * 9 + x + 1, 8 + j * 18, y + i * 18));
+                addSlotToContainer(new Slot(inv, j + i * 9 + 9, x + j * 18, y + i * 18));
             }
         }
 
         for (int i = 0; i < 9; ++i) {
-            this.addSlotToContainer(new Slot(inv, i, x + i * 18, y + 58));
+            addSlotToContainer(new Slot(inv, i, x + i * 18, y + 58));
         }
     }
 
