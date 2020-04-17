@@ -6,6 +6,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
@@ -46,9 +47,11 @@ public class MixinBlockWeb extends Block {
      */
     @Overwrite
     public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity tileEntity, ItemStack item) {
-        if (!world.isRemote) {
+        if (!world.isRemote && item.getItem() == Items.SHEARS) {
             player.addStat(StatList.getBlockStats(this));
             spawnAsEntity(world, pos, new ItemStack(Item.getItemFromBlock(this), 1));
+        } else {
+            super.harvestBlock(world, player, pos, state, tileEntity, item);
         }
     }
 }
