@@ -102,6 +102,7 @@
   "client": [
     "client.entity.MixinEntityPlayerSP",
     "client.particle.MixinParticleManager",
+    "client.renderer.MixinRenderItem",
     "client.renderer.MixinBufferBuilder",
     "client.renderer.MixinBlockModelShapes$3",
     "client.renderer.MixinBlockModelShapes$4",

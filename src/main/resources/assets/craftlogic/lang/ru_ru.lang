@@ -19,7 +19,6 @@ fluid.oil=Нефть
 entity.MinecartFurnace.name=Самоходная вагонетка
 
 item.forge.bucketFilled.milk=Ведро молока
-item.forge.bucketFilled.oil=Ведро сырой нефти
 
 tile.rock.name=Камень
 tile.barrel_wood.name=Деревянная бочка

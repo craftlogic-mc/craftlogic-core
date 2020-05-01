@@ -52,18 +52,26 @@ public abstract class MixinBlockFlower extends BlockBush implements Shearable {
      */
     @Overwrite
     public int damageDropped(IBlockState state) {
-        EnumDyeColor color = getColor(state.getValue(getTypeProperty()));
-        return color.getDyeDamage();
+        if ((Class<?>)getClass() == BlockFlower.class) {
+            EnumDyeColor color = getColor(state.getValue(getTypeProperty()));
+            return color.getDyeDamage();
+        } else {
+            return 0;
+        }
     }
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        return Items.DYE;
+        if ((Class<?>)getClass() == BlockFlower.class) {
+            return Items.DYE;
+        } else {
+            return super.getItemDropped(state, rand, fortune);
+        }
     }
 
     @Override
     public boolean isShearable(Location location, @Nonnull ItemStack tool) {
-        return true;
+        return (Class<?>) getClass() == BlockFlower.class;
     }
 
     @Override
