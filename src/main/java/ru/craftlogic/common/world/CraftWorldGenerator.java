@@ -6,6 +6,7 @@ import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 import net.minecraftforge.fml.common.IWorldGenerator;
+import ru.craftlogic.CraftConfig;
 
 import java.util.Random;
 
@@ -37,11 +38,13 @@ public final class CraftWorldGenerator implements IWorldGenerator {
 
     @Override
     public void generate(Random rand, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-        for (int i = 0; i < 1; ++i) {
-            int x = chunkX * 16 + rand.nextInt(16) + 8;
-            int z = chunkZ * 16 + rand.nextInt(16) + 8;
-            int y = world.getTopSolidOrLiquidBlock(new BlockPos(x, 0, z)).getY() * 2;
-            rockGen.generate(world, rand, new BlockPos(x, y, z));
+        if (CraftConfig.items.enableRocks) {
+            for (int i = 0; i < 1; ++i) {
+                int x = chunkX * 16 + rand.nextInt(16) + 8;
+                int z = chunkZ * 16 + rand.nextInt(16) + 8;
+                int y = world.getTopSolidOrLiquidBlock(new BlockPos(x, 0, z)).getY() * 2;
+                rockGen.generate(world, rand, new BlockPos(x, y, z));
+            }
         }
     }
 }
