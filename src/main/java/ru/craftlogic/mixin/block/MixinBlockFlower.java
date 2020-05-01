@@ -2,6 +2,8 @@ package ru.craftlogic.mixin.block;
 
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.BlockFlower;
+import net.minecraft.block.BlockRedFlower;
+import net.minecraft.block.BlockYellowFlower;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Items;
@@ -52,7 +54,7 @@ public abstract class MixinBlockFlower extends BlockBush implements Shearable {
      */
     @Overwrite
     public int damageDropped(IBlockState state) {
-        if ((Class<?>)getClass() == BlockFlower.class) {
+        if ((Object)this instanceof BlockRedFlower || (Object)this instanceof BlockYellowFlower) {
             EnumDyeColor color = getColor(state.getValue(getTypeProperty()));
             return color.getDyeDamage();
         } else {
@@ -62,7 +64,7 @@ public abstract class MixinBlockFlower extends BlockBush implements Shearable {
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        if ((Class<?>)getClass() == BlockFlower.class) {
+        if ((Object)this instanceof BlockRedFlower || (Object)this instanceof BlockYellowFlower) {
             return Items.DYE;
         } else {
             return super.getItemDropped(state, rand, fortune);
@@ -71,7 +73,7 @@ public abstract class MixinBlockFlower extends BlockBush implements Shearable {
 
     @Override
     public boolean isShearable(Location location, @Nonnull ItemStack tool) {
-        return (Class<?>) getClass() == BlockFlower.class;
+        return (Object)this instanceof BlockRedFlower || (Object)this instanceof BlockYellowFlower;
     }
 
     @Override
