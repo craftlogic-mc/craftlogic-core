@@ -11,7 +11,7 @@ public interface Bounding {
     double getEndZ();
 
     default boolean isOwning(Location location) {
-        return this.isOwning(location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        return isOwning(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 
     default boolean isOwning(double x, double y, double z) {
@@ -19,10 +19,16 @@ public interface Bounding {
     }
 
     default boolean isIntersects(Bounding other) {
-        return this.isIntersects(other.getStartX(), other.getStartY(), other.getStartZ(), other.getEndX(), other.getEndY(), other.getEndZ());
+        return isIntersects(other.getStartX(), other.getStartY(), other.getStartZ(), other.getEndX(), other.getEndY(), other.getEndZ());
     }
 
     default boolean isIntersects(double startX, double startY, double startZ, double endX, double endY, double endZ) {
-        return this.getStartX() < endX && this.getEndX() > startX && this.getStartY() < endY && this.getEndY() > startY && this.getStartZ() < endZ && this.getEndZ() > startZ;
+        double sx = Math.min(startX, endX);
+        double sy = Math.min(startY, endY);
+        double sz = Math.min(startZ, endZ);
+        double ex = Math.max(startX, endX);
+        double ey = Math.max(startY, endY);
+        double ez = Math.max(startZ, endZ);
+        return getStartX() <= ex && getEndX() >= sx && getStartY() <= ey && getEndY() >= sy && getStartZ() <= ez && getEndZ() >= sz;
     }
 }

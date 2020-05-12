@@ -7,9 +7,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
@@ -76,17 +74,17 @@ public class MixinBlockTallGrass extends BlockBush {
      * @author Radviger
      * @reason Grass drop
      */
-    @Overwrite
-    public Item getItemDropped(IBlockState state, Random random, int fortune) {
-        return Items.AIR;
-    }
+    //@Overwrite
+    //public Item getItemDropped(IBlockState state, Random random, int fortune) {
+    //    return Items.AIR;
+    //}
 
     /**
      * @author Radviger
      * @reason No seeds drop from grass
      */
-    @Overwrite(remap = false)
-    public void getDrops(NonNullList<ItemStack> drops, IBlockAccess blockAccessor, BlockPos pos, IBlockState state, int fortune) {}
+    //@Overwrite(remap = false)
+    //public void getDrops(NonNullList<ItemStack> drops, IBlockAccess blockAccessor, BlockPos pos, IBlockState state, int fortune) {}
 
     /**
      * @author Radviger

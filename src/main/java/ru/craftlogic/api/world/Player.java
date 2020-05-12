@@ -321,7 +321,7 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
     }
 
     public void sendTitle(ITextComponent title, @Nullable ITextComponent subtitle, int fadeIn, int timeout, int fadeOut) {
-        EntityPlayerMP entity = this.getEntity();
+        EntityPlayerMP entity = getEntity();
         if (entity != null) {
             NetHandlerPlayServer connection = entity.connection;
             connection.sendPacket(new SPacketTitle(SPacketTitle.Type.RESET, null, 0, 0, 0));
@@ -334,12 +334,20 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
     }
 
     public void sendQuestion(String id, Text<?, ?> question, int timeout, BooleanConsumer callback) {
-        this.sendQuestion(id, question.build(), timeout, callback);
+        sendQuestion(id, question.build(), timeout, callback);
     }
 
     public void sendQuestion(String id, ITextComponent question, int timeout, BooleanConsumer callback) {
-        this.sendPacket(new MessageQuestion(id, question, timeout));
-        this.pendingCallbacks.put(id, callback);
+        sendPacket(new MessageQuestion(id, question, timeout));
+        pendingCallbacks.put(id, callback);
+    }
+
+    public void sendStatus(Text<?, ?> status) {
+        sendStatus(status.build());
+    }
+
+    public void sendStatus(ITextComponent status) {
+        getEntity().sendStatusMessage(status, true);
     }
 
     public boolean addPendingTeleport(UUID id) {
