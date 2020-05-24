@@ -49,7 +49,8 @@ public abstract class MixinBlockPistonStructureHelper {
         } else if (!addBlockLine(blockToMove, moveDirection)) {
             return false;
         } else {
-            for (BlockPos pos : toMove) {
+            for(int i = 0; i < toMove.size(); ++i) {
+                BlockPos pos = toMove.get(i);
                 if (world.getBlockState(pos).getBlock().isStickyBlock(world.getBlockState(pos)) && !addBranchingBlocks(pos)) {
                     return false;
                 }

@@ -32,21 +32,23 @@ public class RemoteDependencyTransformer implements ObfuscatedClassTransformer {
 
     @Override
     public byte[] transform(String name, String transformedName, byte[] basicClass) {
-        ClassReader reader = new ClassReader(basicClass);
-        ClassNode classNode = new ClassNode();
-        reader.accept(classNode, 0);
-        List<AnnotationNode> annotations = getAnnotationsByType(
-            classNode.visibleAnnotations,
-            "ru/craftlogic/api/dependency/RemoteDependency",
-            "ru/craftlogic/api/dependency/RemoteDependencies"
-        );
-        for (AnnotationNode annotation : annotations) {
-            Map<String, Object> params = getAnnotationParameters(annotation);
-            loadRemoteDependency(
-                (String[]) params.getOrDefault("mirrors", new String[0]),
-                (String) params.get("value"),
-                (String[]) params.getOrDefault("transformerExclusions", new String[0])
+        if (basicClass != null) {
+            ClassReader reader = new ClassReader(basicClass);
+            ClassNode classNode = new ClassNode();
+            reader.accept(classNode, 0);
+            List<AnnotationNode> annotations = getAnnotationsByType(
+                classNode.visibleAnnotations,
+                "ru/craftlogic/api/dependency/RemoteDependency",
+                "ru/craftlogic/api/dependency/RemoteDependencies"
             );
+            for (AnnotationNode annotation : annotations) {
+                Map<String, Object> params = getAnnotationParameters(annotation);
+                loadRemoteDependency(
+                    (String[]) params.getOrDefault("mirrors", new String[0]),
+                    (String) params.get("value"),
+                    (String[]) params.getOrDefault("transformerExclusions", new String[0])
+                );
+            }
         }
         return basicClass;
     }

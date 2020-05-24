@@ -105,7 +105,7 @@ public abstract class CommandBase implements ICommand {
     }
 
     public final boolean checkPermission(MinecraftServer _server, ICommandSender _sender, String[] rawArgs, boolean partial) throws CommandException {
-        if (_server.isSinglePlayer() && _sender.getName().equalsIgnoreCase(_server.getServerOwner())) {
+        if (_server.isSinglePlayer() && _sender.getName().equalsIgnoreCase(_server.getServerOwner()) || _sender == _server) {
             return true;
         }
         Server server = Server.from(_server);
