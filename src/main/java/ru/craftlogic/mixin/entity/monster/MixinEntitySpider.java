@@ -60,22 +60,21 @@ public abstract class MixinEntitySpider extends EntityMob implements Spider {
 
     @Override
     protected final void setSize(float width, float height) {
-        boolean flag = this.spiderWidth > 0F && this.spiderHeight > 0F;
-        this.spiderWidth = width;
-        this.spiderHeight = height;
+        boolean flag = spiderWidth > 0F && spiderHeight > 0F;
+        spiderWidth = width;
+        spiderHeight = height;
         if (!flag) {
-            this.multiplySize(1F);
+            multiplySize(1F);
         }
-
     }
 
     protected final void multiplySize(float modifier) {
-        super.setSize(this.spiderWidth * modifier, this.spiderHeight * modifier);
+        super.setSize(spiderWidth * modifier, spiderHeight * modifier);
     }
 
     @Override
     public float getRenderSizeModifier() {
-        return this.dataManager.get(SIZE);
+        return dataManager.get(SIZE);
     }
 
     @Override
@@ -98,7 +97,7 @@ public abstract class MixinEntitySpider extends EntityMob implements Spider {
      */
     @Overwrite
     public float getEyeHeight() {
-        return 0.65F * this.dataManager.get(SIZE);
+        return 0.65F * dataManager.get(SIZE);
     }
 
     @Override

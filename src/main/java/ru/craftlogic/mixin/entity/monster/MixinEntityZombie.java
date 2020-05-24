@@ -27,10 +27,7 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -44,10 +41,9 @@ import java.util.Random;
 @Mixin(EntityZombie.class)
 public abstract class MixinEntityZombie extends EntityMob implements Zombie {
     private static final DataParameter<Boolean> SWINGING_ARMS = EntityDataManager.createKey(EntityZombie.class, DataSerializers.BOOLEAN);
-    private static final DataParameter<Float> SIZE = EntityDataManager.createKey(EntityZombie.class, DataSerializers.FLOAT);
     private static final DataParameter<Byte> VARIANT = EntityDataManager.createKey(EntityZombie.class, DataSerializers.BYTE);
 
-    private final EntityAIAttackRangedBow aiArrowAttack = new EntityAIAttackRangedBow<>(this, 1, 20, 15);
+    private final EntityAIAttackRangedBow<?> aiArrowAttack = new EntityAIAttackRangedBow<>(this, 1, 20, 15);
     private final EntityAIAttackMelee aiAttackOnCollide = new EntityAICustomZombieAttack<>((EntityZombie & Zombie)(Object)this, 1.2, false);
 
     public MixinEntityZombie(World world) {
@@ -57,17 +53,11 @@ public abstract class MixinEntityZombie extends EntityMob implements Zombie {
     @Inject(method = "<init>", at = @At("RETURN"))
     public void constructor(World world, CallbackInfo info) {
         this.setCombatTask();
-        if (!world.isRemote) {
-            float size = world.rand.nextFloat() * 0.2F + 1F;
-            this.multiplySize(size);
-            this.dataManager.set(SIZE, size);
-        }
     }
 
     @Inject(method = "entityInit", at = @At("RETURN"))
     protected void onInit(CallbackInfo info) {
         this.dataManager.register(SWINGING_ARMS, false);
-        this.dataManager.register(SIZE, 1F);
         this.dataManager.register(VARIANT, (byte)0);
     }
 
@@ -76,51 +66,16 @@ public abstract class MixinEntityZombie extends EntityMob implements Zombie {
         this.tasks.taskEntries.removeIf(e -> e.action instanceof EntityAIZombieAttack);
     }
 
-    @Inject(method = "notifyDataManagerChange", at = @At("RETURN"))
-    public void dataChange(DataParameter<?> parameter, CallbackInfo info) {
-        if (parameter == SIZE) {
-            float size = this.dataManager.get(SIZE);
-            this.multiplySize(size);
-        }
-    }
-
-    @Shadow @Final
-    protected abstract void multiplySize(float modifier);
-
-    /**
-     * @author Radviger
-     * @reason Random-sized zombies
-     */
-    @Overwrite
-    public float getEyeHeight() {
-        float height = 1.74F * this.dataManager.get(SIZE);
-        if (this.isChild()) {
-            height -= 0.81F;
-        }
-
-        return height;
-    }
-
     @Override
     public ZombieVariant getVariant() {
         int variant = this.dataManager.get(VARIANT);
         return ZombieVariant.values()[variant];
     }
 
-    @Override
-    protected float getSoundPitch() {
-        return super.getSoundPitch() / this.getRenderSizeModifier();
-    }
-
     @SideOnly(Side.CLIENT)
     @Override
     public boolean isSwingingArms() {
         return this.dataManager.get(SWINGING_ARMS);
-    }
-
-    @Override
-    public float getRenderSizeModifier() {
-        return this.dataManager.get(SIZE);
     }
 
     @Override
@@ -149,7 +104,7 @@ public abstract class MixinEntityZombie extends EntityMob implements Zombie {
         double dx = target.posX - this.posX;
         double dy = target.getEntityBoundingBox().minY + (double)(target.height / 3F) - arrow.posY;
         double dz = target.posZ - this.posZ;
-        double distance = (double) MathHelper.sqrt(dx * dx + dz * dz);
+        double distance = MathHelper.sqrt(dx * dx + dz * dz);
         arrow.shoot(dx, dy + distance * 0.20000000298023224D, dz, 1.6F, (float)(14 - this.world.getDifficulty().getId() * 4));
         this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1F, 1F / (this.getRNG().nextFloat() * 0.4F + 0.8F));
         this.world.spawnEntity(arrow);
@@ -187,16 +142,12 @@ public abstract class MixinEntityZombie extends EntityMob implements Zombie {
 
     @Inject(method = "readEntityFromNBT", at = @At("RETURN"))
     public void onNbtRead(NBTTagCompound compound, CallbackInfo info) {
-        if (compound.hasKey("size")) {
-            this.dataManager.set(SIZE, compound.getFloat("size"));
-        }
         this.dataManager.set(VARIANT, compound.getByte("variant"));
         this.setCombatTask();
     }
 
     @Inject(method = "writeEntityToNBT", at = @At("RETURN"))
     public void onNbtWrite(NBTTagCompound compound, CallbackInfo info) {
-        compound.setFloat("size", this.getRenderSizeModifier());
         compound.setByte("variant", (byte) this.getVariant().ordinal());
     }
 
