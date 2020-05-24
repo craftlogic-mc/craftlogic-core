@@ -1,12 +1,10 @@
 package ru.craftlogic.mixin.entity.passive;
 
-import net.minecraft.entity.ai.EntityAIAvoidEntity;
-import net.minecraft.entity.ai.EntityAIMate;
-import net.minecraft.entity.ai.EntityAITasks;
-import net.minecraft.entity.ai.EntityAITempt;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.*;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityChicken;
-import net.minecraft.entity.passive.EntityOcelot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.init.SoundEvents;
@@ -16,8 +14,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -96,8 +96,24 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
             }
         }
         tasks.taskEntries.removeIf(entry -> entry.action instanceof EntityAIMate);
-        tasks.addTask(2, new EntityAIMateBird<>(this, 1.0));
-        tasks.addTask(8, new EntityAIAvoidEntity<>(this, EntityOcelot.class, 16F, 0.6, 1.33));
+        tasks.addTask(2, new EntityAIMateBird<>(this, 1));
+        tasks.addTask(8, new EntityAIAttackMelee(this, 1.5, false));
+        targetTasks.addTask(1, new EntityAIHurtByTarget(this, true));
+    }
+
+    @Inject(method = "applyEntityAttributes", at = @At("TAIL"))
+    protected void onApplyAttributes(CallbackInfo ci) {
+        getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1);
+    }
+
+    @Override
+    public boolean attackEntityAsMob(Entity victim) {
+        boolean attack = victim.attackEntityFrom(DamageSource.causeMobDamage(this), (float)((int)getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue()));
+        if (attack) {
+            applyEnchantments(this, victim);
+        }
+
+        return attack;
     }
 
     /**
@@ -205,6 +221,16 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
             double dz = rand.nextGaussian() * 0.02;
             world.spawnParticle(particle, posX + (double)(rand.nextFloat() * width * 2F) - (double)width, posY + 0.5D + (double)(rand.nextFloat() * height), posZ + (double)(rand.nextFloat() * width * 2F) - (double)width, dx, dy, dz);
         }
+    }
+
+    /**
+     * @author Radviger
+     * @reason angry chickens
+     */
+    @Nullable
+    @Overwrite
+    protected SoundEvent getAmbientSound() {
+        return getAttackTarget() != null ? SoundEvents.ENTITY_CHICKEN_HURT : SoundEvents.ENTITY_CHICKEN_AMBIENT;
     }
 
     @Override
