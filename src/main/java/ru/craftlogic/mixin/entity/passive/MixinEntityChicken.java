@@ -67,37 +67,37 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
 
     @Inject(method = "<init>", at = @At("RETURN"))
     protected void constructor(CallbackInfo info) {
-        this.timeUntilNextEgg = -1;
-        if (this.aiAvoidPlayer == null) {
-            this.aiAvoidPlayer = new EntityAIAvoidEntity<>(this, EntityPlayer.class, 16F, 0.8, 1.33);
+        timeUntilNextEgg = -1;
+        if (aiAvoidPlayer == null) {
+            aiAvoidPlayer = new EntityAIAvoidEntity<>(this, EntityPlayer.class, 16F, 0.8, 1.33);
         }
 
-        this.tasks.removeTask(this.aiAvoidPlayer);
-        if (!this.isTamed()) {
-            this.tasks.addTask(9, this.aiAvoidPlayer);
+        tasks.removeTask(aiAvoidPlayer);
+        if (!isTamed()) {
+            tasks.addTask(9, aiAvoidPlayer);
         }
-        this.dataManager.set(VARIANT, this.rand.nextInt(ChickenVariant.values().length));
-        this.setSize(0.6F, 0.7F);
+        dataManager.set(VARIANT, rand.nextInt(ChickenVariant.values().length));
+        setSize(0.6F, 0.7F);
     }
 
     @Override
     protected void entityInit() {
         super.entityInit();
-        this.dataManager.register(VARIANT, 0);
-        this.dataManager.register(TAMED, false);
+        dataManager.register(VARIANT, 0);
+        dataManager.register(TAMED, false);
     }
 
     @Inject(method = "initEntityAI", at = @At("TAIL"))
     protected void onAiInit(CallbackInfo info) {
-        for (EntityAITasks.EntityAITaskEntry taskEntry : this.tasks.taskEntries) {
+        for (EntityAITasks.EntityAITaskEntry taskEntry : tasks.taskEntries) {
             if (taskEntry.action instanceof EntityAITempt && taskEntry.priority == 3) {
-                this.aiTempt = (EntityAITempt) taskEntry.action;
+                aiTempt = (EntityAITempt) taskEntry.action;
                 break;
             }
         }
-        this.tasks.taskEntries.removeIf(entry -> entry.action instanceof EntityAIMate);
-        this.tasks.addTask(2, new EntityAIMateBird<>(this, 1.0));
-        this.tasks.addTask(8, new EntityAIAvoidEntity<>(this, EntityOcelot.class, 16F, 0.6, 1.33));
+        tasks.taskEntries.removeIf(entry -> entry.action instanceof EntityAIMate);
+        tasks.addTask(2, new EntityAIMateBird<>(this, 1.0));
+        tasks.addTask(8, new EntityAIAvoidEntity<>(this, EntityOcelot.class, 16F, 0.6, 1.33));
     }
 
     /**
@@ -131,12 +131,12 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
                 } else {
                     timeUntilNextEgg = -1;
                 }
-                playSound(SoundEvents.ENTITY_CHICKEN_EGG, 1F, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1F);
+                playSound(SoundEvents.ENTITY_CHICKEN_EGG, 1F, (rand.nextFloat() - rand.nextFloat()) * 0.2F + 1F);
                 ItemStack egg = new ItemStack(Items.EGG);
                 NBTTagCompound compound = new NBTTagCompound();
                 NBTTagCompound data = egg.getOrCreateSubCompound("BirdData");
                 data.setString("id", EntityRegistry.getEntry(getClass()).getRegistryName().toString());
-                data.setInteger("variant", this.getVariant().ordinal());
+                data.setInteger("variant", getVariant().ordinal());
                 compound.setTag("BirdData", data);
                 egg.setTagCompound(compound);
                 entityDropItem(egg, 0F);
@@ -149,41 +149,41 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
 
     @Inject(method = "writeEntityToNBT", at = @At("TAIL"))
     public void onNBTWrite(NBTTagCompound compound, CallbackInfo info) {
-        compound.setInteger("possibleEggs", this.possibleEggs);
-        compound.setInteger("variant", this.getVariant().ordinal());
-        compound.setBoolean("tamed", this.isTamed());
+        compound.setInteger("possibleEggs", possibleEggs);
+        compound.setInteger("variant", getVariant().ordinal());
+        compound.setBoolean("tamed", isTamed());
     }
 
     @Inject(method = "readEntityFromNBT", at = @At("TAIL"))
     public void onNBTRead(NBTTagCompound compound, CallbackInfo info) {
-        this.possibleEggs = compound.getInteger("possibleEggs");
-        this.dataManager.set(VARIANT, compound.getInteger("variant"));
-        this.setTamed(compound.getBoolean("tamed"));
+        possibleEggs = compound.getInteger("possibleEggs");
+        dataManager.set(VARIANT, compound.getInteger("variant"));
+        setTamed(compound.getBoolean("tamed"));
     }
 
     @Override
     public boolean processInteract(EntityPlayer player, EnumHand hand) {
         ItemStack heldItem = player.getHeldItem(hand);
-        boolean tamed = this.isTamed();
-        boolean fed = this.isInLove();
-        if ((!tamed || !fed) && (this.aiTempt == null || this.aiTempt.isRunning()) && TEMPTATION_ITEMS.contains(heldItem.getItem()) && player.getDistanceSq(this) < 9.0) {
+        boolean tamed = isTamed();
+        boolean fed = isInLove();
+        if ((!tamed || !fed) && (aiTempt == null || aiTempt.isRunning()) && TEMPTATION_ITEMS.contains(heldItem.getItem()) && player.getDistanceSq(this) < 9.0) {
             if (!player.capabilities.isCreativeMode) {
                 heldItem.shrink(1);
             }
 
-            if (!this.world.isRemote) {
-                if (this.rand.nextInt(3) == 0) {
+            if (!world.isRemote) {
+                if (rand.nextInt(3) == 0) {
                     if (!tamed && !ForgeEventFactory.onAnimalTame(this, player)) {
-                        this.setTamed(true);
+                        setTamed(true);
                     } else {
-                        this.setInLove(player);
+                        setInLove(player);
                     }
-                    this.playTameEffect(true);
+                    playTameEffect(true);
                 } else {
-                    this.playTameEffect(false);
+                    playTameEffect(false);
                 }
-                if (this.possibleEggs > 0 && this.timeUntilNextEgg > 0 && this.world.rand.nextInt(3) == 0) {
-                    this.timeUntilNextEgg = Math.max(0, this.timeUntilNextEgg - this.world.rand.nextInt(500) + 500);
+                if (possibleEggs > 0 && timeUntilNextEgg > 0 && world.rand.nextInt(3) == 0) {
+                    timeUntilNextEgg = Math.max(0, timeUntilNextEgg - world.rand.nextInt(500) + 500);
                 }
             }
 
@@ -200,42 +200,42 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
         }
 
         for(int i = 0; i < 7; ++i) {
-            double dx = this.rand.nextGaussian() * 0.02;
-            double dy = this.rand.nextGaussian() * 0.02;
-            double dz = this.rand.nextGaussian() * 0.02;
-            this.world.spawnParticle(particle, this.posX + (double)(this.rand.nextFloat() * this.width * 2F) - (double)this.width, this.posY + 0.5D + (double)(this.rand.nextFloat() * this.height), this.posZ + (double)(this.rand.nextFloat() * this.width * 2F) - (double)this.width, dx, dy, dz);
+            double dx = rand.nextGaussian() * 0.02;
+            double dy = rand.nextGaussian() * 0.02;
+            double dz = rand.nextGaussian() * 0.02;
+            world.spawnParticle(particle, posX + (double)(rand.nextFloat() * width * 2F) - (double)width, posY + 0.5D + (double)(rand.nextFloat() * height), posZ + (double)(rand.nextFloat() * width * 2F) - (double)width, dx, dy, dz);
         }
     }
 
     @Override
     protected float getSoundPitch() {
-        return this.isRooster() && !this.isChild() ? super.getSoundPitch() * 0.7F : super.getSoundPitch();
+        return isRooster() && !isChild() ? super.getSoundPitch() * 0.7F : super.getSoundPitch();
     }
 
     @Override
     public void updateAITasks() {
-        if (this.getMoveHelper().isUpdating()) {
-            double speed = this.getMoveHelper().getSpeed();
+        if (getMoveHelper().isUpdating()) {
+            double speed = getMoveHelper().getSpeed();
             if (speed == 1.33) {
-                if (!this.isSprinting() && this.world.getTotalWorldTime() - this.lastScaredSound > 20L) {
-                    this.lastScaredSound = this.world.getTotalWorldTime();
-                    this.playSound(SoundEvents.ENTITY_CHICKEN_HURT, this.getSoundVolume(), this.getSoundPitch());
+                if (!isSprinting() && world.getTotalWorldTime() - lastScaredSound > 20L) {
+                    lastScaredSound = world.getTotalWorldTime();
+                    playSound(SoundEvents.ENTITY_CHICKEN_HURT, getSoundVolume(), getSoundPitch());
                 }
-                this.setSneaking(false);
-                this.setSprinting(true);
+                setSneaking(false);
+                setSprinting(true);
             } else {
-                this.setSneaking(false);
-                this.setSprinting(false);
+                setSneaking(false);
+                setSprinting(false);
             }
         } else {
-            this.setSneaking(false);
-            this.setSprinting(false);
+            setSneaking(false);
+            setSprinting(false);
         }
     }
 
     @Override
     public ChickenVariant getVariant() {
-        return ChickenVariant.values()[this.dataManager.get(VARIANT)];
+        return ChickenVariant.values()[dataManager.get(VARIANT)];
     }
 
     @Override
@@ -245,17 +245,17 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
 
     @Override
     public boolean canMateWith(EntityAnimal other) {
-        return super.canMateWith(other) && this.isRooster() != ((MixinEntityChicken) other).isRooster();
+        return super.canMateWith(other) && isRooster() != ((MixinEntityChicken) other).isRooster();
     }
 
     @Override
     public void setEggLayingDelay(int delay) {
-        this.timeUntilNextEgg = delay;
+        timeUntilNextEgg = delay;
     }
 
     @Override
     public int getEggLayingDelay() {
-        return this.timeUntilNextEgg;
+        return timeUntilNextEgg;
     }
 
     @Override
@@ -265,20 +265,20 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
 
     @Override
     public int getPossibleEggsCount() {
-        return this.possibleEggs;
+        return possibleEggs;
     }
 
     @Override
     public boolean isTamed() {
-        return this.dataManager.get(TAMED);
+        return dataManager.get(TAMED);
     }
 
     @Override
     public void setTamed(boolean tamed) {
-        this.dataManager.set(TAMED, tamed);
-        this.tasks.removeTask(this.aiAvoidPlayer);
-        if (!this.isTamed()) {
-            this.tasks.addTask(9, this.aiAvoidPlayer);
+        dataManager.set(TAMED, tamed);
+        tasks.removeTask(aiAvoidPlayer);
+        if (!isTamed()) {
+            tasks.addTask(9, aiAvoidPlayer);
         }
     }
 }

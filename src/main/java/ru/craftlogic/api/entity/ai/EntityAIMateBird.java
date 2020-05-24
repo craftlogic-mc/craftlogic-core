@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.world.World;
+import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.entity.Bird;
 
 import java.util.List;
@@ -99,14 +100,16 @@ public class EntityAIMateBird<B extends EntityAnimal & Bird> extends EntityAIBas
             int delay = this.bird.getEggLayingDelay();
             int possibleEggs = this.bird.getPossibleEggsCount();
             if (delay <= 0) {
-                this.bird.setEggLayingDelay(this.world.rand.nextInt(6000) + 6000);
+                int d = CraftConfig.tweaks.chickenEggLayDelay;
+                this.bird.setEggLayingDelay(this.world.rand.nextInt(d) + d);
                 this.targetBird.setPossibleEggsCount(possibleEggs + this.world.rand.nextInt(5) + 1);
             }
         } else if (!this.targetBird.isRooster()) {
             int delay = this.targetBird.getEggLayingDelay();
             int possibleEggs = this.targetBird.getPossibleEggsCount();
             if (delay <= 0) {
-                this.targetBird.setEggLayingDelay(this.world.rand.nextInt(6000) + 6000);
+                int d = CraftConfig.tweaks.chickenEggLayDelay;
+                this.targetBird.setEggLayingDelay(this.world.rand.nextInt(d) + d);
                 this.targetBird.setPossibleEggsCount(possibleEggs + this.world.rand.nextInt(5) + 1);
             }
         }

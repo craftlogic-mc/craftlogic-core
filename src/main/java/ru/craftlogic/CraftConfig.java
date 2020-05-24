@@ -62,7 +62,7 @@ public class CraftConfig {
         @Config.Comment("Reconnect delay on server crash")
         public int crashReconnectDelay = 60;
         @Config.Comment("Chicken egg lay delay (in ticks; used as %delay% + random[0, %delay%])")
-        public int chickenEggLayDelay = 100;
+        public int chickenEggLayDelay = 6000;
 
         @Config.Comment("Enable visual snow layer tweaks (for flowers, tallgrass, rocks, etc.)")
         public boolean enableVisualSnowTweaks = true;
