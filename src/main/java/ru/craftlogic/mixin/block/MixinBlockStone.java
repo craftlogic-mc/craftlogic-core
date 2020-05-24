@@ -45,7 +45,7 @@ public abstract class MixinBlockStone extends Block {
      */
     @Overwrite
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        if (CraftConfig.items.enableRocks) {
+        if (CraftConfig.items.enableRocksDrop) {
             return Item.getItemFromBlock(CraftBlocks.ROCK);
         } else {
             if (CraftConfig.tweaks.enableStoneUnification || state.getValue(VARIANT) == BlockStone.EnumType.STONE) {
@@ -58,7 +58,7 @@ public abstract class MixinBlockStone extends Block {
 
     @Override
     public int quantityDropped(Random random) {
-        if (CraftConfig.items.enableRocks) {
+        if (CraftConfig.items.enableRocksDrop) {
             return 1 + random.nextInt(4);
         } else {
             return super.quantityDropped(random);

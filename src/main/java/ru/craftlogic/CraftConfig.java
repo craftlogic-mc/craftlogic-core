@@ -29,12 +29,16 @@ public class CraftConfig {
         public boolean enableStoneBricks = true;
 
         @Config.RequiresMcRestart
-        @Config.Comment("Enable ability to get a rock item from stone & cobblestone")
+        @Config.Comment("Enable poor rocks")
         public boolean enableRocks = true;
 
         @Config.RequiresMcRestart
+        @Config.Comment("Enable poor rock drop from stone & cobblestone")
+        public boolean enableRocksDrop = false;
+
+        @Config.RequiresMcRestart
         @Config.Comment("Enable ability to break eggs into raw ones by throwing them")
-        public boolean enableRawEggs = true;
+        public boolean enableRawEggs = false;
 
         @Config.RequiresMcRestart
         @Config.Comment("Enable chain armor crafting")
@@ -92,8 +96,6 @@ public class CraftConfig {
         @Config.Comment("Enable stone unification (removes granite, andesite & diorite)")
         @Config.RequiresWorldRestart
         public boolean enableStoneUnification = true;
-        @Config.Comment("Enable chicken egg into a broken egg when thrown")
-        public boolean enableEggBreaking = false;
         @Config.Comment("Disable roofed (dark) forest")
         @Config.RequiresWorldRestart
         public boolean disableRoofedForest = true;

@@ -24,17 +24,15 @@ public abstract class MixinEntityEgg extends EntityThrowable {
     @Overwrite
     protected void onImpact(RayTraceResult target) {
         if (target.entityHit != null) {
-            target.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, this.getThrower()), 0F);
+            target.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, getThrower()), 0F);
         }
 
         if (!world.isRemote) {
-            if (CraftConfig.tweaks.enableEggBreaking) {
+            if (CraftConfig.items.enableRawEggs) {
                 int amount = rand.nextInt(32) == 0 ? 2 : 1;
 
-                if (CraftConfig.items.enableRawEggs) {
-                    for (int i = 0; i < amount; ++i) {
-                        dropItem(CraftItems.RAW_EGG, 1);
-                    }
+                for (int i = 0; i < amount; ++i) {
+                    dropItem(CraftItems.RAW_EGG, 1);
                 }
             } else {
                 if (rand.nextInt(8) == 0) {
@@ -44,9 +42,9 @@ public abstract class MixinEntityEgg extends EntityThrowable {
                     }
 
                     for (int j = 0; j < i; ++j) {
-                        EntityChicken chick = new EntityChicken(this.world);
+                        EntityChicken chick = new EntityChicken(world);
                         chick.setGrowingAge(-24000);
-                        chick.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, 0.0F);
+                        chick.setLocationAndAngles(posX, posY, posZ, rotationYaw, 0.0F);
                         world.spawnEntity(chick);
                     }
                 }
