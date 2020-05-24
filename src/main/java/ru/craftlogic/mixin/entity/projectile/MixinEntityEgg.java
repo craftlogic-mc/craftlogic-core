@@ -1,5 +1,6 @@
 package ru.craftlogic.mixin.entity.projectile;
 
+import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.projectile.EntityEgg;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.util.DamageSource;
@@ -26,17 +27,33 @@ public abstract class MixinEntityEgg extends EntityThrowable {
             target.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, this.getThrower()), 0F);
         }
 
-        if (!this.world.isRemote) {
-            int amount = this.rand.nextInt(32) == 0 ? 2 : 1;
+        if (!world.isRemote) {
+            if (CraftConfig.tweaks.enableEggBreaking) {
+                int amount = rand.nextInt(32) == 0 ? 2 : 1;
 
-            if (CraftConfig.items.enableRawEggs) {
-                for (int i = 0; i < amount; ++i) {
-                    this.dropItem(CraftItems.RAW_EGG, 1);
+                if (CraftConfig.items.enableRawEggs) {
+                    for (int i = 0; i < amount; ++i) {
+                        dropItem(CraftItems.RAW_EGG, 1);
+                    }
+                }
+            } else {
+                if (rand.nextInt(8) == 0) {
+                    int i = 1;
+                    if (rand.nextInt(32) == 0) {
+                        i = 4;
+                    }
+
+                    for (int j = 0; j < i; ++j) {
+                        EntityChicken chick = new EntityChicken(this.world);
+                        chick.setGrowingAge(-24000);
+                        chick.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, 0.0F);
+                        world.spawnEntity(chick);
+                    }
                 }
             }
 
-            this.world.setEntityState(this, (byte)3);
-            this.setDead();
+            world.setEntityState(this, (byte) 3);
+            setDead();
         }
     }
 }

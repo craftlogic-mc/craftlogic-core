@@ -57,6 +57,8 @@ public class CraftConfig {
         public int maxStructureSize = 64;
         @Config.Comment("Reconnect delay on server crash")
         public int crashReconnectDelay = 60;
+        @Config.Comment("Chicken egg lay delay (in ticks; used as %delay% + random[0, %delay%])")
+        public int chickenEggLayDelay = 100;
 
         @Config.Comment("Enable visual snow layer tweaks (for flowers, tallgrass, rocks, etc.)")
         public boolean enableVisualSnowTweaks = true;
@@ -90,6 +92,8 @@ public class CraftConfig {
         @Config.Comment("Enable stone unification (removes granite, andesite & diorite)")
         @Config.RequiresWorldRestart
         public boolean enableStoneUnification = true;
+        @Config.Comment("Enable chicken egg into a broken egg when thrown")
+        public boolean enableEggBreaking = false;
         @Config.Comment("Disable roofed (dark) forest")
         @Config.RequiresWorldRestart
         public boolean disableRoofedForest = true;

@@ -31,6 +31,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.entity.Chicken;
 import ru.craftlogic.api.entity.ai.EntityAIMateBird;
 import ru.craftlogic.util.ReflectiveUsage;
@@ -107,29 +108,30 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
     @Overwrite
     public void onLivingUpdate() {
         super.onLivingUpdate();
-        this.oFlap = this.wingRotation;
-        this.oFlapSpeed = this.destPos;
-        this.destPos = (float)((double)this.destPos + (double)(this.onGround ? -1 : 4) * 0.3);
-        this.destPos = MathHelper.clamp(this.destPos, 0F, 1F);
-        if (!this.onGround && this.wingRotDelta < 1F) {
-            this.wingRotDelta = 1F;
+        oFlap = wingRotation;
+        oFlapSpeed = destPos;
+        destPos = (float)((double)destPos + (double)(onGround ? -1 : 4) * 0.3);
+        destPos = MathHelper.clamp(destPos, 0F, 1F);
+        if (!onGround && wingRotDelta < 1F) {
+            wingRotDelta = 1F;
         }
 
-        this.wingRotDelta = (float)((double)this.wingRotDelta * 0.9);
-        if (!this.onGround && this.motionY < 0.0) {
-            this.motionY *= 0.6;
+        wingRotDelta = (float)((double)wingRotDelta * 0.9);
+        if (!onGround && motionY < 0.0) {
+            motionY *= 0.6;
         }
 
-        this.wingRotation += this.wingRotDelta * 2F;
-        if (!this.world.isRemote && !this.isChild() && !this.isRooster() && !this.isChickenJockey() && this.timeUntilNextEgg > 0) {
-            if (--this.timeUntilNextEgg == 0) {
-                if (this.possibleEggs > 0) {
-                    --this.possibleEggs;
-                    this.timeUntilNextEgg = this.world.rand.nextInt(6000) + 6000;
+        wingRotation += wingRotDelta * 2F;
+        if (!world.isRemote && !isChild() && !isRooster() && !isChickenJockey() && timeUntilNextEgg > 0) {
+            if (--timeUntilNextEgg == 0) {
+                if (possibleEggs > 0) {
+                    --possibleEggs;
+                    int delay = CraftConfig.tweaks.chickenEggLayDelay;
+                    timeUntilNextEgg = world.rand.nextInt(delay) + delay;
                 } else {
-                    this.timeUntilNextEgg = -1;
+                    timeUntilNextEgg = -1;
                 }
-                this.playSound(SoundEvents.ENTITY_CHICKEN_EGG, 1F, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1F);
+                playSound(SoundEvents.ENTITY_CHICKEN_EGG, 1F, (this.rand.nextFloat() - this.rand.nextFloat()) * 0.2F + 1F);
                 ItemStack egg = new ItemStack(Items.EGG);
                 NBTTagCompound compound = new NBTTagCompound();
                 NBTTagCompound data = egg.getOrCreateSubCompound("BirdData");
@@ -137,7 +139,7 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
                 data.setInteger("variant", this.getVariant().ordinal());
                 compound.setTag("BirdData", data);
                 egg.setTagCompound(compound);
-                this.entityDropItem(egg, 0F);
+                entityDropItem(egg, 0F);
             }
         }
     }
