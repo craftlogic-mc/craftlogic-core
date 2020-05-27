@@ -95,4 +95,9 @@ public abstract class MixinTileEntityChest extends TileEntityLockableLoot implem
 
     @Shadow
     protected abstract void setNeighbor(TileEntityChest chest, EnumFacing side);
+
+    /*@SideOnly(Side.CLIENT)
+    public AxisAlignedBB getRenderBoundingBox() {
+
+    }*/
 }

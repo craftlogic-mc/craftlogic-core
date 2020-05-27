@@ -99,6 +99,9 @@ public class CraftConfig {
         @Config.Comment("Disable roofed (dark) forest")
         @Config.RequiresWorldRestart
         public boolean disableRoofedForest = true;
+        @Config.Comment("Disable log breaking by hand")
+        @Config.RequiresWorldRestart
+        public boolean disableHandLogBreaking = false;
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID)

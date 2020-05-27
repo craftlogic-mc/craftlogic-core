@@ -9,7 +9,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ForgeHooks;
 import org.spongepowered.asm.mixin.Mixin;
+import ru.craftlogic.CraftConfig;
 
 @Mixin(BlockLog.class)
 public class MixinBlockLog extends Block {
@@ -19,7 +21,11 @@ public class MixinBlockLog extends Block {
 
     @Override
     public float getPlayerRelativeBlockHardness(IBlockState state, EntityPlayer player, World world, BlockPos pos) {
-        ItemStack heldItem = player.getHeldItem(EnumHand.MAIN_HAND);
-        return heldItem.getDestroySpeed(state) == 1F ? 0F : super.getPlayerRelativeBlockHardness(state, player, world, pos);
+        if (CraftConfig.tweaks.disableHandLogBreaking) {
+            ItemStack heldItem = player.getHeldItem(EnumHand.MAIN_HAND);
+            return heldItem.getDestroySpeed(state) == 1F ? 0F : super.getPlayerRelativeBlockHardness(state, player, world, pos);
+        } else {
+            return ForgeHooks.blockStrength(state, player, world, pos);
+        }
     }
 }
