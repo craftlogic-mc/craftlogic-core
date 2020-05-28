@@ -33,12 +33,11 @@ import ru.craftlogic.api.network.AdvancedNetHandlerPlayServer;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.util.BooleanConsumer;
-import ru.craftlogic.network.message.MessageCountdown;
-import ru.craftlogic.network.message.MessageQuestion;
-import ru.craftlogic.network.message.MessageToast;
+import ru.craftlogic.network.message.*;
 
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class Player extends OfflinePlayer implements LocatableCommandSender {
     private final Map<String, BooleanConsumer> pendingCallbacks = new HashMap<>();
@@ -132,6 +131,30 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
         }
 
         return true;
+    }
+
+    public UUID teleportDelayed(Consumer<Server> callback, String teleportId, Text<?, ?> toastMessage, Location target, int timeout, boolean freeze) {
+        Consumer<Server> task = server -> {
+            if (isOnline()) {
+                sendPacket(new MessageTimedTeleportEnd(target));
+                if (freeze) {
+                    getEntity().sendPlayerAbilities();
+                }
+                teleport(target);
+                callback.accept(server);
+            }
+        };
+        double distance = target.distance(getLocation());
+        if (distance <= 200 /*|| hasPermission("commands.teleport.instant")*/) {
+            task.accept(server);
+            return null;
+        } else {
+            sendPacket(new MessageTimedTeleportStart(target, timeout, freeze));
+            sendCountdown(teleportId, toastMessage, timeout);
+            UUID taskId = server.addDelayedTask(task, timeout * 1000 + 250);
+            addPendingTeleport(taskId);
+            return taskId;
+        }
     }
 
     public void setGameMode(GameType mode) {

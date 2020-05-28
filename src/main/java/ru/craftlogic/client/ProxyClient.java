@@ -1,7 +1,9 @@
 package ru.craftlogic.client;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockPortal;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiDisconnected;
 import net.minecraft.client.gui.GuiMainMenu;
@@ -11,15 +13,18 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -34,6 +39,8 @@ import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.network.AdvancedMessage;
 import ru.craftlogic.api.screen.Elements;
 import ru.craftlogic.api.screen.toast.AdvancedToast;
+import ru.craftlogic.api.world.Location;
+import ru.craftlogic.client.particle.ParticleTeleport;
 import ru.craftlogic.client.screen.ScreenPlayerInfo;
 import ru.craftlogic.client.screen.ScreenQuestion;
 import ru.craftlogic.client.screen.ScreenReconnect;
@@ -57,6 +64,7 @@ public class ProxyClient extends ProxyCommon {
     private final ExecutorService taskScheduler = Executors.newSingleThreadExecutor(
         r -> new Thread(r, "Client task scheduler")
     );
+    private Teleport teleportInProcess;
 
     public void addTask(Consumer<Minecraft> task) {
         this.addDelayedTask(task, 0L);
@@ -120,7 +128,7 @@ public class ProxyClient extends ProxyCommon {
 
     @SubscribeEvent
     public void onOverlayRender(RenderGameOverlayEvent.Pre event) {
-        EntityPlayerSP player = this.client.player;
+        EntityPlayerSP player = client.player;
         if (player != null && CraftConfig.tweaks.enableHidingFullHUDBars) {
             switch (event.getType()) {
                 case HEALTH:
@@ -145,6 +153,27 @@ public class ProxyClient extends ProxyCommon {
                         event.setCanceled(true);
                     }
                     break;
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if (event.phase == TickEvent.Phase.START && event.side == Side.CLIENT) {
+            EntityPlayerSP player = ((EntityPlayerSP) event.player);
+            if (teleportInProcess != null) {
+                double progress = teleportInProcess.getProgress();
+                player.timeInPortal = (float) progress;
+                World world = player.world;
+                int particles = (int) (8 * progress);
+                for (int i = 0; i < particles; i++) {
+                    client.effectRenderer.addEffect(new ParticleTeleport(world, player, 0, 0.1, 0));
+                }
+            } else if (player.timeInPortal > 0) {
+                Location location = new Location(player);
+                if (!(location.getBlock() instanceof BlockPortal)) {
+                    player.timeInPortal = Math.max(0, player.timeInPortal - 0.05F);
                 }
             }
         }
@@ -257,7 +286,7 @@ public class ProxyClient extends ProxyCommon {
     protected AdvancedMessage handleToast(MessageToast message, MessageContext context) {
         ToastText toast = new ToastText(message.getTitle(), message.getSubtitle(), message.getTimeout());
         syncTask(context, () -> {
-            GuiToast toasts = this.client.getToastGui();
+            GuiToast toasts = client.getToastGui();
             toasts.add(toast);
         });
         return null;
@@ -266,7 +295,7 @@ public class ProxyClient extends ProxyCommon {
     @Override
     protected AdvancedMessage handleCountdown(MessageCountdown message, MessageContext context) {
         syncTask(context, () -> {
-            GuiToast toasts = this.client.getToastGui();
+            GuiToast toasts = client.getToastGui();
             ((AdvancedToast)toasts).remove(t -> t instanceof ToastCountdown && t.getType().equals(message.getId()));
             toasts.add(
                 new ToastCountdown(message.getId(), message.getTitle(), message.getTimeout(), message.getColor(), message.getTickSound())
@@ -281,7 +310,7 @@ public class ProxyClient extends ProxyCommon {
         ScreenQuestion screen = new ScreenQuestion(message.getQuestion(), message.getTimeout(), choice ->
             CraftAPI.NETWORK.sendToServer(new MessageConfirmation(id, choice))
         );
-        syncTask(context, () -> this.client.displayGuiScreen(screen));
+        syncTask(context, () -> client.displayGuiScreen(screen));
         return null;
     }
 
@@ -291,7 +320,25 @@ public class ProxyClient extends ProxyCommon {
             message.getProfile(), message.getFirstPlayed(), message.getLastPlayed(), message.getTimePlayed(),
             message.isEditAllowed(), message.getLastLocation(), message.getBedLocation()
         );
-        syncTask(context, () -> this.client.displayGuiScreen(screen));
+        syncTask(context, () -> client.displayGuiScreen(screen));
+        return null;
+    }
+
+    @Override
+    protected AdvancedMessage handleTimedTeleportStart(MessageTimedTeleportStart message, MessageContext context) {
+        syncTask(context, () -> {
+            teleportInProcess = new Teleport(message.getPos(), message.getTimeout(), message.isFreeze());
+            client.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.BLOCK_PORTAL_TRIGGER, 1.0F));
+        });
+        return null;
+    }
+
+    @Override
+    protected AdvancedMessage handleTimedTeleportEnd(MessageTimedTeleportEnd message, MessageContext context) {
+        syncTask(context, () -> {
+            teleportInProcess = null;
+            client.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.BLOCK_PORTAL_TRAVEL, 1.0F));
+        });
         return null;
     }
 }

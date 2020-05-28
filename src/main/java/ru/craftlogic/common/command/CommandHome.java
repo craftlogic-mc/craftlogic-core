@@ -15,7 +15,6 @@ import ru.craftlogic.api.world.PhantomPlayer;
 import ru.craftlogic.api.world.Player;
 
 import javax.annotation.Nullable;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 public final class CommandHome extends CommandBase {
@@ -56,28 +55,17 @@ public final class CommandHome extends CommandBase {
 
     private void teleportHome(CommandContext ctx, Player sender, GameProfile target, Location bedLocation) throws CommandException {
         if (bedLocation != null) {
-            Consumer<Server> task = server -> {
-                if (sender.isOnline()) {
-                    sender.teleport(bedLocation);
-                    if (sender.getId().equals(target.getId())) {
-                        ctx.sendMessage(Text.translation("commands.home.teleport.you").green());
-                    } else {
-                        ctx.sendMessage(Text.translation("commands.home.teleport.other").green().arg(target.getName(), Text::darkGreen));
-                    }
+            Consumer<Server> callback = server -> {
+                if (sender.getId().equals(target.getId())) {
+                    ctx.sendMessage(Text.translation("commands.home.teleport.you").green());
+                } else {
+                    ctx.sendMessage(Text.translation("commands.home.teleport.other").green().arg(target.getName(), Text::darkGreen));
                 }
             };
-            double distance = bedLocation.distance(sender.getLocation());
-            if (distance <= 200 || sender.hasPermission("commands.home.instant")) {
-                task.accept(ctx.server());
-            } else {
-                int timeout = 5;
-                Text<?, ?> message = sender.getId().equals(target.getId()) ?
-                    Text.translation("tooltip.home_teleport") :
-                    Text.translation("tooltip.home_teleport.other");
-                sender.sendCountdown("home", message, timeout);
-                UUID id = ctx.server().addDelayedTask(task, timeout * 1000 + 250);
-                sender.addPendingTeleport(id);
-            }
+            Text<?, ?> message = sender.getId().equals(target.getId()) ?
+                Text.translation("tooltip.home_teleport") :
+                Text.translation("tooltip.home_teleport.other");
+            sender.teleportDelayed(callback, "home", message, bedLocation, 5, true);
         } else {
             if (sender.getId().equals(target.getId())) {
                 throw new CommandException("commands.home.missing.you");
