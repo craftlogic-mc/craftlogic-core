@@ -151,9 +151,7 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
         } else {
             sendPacket(new MessageTimedTeleportStart(target, timeout, freeze));
             sendCountdown(teleportId, toastMessage, timeout);
-            UUID taskId = server.addDelayedTask(task, timeout * 1000 + 250);
-            addPendingTeleport(taskId);
-            return taskId;
+            return server.addDelayedTask(task, timeout * 1000 + 250);
         }
     }
 
@@ -246,7 +244,7 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
     }
 
     public boolean confirm(String id, boolean choice) {
-        BooleanConsumer callback = this.pendingCallbacks.get(id);
+        BooleanConsumer callback = this.pendingCallbacks.remove(id);
         if (callback != null) {
             callback.accept(choice);
             return true;
@@ -363,6 +361,10 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
     public void sendQuestion(String id, ITextComponent question, int timeout, BooleanConsumer callback) {
         sendPacket(new MessageQuestion(id, question, timeout));
         pendingCallbacks.put(id, callback);
+    }
+
+    public boolean hasQuestion(String id) {
+        return pendingCallbacks.containsKey(id);
     }
 
     public void sendStatus(Text<?, ?> status) {

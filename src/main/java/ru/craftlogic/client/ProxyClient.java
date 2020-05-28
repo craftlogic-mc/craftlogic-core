@@ -1,7 +1,6 @@
 package ru.craftlogic.client;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockPortal;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -39,7 +38,6 @@ import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.network.AdvancedMessage;
 import ru.craftlogic.api.screen.Elements;
 import ru.craftlogic.api.screen.toast.AdvancedToast;
-import ru.craftlogic.api.world.Location;
 import ru.craftlogic.client.particle.ParticleTeleport;
 import ru.craftlogic.client.screen.ScreenPlayerInfo;
 import ru.craftlogic.client.screen.ScreenQuestion;
@@ -161,20 +159,22 @@ public class ProxyClient extends ProxyCommon {
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase == TickEvent.Phase.START && event.side == Side.CLIENT) {
-            EntityPlayerSP player = ((EntityPlayerSP) event.player);
-            if (teleportInProcess != null) {
-                double progress = teleportInProcess.getProgress();
-                player.timeInPortal = (float) progress;
-                World world = player.world;
-                int particles = (int) (8 * progress);
-                for (int i = 0; i < particles; i++) {
-                    client.effectRenderer.addEffect(new ParticleTeleport(world, player, 0, 0.1, 0));
-                }
-            } else if (player.timeInPortal > 0) {
-                Location location = new Location(player);
-                if (!(location.getBlock() instanceof BlockPortal)) {
-                    player.timeInPortal = Math.max(0, player.timeInPortal - 0.05F);
-                }
+            if (event.player == client.player) {
+                EntityPlayerSP player = ((EntityPlayerSP) event.player);
+                if (teleportInProcess != null) {
+                    double progress = teleportInProcess.getProgress();
+                    //player.timeInPortal = (float) progress;
+                    World world = player.world;
+                    int particles = (int) (8 * progress);
+                    for (int i = 0; i < particles; i++) {
+                        client.effectRenderer.addEffect(new ParticleTeleport(world, player, 0, 0.1, 0));
+                    }
+                }/* else if (player.timeInPortal > 0) {
+                    Location location = new Location(player);
+                    if (!(location.getBlock() instanceof BlockPortal)) {
+                        player.timeInPortal = Math.max(0, player.timeInPortal - 0.05F);
+                    }
+                }*/
             }
         }
     }
@@ -328,7 +328,6 @@ public class ProxyClient extends ProxyCommon {
     protected AdvancedMessage handleTimedTeleportStart(MessageTimedTeleportStart message, MessageContext context) {
         syncTask(context, () -> {
             teleportInProcess = new Teleport(message.getPos(), message.getTimeout(), message.isFreeze());
-            client.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.BLOCK_PORTAL_TRIGGER, 1.0F));
         });
         return null;
     }
@@ -337,7 +336,7 @@ public class ProxyClient extends ProxyCommon {
     protected AdvancedMessage handleTimedTeleportEnd(MessageTimedTeleportEnd message, MessageContext context) {
         syncTask(context, () -> {
             teleportInProcess = null;
-            client.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.BLOCK_PORTAL_TRAVEL, 1.0F));
+            client.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ENTITY_ENDERMEN_TELEPORT, 1.0F));
         });
         return null;
     }

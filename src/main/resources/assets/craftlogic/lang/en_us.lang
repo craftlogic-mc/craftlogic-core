@@ -6,6 +6,7 @@ tooltip.you=You
 tooltip.server_stop=Server is stopping...
 tooltip.home_teleport=Teleporting to home...
 tooltip.home_teleport.other=Teleporting to %s's home...
+tooltip.request_teleport=Teleporting to %s...
 
 death.fallIntoLeaves=%1$s fell into leaves and was impaled by branches
 
@@ -155,6 +156,12 @@ commands.gamemode.creative=Creative
 commands.gamemode.survival=Survival
 commands.gamemode.spectator=Spectator
 commands.gamemode.adventure=Adventure
+
+commands.request_teleport.question=%s wats to teleport to you. Do you want to allow?
+commands.request_teleport.pending=Teleport request is already sent to %s
+commands.request_teleport.accepted=Teleportation request accepted
+commands.request_teleport.declined=Teleportation request denied
+commands.request_teleport.self=You cannot teleport to yourself
 
 disconnect.ip-banned.temp=Your ip-address is temporarely banned from this server!
 disconnect.ip-banned.permanent=Your ip-address is permanently banned from this server!

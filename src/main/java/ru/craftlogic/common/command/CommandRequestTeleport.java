@@ -1,0 +1,43 @@
+package ru.craftlogic.common.command;
+
+import net.minecraft.command.CommandException;
+import ru.craftlogic.api.command.CommandBase;
+import ru.craftlogic.api.command.CommandContext;
+import ru.craftlogic.api.text.Text;
+import ru.craftlogic.api.world.Player;
+
+public final class CommandRequestTeleport extends CommandBase {
+    CommandRequestTeleport() {
+        super("tpa", 0, "<target:Player>");
+        aliases.add("call");
+    }
+
+    @Override
+    protected void execute(CommandContext ctx) throws CommandException {
+        Player sender = ctx.senderAsPlayer();
+        Player target = ctx.get("target").asPlayer();
+        if (sender == target) {
+            throw new CommandException("commands.request_teleport.self");
+        }
+        if (target.hasQuestion("tpa")) {
+            throw new CommandException("commands.request_teleport.pending", target.getName());
+        } else {
+            Text<?, ?> title = Text.translation("commands.request_teleport.question").arg(sender.getName());
+            target.sendQuestion("tpa", title, 60, accepted -> {
+                if (sender.isOnline() && target.isOnline()) {
+                    if (accepted) {
+                        Text<?, ?> message = Text.translation("commands.request_teleport.accepted").green();
+                        sender.sendMessage(message);
+                        target.sendMessage(message);
+                        Text<?, ?> toast = Text.translation("tooltip.request_teleport").arg(target.getName());
+                        sender.teleportDelayed(server -> {}, "tpa", toast, target.getLocation(), 5, true);
+                    } else {
+                        Text<?, ?> message = Text.translation("commands.request_teleport.declined").red();
+                        sender.sendMessage(message);
+                        target.sendMessage(message);
+                    }
+                }
+            });
+        }
+    }
+}

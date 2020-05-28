@@ -6,6 +6,7 @@ tooltip.you=Вы
 tooltip.server_stop=Сервер выключается...
 tooltip.home_teleport=Телепортация домой...
 tooltip.home_teleport.other=Телепортация домой к %s...
+tooltip.request_teleport=Телепортация к %s...
 
 death.fallIntoLeaves=%1$s упал в листву и был пронзён ветками
 
@@ -154,6 +155,12 @@ commands.gamemode.creative=Творчество
 commands.gamemode.survival=Выживание
 commands.gamemode.spectator=Наблюдение
 commands.gamemode.adventure=Приключение
+
+commands.request_teleport.question=%s хочет к вам телепортироваться. Разрешить?
+commands.request_teleport.pending=Запрос на телепортацию к %s уже отправлен
+commands.request_teleport.accepted=Запрос на телепортацию подтверждён
+commands.request_teleport.declined=Запрос на телепортацию отколнён
+commands.request_teleport.self=Вы не можете телепортироваться к самому себе
 
 disconnect.ip-banned.temp=Ваш ip-адрес временно забанен на этом сервере
 disconnect.ip-banned.permanent=Ваш ip-адрес навсегда забанен на этом сервере

@@ -83,6 +83,7 @@ public class CommandManager extends ConfigurableManager {
         commandManager.registerCommand(new CommandCraft());
         commandManager.registerCommand(new CommandInventory());
         commandManager.registerCommand(new CommandTime());
+        commandManager.registerCommand(new CommandRequestTeleport());
 
         if (server.isDedicated()) {
             commandManager.registerCommand(new CommandInfo());
