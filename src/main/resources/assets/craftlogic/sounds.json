@@ -1,4 +1,18 @@
 {
+  "entity.woodpecker.chirp": {
+    "category": "neutral",
+    "subtitle": "craftlogic.subtitle.woodpecker_chirp",
+    "sounds": [ 
+      "craftlogic:entity/woodpecker/chirp",
+      "craftlogic:entity/woodpecker/chirp1",
+      "craftlogic:entity/woodpecker/chirp2"
+    ]
+  },
+  "entity.woodpecker.peck": {
+    "category": "neutral",
+    "subtitle": "craftlogic.subtitle.woodpecker_peck",
+    "sounds": [ "craftlogic:entity/woodpecker/peck" ]
+  },
   "furnace.vent.open": {
     "category": "block",
     "subtitle": "craftlogic.subtitle.furnace_vent_open",

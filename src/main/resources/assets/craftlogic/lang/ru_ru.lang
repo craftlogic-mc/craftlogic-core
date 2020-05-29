@@ -18,6 +18,7 @@ fluid.milk=Молоко
 fluid.oil=Нефть
 
 entity.MinecartFurnace.name=Самоходная вагонетка
+entity.woodpecker.name=Дятел
 
 item.forge.bucketFilled.milk=Ведро молока
 

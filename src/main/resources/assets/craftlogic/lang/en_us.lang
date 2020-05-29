@@ -18,6 +18,7 @@ fluid.milk=Milk
 fluid.oil=Oil
 
 entity.MinecartFurnace.name=Minecart Furnace
+entity.woodpecker.name=Woodpecker
 
 item.forge.bucketFilled.milk=Milk Bucket
 item.forge.bucketFilled.oil=Crude Oil Bucket

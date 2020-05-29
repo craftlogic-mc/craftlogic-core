@@ -17,6 +17,7 @@ import static ru.craftlogic.api.CraftAPI.MOD_ID;
 import static ru.craftlogic.api.CraftAPI.wrapWithActiveModId;
 
 public class CraftSounds {
+    public static SoundEvent WOODPECKER_CHIRP, WOODPECKER_PECK;
     public static SoundEvent FURNACE_VENT_OPEN, FURNACE_VENT_CLOSE, FURNACE_HOT_LOOP;
     public static SoundEvent BALANCE_ADD, BALANCE_SUBTRACT;
     public static SoundEvent COUNTDOWN_TICK;
@@ -25,6 +26,8 @@ public class CraftSounds {
     public static SoundEvent HEAL, HINT, WARNING, LEVEL_UP, SPELL, SLOW, HIDE, KICK, BAN, TOME, OPENING_FAILED, SQUASH, ERROR;
 
     static void init(Side side) {
+        WOODPECKER_CHIRP = registerSound("entity.woodpecker.chirp");
+        WOODPECKER_PECK = registerSound("entity.woodpecker.peck");
         FURNACE_VENT_OPEN = registerSound("furnace.vent.open");
         FURNACE_VENT_CLOSE = registerSound("furnace.vent.close");
         FURNACE_HOT_LOOP = registerSound("furnace.hot.loop");

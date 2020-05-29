@@ -122,13 +122,13 @@ public class EntityThrownItem extends EntityThrowable {
                 }
             }
 
-            if (!this.world.isRemote) {
+            if (!world.isRemote) {
                 if (item.getItem() instanceof ThrowableItem && ((ThrowableItem) item.getItem()).onProjectileHit(this, target)) {
-                    this.world.setEntityState(this, (byte) 3);
+                    world.setEntityState(this, (byte) 3);
                 } else if (this.drop) {
-                    this.entityDropItem(item.copy(), 0F);
+                    entityDropItem(item.copy(), 0F);
                 }
-                this.setDead();
+                setDead();
             }
         }
     }
