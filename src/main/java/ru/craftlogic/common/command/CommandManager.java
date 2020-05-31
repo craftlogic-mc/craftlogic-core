@@ -74,6 +74,7 @@ public class CommandManager extends ConfigurableManager {
             return emptyList();
         });
 
+        commandManager.registerCommand(new CommandSpawn());
         commandManager.registerCommand(new CommandHome());
         commandManager.registerCommand(new CommandGameMode());
         commandManager.registerCommand(new CommandFly());

@@ -4,6 +4,7 @@ tooltip.empty=Empty
 tooltip.bird=Bird: %s
 tooltip.you=You
 tooltip.server_stop=Server is stopping...
+tooltip.spawn_teleport=Teleporting to spawn...
 tooltip.home_teleport=Teleporting to home...
 tooltip.home_teleport.other=Teleporting to %s's home...
 tooltip.request_teleport=Teleporting to %s...
@@ -94,6 +95,8 @@ commands.generic.second.plural.a=%d seconds
 commands.generic.second.plural.b=%d seconds
 commands.generic.uuid.invalidFormat=Invalid UUID format: %s
 
+commands.spawn.teleport=Welcome to spawn!
+commands.spawn.teleport.other=Welcome to %s's home!
 commands.home.teleport.you=Welcome home!
 commands.home.teleport.other=Welcome to %s's home!
 commands.home.missing.you=Your home bed is missing or obstructed!
