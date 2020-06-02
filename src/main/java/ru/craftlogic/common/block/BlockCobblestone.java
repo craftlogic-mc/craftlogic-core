@@ -136,6 +136,15 @@ public class BlockCobblestone extends BlockFalling implements Mossable {
     }
 
     @Override
+    public int damageDropped(IBlockState state) {
+        if (CraftConfig.items.enableRocksDrop) {
+            return 0;
+        } else {
+            return super.damageDropped(state);
+        }
+    }
+
+    @Override
     public void getDrops(NonNullList<ItemStack> drops, IBlockAccess blockAccessor, BlockPos pos, IBlockState state, int fortune) {
         Random rand = blockAccessor instanceof World ? ((World)blockAccessor).rand : RANDOM;
         super.getDrops(drops, blockAccessor, pos, state, fortune);

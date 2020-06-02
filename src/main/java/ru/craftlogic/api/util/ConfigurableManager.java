@@ -21,7 +21,6 @@ public abstract class ConfigurableManager extends ServerManager {
     protected final Path configFile;
 
     private boolean needsSave = false;
-    private JsonObject config;
 
     protected ConfigurableManager(Server server, Path configFile, Logger logger) {
         super(server, logger);
@@ -84,11 +83,10 @@ public abstract class ConfigurableManager extends ServerManager {
         if (root == null) {
             root = new JsonObject();
         }
-        this.config = root;
-        this.load(this.config);
+        this.load(root);
         if (this.isDirty()) {
             this.setDirty(false);
-            Files.write(configFile, GSON.toJson(this.config).getBytes(StandardCharsets.UTF_8));
+            Files.write(configFile, GSON.toJson(root).getBytes(StandardCharsets.UTF_8));
         }
     }
 
@@ -106,12 +104,8 @@ public abstract class ConfigurableManager extends ServerManager {
 
     public final void save(boolean force) throws IOException {
         if (force || this.isDirty()) {
-            JsonObject root = this.config;
-            if (root == null) {
-                root = new JsonObject();
-            }
+            JsonObject root = new JsonObject();
             this.save(root);
-            this.config = root;
             Path configFile = this.getConfigFile();
             if (!Files.exists(configFile.getParent())) {
                 Files.createDirectories(configFile.getParent());

@@ -47,12 +47,10 @@ public abstract class MixinBlockStone extends Block {
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
         if (CraftConfig.items.enableRocksDrop) {
             return Item.getItemFromBlock(CraftBlocks.ROCK);
+        } else if (CraftConfig.tweaks.enableStoneUnification || state.getValue(VARIANT) == BlockStone.EnumType.STONE) {
+            return Item.getItemFromBlock(Blocks.COBBLESTONE);
         } else {
-            if (CraftConfig.tweaks.enableStoneUnification || state.getValue(VARIANT) == BlockStone.EnumType.STONE) {
-                return Item.getItemFromBlock(Blocks.COBBLESTONE);
-            } else {
-                return Item.getItemFromBlock(this);
-            }
+            return Item.getItemFromBlock(this);
         }
     }
 
@@ -62,6 +60,19 @@ public abstract class MixinBlockStone extends Block {
             return 1 + random.nextInt(4);
         } else {
             return super.quantityDropped(random);
+        }
+    }
+
+    /**
+     * @author Radviger
+     * @reason Rocks
+     */
+    @Overwrite
+    public int damageDropped(IBlockState state) {
+        if (CraftConfig.items.enableRocksDrop) {
+            return 0;
+        } else {
+            return super.damageDropped(state);
         }
     }
 

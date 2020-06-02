@@ -96,7 +96,6 @@ commands.generic.second.plural.b=%d seconds
 commands.generic.uuid.invalidFormat=Invalid UUID format: %s
 
 commands.spawn.teleport=Welcome to spawn!
-commands.spawn.teleport.other=Welcome to %s's home!
 commands.home.teleport.you=Welcome home!
 commands.home.teleport.other=Welcome to %s's home!
 commands.home.missing.you=Your home bed is missing or obstructed!

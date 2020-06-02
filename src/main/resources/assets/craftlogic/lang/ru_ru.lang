@@ -22,6 +22,7 @@ entity.MinecartFurnace.name=Самоходная вагонетка
 entity.woodpecker.name=Дятел
 
 item.forge.bucketFilled.milk=Ведро молока
+item.forge.bucketFilled.oil=Ведро сырой нефти
 
 tile.rock.name=Камень
 tile.barrel_wood.name=Деревянная бочка
@@ -94,6 +95,7 @@ commands.generic.uuid.invalidFormat=Неправильный формат UUID: 
 
 commands.stop.delayed=Выключение сервера через %s
 
+commands.spawn.teleport=Добро пожаловать на спавн!
 commands.home.teleport.you=Добро пожаловать домой!
 commands.home.teleport.other=Добро пожаловать в дом %s!
 commands.home.missing.you=Ваша кровать отсутствует или доступ к ней затруднён!
