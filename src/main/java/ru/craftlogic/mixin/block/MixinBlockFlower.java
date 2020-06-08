@@ -6,11 +6,15 @@ import net.minecraft.block.BlockRedFlower;
 import net.minecraft.block.BlockYellowFlower;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -80,5 +84,14 @@ public abstract class MixinBlockFlower extends BlockBush implements Shearable {
     public List<ItemStack> onSheared(Location location, int fortune, @Nonnull ItemStack tool) {
         BlockFlower.EnumFlowerType type = location.getBlockProperty(getTypeProperty());
         return NonNullList.withSize(1, new ItemStack(this, 1, type.getMeta()));
+    }
+
+    @Override
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+        if ((Object)this instanceof BlockRedFlower || (Object)this instanceof BlockYellowFlower) {
+            return new ItemStack(this, 1, state.getValue(getTypeProperty()).getMeta());
+        } else {
+            return super.getPickBlock(state, target, world, pos, player);
+        }
     }
 }

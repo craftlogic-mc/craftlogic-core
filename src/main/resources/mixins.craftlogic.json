@@ -75,6 +75,7 @@
     "item.MixinItemLilyPad",
     "item.MixinItemMinecart",
     "item.MixinItemSeeds",
+    "item.MixinItemStack",
     "item.MixinItemSword",
     "item.MixinItemTool",
     "item.MixinItemUniversalBucket",
