@@ -152,25 +152,22 @@ public abstract class ScreenWithInventory<C extends Container> extends GuiContai
     protected abstract void init();
 
     protected void close() {
-        this.mc.displayGuiScreen(null);
-        if (this.mc.currentScreen == null) {
-            this.mc.setIngameFocus();
-        }
+        mc.player.closeScreen();
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        if (this.isDefaultBackgroundEnabled()) {
-            this.drawDefaultBackground();
+        if (isDefaultBackgroundEnabled()) {
+            drawDefaultBackground();
         }
         super.drawScreen(mouseX, mouseY, partialTicks);
-        this.renderHoveredToolTip(mouseX, mouseY);
+        renderHoveredToolTip(mouseX, mouseY);
     }
 
     @Override
     protected final void drawGuiContainerBackgroundLayer(float deltaTime, int mouseX, int mouseY) {
-        this.drawBackground(mouseX, mouseY, deltaTime);
-        for (Element element : this.elements) {
+        drawBackground(mouseX, mouseY, deltaTime);
+        for (Element element : elements) {
             element.drawBackground(mouseX, mouseY, deltaTime);
         }
     }
@@ -178,8 +175,8 @@ public abstract class ScreenWithInventory<C extends Container> extends GuiContai
     @Override
     protected final void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         float deltaTime = getClient().getRenderPartialTicks();
-        this.drawForeground(mouseX, mouseY, deltaTime);
-        for (Element element : this.elements) {
+        drawForeground(mouseX, mouseY, deltaTime);
+        for (Element element : elements) {
             element.drawForeground(mouseX, mouseY, deltaTime);
         }
     }
@@ -200,20 +197,20 @@ public abstract class ScreenWithInventory<C extends Container> extends GuiContai
 
     @Override
     protected final void keyTyped(char symbol, int key) {
-        if (key == Keyboard.KEY_ESCAPE || isInvKeyClosingScreen() && this.mc.gameSettings.keyBindInventory.isActiveAndMatches(key)) {
-            this.close();
+        if (key == Keyboard.KEY_ESCAPE || isInvKeyClosingScreen() && mc.gameSettings.keyBindInventory.isActiveAndMatches(key)) {
+            close();
         } else {
-            this.checkHotbarKeys(key);
+            checkHotbarKeys(key);
             Slot hoveredSlot = getSlotUnderMouse();
             if (hoveredSlot != null && hoveredSlot.getHasStack()) {
-                if (this.mc.gameSettings.keyBindPickBlock.isActiveAndMatches(key)) {
-                    this.handleMouseClick(hoveredSlot, hoveredSlot.slotNumber, 0, ClickType.CLONE);
-                } else if (this.mc.gameSettings.keyBindDrop.isActiveAndMatches(key)) {
-                    this.handleMouseClick(hoveredSlot, hoveredSlot.slotNumber, isCtrlKeyDown() ? 1 : 0, ClickType.THROW);
+                if (mc.gameSettings.keyBindPickBlock.isActiveAndMatches(key)) {
+                    handleMouseClick(hoveredSlot, hoveredSlot.slotNumber, 0, ClickType.CLONE);
+                } else if (mc.gameSettings.keyBindDrop.isActiveAndMatches(key)) {
+                    handleMouseClick(hoveredSlot, hoveredSlot.slotNumber, isCtrlKeyDown() ? 1 : 0, ClickType.THROW);
                 }
             }
-            this.onKeyPressed(symbol, key);
-            for (Element element : this.elements) {
+            onKeyPressed(symbol, key);
+            for (Element element : elements) {
                 if (element instanceof InteractiveElement) {
                     ((InteractiveElement) element).onKeyPressed(key, symbol);
                 }
@@ -226,7 +223,7 @@ public abstract class ScreenWithInventory<C extends Container> extends GuiContai
     @Override
     protected final void mouseClicked(int x, int y, int button) throws IOException {
         super.mouseClicked(x, y, button);
-        this.onMouseClick(x, y, button);
+        onMouseClick(x, y, button);
         for (Element element : this.elements) {
             if (element instanceof InteractiveElement) {
                 ((InteractiveElement) element).onMouseClick(x, y, button);
@@ -239,7 +236,7 @@ public abstract class ScreenWithInventory<C extends Container> extends GuiContai
     @Override
     protected final void mouseReleased(int x, int y, int button) {
         super.mouseReleased(x, y, button);
-        this.onMouseRelease(x, y, button);
+        onMouseRelease(x, y, button);
         for (Element element : this.elements) {
             if (element instanceof InteractiveElement) {
                 ((InteractiveElement) element).onMouseRelease(x, y, button);
@@ -252,7 +249,7 @@ public abstract class ScreenWithInventory<C extends Container> extends GuiContai
     @Override
     protected final void mouseClickMove(int x, int y, int button, long dragTime) {
         super.mouseClickMove(x, y, button, dragTime);
-        this.onMouseDrag(x, y, button, dragTime);
+        onMouseDrag(x, y, button, dragTime);
         for (Element element : this.elements) {
             if (element instanceof InteractiveElement) {
                 ((InteractiveElement) element).onMouseDrag(x, y, button, dragTime);
