@@ -277,8 +277,12 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
     }
 
     public Location getBedLocation() {
-        BlockPos bed = getEntity().getBedLocation();
-        return bed != null ? new Location(getWorld().unwrap(), bed) : null;
+        return getBedLocation(getWorld());
+    }
+
+    public Location getBedLocation(World world) {
+        BlockPos bed = getEntity().getBedLocation(world.getDimension().getVanilla().getId());
+        return bed != null ? new Location(world.unwrap(), bed) : null;
     }
 
     public void disconnect(Text<?, ?> reason) {

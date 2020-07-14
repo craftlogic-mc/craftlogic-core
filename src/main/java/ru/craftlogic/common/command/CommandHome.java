@@ -27,11 +27,11 @@ public final class CommandHome extends CommandBase {
         Player sender = ctx.senderAsPlayer();
         OfflinePlayer target = ctx.has("target") ? ctx.get("target").asOfflinePlayer() : sender;
         if (target.isOnline()) {
-            Location bedLocation = adjustBedLocation(target.asOnline().getBedLocation());
+            Location bedLocation = adjustBedLocation(target.asOnline().getBedLocation(sender.getWorld()));
             teleportHome(ctx, sender, target.getProfile(), bedLocation);
         } else {
             PhantomPlayer fake = target.asPhantom(sender.getWorld());
-            Location bedLocation = adjustBedLocation(fake.getBedLocation());
+            Location bedLocation = adjustBedLocation(fake.getBedLocation(sender.getWorld()));
             teleportHome(ctx, sender, fake.getProfile(), bedLocation);
         }
     }
