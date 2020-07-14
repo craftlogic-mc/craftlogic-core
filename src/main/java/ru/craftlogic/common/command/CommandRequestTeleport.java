@@ -19,6 +19,9 @@ public final class CommandRequestTeleport extends CommandBase {
         if (sender == target) {
             throw new CommandException("commands.request_teleport.self");
         }
+        if (sender.getWorld().getDimension() != target.getWorld().getDimension()) {
+            throw new CommandException("commands.tp.notSameDimension");
+        }
         if (target.hasQuestion("tpa")) {
             throw new CommandException("commands.request_teleport.pending", target.getName());
         } else {
@@ -26,11 +29,15 @@ public final class CommandRequestTeleport extends CommandBase {
             target.sendQuestion("tpa", title, 60, accepted -> {
                 if (sender.isOnline() && target.isOnline()) {
                     if (accepted) {
-                        Text<?, ?> message = Text.translation("commands.request_teleport.accepted").green();
-                        sender.sendMessage(message);
-                        target.sendMessage(message);
-                        Text<?, ?> toast = Text.translation("tooltip.request_teleport").arg(target.getName());
-                        sender.teleportDelayed(server -> {}, "tpa", toast, target.getLocation(), 5, true);
+                        if (sender.getWorld().getDimension() != target.getWorld().getDimension()) {
+                            sender.sendMessage(Text.translation("commands.tp.notSameDimension").red());
+                        } else {
+                            Text<?, ?> message = Text.translation("commands.request_teleport.accepted").green();
+                            sender.sendMessage(message);
+                            target.sendMessage(message);
+                            Text<?, ?> toast = Text.translation("tooltip.request_teleport").arg(target.getName());
+                            sender.teleportDelayed(server -> {}, "tpa", toast, target.getLocation(), 5, true);
+                        }
                     } else {
                         Text<?, ?> message = Text.translation("commands.request_teleport.declined").red();
                         sender.sendMessage(message);
