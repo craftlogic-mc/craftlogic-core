@@ -44,6 +44,7 @@ public class CraftBlocks {
     public static Block PINE_STAIRS;
     public static Block WILLOW_STAIRS;
     public static Block BERRY_BUSH;
+    public static Block STONEBRICK_LIGHT;
 
     static void init(Side side) {
         if (CraftConfig.blocks.enableBarrels) {
@@ -78,6 +79,7 @@ public class CraftBlocks {
         WILLOW_STAIRS = registerBlockWithItem(new BlockStairs2(PlanksType2.WILLOW), ItemBlock::new);
 
         BERRY_BUSH = registerBlockWithItem(new BlockBerryBush(), ItemBerryBush::new);
+        STONEBRICK_LIGHT = registerBlockWithItem(new BlockStoneBrickLight());
     }
 
     public static <B extends Block> B registerBlock(@Nonnull B block) {

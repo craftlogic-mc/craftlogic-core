@@ -45,6 +45,7 @@ tile.wooden_slab.willow.name=Ивовая плита
 tile.wooden_stairs.pine.name=Сосновые ступеньки
 tile.wooden_stairs.willow.name=Ивовые ступеньки
 tile.berry_bush.name=Ягодный куст
+tile.stonebrick_light.name=Светящиеся каменные кирпичи
 
 item.crowbar.name=Монтировка
 item.wool_card.name=Чесалка

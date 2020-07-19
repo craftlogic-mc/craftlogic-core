@@ -45,6 +45,7 @@ tile.wooden_slab.willow.name=Willow Slab
 tile.wooden_stairs.pine.name=Pine Stairs
 tile.wooden_stairs.willow.name=Willow Stairs
 tile.berry_bush.name=Berry Bush
+tile.stonebrick_light.name=Glowing Stone Bricks
 
 item.crowbar.name=Crowbar
 item.wool_card.name=Wool Card
