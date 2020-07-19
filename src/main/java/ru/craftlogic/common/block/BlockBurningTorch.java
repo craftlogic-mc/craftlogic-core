@@ -17,13 +17,12 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.CraftConfig;
-import ru.craftlogic.api.model.ModelRegistrar;
 import ru.craftlogic.api.model.ModelManager;
+import ru.craftlogic.api.model.ModelRegistrar;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,12 +32,12 @@ public class BlockBurningTorch extends BlockTorch implements ModelRegistrar {
     public static final PropertyBool LIT = PropertyBool.create("lit");
 
     public BlockBurningTorch() {
-        this.setHardness(0.0F);
-        this.setLightLevel(0.9375F);
-        this.setSoundType(SoundType.WOOD);
-        this.setTranslationKey("torch");
-        this.setTickRandomly(true);
-        this.setDefaultState(this.blockState.getBaseState()
+        setHardness(0.0F);
+        setLightLevel(CraftConfig.tweaks.enableTorchBurning ? 0F : 0.9375F);
+        setSoundType(SoundType.WOOD);
+        setTranslationKey("torch");
+        setTickRandomly(true);
+        setDefaultState(this.blockState.getBaseState()
             .withProperty(FACING, EnumFacing.UP)
             .withProperty(LIT, !CraftConfig.tweaks.enableTorchBurning)
         );
@@ -122,8 +121,8 @@ public class BlockBurningTorch extends BlockTorch implements ModelRegistrar {
     }
 
     @Override
-    public int getLightValue(IBlockState state, IBlockAccess blockAccessor, BlockPos pos) {
-        return state.getValue(LIT) ? super.getLightValue(state, blockAccessor, pos) : 0;
+    public int getLightValue(IBlockState state) {
+        return state.getValue(LIT) ? super.getLightValue(state) : 0;
     }
 
     @Override

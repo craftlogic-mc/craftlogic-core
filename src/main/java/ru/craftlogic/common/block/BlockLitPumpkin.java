@@ -92,7 +92,7 @@ public class BlockLitPumpkin extends BlockPumpkin implements ModelRegistrar {
     }
 
     @Override
-    public int getLightValue(IBlockState state, IBlockAccess blockAccessor, BlockPos pos) {
+    public int getLightValue(IBlockState state) {
         return state.getValue(LIT) ? 15 : 0;
     }
 
