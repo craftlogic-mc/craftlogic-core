@@ -75,9 +75,9 @@ public class BlockCobblestone extends BlockFalling implements Mossable {
             }
             boolean loaded = world.isAreaLoaded(pos, 32);
             if (humidity > heat) {
-                if (!this.mossy) {
-                    if (rand.nextInt(30) == 0) {
-                        this.growMoss(new Location(world, pos));
+                if (!mossy) {
+                    if (rand.nextInt(60) == 0) {
+                        growMoss(new Location(world, pos));
                     }
                 } else if (CraftConfig.tweaks.enableMossSpreading) {
                     for (int x = -1; x <= 1; x++) {
@@ -85,7 +85,7 @@ public class BlockCobblestone extends BlockFalling implements Mossable {
                             for (int z = -1; z <= 1; z++) {
                                 if (x != 0 && y != 0 && z != 0) {
                                     BlockPos offsetPos = pos.add(x, y, z);
-                                    if (rand.nextInt(4) == 0) {
+                                    if (rand.nextInt(15) == 0) {
                                         IBlockState s = world.getBlockState(offsetPos);
                                         Block block = s.getBlock();
                                         if (block instanceof Mossable) {
@@ -101,10 +101,8 @@ public class BlockCobblestone extends BlockFalling implements Mossable {
                         }
                     }
                 }
-            } else if (this.mossy && rand.nextInt(3) == 0 && CraftConfig.tweaks.enableMossDecay) {
+            } else if (CraftConfig.tweaks.enableMossDecay && mossy && rand.nextInt(30) == 0) {
                 world.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState(), loaded ? 3 : 2);
-                world.playEvent(1009, pos, 0);
-                world.playEvent(2000, pos, 0);
             }
         }
     }
@@ -122,7 +120,7 @@ public class BlockCobblestone extends BlockFalling implements Mossable {
         if (CraftConfig.items.enableRocksDrop) {
             return Item.getItemFromBlock(CraftBlocks.ROCK);
         } else {
-            return super.getItemDropped(state, rand, fortune);
+            return Item.getItemFromBlock(Blocks.COBBLESTONE);
         }
     }
 
@@ -148,19 +146,19 @@ public class BlockCobblestone extends BlockFalling implements Mossable {
     public void getDrops(NonNullList<ItemStack> drops, IBlockAccess blockAccessor, BlockPos pos, IBlockState state, int fortune) {
         Random rand = blockAccessor instanceof World ? ((World)blockAccessor).rand : RANDOM;
         super.getDrops(drops, blockAccessor, pos, state, fortune);
-        if (this.mossy && rand.nextInt(4) == 0 && CraftConfig.items.enableMoss) {
+        if (mossy && rand.nextInt(4) == 0 && CraftConfig.items.enableMoss) {
             drops.add(new ItemStack(CraftItems.MOSS));
         }
     }
 
     @Override
     public boolean isMossy(Location location) {
-        return this.mossy;
+        return mossy;
     }
 
     @Override
     public boolean growMoss(Location location) {
-        if (!this.mossy && CraftConfig.tweaks.enableCobblestoneMossGrowth) {
+        if (!mossy && CraftConfig.tweaks.enableCobblestoneMossGrowth) {
             boolean loaded = location.isAreaLoaded(32);
             location.setBlock(Blocks.MOSSY_COBBLESTONE, loaded ? 3 : 2);
             return true;

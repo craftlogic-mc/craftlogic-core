@@ -12,10 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
@@ -24,7 +21,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.CraftItems;
-import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.api.block.Mossable;
 import ru.craftlogic.api.world.Location;
 
@@ -82,21 +78,6 @@ public class BlockStoneBrick extends BlockFalling implements Mossable {
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (state.getValue(VARIANT) == EnumType.MOSSY && CraftConfig.items.enableMoss) {
-            if (!world.isRemote) {
-                if (world.rand.nextInt(4) == 0) {
-                    player.addItemStackToInventory(new ItemStack(CraftItems.MOSS));
-                }
-                world.playSound(null, pos, CraftSounds.SQUASH, SoundCategory.PLAYERS, 1F, 0.8F + 0.2F * world.rand.nextFloat());
-                world.setBlockState(pos, state.withProperty(VARIANT, EnumType.DEFAULT));
-            }
-            return true;
-        }
-        return false;
-    }
-
-    @Override
     public void randomTick(World world, BlockPos pos, IBlockState state, Random rand) {
         if (!world.isRemote) {
             int cold = 0;
@@ -133,8 +114,8 @@ public class BlockStoneBrick extends BlockFalling implements Mossable {
                 }
             } else if (humidity > heat) {
                 if (state.getValue(VARIANT) == EnumType.DEFAULT) {
-                    if (rand.nextInt(30) == 0) {
-                        this.growMoss(new Location(world, pos));
+                    if (rand.nextInt(60) == 0) {
+                        growMoss(new Location(world, pos));
                     }
                 } else if (CraftConfig.tweaks.enableMossSpreading) {
                     for (int x = -1; x <= 1; x++) {
@@ -142,7 +123,7 @@ public class BlockStoneBrick extends BlockFalling implements Mossable {
                             for (int z = -1; z <= 1; z++) {
                                 if (x != 0 && y != 0 && z != 0) {
                                     BlockPos offsetPos = pos.add(x, y, z);
-                                    if (rand.nextInt(4) == 0) {
+                                    if (rand.nextInt(15) == 0) {
                                         IBlockState s = world.getBlockState(offsetPos);
                                         Block block = s.getBlock();
                                         if (block instanceof Mossable) {
@@ -158,11 +139,7 @@ public class BlockStoneBrick extends BlockFalling implements Mossable {
                         }
                     }
                 }
-            } else if (humidity < heat && state.getValue(VARIANT) == EnumType.MOSSY && rand.nextInt(2) == 0
-                    && CraftConfig.tweaks.enableMossDecay) {
-
-                world.playEvent(1009, pos, 0);
-                world.playEvent(2000, pos, 5);
+            } else if (CraftConfig.tweaks.enableMossDecay && humidity < heat && state.getValue(VARIANT) == EnumType.MOSSY && rand.nextInt(30) == 0) {
                 world.setBlockState(pos, Blocks.STONEBRICK.getDefaultState());
             }
         }
