@@ -32,10 +32,10 @@ public class BlockLitPumpkin extends BlockPumpkin implements ModelRegistrar {
     public static final PropertyBool LIT = BlockBurningTorch.LIT;
 
     public BlockLitPumpkin() {
-        this.setHardness(1F);
-        this.setSoundType(SoundType.WOOD);
-        this.setTranslationKey("litpumpkin");
-        this.setDefaultState(
+        setHardness(1F);
+        setSoundType(SoundType.WOOD);
+        setTranslationKey("litpumpkin");
+        setDefaultState(
             this.blockState.getBaseState()
                 .withProperty(LIT, false)
                 .withProperty(FACING, EnumFacing.NORTH)

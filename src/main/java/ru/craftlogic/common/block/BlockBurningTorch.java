@@ -33,7 +33,7 @@ public class BlockBurningTorch extends BlockTorch implements ModelRegistrar {
 
     public BlockBurningTorch() {
         setHardness(0.0F);
-        setLightLevel(CraftConfig.tweaks.enableTorchBurning ? 0F : 0.9375F);
+        setLightLevel(0.9375F);
         setSoundType(SoundType.WOOD);
         setTranslationKey("torch");
         setTickRandomly(true);
@@ -122,7 +122,7 @@ public class BlockBurningTorch extends BlockTorch implements ModelRegistrar {
 
     @Override
     public int getLightValue(IBlockState state) {
-        return state.getValue(LIT) ? super.getLightValue(state) : 0;
+        return state.getValue(LIT) ? super.lightValue : 0;
     }
 
     @Override
