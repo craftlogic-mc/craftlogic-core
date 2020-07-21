@@ -310,7 +310,12 @@ public class ProxyClient extends ProxyCommon {
         ScreenQuestion screen = new ScreenQuestion(message.getQuestion(), message.getTimeout(), choice ->
             CraftAPI.NETWORK.sendToServer(new MessageConfirmation(id, choice))
         );
-        syncTask(context, () -> client.displayGuiScreen(screen));
+        syncTask(context, () -> {
+            if (client.player != null && client.player.openContainer != null) {
+                client.player.closeScreen();
+            }
+            client.displayGuiScreen(screen);
+        });
         return null;
     }
 
