@@ -145,7 +145,7 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
             }
         };
         double distance = target.distance(getLocation());
-        if (distance <= 200 /*|| hasPermission("commands.teleport.instant")*/) {
+        if (distance <= 200 || hasPermission("commands.teleport.instant")) {
             task.accept(server);
             return null;
         } else {
