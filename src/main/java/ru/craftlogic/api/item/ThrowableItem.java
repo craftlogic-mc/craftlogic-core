@@ -34,7 +34,7 @@ public interface ThrowableItem {
     }
 
     default int getProjectileDropChance(EntityThrownItem entity, RayTraceResult target) {
-        return 3;
+        return 0;
     }
 
     default float getProjectileDamage(EntityThrownItem entity, RayTraceResult target) {
