@@ -177,6 +177,8 @@ jar {
     from 'build/unzip-dependency'
 
     include '**/*'
+
+    rename '(.+_at.cfg)', 'META-INF/$1'
 }
 
 jar.dependsOn(repack)

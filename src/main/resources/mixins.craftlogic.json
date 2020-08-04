@@ -65,6 +65,7 @@
     "entity.projectile.MixinEntityExpBottle",
     "forge.MixinCraftingHelper",
     "forge.MixinUsernameCache",
+    "forge.MixinUsernameCache$MixinSaveThread",
     "inventory.MixinContainerPlayer",
     "item.MixinItem",
     "item.MixinItemBucket",
@@ -92,12 +93,18 @@
     "tileentity.MixinTileEntityFurnace",
     "tileentity.MixinTileEntityStructure",
     "util.text.MixinITextComponent$Serializer",
+    "world.MixinAnvilChunkLoader",
+    "world.MixinChunk",
+    "world.MixinChunkProviderServer",
     "world.MixinCommandHandler",
+    "world.MixinExtendedBlockStorage",
+    "world.MixinSPacketChunkData",
+    "world.MixinWorld",
     "world.biome.MixinBiomeManager",
     "world.biome.MixinBiomeSwamp",
     "world.biome.MixinBiomeTaiga",
     "world.gen.structure.MixinJungleTemple",
-    "world.gen.structure.MixinVillage",
+    "world.gen.structure.MixinVillage"
     "world.storage.MixinSaveHandler"
   ],
   "client": [
