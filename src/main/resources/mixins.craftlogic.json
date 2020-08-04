@@ -104,7 +104,7 @@
     "world.biome.MixinBiomeSwamp",
     "world.biome.MixinBiomeTaiga",
     "world.gen.structure.MixinJungleTemple",
-    "world.gen.structure.MixinVillage"
+    "world.gen.structure.MixinVillage",
     "world.storage.MixinSaveHandler"
   ],
   "client": [
