@@ -10,12 +10,14 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import ru.craftlogic.api.CraftMessages;
+import ru.craftlogic.api.server.PlayerManager;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.util.CheckedFunction;
 import ru.craftlogic.api.world.*;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -188,69 +190,80 @@ public class CommandContext {
         }
 
         public boolean isVararg() {
-            return this.vararg;
+            return vararg;
         }
 
         public String name() {
-            return this.name;
+            return name;
         }
 
         public String asString() {
-            return this.value;
+            return value;
         }
 
         @Nonnull
         public UUID asUUID() throws CommandException {
             try {
-                return UUID.fromString(this.value);
+                return UUID.fromString(value);
             } catch (IllegalArgumentException exc) {
                 throw new CommandException("commands.generic.uuid.invalidFormat", this.value);
             }
         }
 
+        @Nullable
+        public UUID asUUIDOrNull() {
+            try {
+                return UUID.fromString(value);
+            } catch (IllegalArgumentException exc) {
+                return null;
+            }
+        }
+
         @Nonnull
         public OfflinePlayer asOfflinePlayer() throws CommandException {
-            OfflinePlayer player = this.context.server.getPlayerManager().getOffline(this.value);
+            PlayerManager playerManager = context.server.getPlayerManager();
+            UUID uuid = asUUIDOrNull();
+            OfflinePlayer player = uuid != null ? playerManager.getOffline(uuid) : playerManager.getOffline(value);
             if (player == null) {
-                throw new CommandException("commands.generic.userNeverPlayed", this.value);
+                throw new CommandException("commands.generic.userNeverPlayed", value);
             }
             return player;
         }
 
         @Nonnull
         public Player asPlayer() throws CommandException {
-            Player player = this.context.server.getPlayerManager().getOnline(this.value);
+            Player player = context.server.getPlayerManager().getOnline(value);
             if (player == null) {
-                throw new CommandException("commands.generic.player.notFound", this.value);
+                throw new CommandException("commands.generic.player.notFound", value);
             }
             return player;
         }
 
         public long asDuration() throws CommandException {
-            return parseDuration(this.value);
+            return parseDuration(value);
         }
 
         public String asIP() throws CommandException {
-            if (!IP_PATTERN.matcher(this.value).matches()) {
-                throw new CommandException("commands.generic.ip.invalid", this.value);
+            if (!IP_PATTERN.matcher(value).matches()) {
+                throw new CommandException("commands.generic.ip.invalid", value);
             }
-            return this.value;
+            return value;
         }
 
         @Nonnull
         public World asWorld() throws CommandException {
-            World world = this.context.server.getWorldManager().get(this.value);
+            World world = this.context.server.getWorldManager().get(value);
             if (world == null) {
-                throw new CommandException("commands.generic.world.notFound", this.value);
+                throw new CommandException("commands.generic.world.notFound", value);
             }
             return world;
         }
 
         public int asInt() throws CommandException {
             try {
-                return Integer.parseInt(this.value);
+                return Integer.parseInt(value);
             } catch (NumberFormatException exc) {
-                throw new CommandException("commands.generic.num.invalid", this.value);
+                throw new CommandException("commands.generic.num.invalid", value);
             }
         }
 
@@ -270,9 +283,9 @@ public class CommandContext {
 
         public float asFloat() throws CommandException {
             try {
-                return Float.parseFloat(this.value);
+                return Float.parseFloat(value);
             } catch (NumberFormatException exc) {
-                throw new CommandException("commands.generic.num.invalid", this.value);
+                throw new CommandException("commands.generic.num.invalid", value);
             }
         }
 
@@ -310,7 +323,7 @@ public class CommandContext {
 
         @Nonnull
         public Item asItem() throws CommandException {
-            ResourceLocation id = new ResourceLocation(this.value);
+            ResourceLocation id = new ResourceLocation(value);
             if (!Item.REGISTRY.containsKey(id)) {
                 throw new CommandException("commands.give.item.notFound", value);
             }
@@ -319,25 +332,25 @@ public class CommandContext {
 
         @Nonnull
         public Block asBlock() throws CommandException {
-            ResourceLocation id = new ResourceLocation(this.value);
+            ResourceLocation id = new ResourceLocation(value);
             if (!Block.REGISTRY.containsKey(id)) {
-                throw new CommandException("commands.give.block.notFound", this.value);
+                throw new CommandException("commands.give.block.notFound", value);
             }
             return Block.REGISTRY.getObject(id);
         }
 
         @Nonnull
         public IBlockState asBlockState() throws CommandException {
-            int firstBracket = this.value.indexOf('[');
+            int firstBracket = value.indexOf('[');
             boolean hasBracket = firstBracket >= 0;
-            ResourceLocation id = new ResourceLocation(hasBracket ? this.value.substring(0, firstBracket) : this.value);
+            ResourceLocation id = new ResourceLocation(hasBracket ? value.substring(0, firstBracket) : value);
             if (!Block.REGISTRY.containsKey(id)) {
-                throw new CommandException("commands.give.block.notFound", this.value);
+                throw new CommandException("commands.give.block.notFound", value);
             }
             Block block = Block.REGISTRY.getObject(id);
             IBlockState state = block.getDefaultState();
             if (hasBracket) {
-                String args = this.value.substring(firstBracket + 1, this.value.length() - 1);
+                String args = value.substring(firstBracket + 1, value.length() - 1);
                 Map<String, IProperty<?>> properties = new HashMap<>();
                 for (IProperty<?> property : state.getPropertyKeys()) {
                     properties.put(property.getName(), property);
