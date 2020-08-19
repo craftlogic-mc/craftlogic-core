@@ -4,6 +4,7 @@
   "target": "@env(DEFAULT)",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "MixinNettyPacketEncoder",
     "MixinServerHangWatchdog",
     "advancement.MixinAdvancementManager",
     "block.MixinBlock",
