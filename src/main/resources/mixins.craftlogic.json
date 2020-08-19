@@ -4,6 +4,7 @@
   "target": "@env(DEFAULT)",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "MixinServerHangWatchdog",
     "advancement.MixinAdvancementManager",
     "block.MixinBlock",
     "block.MixinBlockBasePressurePlate",
