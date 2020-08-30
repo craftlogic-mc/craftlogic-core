@@ -108,6 +108,8 @@
     "world.biome.MixinBiomeTaiga",
     "world.gen.structure.MixinJungleTemple",
     "world.gen.structure.MixinVillage",
+    "world.gen.structure.MixinVillageHouseBlacksmith",
+    "world.gen.structure.MixinVillageHouseChurch",
     "world.storage.MixinSaveHandler"
   ],
   "client": [
