@@ -1,0 +1,23 @@
+{
+  "conditions": [
+    {
+      "type": "minecraft:item_exists",
+      "item": "craftlogic:stone_brick"
+    }
+  ],
+  "key": {
+    "A": {
+      "item": "craftlogic:stone_brick"
+    }
+  },
+  "pattern": [
+    "A  ",
+    "AA ",
+    "AAA"
+  ],
+  "result": {
+    "count": 1,
+    "item": "minecraft:stone_brick_stairs"
+  },
+  "type": "minecraft:crafting_shaped"
+}

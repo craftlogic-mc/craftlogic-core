@@ -1,0 +1,25 @@
+{
+  "conditions": [
+    {
+      "type": "minecraft:item_exists",
+      "item": "craftlogic:stone_brick"
+    }
+  ],
+  "key": {
+    "A": {
+      "item": "craftlogic:stone_brick"
+    },
+    "#": {
+      "item": "minecraft:glowstone"
+    }
+  },
+  "pattern": [
+    " A ",
+    "A#A",
+    " A "
+  ],
+  "result": {
+    "item": "craftlogic:stonebrick_light"
+  },
+  "type": "minecraft:crafting_shaped"
+}
