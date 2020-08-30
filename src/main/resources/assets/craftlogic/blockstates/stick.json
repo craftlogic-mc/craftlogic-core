@@ -2,24 +2,24 @@
   "variants": {
     "normal": [
       {
-        "model": "craftlogic:rock",
+        "model": "minecraft:stick",
         "item": true,
         "x": 90
       },
       {
-        "model": "craftlogic:rock",
+        "model": "minecraft:stick",
         "item": true,
         "x": 90,
         "y": 90
       },
       {
-        "model": "craftlogic:rock",
+        "model": "minecraft:stick",
         "item": true,
         "x": 90,
         "y": 180
       },
       {
-        "model": "craftlogic:rock",
+        "model": "minecraft:stick",
         "item": true,
         "x": 90,
         "y": 270
