@@ -13,6 +13,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.model.ModelManager;
 
 public class BlockBarrelStone extends BlockBarrel {
@@ -61,7 +62,11 @@ public class BlockBarrelStone extends BlockBarrel {
         for (EnumType stoneType : EnumType.values()) {
             if (stoneType.isNatural()) {
                 int meta = stoneType.getMetadata();
-                items.add(new ItemStack(this, 1, meta > 1 ? (meta + 1) / 2 : meta));
+                if (!CraftConfig.tweaks.enableStoneUnification || meta == 0) {
+                    items.add(new ItemStack(this, 1, meta > 1 ? (meta + 1) / 2 : meta));
+                } else {
+                    break;
+                }
             }
         }
     }
