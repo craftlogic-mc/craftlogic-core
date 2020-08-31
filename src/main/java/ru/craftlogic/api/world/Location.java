@@ -110,121 +110,121 @@ public class Location extends ChunkLocation {
 
     public JsonObject serialize() {
         JsonObject json = new JsonObject();
-        json.addProperty("x", this.getX());
-        json.addProperty("y", this.getY());
-        json.addProperty("z", this.getZ());
-        json.addProperty("yaw", this.getYaw());
-        json.addProperty("pitch", this.getPitch());
+        json.addProperty("x", getX());
+        json.addProperty("y", getY());
+        json.addProperty("z", getZ());
+        json.addProperty("yaw", getYaw());
+        json.addProperty("pitch", getPitch());
         return json;
     }
 
     public int getBlockX() {
-        return MathHelper.floor(this.getX());
+        return MathHelper.floor(getX());
     }
 
     public int getBlockY() {
-        return MathHelper.floor(this.getY());
+        return MathHelper.floor(getY());
     }
 
     public int getBlockZ() {
-        return MathHelper.floor(this.getZ());
+        return MathHelper.floor(getZ());
     }
 
     public double getX() {
-        return this.x;
+        return x;
     }
 
     public double getY() {
-        return this.y;
+        return y;
     }
 
     public double getZ() {
-        return this.z;
+        return z;
     }
 
     public float getYaw() {
-        return this.yaw;
+        return yaw;
     }
 
     public float getPitch() {
-        return this.pitch;
+        return pitch;
     }
 
     public BlockPos getPos() {
-        return new BlockPos(this.getBlockX(), this.getBlockY(), this.getBlockZ());
+        return new BlockPos(getBlockX(), getBlockY(), getBlockZ());
     }
 
     public boolean isSameBlock(Block block) {
-        return this.getBlock() == block;
+        return getBlock() == block;
     }
 
     public boolean isSameBlockMaterial(Material material) {
-        return this.getBlockMaterial() == material;
+        return getBlockMaterial() == material;
     }
 
     public boolean setBlock(Block block) {
-        return this.setBlockState(block.getDefaultState());
+        return setBlockState(block.getDefaultState());
     }
 
     public boolean setBlock(Block block, int flag) {
-        return this.setBlockState(block.getDefaultState(), flag);
+        return setBlockState(block.getDefaultState(), flag);
     }
 
     public boolean setBlockState(IBlockState state) {
-        return this.getWorld().setBlockState(this.getPos(), state);
+        return getWorld().setBlockState(getPos(), state);
     }
 
     public boolean setBlockState(IBlockState state, int flag) {
-        return this.getWorld().setBlockState(this.getPos(), state, flag);
+        return getWorld().setBlockState(getPos(), state, flag);
     }
 
     public <B> B getBlock(Class<B> type) {
-        Block block = this.getBlock();
+        Block block = getBlock();
         return block == Blocks.AIR || !type.isAssignableFrom(block.getClass()) ? null : (B)block;
     }
 
     public Block getBlock() {
-        return this.getBlockState().getBlock();
+        return getBlockState().getBlock();
     }
 
     public Material getBlockMaterial() {
-        return this.getBlockState().getMaterial();
+        return getBlockState().getMaterial();
     }
 
     public IBlockState getActualBlockState() {
-        return this.getBlockState().getActualState(this.getBlockAccessor(), this.getPos());
+        return getBlockState().getActualState(getBlockAccessor(), getPos());
     }
 
     public IBlockState getBlockState() {
-        return this.getBlockAccessor().getBlockState(this.getPos());
+        return getBlockAccessor().getBlockState(getPos());
     }
 
     @Override
     public World getWorld() {
-        return this.world != null ? this.world.get() : super.getWorld();
+        return world != null ? world.get() : super.getWorld();
     }
 
     public <T extends Comparable<T>> T getBlockProperty(IProperty<T> property) {
-        return this.getBlockState().getValue(property);
+        return getBlockState().getValue(property);
     }
 
     public <T extends Comparable<T>> void setBlockProperty(IProperty<T> property, T value) {
-        this.setBlockState(this.getBlockState().withProperty(property, value));
+        setBlockState(getBlockState().withProperty(property, value));
     }
 
     public <T extends Comparable<T>> void setBlockProperty(IProperty<T> property, T value, int flag) {
-        this.setBlockState(this.getBlockState().withProperty(property, value), flag);
+        setBlockState(getBlockState().withProperty(property, value), flag);
     }
 
     public <T extends Comparable<T>> T cycleBlockProperty(IProperty<T> property) {
-        IBlockState newState = this.getBlockState().cycleProperty(property);
-        this.setBlockState(newState);
+        IBlockState newState = getBlockState().cycleProperty(property);
+        setBlockState(newState);
         return newState.getValue(property);
     }
 
     public <T extends Comparable<T>> T cycleBlockProperty(IProperty<T> property, int flag) {
-        IBlockState newState = this.getBlockState().cycleProperty(property);
-        this.setBlockState(newState, flag);
+        IBlockState newState = getBlockState().cycleProperty(property);
+        setBlockState(newState, flag);
         return newState.getValue(property);
     }
 
@@ -237,78 +237,78 @@ public class Location extends ChunkLocation {
     }
 
     public Biome getBiome() {
-        return this.getBlockAccessor().getBiome(this.getPos());
+        return getChunk().getBiome(getPos(), getWorld().getBiomeProvider());
     }
 
     public float getBiomeTemperature() {
-        return this.getBiome().getTemperature(this.getPos());
+        return getBiome().getTemperature(getPos());
     }
 
     public float getBiomeRainfall() {
-        return this.getBiome().getRainfall();
+        return getBiome().getRainfall();
     }
 
     public TileEntity getTileEntity() {
-        return this.getBlockAccessor().getTileEntity(this.getPos());
+        return getBlockAccessor().getTileEntity(getPos());
     }
 
     public <T> T getTileEntity(Class<T> type) {
-        return TileEntities.getTileEntity(this.getBlockAccessor(), this.getPos(), type);
+        return TileEntities.getTileEntity(getBlockAccessor(), getPos(), type);
     }
 
     public void withTileEntity(Consumer<TileEntity> action) {
-        TileEntity tile = this.getTileEntity();
+        TileEntity tile = getTileEntity();
         if (tile != null) {
             action.accept(tile);
         }
     }
 
     public <T> void withTileEntity(Class<T> type, Consumer<T> action) {
-        T tile = this.getTileEntity(type);
+        T tile = getTileEntity(type);
         if (tile != null) {
             action.accept(tile);
         }
     }
 
     public boolean setBlockToAir() {
-        return this.setBlockToAir(false);
+        return setBlockToAir(false);
     }
 
     public boolean setBlockToAir(boolean drop) {
         if (drop) {
             getBlock().dropBlockAsItem(getWorld(), getPos(), getBlockState(), 0);
         }
-        return this.getWorld().setBlockToAir(this.getPos());
+        return getWorld().setBlockToAir(getPos());
     }
 
     public void spawnParticle(EnumParticleTypes particle, double ox, double oy, double oz, double mx, double my, double mz, int... data) {
-        World world = this.getWorld();
+        World world = getWorld();
         if (world instanceof WorldServer) {
-            ((WorldServer)world).spawnParticle(particle, this.getX() + ox, this.getY() + oy, this.getZ() + oz, 1, mx, my, mz, 1.0, data);
+            ((WorldServer)world).spawnParticle(particle, getX() + ox, getY() + oy, getZ() + oz, 1, mx, my, mz, 1.0, data);
         } else {
-            world.spawnParticle(particle, this.getX() + ox, this.getY() + oy, this.getZ() + oz, mx, my, mz, data);
+            world.spawnParticle(particle, getX() + ox, getY() + oy, getZ() + oz, mx, my, mz, data);
         }
     }
 
     public void playSound(SoundEvent sound, SoundCategory category, float volume, float pitch) {
-        World world = this.getWorld();
+        World world = getWorld();
         if (world.isRemote) {
-            world.playSound(this.getX(), this.getY(), this.getZ(), sound, category, volume, pitch, false);
+            world.playSound(getX(), getY(), getZ(), sound, category, volume, pitch, false);
         } else {
-            world.playSound(null, this.getX(), this.getY(), this.getZ(), sound, category, volume, pitch);
+            world.playSound(null, getX(), getY(), getZ(), sound, category, volume, pitch);
         }
     }
 
     public void playEvent(int id, int data) {
-        getWorld().playEvent(id, this.getPos(), data);
+        getWorld().playEvent(id, getPos(), data);
     }
 
     public Explosion explode(Entity exploder, float power, boolean igniteBlocks, boolean damageBlocks) {
-        return this.getWorld().newExplosion(exploder, this.getX(), this.getY(), this.getZ(), power, igniteBlocks, damageBlocks);
+        return getWorld().newExplosion(exploder, getX(), getY(), getZ(), power, igniteBlocks, damageBlocks);
     }
 
     public boolean canBlockBePlaced(Block block) {
-        return getBlock().isReplaceable(getWorld(), getPos()) && block.canPlaceBlockAt(this.getWorld(), this.getPos());
+        return getBlock().isReplaceable(getWorld(), getPos()) && block.canPlaceBlockAt(getWorld(), getPos());
     }
 
     public boolean setBlockIfPossible(Block block) {
@@ -321,21 +321,21 @@ public class Location extends ChunkLocation {
     }
 
     public Bounding toBounding(int width, int height, int depth) {
-        return new CenteredBounding(this.getX(), this.getY(), this.getZ(), width, height, depth) {
+        return new CenteredBounding(getX(), getY(), getZ(), width, height, depth) {
             @Override
             public double getStartY() {
-                return Math.max(this.getStartY(), 0);
+                return Math.max(getStartY(), 0);
             }
 
             @Override
             public double getEndY() {
-                return Math.min(this.getEndY(), Location.this.getWorld().getHeight());
+                return Math.min(getEndY(), getWorld().getHeight());
             }
         };
     }
 
     public Bounding toFullHeightBounding(int width, int depth) {
-        return new CenteredBounding(this.getX(), this.getY(), this.getZ(), width, 0, depth) {
+        return new CenteredBounding(getX(), getY(), getZ(), width, 0, depth) {
             @Override
             public double getStartY() {
                 return 0;
@@ -343,19 +343,19 @@ public class Location extends ChunkLocation {
 
             @Override
             public double getEndY() {
-                return Location.this.getWorld().getHeight();
+                return getWorld().getHeight();
             }
         };
     }
 
     @Override
     public Location offset(EnumFacing side) {
-        return this.offset(side, 1);
+        return offset(side, 1);
     }
 
     @Override
     public Location offset(EnumFacing side, int amount) {
-        return this.add(
+        return add(
             side.getXOffset() * amount,
             side.getYOffset() * amount,
             side.getZOffset() * amount
@@ -363,7 +363,7 @@ public class Location extends ChunkLocation {
     }
 
     public Location offset(EnumFacing side, double amount) {
-        return this.add(
+        return add(
             side.getXOffset() * amount,
             side.getYOffset() * amount,
             side.getZOffset() * amount
@@ -371,11 +371,11 @@ public class Location extends ChunkLocation {
     }
 
     public Location randomize(Random rand, double range) {
-        return this.randomize(rand, range, range, range);
+        return randomize(rand, range, range, range);
     }
 
     public Location randomize(Random rand, double rangeX, double rangeY, double rangeZ) {
-        return this.add(
+        return add(
             rand.nextDouble() * rangeX - (rangeX / 2.0),
             rand.nextDouble() * rangeY - (rangeY / 2.0),
             rand.nextDouble() * rangeZ - (rangeZ / 2.0)
@@ -383,27 +383,27 @@ public class Location extends ChunkLocation {
     }
 
     protected Location add(double x, double y, double z) {
-        return new Location(this.getDimensionId(), this.getX() + x, this.getY() + y, this.getZ() + z);
+        return new Location(getDimensionId(), getX() + x, getY() + y, getZ() + z);
     }
 
     public boolean isBlockLoaded() {
-        return isWorldLoaded() && this.getWorld().isBlockLoaded(this.getPos());
+        return isWorldLoaded() && getWorld().isBlockLoaded(getPos());
     }
 
     public boolean isWorldLoaded() {
-        return this.getWorld() != null;
+        return getWorld() != null;
     }
 
     public boolean isSideSolid(EnumFacing facing) {
-        return this.isSideSolid(facing, false);
+        return isSideSolid(facing, false);
     }
 
     public boolean isSideSolid(EnumFacing facing, boolean def) {
-        return this.getBlockAccessor().isSideSolid(this.getPos(), facing, def);
+        return getBlockAccessor().isSideSolid(getPos(), facing, def);
     }
 
     public boolean spawnEntity(Entity entity) {
-        return this.getWorld().spawnEntity(entity);
+        return getWorld().spawnEntity(entity);
     }
 
     public void spawnItem(ItemStack item) {
@@ -423,11 +423,11 @@ public class Location extends ChunkLocation {
     }
 
     public void removeTileEntity() {
-        this.getWorld().removeTileEntity(this.getPos());
+        getWorld().removeTileEntity(getPos());
     }
 
     public EnumFacing getDirectionFromEntityLiving(EntityLivingBase entity) {
-        return EnumFacing.getDirectionFromEntityLiving(this.getPos(), entity);
+        return EnumFacing.getDirectionFromEntityLiving(getPos(), entity);
     }
 
     public boolean isAreaLoaded(int radius) {
@@ -469,7 +469,7 @@ public class Location extends ChunkLocation {
     }
 
     public boolean isAir() {
-        return this.getBlockMaterial() == Material.AIR;
+        return getBlockMaterial() == Material.AIR;
     }
 
     @SideOnly(Side.CLIENT)
@@ -478,12 +478,12 @@ public class Location extends ChunkLocation {
     }
 
     public double distance(Location other) {
-        double sq = this.distanceSq(other);
+        double sq = distanceSq(other);
         return Math.sqrt(sq);
     }
 
     public double distanceSq(Location other) {
-        return this.getDimensionId() != other.getDimensionId() ? Double.POSITIVE_INFINITY : this.getPos().distanceSq(other.getPos());
+        return getDimensionId() != other.getDimensionId() ? Double.POSITIVE_INFINITY : getPos().distanceSq(other.getPos());
     }
 
     @Override
@@ -510,7 +510,7 @@ public class Location extends ChunkLocation {
 
     @Override
     public int hashCode() {
-        int result = this.getDimensionId();
+        int result = getDimensionId();
         long temp = Double.doubleToLongBits(x);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(y);

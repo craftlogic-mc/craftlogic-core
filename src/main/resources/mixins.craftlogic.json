@@ -97,6 +97,7 @@
     "util.text.MixinITextComponent$Serializer",
     "world.MixinAnvilChunkLoader",
     "world.MixinChunk",
+    "world.MixinChunkCache",
     "world.MixinChunkProviderServer",
     "world.MixinCommandHandler",
     "world.MixinExtendedBlockStorage",

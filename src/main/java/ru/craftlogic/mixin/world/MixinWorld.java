@@ -1,6 +1,9 @@
 package ru.craftlogic.mixin.world;
 
+import net.minecraft.world.chunk.Chunk;
+import org.spongepowered.asm.mixin.Shadow;
 import ru.craftlogic.api.light.LightingEngineProvider;
+import ru.craftlogic.api.world.ChunkGetter;
 import ru.craftlogic.common.world.lighting.LightingEngineFast;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.EnumSkyBlock;
@@ -12,7 +15,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(World.class)
-public abstract class MixinWorld implements LightingEngineProvider {
+public abstract class MixinWorld implements LightingEngineProvider, ChunkGetter {
+    @Shadow public abstract Chunk getChunk(int chunkX, int chunkZ);
+
     private LightingEngineFast lightingEngine;
 
     /**
@@ -38,5 +43,10 @@ public abstract class MixinWorld implements LightingEngineProvider {
     @Override
     public LightingEngineFast getLightingEngine() {
         return this.lightingEngine;
+    }
+
+    @Override
+    public Chunk getChunkAt(int chunkX, int chunkZ) {
+        return getChunk(chunkX, chunkZ);
     }
 }

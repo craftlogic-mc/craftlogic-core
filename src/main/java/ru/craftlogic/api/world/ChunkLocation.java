@@ -38,57 +38,62 @@ public class ChunkLocation {
     }
 
     public IBlockAccess getBlockAccessor() {
-        return this.getWorld();
+        return getWorld();
     }
 
     public World getWorld() {
-        return CraftWorlds.getOrLoadWorld(this.getDimensionId());
+        return CraftWorlds.getOrLoadWorld(getDimensionId());
     }
 
     public String getWorldName() {
         try {
-            return DimensionType.getById(this.getDimensionId()).getName();
+            return DimensionType.getById(getDimensionId()).getName();
         } catch (IllegalArgumentException e) {
-            return "DIM" + this.getDimensionId();
+            return "DIM" + getDimensionId();
         }
     }
 
     public Chunk getChunk() {
-        return getWorld().getChunk(getChunkX(), getChunkZ());
+        IBlockAccess ba = getBlockAccessor();
+        if (ba instanceof ChunkGetter) {
+            return ((ChunkGetter) ba).getChunkAt(getChunkX(), getChunkZ());
+        } else {
+            return null;
+        }
     }
 
     public int getChunkX() {
-        return this.x;
+        return x;
     }
 
     public int getChunkZ() {
-        return this.z;
+        return z;
     }
 
     public Dimension getDimension() {
-        return Dimension.fromVanilla(DimensionType.getById(this.dimension));
+        return Dimension.fromVanilla(DimensionType.getById(dimension));
     }
 
     public int getDimensionId() {
-        return this.dimension;
+        return dimension;
     }
 
     public boolean isDimensionLoaded() {
-        return DimensionManager.getWorld(this.getDimensionId()) != null;
+        return DimensionManager.getWorld(getDimensionId()) != null;
     }
 
     public boolean isWithinWorldBorder() {
-        return getWorld().getWorldBorder().contains(new ChunkPos(this.x, this.z));
+        return getWorld().getWorldBorder().contains(new ChunkPos(x, z));
     }
 
     public ChunkLocation offset(EnumFacing side) {
-        return this.offset(side, 1);
+        return offset(side, 1);
     }
 
     public ChunkLocation offset(EnumFacing side, int amount) {
-        return new ChunkLocation(this.dimension,
-            this.x + side.getXOffset() * amount,
-            this.z + side.getZOffset() * amount
+        return new ChunkLocation(dimension,
+            x + side.getXOffset() * amount,
+            z + side.getZOffset() * amount
         );
     }
 
