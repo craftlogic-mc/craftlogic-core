@@ -1,0 +1,23 @@
+{
+  "conditions": [
+    {
+      "type": "minecraft:item_exists",
+      "item": "craftlogic:red_sandy_rock"
+    }
+  ],
+  "key": {
+    "A": {
+      "item": "craftlogic:red_sandy_rock"
+    }
+  },
+  "pattern": [
+    "AA",
+    "AA"
+  ],
+  "result": {
+    "count": 1,
+    "item": "minecraft:red_sandstone",
+    "data": 0
+  },
+  "type": "minecraft:crafting_shaped"
+}

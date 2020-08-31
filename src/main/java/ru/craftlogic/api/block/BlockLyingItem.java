@@ -13,7 +13,7 @@ import ru.craftlogic.api.world.Location;
 import javax.annotation.Nullable;
 
 public class BlockLyingItem extends BlockNarrow {
-    private static final AxisAlignedBB BOUNDING = new AxisAlignedBB(2.0 / 16.0, 0.0, 2.0 / 16.0, 14.0 / 16.0, 1.0 / 16.0, 14.0 / 16.0);
+    private static final AxisAlignedBB BOUNDING = new AxisAlignedBB(0, 0.0, 0, 1, 1.0 / 16.0, 1);
 
     public BlockLyingItem(String name, float hardness, CreativeTabs tab) {
         super(Material.GROUND, name, hardness, tab);

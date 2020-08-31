@@ -5,13 +5,16 @@ import net.minecraft.creativetab.CreativeTabs;
 import ru.craftlogic.api.block.BlockLyingItem;
 
 public class BlockRock extends BlockLyingItem {
-    public BlockRock() {
-        super("rock", 0F, CreativeTabs.DECORATIONS);
+    private final double maxOffset;
+
+    public BlockRock(String name, double maxOffset) {
+        super(name, 0F, CreativeTabs.DECORATIONS);
+        this.maxOffset = maxOffset;
         setSoundType(SoundType.STONE);
     }
 
     @Override
     protected double getMaxOffset() {
-        return 0.2;
+        return maxOffset;
     }
 }

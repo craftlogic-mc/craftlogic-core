@@ -25,6 +25,8 @@ item.forge.bucketFilled.milk=Milk Bucket
 item.forge.bucketFilled.oil=Crude Oil Bucket
 
 tile.rock.name=Rock
+tile.sandy_rock.name=Sandy Rock
+tile.red_sandy_rock.name=Red Sandy Rock
 tile.barrel_wood.name=Wooden Barrel
 tile.barrel_stone.name=Stone Barrel
 tile.drying_rack.name=Drying Rack

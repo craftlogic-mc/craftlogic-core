@@ -1,0 +1,23 @@
+{
+  "conditions": [
+    {
+      "type": "minecraft:item_exists",
+      "item": "craftlogic:sandy_rock"
+    }
+  ],
+  "key": {
+    "A": {
+      "item": "craftlogic:sandy_rock"
+    }
+  },
+  "pattern": [
+    "A  ",
+    "AA ",
+    "AAA"
+  ],
+  "result": {
+    "count": 1,
+    "item": "minecraft:sandstone_stairs"
+  },
+  "type": "minecraft:crafting_shaped"
+}

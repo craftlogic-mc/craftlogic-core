@@ -30,7 +30,7 @@ public class CraftBlocks {
     public static Block DRYING_RACK;
     public static BlockGourd MELON, PUMPKIN;
     public static Block MUSHROOM_GRASS;
-    public static Block ROCK, STICK;
+    public static Block ROCK, SANDY_ROCK, RED_SANDY_ROCK, STICK;
     public static Block LOG3;
     public static Block LEAVES3;
     public static Block SAPLING2;
@@ -62,7 +62,9 @@ public class CraftBlocks {
         MUSHROOM_GRASS = registerBlock(new BlockMushroomGrass());
 
         if (CraftConfig.items.enableRocks) {
-            ROCK = registerBlockWithItem(new BlockRock(), ItemRock::new);
+            ROCK = registerBlockWithItem(new BlockRock("rock", 0.2), ItemRock::new);
+            SANDY_ROCK = registerBlockWithItem(new BlockRock("sandy_rock", 0.3), ItemRock::new);
+            RED_SANDY_ROCK = registerBlockWithItem(new BlockRock("red_sandy_rock", 0.3), ItemRock::new);
         }
         STICK = registerBlock(new BlockStick());
 

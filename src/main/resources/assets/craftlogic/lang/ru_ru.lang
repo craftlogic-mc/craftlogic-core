@@ -25,6 +25,8 @@ item.forge.bucketFilled.milk=Ведро молока
 item.forge.bucketFilled.oil=Ведро сырой нефти
 
 tile.rock.name=Камень
+tile.sandy_rock.name=Песчаный камень
+tile.red_sandy_rock.name=Красный песчаный камень
 tile.barrel_wood.name=Деревянная бочка
 tile.barrel_stone.name=Каменная бочка
 tile.drying_rack.name=Сушилка

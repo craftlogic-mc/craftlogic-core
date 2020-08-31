@@ -1,0 +1,29 @@
+{
+  "variants": {
+    "normal": [
+      {
+        "model": "craftlogic:red_sandy_rock",
+        "item": true,
+        "x": 90
+      },
+      {
+        "model": "craftlogic:red_sandy_rock",
+        "item": true,
+        "x": 90,
+        "y": 90
+      },
+      {
+        "model": "craftlogic:red_sandy_rock",
+        "item": true,
+        "x": 90,
+        "y": 180
+      },
+      {
+        "model": "craftlogic:red_sandy_rock",
+        "item": true,
+        "x": 90,
+        "y": 270
+      }
+    ]
+  }
+}
