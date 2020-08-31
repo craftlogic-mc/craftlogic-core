@@ -111,9 +111,10 @@ public final class CommandTime extends CommandBase {
                 long time = parseTimePhrase(phrase);
                 for (World world : getAffectedWorlds(ctx)) {
                     ctx.sendNotification(
-                        Text.translation("commands.time.set").gray()
-                            .arg(world.getName(), Text::darkGray)
-                            .argTranslate("commands.time.set." + phrase, Text::darkGray)
+                        Text.translation("commands.time.set")
+                            .yellow()
+                            .arg(world.getName(), Text::gold)
+                            .argTranslate("commands.time.set." + phrase, Text::gold)
                     );
                     world.setTotalTime(time);
                 }

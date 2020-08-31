@@ -46,7 +46,10 @@ public final class CraftWorldGenerator implements IWorldGenerator {
                 int x = chunkX * 16 + rand.nextInt(16) + 8;
                 int z = chunkZ * 16 + rand.nextInt(16) + 8;
                 int y = world.getTopSolidOrLiquidBlock(new BlockPos(x, 0, z)).getY() * 2;
-                rockGen.generate(world, rand, new BlockPos(x, y, z));
+                Biome biome = world.getBiome(new BlockPos(x, y, z));
+                if (biome.getTempCategory() == Biome.TempCategory.MEDIUM) {
+                    rockGen.generate(world, rand, new BlockPos(x, y, z));
+                }
             }
         }
         for (int i = 0; i < 1; ++i) {
