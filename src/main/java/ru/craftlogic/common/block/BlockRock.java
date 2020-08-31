@@ -8,7 +8,7 @@ public class BlockRock extends BlockLyingItem {
     private final double maxOffset;
 
     public BlockRock(String name, double maxOffset) {
-        super(name, 0F, CreativeTabs.DECORATIONS);
+        super(name, 0F, CreativeTabs.MATERIALS);
         this.maxOffset = maxOffset;
         setSoundType(SoundType.STONE);
     }
