@@ -1,0 +1,6 @@
+{
+    "parent": "craftlogic:block/berry_bush_huge",
+    "textures": {
+        "all": "craftlogic:blocks/raspberry_ripe"
+    }
+}

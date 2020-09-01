@@ -1,0 +1,6 @@
+{
+    "parent": "craftlogic:block/berry_bush_medium",
+    "textures": {
+        "all": "craftlogic:blocks/blueberry"
+    }
+}

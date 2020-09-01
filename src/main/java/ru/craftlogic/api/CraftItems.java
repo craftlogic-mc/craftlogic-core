@@ -26,7 +26,7 @@ public class CraftItems {
     public static Item CREEPER_OYSTERS;
     public static Item GRASS;
     public static Item STONE_AXE_HEADING;
-    public static Item BERRY;
+    public static Item BLUEBERRY, RASPBERRY;
 
     static void init(Side side) {
         SPIT = registerItem(new ItemBase("spit", CreativeTabs.MISC));
@@ -51,7 +51,10 @@ public class CraftItems {
         CREEPER_OYSTERS = registerItem(new ItemCreeperOysters());
         GRASS = registerItem(new ItemBase("grass", CreativeTabs.MATERIALS));
         STONE_AXE_HEADING = registerItem(new ItemBase("stone_axe_heading", CreativeTabs.TOOLS).setMaxStackSize(1));
-        BERRY = registerItem(new ItemBerry());
+        if (CraftConfig.items.enableBerries) {
+            BLUEBERRY = registerItem(new ItemBerry("blueberry"));
+            RASPBERRY = registerItem(new ItemBerry("raspberry"));
+        }
     }
 
     public static Item registerItem(@Nonnull Item item) {

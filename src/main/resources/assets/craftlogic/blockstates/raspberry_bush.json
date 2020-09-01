@@ -1,0 +1,16 @@
+{
+    "variants": {
+        "ripe=false":  [
+        	{ "model": "craftlogic:raspberry_bush" },
+        	{ "model": "craftlogic:raspberry_bush", "y": 90 },
+        	{ "model": "craftlogic:raspberry_bush", "y": 180 },
+        	{ "model": "craftlogic:raspberry_bush", "y": 270 }
+        ],
+        "ripe=true":  [
+        	{ "model": "craftlogic:raspberry_bush_ripe" },
+        	{ "model": "craftlogic:raspberry_bush_ripe", "y": 90 },
+        	{ "model": "craftlogic:raspberry_bush_ripe", "y": 180 },
+        	{ "model": "craftlogic:raspberry_bush_ripe", "y": 270 }
+        ]
+    }
+}

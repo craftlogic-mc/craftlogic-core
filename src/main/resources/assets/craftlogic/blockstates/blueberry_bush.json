@@ -1,0 +1,16 @@
+{
+    "variants": {
+        "ripe=false":  [
+        	{ "model": "craftlogic:blueberry_bush" },
+        	{ "model": "craftlogic:blueberry_bush", "y": 90 },
+        	{ "model": "craftlogic:blueberry_bush", "y": 180 },
+        	{ "model": "craftlogic:blueberry_bush", "y": 270 }
+        ],
+        "ripe=true":  [
+        	{ "model": "craftlogic:blueberry_bush_ripe" },
+        	{ "model": "craftlogic:blueberry_bush_ripe", "y": 90 },
+        	{ "model": "craftlogic:blueberry_bush_ripe", "y": 180 },
+        	{ "model": "craftlogic:blueberry_bush_ripe", "y": 270 }
+        ]
+    }
+}

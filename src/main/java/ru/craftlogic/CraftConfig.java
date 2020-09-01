@@ -29,6 +29,10 @@ public class CraftConfig {
         public boolean enableStoneBricks = true;
 
         @Config.RequiresMcRestart
+        @Config.Comment("Enable berries")
+        public boolean enableBerries = true;
+
+        @Config.RequiresMcRestart
         @Config.Comment("Enable poor rocks")
         public boolean enableRocks = true;
 

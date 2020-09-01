@@ -4,7 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
@@ -18,53 +18,54 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.ColorizerFoliage;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.api.CraftAPI;
-import ru.craftlogic.api.CraftItems;
-import ru.craftlogic.api.block.Colored;
 import ru.craftlogic.api.entity.Creature;
 import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.model.ModelRegistrar;
-import ru.craftlogic.api.util.Nameable;
-import ru.craftlogic.api.world.Location;
 
-import javax.annotation.Nullable;
 import java.util.Random;
 
-public class BlockBerryBush extends BlockBush implements ModelRegistrar, Colored {
-    public static final PropertyEnum<Stage> STAGE = PropertyEnum.create("stage", Stage.class);
+public abstract class BlockBerryBush extends BlockBush implements ModelRegistrar {
+    public static final PropertyBool RIPE = PropertyBool.create("ripe");
 
-    public BlockBerryBush() {
+    public BlockBerryBush(String name) {
         super(Material.GRASS);
-        setRegistryName("berry_bush");
+        setRegistryName(name + "_bush");
+        setTranslationKey(name + "_bush");
         setHarvestLevel("axe", 1);
-        setTranslationKey("berry_bush");
         setCreativeTab(CreativeTabs.DECORATIONS);
         setSoundType(SoundType.PLANT);
         setTickRandomly(true);
         setHardness(0.8F);
+        setDefaultState(getBlockState().getBaseState().withProperty(RIPE, false));
     }
 
     @Override
+    public abstract AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos);
+
+    public abstract Item getBerry();
+
+    @Override
     public IBlockState getStateFromMeta(int meta) {
-        return getDefaultState().withProperty(STAGE, Stage.values()[meta % Stage.values().length]);
+        return getDefaultState().withProperty(RIPE, (meta & 8) > 0);
     }
 
     @Override
     public int getMetaFromState(IBlockState state) {
-        return state.getValue(STAGE).ordinal();
+        return state.getValue(RIPE) ? 8 : 0;
     }
 
     @Override
     protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, STAGE);
+        return new BlockStateContainer(this, RIPE);
     }
 
     @Override
@@ -74,25 +75,13 @@ public class BlockBerryBush extends BlockBush implements ModelRegistrar, Colored
     }
 
     @Override
-    @SideOnly(Side.CLIENT)
-    public int getBlockColor(@Nullable Location location, IBlockState state, int tint) {
-        return tint == 1 ? 0xFF0000 : (location != null ? location.getFoliageColor() : 0xFFFFFF);
-    }
-
-    @Override
-    public int getItemColor(ItemStack stack, int tint) {
-        return tint == 1 ? 0xFF0000 : ColorizerFoliage.getFoliageColorBasic();
-    }
-
-    @Override
     public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
         if (world.isAreaLoaded(pos, 1)) {
-            Stage stage = state.getValue(STAGE);
             if (world.getLightFromNeighbors(pos.up()) >= 9) {
-                if (!stage.isRipe()) {
+                if (!state.getValue(RIPE)) {
                     float chance = getGrowthChance(this, world, pos);
-                    if (ForgeHooks.onCropsGrowPre(world, pos, state, rand.nextInt((int) (25F / chance) + 1) == 0)) {
-                        world.setBlockState(pos, state.cycleProperty(STAGE));
+                    if (ForgeHooks.onCropsGrowPre(world, pos, state, rand.nextInt((int) (100F / chance) + 1) == 0)) {
+                        world.setBlockState(pos, state.cycleProperty(RIPE));
                         ForgeHooks.onCropsGrowPost(world, pos, state, world.getBlockState(pos));
                     }
                 }
@@ -102,10 +91,11 @@ public class BlockBerryBush extends BlockBush implements ModelRegistrar, Colored
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        if (state.getValue(STAGE).isRipe() && player.getHeldItem(hand).isEmpty()) {
+        if (state.getValue(RIPE) && player.getHeldItem(hand).isEmpty()) {
             if (!world.isRemote) {
-                world.setBlockState(pos, state.withProperty(STAGE, Stage.BIG));
-                ItemStack berries = new ItemStack(CraftItems.BERRY, 1 + world.rand.nextInt(3));
+                world.playEvent(2001, pos, Block.getStateId(state));
+                world.setBlockState(pos, state.withProperty(RIPE, false));
+                ItemStack berries = new ItemStack(getBerry(), 1 + world.rand.nextInt(2));
                 if (!player.inventory.addItemStackToInventory(berries)) {
                     player.dropItem(berries, false);
                 }
@@ -201,13 +191,5 @@ public class BlockBerryBush extends BlockBush implements ModelRegistrar, Colored
         }
 
         return chance;
-    }
-
-    public enum Stage implements Nameable {
-        SMALL, MEDIUM, BIG, BIG_RIPE;
-
-        public boolean isRipe() {
-            return this == BIG_RIPE;
-        }
     }
 }
