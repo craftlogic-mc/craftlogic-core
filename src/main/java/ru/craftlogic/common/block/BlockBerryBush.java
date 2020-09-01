@@ -3,7 +3,6 @@ package ru.craftlogic.common.block;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -28,6 +27,7 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.api.CraftAPI;
+import ru.craftlogic.api.CraftMaterials;
 import ru.craftlogic.api.block.Plantable;
 import ru.craftlogic.api.entity.Creature;
 import ru.craftlogic.api.model.ModelManager;
@@ -40,10 +40,9 @@ public abstract class BlockBerryBush extends BlockBush implements ModelRegistrar
     public static final PropertyBool RIPE = PropertyBool.create("ripe");
 
     public BlockBerryBush(String name) {
-        super(Material.GRASS);
+        super(CraftMaterials.BERRY_BUSH);
         setRegistryName(name + "_bush");
         setTranslationKey(name + "_bush");
-        setHarvestLevel("pickaxe", 1);
         setHarvestLevel("shovel", 1);
         setCreativeTab(CreativeTabs.DECORATIONS);
         setSoundType(SoundType.PLANT);
