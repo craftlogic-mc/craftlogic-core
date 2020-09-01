@@ -43,7 +43,7 @@ public class CraftBlocks {
     public static BlockSlab WOODEN_SLAB2;
     public static Block PINE_STAIRS;
     public static Block WILLOW_STAIRS;
-    public static Block BLUEBERRY, RASPBERRY;
+    public static BlockBerryBush BLUEBERRY, RASPBERRY, BLACKBERRY, STRAWBERRY;
     public static Block STONEBRICK_LIGHT;
 
     static void init(Side side) {
@@ -84,6 +84,8 @@ public class CraftBlocks {
         if (CraftConfig.items.enableBerries) {
             BLUEBERRY = registerBlockWithItem(new BlockBlueberryBush(), ItemBerryBush::new);
             RASPBERRY = registerBlockWithItem(new BlockRaspberryBush(), ItemBerryBush::new);
+            STRAWBERRY = registerBlockWithItem(new BlockStrawberryBush(), ItemBerryBush::new);
+            BLACKBERRY = registerBlockWithItem(new BlockBlackberryBush(), ItemBerryBush::new);
         }
         STONEBRICK_LIGHT = registerBlockWithItem(new BlockStoneBrickLight());
     }

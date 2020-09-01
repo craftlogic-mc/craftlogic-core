@@ -21,12 +21,11 @@ public class CraftItems {
     public static Item WOOL_CARD;
     public static Item CHAIN_LINKS;
     public static Item CHAIN_MESH;
-    public static Item CROWBAR;
     public static Item MILK_BOTTLE;
     public static Item CREEPER_OYSTERS;
     public static Item GRASS;
     public static Item STONE_AXE_HEADING;
-    public static Item BLUEBERRY, RASPBERRY;
+    public static Item BLUEBERRY, RASPBERRY, BLACKBERRY, STRAWBERRY;
 
     static void init(Side side) {
         SPIT = registerItem(new ItemBase("spit", CreativeTabs.MISC));
@@ -46,14 +45,15 @@ public class CraftItems {
             CHAIN_LINKS = registerItem(new ItemBase("chain_links", CreativeTabs.MATERIALS));
             CHAIN_MESH = registerItem(new ItemBase("chain_mesh", CreativeTabs.MATERIALS));
         }
-        CROWBAR = registerItem(new ItemCrowbar());
         MILK_BOTTLE = registerItem(new ItemMilkBottle());
         CREEPER_OYSTERS = registerItem(new ItemCreeperOysters());
         GRASS = registerItem(new ItemBase("grass", CreativeTabs.MATERIALS));
         STONE_AXE_HEADING = registerItem(new ItemBase("stone_axe_heading", CreativeTabs.TOOLS).setMaxStackSize(1));
         if (CraftConfig.items.enableBerries) {
-            BLUEBERRY = registerItem(new ItemBerry("blueberry"));
-            RASPBERRY = registerItem(new ItemBerry("raspberry"));
+            BLUEBERRY = registerItem(new ItemBerry("blueberry", 4, 0.2F));
+            RASPBERRY = registerItem(new ItemBerry("raspberry", 4, 0.15F));
+            BLACKBERRY = registerItem(new ItemBerry("blackberry", 4, 0.15F));
+            STRAWBERRY = registerItem(new ItemBerry("strawberry", 3, 0.1F));
         }
     }
 

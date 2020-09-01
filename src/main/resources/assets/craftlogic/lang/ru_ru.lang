@@ -48,9 +48,10 @@ tile.wooden_stairs.pine.name=Сосновые ступеньки
 tile.wooden_stairs.willow.name=Ивовые ступеньки
 tile.raspberry_bush.name=Куст малины
 tile.blueberry_bush.name=Куст черники
+tile.blackberry_bush.name=Куст ежевики
+tile.strawberry_bush.name=Куст земляники
 tile.stonebrick_light.name=Светящиеся каменные кирпичи
 
-item.crowbar.name=Монтировка
 item.wool_card.name=Чесалка
 item.ash.name=Пепел
 item.stone_brick.name=Каменный кирпич
@@ -67,6 +68,8 @@ item.spit.name=Плевок паутины
 item.stone_axe_heading.name=Изголовье каменного топора
 item.blueberry.name=Черника
 item.raspberry.name=Малина
+item.blackberry.name=Ежевика
+item.strawberry.name=Земляника
 
 commands.generic.unknownFailure=Неизвестная ошибка! Смотрите делали в консоли.
 commands.generic.noPermission=У вас нет необходимого разрешения: %s

@@ -1,0 +1,6 @@
+{
+    "parent": "craftlogic:block/berry_bush_small",
+    "textures": {
+        "all": "craftlogic:blocks/strawberry"
+    }
+}

@@ -5,6 +5,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeForest;
+import net.minecraft.world.biome.BiomeHills;
 import net.minecraft.world.biome.BiomeTaiga;
 import net.minecraft.world.gen.feature.WorldGenerator;
 import ru.craftlogic.api.CraftBlocks;
@@ -17,10 +18,11 @@ public class WorldGenBerry extends WorldGenerator {
     public WorldGenBerry() {}
 
     @Nullable
-    private IBlockState getBerry(Biome biome, Random rand) {
+    private BlockBerryBush getBerry(Biome biome, Random rand) {
         if (biome instanceof BiomeForest || biome instanceof BiomeTaiga) {
-            return (rand.nextInt(2) == 0 ? CraftBlocks.BLUEBERRY.getDefaultState() : CraftBlocks.RASPBERRY.getDefaultState())
-                .withProperty(BlockBerryBush.RIPE, rand.nextBoolean());
+            return rand.nextInt(3) == 0 ? CraftBlocks.BLUEBERRY : (rand.nextInt(2) == 0 ? CraftBlocks.RASPBERRY : CraftBlocks.RASPBERRY);
+        } else if (biome instanceof BiomeHills) {
+            return CraftBlocks.STRAWBERRY;
         }
         return null;
     }
@@ -32,12 +34,12 @@ public class WorldGenBerry extends WorldGenerator {
         }
         for (int i = 0; i < 128; ++i) {
             BlockPos p = pos.add(rand.nextInt(8) - rand.nextInt(8), rand.nextInt(4) - rand.nextInt(4), rand.nextInt(8) - rand.nextInt(8));
-            IBlockState state = getBerry(world.getBiome(pos), rand);
+            BlockBerryBush state = getBerry(world.getBiome(pos), rand);
             if (state == null) {
                 continue;
             }
-            if (state.getBlock().canPlaceBlockAt(world, p)) {
-                world.setBlockState(p, state, 2);
+            if (state.canPlaceBlockAt(world, p)) {
+                world.setBlockState(p, state.getDefaultState().withProperty(BlockBerryBush.RIPE, rand.nextBoolean()), 2);
                 if (rand.nextInt(3) == 0) {
                     continue;
                 }

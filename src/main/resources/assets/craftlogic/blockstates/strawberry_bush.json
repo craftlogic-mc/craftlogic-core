@@ -1,0 +1,16 @@
+{
+    "variants": {
+        "ripe=false":  [
+        	{ "model": "craftlogic:strawberry_bush" },
+        	{ "model": "craftlogic:strawberry_bush", "y": 90 },
+        	{ "model": "craftlogic:strawberry_bush", "y": 180 },
+        	{ "model": "craftlogic:strawberry_bush", "y": 270 }
+        ],
+        "ripe=true":  [
+        	{ "model": "craftlogic:strawberry_bush_ripe" },
+        	{ "model": "craftlogic:strawberry_bush_ripe", "y": 90 },
+        	{ "model": "craftlogic:strawberry_bush_ripe", "y": 180 },
+        	{ "model": "craftlogic:strawberry_bush_ripe", "y": 270 }
+        ]
+    }
+}

@@ -23,29 +23,48 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.EnumPlantType;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import ru.craftlogic.api.CraftAPI;
+import ru.craftlogic.api.block.Plantable;
 import ru.craftlogic.api.entity.Creature;
 import ru.craftlogic.api.model.ModelManager;
 import ru.craftlogic.api.model.ModelRegistrar;
+import ru.craftlogic.api.world.Location;
 
 import java.util.Random;
 
-public abstract class BlockBerryBush extends BlockBush implements ModelRegistrar {
+public abstract class BlockBerryBush extends BlockBush implements ModelRegistrar, Plantable {
     public static final PropertyBool RIPE = PropertyBool.create("ripe");
 
     public BlockBerryBush(String name) {
         super(Material.GRASS);
         setRegistryName(name + "_bush");
         setTranslationKey(name + "_bush");
-        setHarvestLevel("axe", 1);
+        setHarvestLevel("pickaxe", 1);
+        setHarvestLevel("shovel", 1);
         setCreativeTab(CreativeTabs.DECORATIONS);
         setSoundType(SoundType.PLANT);
         setTickRandomly(true);
         setHardness(0.8F);
         setDefaultState(getBlockState().getBaseState().withProperty(RIPE, false));
+    }
+
+    protected IBlockState getOffspring(IBlockState self, World world, BlockPos pos, Random rand, float chance) {
+        return self.withProperty(RIPE, false);
+    }
+
+    protected boolean tryGrowOffspring(IBlockState self, World world, BlockPos pos, Random rand, float chance) {
+        IBlockState offspring = getOffspring(self, world, pos, rand, chance);
+        if (canPlaceBlockAt(world, pos) && ForgeHooks.onCropsGrowPre(world, pos, offspring, rand.nextInt((int) (500F / chance) + 1) == 0)) {
+            world.setBlockState(pos, offspring);
+            ForgeHooks.onCropsGrowPost(world, pos, offspring, offspring);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -83,6 +102,15 @@ public abstract class BlockBerryBush extends BlockBush implements ModelRegistrar
                     if (ForgeHooks.onCropsGrowPre(world, pos, state, rand.nextInt((int) (100F / chance) + 1) == 0)) {
                         world.setBlockState(pos, state.cycleProperty(RIPE));
                         ForgeHooks.onCropsGrowPost(world, pos, state, world.getBlockState(pos));
+                    } else {
+                        for (EnumFacing side : EnumFacing.HORIZONTALS) {
+                            BlockPos p = pos.offset(side);
+                            if (tryGrowOffspring(state, world, p, rand, chance)
+                                || tryGrowOffspring(state, world, p.up(), rand, chance)
+                                || tryGrowOffspring(state, world, p.down(), rand, chance)) {
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -191,5 +219,15 @@ public abstract class BlockBerryBush extends BlockBush implements ModelRegistrar
         }
 
         return chance;
+    }
+
+    @Override
+    public EnumPlantType getPlantType(Location location) {
+        return EnumPlantType.Plains;
+    }
+
+    @Override
+    public IBlockState getPlant(Location location) {
+        return super.getPlant(location.getBlockAccessor(), location.getPos());
     }
 }
