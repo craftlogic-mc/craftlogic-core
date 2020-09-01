@@ -8,6 +8,7 @@ import net.minecraft.world.biome.BiomeForest;
 import net.minecraft.world.biome.BiomeTaiga;
 import net.minecraft.world.gen.feature.WorldGenerator;
 import ru.craftlogic.api.CraftBlocks;
+import ru.craftlogic.common.block.BlockBerryBush;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -18,11 +19,8 @@ public class WorldGenBerry extends WorldGenerator {
     @Nullable
     private IBlockState getBerry(Biome biome, Random rand) {
         if (biome instanceof BiomeForest || biome instanceof BiomeTaiga) {
-            if (rand.nextInt(2) == 0) {
-                return CraftBlocks.BLUEBERRY.getDefaultState();
-            } else {
-                return CraftBlocks.RASPBERRY.getDefaultState();
-            }
+            return (rand.nextInt(2) == 0 ? CraftBlocks.BLUEBERRY.getDefaultState() : CraftBlocks.RASPBERRY.getDefaultState())
+                .withProperty(BlockBerryBush.RIPE, rand.nextBoolean());
         }
         return null;
     }
