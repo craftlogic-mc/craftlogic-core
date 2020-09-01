@@ -88,16 +88,6 @@ task repack {
     }
 }
 
-task sourcesJar(type: Jar) {
-    from(sourceSets.main.allSource)
-    classifier = 'sources'
-}
-
-task deobfJar(type: Jar) {
-    from(sourceSets.main.output)
-    classifier = 'dev'
-}
-
 dependencies {
     // https://mvnrepository.com/artifact/org.spongepowered/mixin
     extend(group: 'org.spongepowered', name: 'mixin', version: project.mixin_version) {
@@ -153,23 +143,26 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+    rename '(.+_at.cfg)', 'META-INF/$1'
+}
+
+def commonManifest = [
+    'FMLAT'        : 'craftlogic_at.cfg',
+    'TweakClass'   : 'org.spongepowered.asm.launch.MixinTweaker',
+    'TweakOrder'   : '0',
+    'MixinConfigs' : 'mixins.craftlogic.json',
+    'FMLCorePlugin': 'ru.craftlogic.coremod.CraftLogicCoremod'
+]
+
+if (!gradle.startParameter.taskNames.contains('runClient')) {
+    println 'Not running'
+    commonManifest['FMLCorePluginContainsFMLMod'] = 'true'
+    commonManifest['ForceLoadAsMod'] = 'true'
 }
 
 jar {
     manifest {
-        def a = [
-                'FMLAT'        : 'craftlogic_at.cfg',
-                'TweakClass'   : 'org.spongepowered.asm.launch.MixinTweaker',
-                'TweakOrder'   : '0',
-                'MixinConfigs' : 'mixins.craftlogic.json',
-                'FMLCorePlugin': 'ru.craftlogic.coremod.CraftLogicCoremod'
-        ]
-        if (!gradle.startParameter.taskNames.contains('runClient')) {
-            println 'Not running'
-            a['FMLCorePluginContainsFMLMod'] = 'true'
-            a['ForceLoadAsMod'] = 'true'
-        }
-        attributes(a)
+        attributes(commonManifest)
     }
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -181,9 +174,31 @@ jar {
     rename '(.+_at.cfg)', 'META-INF/$1'
 }
 
+jar {
+    manifest {
+        attributes(commonManifest)
+    }
+}
+
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'dev'
+    manifest {
+        attributes(commonManifest)
+    }
+}
+
+task srcJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+    manifest {
+        attributes(commonManifest)
+    }
+}
+
 jar.dependsOn(repack)
 
 artifacts {
-    archives sourcesJar
+    archives srcJar
     archives deobfJar
 }

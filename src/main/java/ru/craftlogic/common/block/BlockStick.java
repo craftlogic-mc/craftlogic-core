@@ -28,7 +28,12 @@ public class BlockStick extends BlockLyingItem {
     }
 
     @Override
+    public EnumOffsetType getOffsetType() {
+        return EnumOffsetType.NONE;
+    }
+
+    @Override
     protected double getMaxOffset() {
-        return 0.2;
+        return 0;
     }
 }

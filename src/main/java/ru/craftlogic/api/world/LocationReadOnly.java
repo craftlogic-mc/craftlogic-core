@@ -4,6 +4,9 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nullable;
 
@@ -36,11 +39,21 @@ public class LocationReadOnly extends Location {
 
     @Override
     public World getWorld() {
-        if (this.blockAccessor instanceof World) {
-            return (World) this.blockAccessor;
+        if (blockAccessor instanceof WorldGetter) {
+            return ((WorldGetter) blockAccessor).getWorld();
         } else {
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("Cannot get world from " + blockAccessor.getClass());
         }
+    }
+
+    @Override
+    public Biome getBiome() {
+        return blockAccessor instanceof WorldGetter ? super.getBiome() : getBiomeClientSide();
+    }
+
+    @SideOnly(Side.CLIENT)
+    private Biome getBiomeClientSide() {
+        return blockAccessor.getBiome(getPos());
     }
 
     @Override
