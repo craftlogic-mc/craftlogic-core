@@ -117,5 +117,61 @@
     "category": "player",
     "subtitle": "craftlogic.subtitle.error",
     "sounds": [ "craftlogic:error" ]
+  },
+  "wild.chick": {
+    "category": "ambient",
+    "subtitle": "craftlogic.subtitle.wild.chick",
+    "sounds": [ 
+      "craftlogic:wildlife/chicka1",
+      "craftlogic:wildlife/chicka2",
+      "craftlogic:wildlife/chicka3"
+    ]
+  },
+  "wild.chirp": {
+    "category": "ambient",
+    "subtitle": "craftlogic.subtitle.wild.chirp",
+    "sounds": [ 
+      "craftlogic:wildlife/chirp1",
+      "craftlogic:wildlife/chirp2",
+      "craftlogic:wildlife/chirp3"
+    ]
+  },
+  "wild.coastbird": {
+    "category": "ambient",
+    "subtitle": "craftlogic.subtitle.wild.coastbird",
+    "sounds": [ 
+      "craftlogic:wildlife/coastbird1",
+      "craftlogic:wildlife/coastbird2",
+      "craftlogic:wildlife/coastbird3",
+      "craftlogic:wildlife/coastbird4",
+      "craftlogic:wildlife/coastbird5",
+      "craftlogic:wildlife/coastbird6",
+      "craftlogic:wildlife/coastbird7"
+    ]
+  },
+  "wild.critter": {
+    "category": "ambient",
+    "subtitle": "craftlogic.subtitle.wild.critter",
+    "sounds": [ 
+      "craftlogic:wildlife/critter1",
+      "craftlogic:wildlife/critter2",
+      "craftlogic:wildlife/critter3",
+      "craftlogic:wildlife/critter6",
+      "craftlogic:wildlife/critter7"
+    ]
+  },
+  "wild.flit": {
+    "category": "ambient",
+    "subtitle": "craftlogic.subtitle.wild.flit",
+    "sounds": [ "craftlogic:wildlife/flit" ]
+  },
+  "wild.squeak": {
+    "category": "ambient",
+    "subtitle": "craftlogic.subtitle.wild.squeak",
+    "sounds": [ 
+      "craftlogic:wildlife/squeek1",
+      "craftlogic:wildlife/squeek2",
+      "craftlogic:wildlife/squeek3"
+    ]
   }
 }

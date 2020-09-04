@@ -24,6 +24,7 @@ public class CraftSounds {
     public static SoundEvent CART_PLACE;
     public static SoundEvent CART_LOADING;
     public static SoundEvent HEAL, HINT, WARNING, LEVEL_UP, SPELL, SLOW, HIDE, KICK, BAN, TOME, OPENING_FAILED, SQUASH, ERROR;
+    public static SoundEvent CHICK, CHIRP, COAST_BIRD, CRITTER, FLIT, SQUEAK;
 
     static void init(Side side) {
         WOODPECKER_CHIRP = registerSound("entity.woodpecker.chirp");
@@ -49,6 +50,11 @@ public class CraftSounds {
         OPENING_FAILED = registerSound("opening_failed");
         SQUASH = registerSound("squash");
         ERROR = registerSound("error");
+        CHICK = registerSound("chick");
+        CHIRP = registerSound("chirp");
+        CRITTER = registerSound("critter");
+        FLIT = registerSound("flit");
+        SQUEAK = registerSound("squeak");
     }
 
     public static SoundEvent registerSound(@Nonnull String name) {
