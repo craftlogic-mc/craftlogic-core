@@ -63,6 +63,35 @@ public abstract class MixinBlockLeaves extends Block {
         this.leavesFancy = true;
     }
 
+    /**
+     * @author Radviger
+     * @reason No more leaves x-ray
+     */
+    @Overwrite
+    @SideOnly(Side.CLIENT)
+    public boolean shouldSideBeRendered(IBlockState state, IBlockAccess accessor, BlockPos pos, EnumFacing side) {
+        return super.shouldSideBeRendered(state, accessor, pos, side);
+    }
+
+    /**
+     * @author Radviger
+     * @reason No more leaves x-ray
+     */
+    @Overwrite
+    public boolean isOpaqueCube(IBlockState state) {
+        return false;
+    }
+
+    /**
+     * @author Radviger
+     * @reason No more leaves x-ray
+     */
+    @Overwrite
+    @SideOnly(Side.CLIENT)
+    public BlockRenderLayer getRenderLayer() {
+        return BlockRenderLayer.CUTOUT_MIPPED;
+    }
+
     @Override
     public boolean isPassable(IBlockAccess world, BlockPos pos) {
         return true;
