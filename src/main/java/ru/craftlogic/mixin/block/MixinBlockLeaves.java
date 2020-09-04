@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -11,6 +12,10 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -18,6 +23,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -25,14 +31,18 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.craftlogic.api.CraftAPI;
+import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.api.entity.Creature;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Random;
 
 @Mixin(BlockLeaves.class)
 public abstract class MixinBlockLeaves extends Block {
     @Shadow protected boolean leavesFancy;
+
+    @Shadow @Final public static PropertyBool DECAYABLE;
 
     public MixinBlockLeaves(Material material) {
         super(material);
@@ -109,5 +119,18 @@ public abstract class MixinBlockLeaves extends Block {
     @Overwrite(remap = false)
     public boolean isShearable(@Nonnull ItemStack item, IBlockAccess world, BlockPos pos) {
         return false;
+    }
+
+    @Inject(method = "updateTick", at = @At("HEAD"))
+    public void onUpdateTick(World world, BlockPos pos, IBlockState state, Random rand, CallbackInfo ci) {
+        if (!world.isRemote && state.getValue(DECAYABLE)) {
+            SoundEvent[] sounds = {
+                CraftSounds.CHICK, CraftSounds.CHIRP, CraftSounds.SQUEAK, CraftSounds.FLIT
+            };
+            if (rand.nextFloat() < 0.05 && world.canBlockSeeSky(pos.up())) {
+                SoundEvent sound = sounds[rand.nextInt(sounds.length)];
+                world.playSound(null, pos, sound, SoundCategory.AMBIENT, 1, 0.9F + 0.2F * rand.nextFloat());
+            }
+        }
     }
 }

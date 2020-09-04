@@ -50,11 +50,11 @@ public class CraftSounds {
         OPENING_FAILED = registerSound("opening_failed");
         SQUASH = registerSound("squash");
         ERROR = registerSound("error");
-        CHICK = registerSound("chick");
-        CHIRP = registerSound("chirp");
-        CRITTER = registerSound("critter");
-        FLIT = registerSound("flit");
-        SQUEAK = registerSound("squeak");
+        CHICK = registerSound("wild.chick");
+        CHIRP = registerSound("wild.chirp");
+        CRITTER = registerSound("wild.critter");
+        FLIT = registerSound("wild.flit");
+        SQUEAK = registerSound("wild.squeak");
     }
 
     public static SoundEvent registerSound(@Nonnull String name) {
