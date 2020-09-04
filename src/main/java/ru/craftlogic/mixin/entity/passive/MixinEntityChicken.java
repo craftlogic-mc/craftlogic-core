@@ -95,9 +95,11 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
                 break;
             }
         }
-        tasks.taskEntries.removeIf(entry -> entry.action instanceof EntityAIMate);
+        tasks.taskEntries.removeIf(entry -> entry.action instanceof EntityAIMate || entry.action instanceof EntityAIPanic);
         tasks.addTask(2, new EntityAIMateBird<>(this, 1));
-        tasks.addTask(8, new EntityAIAttackMelee(this, 1.5, false));
+        if (!isChild()) {
+            tasks.addTask(8, new EntityAIAttackMelee(this, 1.5, false));
+        }
         targetTasks.addTask(1, new EntityAIHurtByTarget(this, true));
     }
 

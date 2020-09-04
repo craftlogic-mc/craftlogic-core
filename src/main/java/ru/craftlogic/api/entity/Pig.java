@@ -1,3 +1,3 @@
 package ru.craftlogic.api.entity;
 
-public interface Pig extends HebivorousAnimal {}
+public interface Pig extends HebivorousAnimal, Tamable {}
