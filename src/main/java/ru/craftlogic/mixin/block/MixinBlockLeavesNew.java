@@ -12,6 +12,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import ru.craftlogic.CraftConfig;
 
 @Mixin(BlockNewLeaf.class)
 public class MixinBlockLeavesNew extends Block {
@@ -25,7 +26,7 @@ public class MixinBlockLeavesNew extends Block {
      */
     @Overwrite
     protected void dropApple(World world, BlockPos pos, IBlockState state, int chance) {
-        if (world.rand.nextFloat() < 0.15F) {
+        if (CraftConfig.tweaks.enableSticksFromLeaf && world.rand.nextFloat() < 0.15F) {
             spawnAsEntity(world, pos, new ItemStack(Items.STICK));
         }
     }

@@ -88,6 +88,8 @@ public class CraftConfig {
         public boolean enableMossSpreading = true;
         @Config.Comment("Enable stone cracking into cobblestone")
         public boolean enableStoneCracking = true;
+        @Config.Comment("Enable sticks from leaf")
+        public boolean enableSticksFromLeaf = true;
         @Config.Comment("Enable torch burnout")
         @Config.RequiresMcRestart
         public boolean enableTorchBurning = true;
