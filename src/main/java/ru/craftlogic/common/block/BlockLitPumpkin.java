@@ -17,12 +17,11 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import ru.craftlogic.api.model.ModelRegistrar;
 import ru.craftlogic.api.model.ModelManager;
+import ru.craftlogic.api.model.ModelRegistrar;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -83,7 +82,7 @@ public class BlockLitPumpkin extends BlockPumpkin implements ModelRegistrar {
             } else if (heldItem.getItem() == Items.FLINT_AND_STEEL && !lit) {
                 heldItem.damageItem(1, player);
                 world.playSound(null, pos, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.PLAYERS, 1F, world.rand.nextFloat() * 0.3F + 0.7F);
-                if (world.rand.nextInt(3) == 0) {
+                if (world.rand.nextInt(3) != 0) {
                     world.setBlockState(pos, state.withProperty(LIT, true));
                 }
             }
