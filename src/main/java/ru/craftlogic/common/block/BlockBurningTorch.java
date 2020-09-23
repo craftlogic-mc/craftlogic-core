@@ -54,7 +54,7 @@ public class BlockBurningTorch extends BlockTorch implements ModelRegistrar {
             } else if (heldItem.getItem() == Items.FLINT_AND_STEEL && !lit) {
                 heldItem.damageItem(1, player);
                 world.playSound(null, pos, SoundEvents.ITEM_FLINTANDSTEEL_USE, SoundCategory.PLAYERS, 1F, world.rand.nextFloat() * 0.3F + 0.7F);
-                if (world.rand.nextInt(3) == 0) {
+                if (world.rand.nextInt(3) != 0) {
                     world.setBlockState(pos, state.withProperty(LIT, true));
                 }
             }
@@ -128,7 +128,17 @@ public class BlockBurningTorch extends BlockTorch implements ModelRegistrar {
     @Override
     public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
         if (state.getValue(LIT) && (rand.nextInt(20) == 0 || world.isRainingAt(pos.up())) && CraftConfig.tweaks.enableTorchBurning) {
-            state.cycleProperty(LIT);
+            world.setBlockState(pos, state.withProperty(LIT, false));
+            world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1F, world.rand.nextFloat() * 0.3F + 0.7F);
+        }
+    }
+
+    @Override
+    public void fillWithRain(World world, BlockPos pos) {
+        IBlockState state = world.getBlockState(pos);
+        if (!world.isRemote && state.getValue(LIT)) {
+            world.setBlockState(pos, state.withProperty(LIT, false));
+            world.playSound(null, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.PLAYERS, 1F, world.rand.nextFloat() * 0.3F + 0.7F);
         }
     }
 
