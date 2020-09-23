@@ -168,6 +168,9 @@ commands.gamemode.survival=Survival
 commands.gamemode.spectator=Spectator
 commands.gamemode.adventure=Adventure
 
+commands.info.usage=/info <player> - Player information
+commands.tpa.usage=/tpa <player> - Player teleport request
+
 commands.request_teleport.question=%s wats to teleport to you. Do you want to allow?
 commands.request_teleport.pending=Teleport request is already sent to %s
 commands.request_teleport.accepted=Teleportation request accepted

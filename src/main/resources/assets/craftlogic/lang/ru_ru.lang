@@ -168,6 +168,9 @@ commands.gamemode.survival=Выживание
 commands.gamemode.spectator=Наблюдение
 commands.gamemode.adventure=Приключение
 
+commands.info.usage=/info <игрок> - Информация об игроке
+commands.tpa.usage=/tpa <игрок> - Запрос на телепортацию к игроку
+
 commands.request_teleport.question=%s хочет к вам телепортироваться. Разрешить?
 commands.request_teleport.pending=Запрос на телепортацию к %s уже отправлен
 commands.request_teleport.accepted=Запрос на телепортацию подтверждён
