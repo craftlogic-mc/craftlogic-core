@@ -20,7 +20,7 @@ public class WorldGenBerry extends WorldGenerator {
     @Nullable
     private BlockBerryBush getBerry(Biome biome, Random rand) {
         if (biome instanceof BiomeForest || biome instanceof BiomeTaiga) {
-            return rand.nextInt(3) == 0 ? CraftBlocks.BLUEBERRY : (rand.nextInt(2) == 0 ? CraftBlocks.RASPBERRY : CraftBlocks.RASPBERRY);
+            return rand.nextInt(3) == 0 ? CraftBlocks.BLUEBERRY : (rand.nextInt(2) == 0 ? CraftBlocks.BLACKBERRY : CraftBlocks.RASPBERRY);
         } else if (biome instanceof BiomeHills) {
             return CraftBlocks.STRAWBERRY;
         }
