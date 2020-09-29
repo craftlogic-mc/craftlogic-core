@@ -25,21 +25,21 @@ public class WrappedPlayerInventory implements InventoryHolder {
 
     @Override
     public String getName() {
-        return this.target.getProfile().getName();
+        return target.getProfile().getName();
     }
 
     @Override
     public ITextComponent getDisplayName() {
-        return this.target.getDisplayName();
+        return target.getDisplayName();
     }
 
     @Override
     public InventoryManager getInventoryManager() {
-        return new SizeCheckedInventoryManager(this.getInventory(), slot -> this.markDirty());
+        return new SizeCheckedInventoryManager(getInventory(), slot -> markDirty());
     }
 
     private InventoryPlayer getInventory() {
-        return this.target.getInventory();
+        return target.getInventory();
     }
 
     @Override
@@ -49,33 +49,33 @@ public class WrappedPlayerInventory implements InventoryHolder {
 
     @Override
     public void markDirty() {
-        this.getInventory().markDirty();
-        if (this.target.isOnline()) {
-            this.target.getOpenContainer().detectAndSendChanges();
+        getInventory().markDirty();
+        if (target.isOnline()) {
+            target.getOpenContainer().detectAndSendChanges();
         }
     }
 
     @Override
     public boolean isUsableByPlayer(EntityPlayer player) {
-        return !this.target.isOnline() || !this.target.isDead();
+        return !target.isOnline() || !target.isDead();
     }
 
     @Override
     public void openInventory(EntityPlayer player) {
-        this.viewer.playSound(SoundEvents.BLOCK_CHEST_OPEN, 1F, 1F);
+        viewer.playSound(SoundEvents.BLOCK_CHEST_OPEN, 1F, 1F);
     }
 
     @Override
     public void closeInventory(EntityPlayer player) {
-        if (!this.target.isOnline()) {
-            this.target.saveData();
+        if (!target.isOnline()) {
+            target.saveData();
         }
-        this.viewer.playSound(SoundEvents.BLOCK_CHEST_CLOSE, 1F, 1F);
+        viewer.playSound(SoundEvents.BLOCK_CHEST_CLOSE, 1F, 1F);
     }
 
     @Nullable
     @Override
     public InventoryFieldHolder getFieldHolder() {
-        return new WrappedInventoryFieldHolder(this.getInventory());
+        return new WrappedInventoryFieldHolder(getInventory());
     }
 }

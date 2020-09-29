@@ -12,11 +12,11 @@ public class PhantomPlayer extends Player {
 
     public PhantomPlayer(World world, GameProfile profile) {
         super(world.getServer(), profile);
-        this.fake = new FakePlayer(world.unwrap(), profile);
+        fake = new FakePlayer(world.unwrap(), profile);
     }
 
     public Player asOnline() {
-        return this.server.getPlayerManager().getOnline(this.profile);
+        return server.getPlayerManager().getOnline(profile);
     }
 
     @Override
@@ -24,36 +24,36 @@ public class PhantomPlayer extends Player {
         if (isOnline()) {
             return asOnline().getEntity();
         }
-        if (!this.loadedData) {
-            this.loadData();
+        if (!loadedData) {
+            loadData();
         }
-        return this.fake;
+        return fake;
     }
 
     private AdvancedPlayerFileData getFileData() {
-        return this.server.getPlayerManager().getFileData();
+        return server.getPlayerManager().getFileData();
     }
 
     @Override
     public boolean hasData(World world) {
-        return isOnline() || getFileData().hasPlayerData(this.profile);
+        return isOnline() || getFileData().hasPlayerData(profile);
     }
 
     public boolean loadData() {
-        if (this.loadedData) {
+        if (loadedData) {
             return true;
         }
-        NBTTagCompound data = getFileData().readPlayerData(this.fake);
+        NBTTagCompound data = getFileData().readPlayerData(fake);
         if (data != null) {
-            this.loadedData = true;
+            loadedData = true;
             return true;
         }
         return false;
     }
 
     public boolean saveData() {
-        if (this.loadedData) {
-            getFileData().writePlayerData(this.fake);
+        if (loadedData) {
+            getFileData().writePlayerData(fake);
         }
         return true;
     }

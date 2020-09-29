@@ -21,9 +21,9 @@ public class OfflinePlayer implements Permissible {
 
     @Override
     public boolean hasPermission(String permission, int opLevel) {
-        PermissionManager permissionManager = this.server.getPermissionManager();
+        PermissionManager permissionManager = server.getPermissionManager();
         if (permissionManager.isEnabled()) {
-            return permissionManager.hasPermission(this.profile, permission);
+            return permissionManager.hasPermission(profile, permission);
         } else {
             return getOperatorLevel() >= opLevel;
         }
@@ -31,9 +31,9 @@ public class OfflinePlayer implements Permissible {
 
     @Override
     public <T> T getPermissionMetadata(String meta, T def, Function<String, T> mapper) {
-        PermissionManager permissionManager = this.server.getPermissionManager();
+        PermissionManager permissionManager = server.getPermissionManager();
         if (permissionManager.isEnabled()) {
-            String m = permissionManager.getPermissionMetadata(this.profile, meta);
+            String m = permissionManager.getPermissionMetadata(profile, meta);
             if (m != null) {
                 try {
                     return mapper.apply(m);
@@ -45,47 +45,47 @@ public class OfflinePlayer implements Permissible {
 
     @Override
     public ITextComponent getDisplayName() {
-        return new TextComponentString(this.profile.getName());
+        return new TextComponentString(profile.getName());
     }
 
     public boolean isOperator() {
-        return this.server.getPlayerManager().isOperator(this.profile);
+        return server.getPlayerManager().isOperator(profile);
     }
 
     public int getOperatorLevel() {
-        return this.server.getPlayerManager().getOperatorLevel(this.profile);
+        return server.getPlayerManager().getOperatorLevel(profile);
     }
 
     public boolean setOperator(boolean operator, int level, boolean bypassPlayerLimit) {
-        return this.server.getPlayerManager().setOperator(this.profile, operator, level, bypassPlayerLimit);
+        return server.getPlayerManager().setOperator(profile, operator, level, bypassPlayerLimit);
     }
 
     public boolean isBypassesPlayerLimit() {
-        return this.server.getPlayerManager().isBypassesPlayerLimit(this.profile);
+        return server.getPlayerManager().isBypassesPlayerLimit(profile);
     }
 
     public boolean isWhitelisted() {
-        return this.server.getPlayerManager().isWhitelisted(this.profile);
+        return server.getPlayerManager().isWhitelisted(profile);
     }
 
     public void setWhitelisted(boolean whitelisted) {
-        this.server.getPlayerManager().setWhitelisted(this.profile, whitelisted);
+        server.getPlayerManager().setWhitelisted(profile, whitelisted);
     }
 
     public boolean isOnline() {
-        return this.server.getPlayerManager().isOnline(this.profile);
+        return server.getPlayerManager().isOnline(profile);
     }
 
     public GameProfile getProfile() {
-        return this.profile;
+        return profile;
     }
 
     public String getName() {
-        return this.profile.getName();
+        return profile.getName();
     }
 
     public UUID getId() {
-        return this.profile.getId();
+        return profile.getId();
     }
 
     public boolean hasData(World world) {
@@ -93,11 +93,11 @@ public class OfflinePlayer implements Permissible {
     }
 
     public PhantomPlayer asPhantom(World world) {
-        return new PhantomPlayer(world, this.getProfile());
+        return new PhantomPlayer(world, getProfile());
     }
 
     public Player asOnline() {
-        return this.server.getPlayerManager().getOnline(this.profile);
+        return server.getPlayerManager().getOnline(profile);
     }
 
     @Override
@@ -116,7 +116,7 @@ public class OfflinePlayer implements Permissible {
     @Override
     public String toString() {
         return getClass().getSimpleName() + "{" +
-                "name=" + this.getDisplayName().getFormattedText() +
+                "name=" + getDisplayName().getFormattedText() +
                 ", id=" + profile.getId() +
                 '}';
     }

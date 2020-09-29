@@ -5,6 +5,7 @@ import ru.craftlogic.api.command.CommandBase;
 import ru.craftlogic.api.command.CommandContext;
 import ru.craftlogic.api.util.WrappedPlayerInventory;
 import ru.craftlogic.api.world.OfflinePlayer;
+import ru.craftlogic.api.world.PhantomPlayer;
 import ru.craftlogic.api.world.Player;
 import ru.craftlogic.api.world.World;
 
@@ -19,8 +20,9 @@ public final class CommandInventory extends CommandBase {
         Player viewer = ctx.senderAsPlayer();
         OfflinePlayer target = ctx.get("target").asOfflinePlayer();
         World requesterWorld = viewer.getWorld();
-        if (target.hasData(requesterWorld)) {
-            viewer.openChestInventory(new WrappedPlayerInventory(viewer, target.asPhantom(requesterWorld)));
+        PhantomPlayer ph = target.asPhantom(requesterWorld);
+        if (target.isOnline() || ph.hasData(requesterWorld)) {
+            viewer.openChestInventory(new WrappedPlayerInventory(viewer, ph));
         } else {
             throw new CommandException("commands.inventory.no_data", target.getName());
         }
