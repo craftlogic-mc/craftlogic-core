@@ -47,7 +47,7 @@ public class CraftRecipes {
         registerGridType(RecipeGridAlloying.class, "alloying", RecipeAlloying::new);
         registerGridType(RecipeGridBarrel.class, "composting", RecipeBarrelCompost::new);
 
-        OreDictionary.registerOre("logWood", new ItemStack(CraftBlocks.PLANKS2, 1, OreDictionary.WILDCARD_VALUE));
+        OreDictionary.registerOre("logWood", new ItemStack(CraftBlocks.LOG3, 1, OreDictionary.WILDCARD_VALUE));
         OreDictionary.registerOre("plankWood", new ItemStack(CraftBlocks.PLANKS2, 1, OreDictionary.WILDCARD_VALUE));
         OreDictionary.registerOre("stairWood", new ItemStack(CraftBlocks.PINE_STAIRS));
         OreDictionary.registerOre("stairWood", new ItemStack(CraftBlocks.WILLOW_STAIRS));
