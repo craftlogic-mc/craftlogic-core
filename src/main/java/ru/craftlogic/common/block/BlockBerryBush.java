@@ -57,7 +57,7 @@ public abstract class BlockBerryBush extends BlockBush implements ModelRegistrar
 
     protected boolean tryGrowOffspring(IBlockState self, World world, BlockPos pos, Random rand, float chance) {
         IBlockState offspring = getOffspring(self, world, pos, rand, chance);
-        if (canPlaceBlockAt(world, pos) && ForgeHooks.onCropsGrowPre(world, pos, offspring, rand.nextInt((int) (500F / chance) + 1) == 0)) {
+        if (canPlaceBlockAt(world, pos) && ForgeHooks.onCropsGrowPre(world, pos, offspring, rand.nextInt((int) (100F / chance / 8) + 1) == 0)) {
             world.setBlockState(pos, offspring);
             ForgeHooks.onCropsGrowPost(world, pos, offspring, offspring);
             return true;
@@ -98,7 +98,7 @@ public abstract class BlockBerryBush extends BlockBush implements ModelRegistrar
             if (world.getLightFromNeighbors(pos.up()) >= 9) {
                 if (!state.getValue(RIPE)) {
                     float chance = getGrowthChance(this, world, pos);
-                    if (ForgeHooks.onCropsGrowPre(world, pos, state, rand.nextInt((int) (100F / chance) + 1) == 0)) {
+                    if (ForgeHooks.onCropsGrowPre(world, pos, state, rand.nextInt((int) (100F / chance / 2) + 1) == 0)) {
                         world.setBlockState(pos, state.cycleProperty(RIPE));
                         ForgeHooks.onCropsGrowPost(world, pos, state, world.getBlockState(pos));
                     } else {
