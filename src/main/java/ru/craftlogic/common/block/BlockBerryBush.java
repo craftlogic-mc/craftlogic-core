@@ -104,9 +104,9 @@ public abstract class BlockBerryBush extends BlockBush implements ModelRegistrar
                     } else {
                         for (EnumFacing side : EnumFacing.HORIZONTALS) {
                             BlockPos p = pos.offset(side);
-                            if (tryGrowOffspring(state, world, p, rand, chance)
-                                || tryGrowOffspring(state, world, p.up(), rand, chance)
-                                || tryGrowOffspring(state, world, p.down(), rand, chance)) {
+                            if (tryGrowOffspring(state, world, p, rand, chance / 5F)
+                                || tryGrowOffspring(state, world, p.up(), rand, chance / 8F)
+                                || tryGrowOffspring(state, world, p.down(), rand, chance / 8F)) {
                                 break;
                             }
                         }
