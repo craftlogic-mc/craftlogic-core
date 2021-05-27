@@ -5,8 +5,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandException;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.MinecraftForge;
 import ru.craftlogic.api.command.CommandBase;
 import ru.craftlogic.api.command.CommandContext;
+import ru.craftlogic.api.event.player.PlayerTeleportHomeEvent;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.world.Location;
@@ -28,11 +30,11 @@ public final class CommandHome extends CommandBase {
         OfflinePlayer target = ctx.has("target") ? ctx.get("target").asOfflinePlayer() : sender;
         if (target.isOnline()) {
             Location bedLocation = adjustBedLocation(target.asOnline().getBedLocation(sender.getWorld()));
-            teleportHome(ctx, sender, target.getProfile(), bedLocation);
+            teleportHome(ctx, sender, target, bedLocation, false);
         } else {
             PhantomPlayer fake = target.asPhantom(sender.getWorld());
             Location bedLocation = adjustBedLocation(fake.getBedLocation(sender.getWorld()));
-            teleportHome(ctx, sender, fake.getProfile(), bedLocation);
+            teleportHome(ctx, sender, fake, bedLocation, true);
         }
     }
 
@@ -53,24 +55,27 @@ public final class CommandHome extends CommandBase {
         return null;
     }
 
-    private void teleportHome(CommandContext ctx, Player sender, GameProfile target, Location bedLocation) throws CommandException {
+    private void teleportHome(CommandContext ctx, Player sender, OfflinePlayer target, Location bedLocation, boolean offline) throws CommandException {
+        GameProfile targetProfile = target.getProfile();
         if (bedLocation != null) {
-            Consumer<Server> callback = server -> {
-                if (sender.getId().equals(target.getId())) {
-                    ctx.sendMessage(Text.translation("commands.home.teleport.you").green());
-                } else {
-                    ctx.sendMessage(Text.translation("commands.home.teleport.other").green().arg(target.getName(), Text::darkGreen));
-                }
-            };
-            Text<?, ?> message = sender.getId().equals(target.getId()) ?
-                Text.translation("tooltip.home_teleport") :
-                Text.translation("tooltip.home_teleport.other");
-            sender.teleportDelayed(callback, "home", message, bedLocation, 5, true);
+            if (!MinecraftForge.EVENT_BUS.post(new PlayerTeleportHomeEvent(sender, target, bedLocation, ctx, offline))) {
+                Consumer<Server> callback = server -> {
+                    if (sender.getId().equals(targetProfile.getId())) {
+                        ctx.sendMessage(Text.translation("commands.home.teleport.you").green());
+                    } else {
+                        ctx.sendMessage(Text.translation("commands.home.teleport.other").green().arg(targetProfile.getName(), Text::darkGreen));
+                    }
+                };
+                Text<?, ?> message = sender.getId().equals(targetProfile.getId()) ?
+                    Text.translation("tooltip.home_teleport") :
+                    Text.translation("tooltip.home_teleport.other");
+                sender.teleportDelayed(callback, "home", message, bedLocation, 5, true);
+            }
         } else {
-            if (sender.getId().equals(target.getId())) {
+            if (sender.getId().equals(targetProfile.getId())) {
                 throw new CommandException("commands.home.missing.you");
             } else {
-                throw new CommandException("commands.home.missing.other", target.getName());
+                throw new CommandException("commands.home.missing.other", targetProfile.getName());
             }
         }
     }
