@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.io.File;
+import java.util.Date;
 
 @Mixin(PlayerProfileCache.class)
 public abstract class MixinPlayerProfileCache {
@@ -26,5 +27,17 @@ public abstract class MixinPlayerProfileCache {
     @Overwrite
     private static GameProfile lookupProfile(GameProfileRepository repo, String username) {
         return null;
+    }
+
+    @Mixin(targets = "net/minecraft/server/management/PlayerProfileCache$ProfileEntry")
+    static class ProfileEntry {
+        /**
+         * @author Radviger
+         * @reason Remove profile entries expiration
+         */
+        @Overwrite
+        public Date getExpirationDate() {
+            return new Date(Long.MAX_VALUE);
+        }
     }
 }
