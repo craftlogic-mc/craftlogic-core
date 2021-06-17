@@ -16,9 +16,11 @@ import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.World;
@@ -26,6 +28,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.api.world.TileEntities;
 import ru.craftlogic.common.block.ChestPart;
 
@@ -53,19 +56,26 @@ public abstract class MixinBlockChest extends BlockContainer {
     @Overwrite
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         ItemStack heldItem = player.getHeldItem(hand);
+        EnumFacing facing = state.getValue(FACING);
         if (heldItem.getItem() != Item.getItemFromBlock(this) || !side.getAxis().isHorizontal() || side == state.getValue(FACING)) {
             if (!world.isRemote) {
-                ILockableContainer container = this.getLockableContainer(world, pos);
-                if (container != null) {
-                    player.displayGUIChest(container);
-                    switch (this.chestType) {
-                        case BASIC:
-                            player.addStat(StatList.CHEST_OPENED);
-                            break;
-                        case TRAP:
-                            player.addStat(StatList.TRAPPED_CHEST_TRIGGERED);
-                            break;
+                ChestPart part = state.getValue(PART);
+                if (!isBlocked(world, pos) && (part == ChestPart.SINGLE || !isBlocked(world, pos.offset(part.rotate(facing))))) {
+                    ILockableContainer container = this.getLockableContainer(world, pos);
+                    if (container != null) {
+                        player.displayGUIChest(container);
+                        switch (this.chestType) {
+                            case BASIC:
+                                player.addStat(StatList.CHEST_OPENED);
+                                break;
+                            case TRAP:
+                                player.addStat(StatList.TRAPPED_CHEST_TRIGGERED);
+                                break;
+                        }
                     }
+                } else {
+                    world.playSound(null, pos, CraftSounds.CHEST_BLOCKED, SoundCategory.BLOCKS, 0.4F, 0.8F + 0.2F * world.rand.nextFloat());
+                    player.sendStatusMessage(new TextComponentTranslation("tile.chest.blocked"), true);
                 }
             }
             return true;
@@ -319,7 +329,7 @@ public abstract class MixinBlockChest extends BlockContainer {
     public ILockableContainer getContainer(World world, BlockPos pos, boolean ignoreIfBlocked) {
         ILockableContainer chest = TileEntities.getTileEntity(world, pos, ILockableContainer.class);
         if (chest != null) {
-            if (ignoreIfBlocked || !this.isBlocked(world, pos)) {
+            if (ignoreIfBlocked || !isBlocked(world, pos)) {
                 IBlockState state = world.getBlockState(pos);
                 ChestPart part = state.getValue(PART);
                 if (part == ChestPart.SINGLE) {

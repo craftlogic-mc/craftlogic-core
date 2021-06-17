@@ -51,6 +51,7 @@ tile.blueberry_bush.name=Куст черники
 tile.blackberry_bush.name=Куст ежевики
 tile.strawberry_bush.name=Куст земляники
 tile.stonebrick_light.name=Светящиеся каменные кирпичи
+tile.chest.blocked=Сундук заблокирован блоком сверху
 
 item.wool_card.name=Чесалка
 item.ash.name=Пепел

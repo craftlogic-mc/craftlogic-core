@@ -173,5 +173,12 @@
       "craftlogic:wildlife/squeek2",
       "craftlogic:wildlife/squeek3"
     ]
+  },
+  "chest.blocked": {
+    "sounds": [
+      "craftlogic:chest/blocked",
+      "craftlogic:chest/blocked2"
+    ],
+    "subtitle": "subtitles.block.chest.blocked"
   }
 }

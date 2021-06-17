@@ -51,6 +51,7 @@ tile.blueberry_bush.name=Blueberry Bush
 tile.blackberry_bush.name=Blackberry Bush
 tile.strawberry_bush.name=Strawberry Bush
 tile.stonebrick_light.name=Glowing Stone Bricks
+tile.chest.blocked=The chest is blocked by the block above
 
 item.wool_card.name=Wool Card
 item.ash.name=Ash
