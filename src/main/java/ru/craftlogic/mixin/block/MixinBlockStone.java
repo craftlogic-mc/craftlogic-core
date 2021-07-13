@@ -72,7 +72,7 @@ public abstract class MixinBlockStone extends Block {
         if (CraftConfig.items.enableRocksDrop) {
             return 0;
         } else {
-            return super.damageDropped(state);
+            return state.getValue(VARIANT).getMetadata();
         }
     }
 
