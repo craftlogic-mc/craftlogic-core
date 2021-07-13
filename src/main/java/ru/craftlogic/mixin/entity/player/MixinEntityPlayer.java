@@ -12,6 +12,8 @@ import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import ru.craftlogic.api.event.player.PlayerCheckCanEditEvent;
 import ru.craftlogic.api.event.player.PlayerSneakEvent;
 
@@ -46,5 +48,10 @@ public abstract class MixinEntityPlayer extends Entity {
     public void setSneaking(boolean sneaking) {
         MinecraftForge.EVENT_BUS.post(new PlayerSneakEvent((EntityPlayer)(Object)this, sneaking));
         super.setSneaking(sneaking);
+    }
+
+    @ModifyConstant(method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/item/EntityItem;", constant = @Constant(floatValue = 0.5F))
+    public float itemVelocity(float old) {
+        return 0.1F;
     }
 }
