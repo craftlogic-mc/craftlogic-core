@@ -39,7 +39,6 @@ public abstract class MixinVariantDeserializer {
 
     private ResourceLocation getResourceLocationBlock(String model, boolean item) {
         ResourceLocation location = new ResourceLocation(model);
-        location = new ResourceLocation(location.getNamespace(), (item ? "item/" : "block/") + location.getPath());
-        return location;
+        return new ResourceLocation(location.getNamespace(), (item ? "item/" : "block/") + location.getPath());
     }
 }

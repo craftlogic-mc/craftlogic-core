@@ -3,6 +3,8 @@ package ru.craftlogic.client.render.tileentity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.GlStateManager.DestFactor;
+import net.minecraft.client.renderer.GlStateManager.SourceFactor;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -28,18 +30,21 @@ public class RenderBarrel extends TileEntitySpecialRenderer<TileEntityBarrel> {
 
                 TextureAtlasSprite texture = mode.getTexture(mc, barrel);
 
-                GlStateManager.pushMatrix();
+                GlStateManager.disableNormalize();
+                GlStateManager.disableLighting();
                 GlStateManager.enableBlend();
+                GlStateManager.tryBlendFuncSeparate(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA, SourceFactor.ONE, DestFactor.ZERO);
+                GlStateManager.pushMatrix();
                 GlStateManager.translate(x, y, z);
 
-                double minU = (double) texture.getMinU();
-                double maxU = (double) texture.getMaxU();
-                double minV = (double) texture.getMinV();
-                double maxV = (double) texture.getMaxV();
+                double minU = texture.getMinU();
+                double maxU = texture.getMaxU();
+                double minV = texture.getMinV();
+                double maxV = texture.getMaxV();
 
-                this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 
-                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
+                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 
                 int r = (color >> 16) & 255;
                 int g = (color >> 8) & 255;
@@ -48,16 +53,18 @@ public class RenderBarrel extends TileEntitySpecialRenderer<TileEntityBarrel> {
 
                 double dy = fill * 0.875 + 0.0625;
 
-                buffer.pos(0.125, dy, 0.125).tex(minU, minV).color(r, g, b, a).normal(0, 1, 0).endVertex();
-                buffer.pos(0.125, dy, 0.875).tex(minU, maxV).color(r, g, b, a).normal(0, 1, 0).endVertex();
-                buffer.pos(0.875, dy, 0.875).tex(maxU, maxV).color(r, g, b, a).normal(0, 1, 0).endVertex();
-                buffer.pos(0.875, dy, 0.125).tex(maxU, minV).color(r, g, b, a).normal(0, 1, 0).endVertex();
+                int light = barrel.getState().getPackedLightmapCoords(barrel.getWorld(), barrel.getPos());
+                int sky = light >> 16 & 65535;
+                int block = light & 65535;
+                buffer.pos(0.125, dy, 0.125).color(r, g, b, a).tex(minU, minV).lightmap(sky, block).endVertex();
+                buffer.pos(0.125, dy, 0.875).color(r, g, b, a).tex(minU, maxV).lightmap(sky, block).endVertex();
+                buffer.pos(0.875, dy, 0.875).color(r, g, b, a).tex(maxU, maxV).lightmap(sky, block).endVertex();
+                buffer.pos(0.875, dy, 0.125).color(r, g, b, a).tex(maxU, minV).lightmap(sky, block).endVertex();
 
                 tessellator.draw();
 
-                GlStateManager.disableBlend();
-                GlStateManager.enableLighting();
                 GlStateManager.popMatrix();
+                GlStateManager.enableLighting();
             }
         }
     }
