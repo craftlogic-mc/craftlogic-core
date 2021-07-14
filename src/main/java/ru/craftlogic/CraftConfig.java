@@ -55,6 +55,8 @@ public class CraftConfig {
         @Config.Comment("Enable barrels (composting & liquid storage)")
         @Config.RequiresMcRestart
         public boolean enableBarrels = true;
+        @Config.Comment("Enable berry bush spreading")
+        public boolean enableBerryBushSpreading = false;
     }
 
     public static Tweaks tweaks = new Tweaks();

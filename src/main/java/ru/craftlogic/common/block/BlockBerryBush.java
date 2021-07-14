@@ -26,6 +26,7 @@ import net.minecraftforge.common.EnumPlantType;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.CraftMaterials;
 import ru.craftlogic.api.block.Plantable;
@@ -101,7 +102,7 @@ public abstract class BlockBerryBush extends BlockBush implements ModelRegistrar
                     if (ForgeHooks.onCropsGrowPre(world, pos, state, rand.nextInt((int) (100F / chance / 2) + 1) == 0)) {
                         world.setBlockState(pos, state.cycleProperty(RIPE));
                         ForgeHooks.onCropsGrowPost(world, pos, state, world.getBlockState(pos));
-                    } else {
+                    } else if (CraftConfig.blocks.enableBerryBushSpreading) {
                         for (EnumFacing side : EnumFacing.HORIZONTALS) {
                             BlockPos p = pos.offset(side);
                             if (tryGrowOffspring(state, world, p, rand, chance / 5F)
