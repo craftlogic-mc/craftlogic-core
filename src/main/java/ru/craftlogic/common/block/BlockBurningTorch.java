@@ -166,6 +166,10 @@ public class BlockBurningTorch extends BlockTorch implements ModelRegistrar {
         });
         Item item = Item.getItemFromBlock(this);
         modelManager.registerItemVariants(item, "minecraft:torch", "minecraft:unlit_torch");
-        modelManager.registerItemModel(item, 0, "unlit_torch");
+        if (CraftConfig.tweaks.enableTorchBurning) {
+            modelManager.registerItemModel(item, 0, "unlit_torch");
+        } else {
+            modelManager.registerItemModel(item, 0, "torch");
+        }
     }
 }
