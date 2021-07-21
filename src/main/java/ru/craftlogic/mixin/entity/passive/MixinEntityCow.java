@@ -28,6 +28,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.entity.Cow;
 import ru.craftlogic.common.entity.ai.EntityAIEatCrops;
 import ru.craftlogic.common.entity.ai.EntityAIEatGrassAdvanced;
@@ -65,7 +66,9 @@ public abstract class MixinEntityCow extends EntityAnimal implements Cow {
     @Override
     protected void entityInit() {
         super.entityInit();
-        dataManager.register(MILK, 0);
+        if (CraftConfig.tweaks.enableCowMilkingTweaks) {
+            dataManager.register(MILK, 0);
+        }
         dataManager.register(TAMED, false);
     }
 
@@ -139,7 +142,7 @@ public abstract class MixinEntityCow extends EntityAnimal implements Cow {
 
     @Override
     public boolean hasMilk() {
-        return dataManager.get(MILK) >= 1000;
+        return !CraftConfig.tweaks.enableCowMilkingTweaks || dataManager.get(MILK) >= 1000;
     }
 
     /**
@@ -172,9 +175,11 @@ public abstract class MixinEntityCow extends EntityAnimal implements Cow {
             return true;
         }
         if (heldItem.getItem() == Items.BUCKET && !player.capabilities.isCreativeMode && !isChild()) {
-            int milk = dataManager.get(MILK);
+            int milk = CraftConfig.tweaks.enableCowMilkingTweaks ? 1000 : dataManager.get(MILK);
             if (milk >= 1000) {
-                dataManager.set(MILK, milk - 1000);
+                if (CraftConfig.tweaks.enableCowMilkingTweaks) {
+                    dataManager.set(MILK, milk - 1000);
+                }
                 player.playSound(SoundEvents.ENTITY_COW_MILK, 1F, 1F);
                 heldItem.shrink(1);
                 if (heldItem.isEmpty()) {
@@ -241,7 +246,7 @@ public abstract class MixinEntityCow extends EntityAnimal implements Cow {
 
     @Override
     public void eatGrassBonus() {
-        if (!isChild()) {
+        if (!isChild() && CraftConfig.tweaks.enableCowMilkingTweaks) {
             this.dataManager.set(MILK, Math.min(1000, dataManager.get(MILK) + 500));
         }
     }

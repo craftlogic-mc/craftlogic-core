@@ -45,7 +45,9 @@ public class CraftItems {
             CHAIN_LINKS = registerItem(new ItemBase("chain_links", CreativeTabs.MATERIALS));
             CHAIN_MESH = registerItem(new ItemBase("chain_mesh", CreativeTabs.MATERIALS));
         }
-        MILK_BOTTLE = registerItem(new ItemMilkBottle());
+        if (CraftConfig.tweaks.enableMilkBucketTweaks) {
+            MILK_BOTTLE = registerItem(new ItemMilkBottle());
+        }
         CREEPER_OYSTERS = registerItem(new ItemCreeperOysters());
         GRASS = registerItem(new ItemBase("grass", CreativeTabs.MATERIALS));
         STONE_AXE_HEADING = registerItem(new ItemBase("stone_axe_heading", CreativeTabs.TOOLS).setMaxStackSize(1));

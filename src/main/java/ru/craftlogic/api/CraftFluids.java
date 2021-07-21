@@ -8,6 +8,7 @@ import net.minecraftforge.fluids.BlockFluidBase;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fml.relauncher.Side;
+import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.block.BlockFluid;
 import ru.craftlogic.api.fluid.FluidBase;
 
@@ -21,7 +22,9 @@ public class CraftFluids {
 
     static void init(Side side) {
         //CRUDE_OIL = registerFluid("crude_oil", CraftMaterials.CRUDE_OIL).setViscosity(2000).setDensity(1000);
-        MILK = registerFluid("milk", CraftMaterials.MILK);
+        if (CraftConfig.tweaks.enableMilkBucketTweaks) {
+            MILK = registerFluid("milk", CraftMaterials.MILK);
+        }
     }
 
     public static FluidBase registerFluid(String name, Material material) {

@@ -70,6 +70,10 @@ public class CraftConfig {
         @Config.Comment("Chicken egg lay delay (in ticks; used as %delay% + random[0, %delay%])")
         public int chickenEggLayDelay = 6000;
 
+        @Config.Comment("Enable milk bucket tweaks")
+        public boolean enableMilkBucketTweaks = true;
+        @Config.Comment("Enable cow milking tweaks")
+        public boolean enableCowMilkingTweaks = true;
         @Config.Comment("Enable visual snow layer tweaks (for flowers, tallgrass, rocks, etc.)")
         public boolean enableVisualSnowTweaks = true;
         @Config.Comment("Enable hiding full HUD bars")
