@@ -18,6 +18,7 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.block.Shearable;
 import ru.craftlogic.api.world.Location;
 
@@ -59,8 +60,13 @@ public abstract class MixinBlockFlower extends BlockBush implements Shearable {
     @Overwrite
     public int damageDropped(IBlockState state) {
         if ((Object)this instanceof BlockRedFlower || (Object)this instanceof BlockYellowFlower) {
-            EnumDyeColor color = getColor(state.getValue(getTypeProperty()));
-            return color.getDyeDamage();
+            BlockFlower.EnumFlowerType type = state.getValue(getTypeProperty());
+            if (CraftConfig.tweaks.flowersAndMushroomsRequireShears) {
+                EnumDyeColor color = getColor(type);
+                return color.getDyeDamage();
+            } else {
+                return type.getMeta();
+            }
         } else {
             return 0;
         }
@@ -68,7 +74,7 @@ public abstract class MixinBlockFlower extends BlockBush implements Shearable {
 
     @Override
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        if ((Object)this instanceof BlockRedFlower || (Object)this instanceof BlockYellowFlower) {
+        if (CraftConfig.tweaks.flowersAndMushroomsRequireShears && ((Object)this instanceof BlockRedFlower || (Object)this instanceof BlockYellowFlower)) {
             return Items.DYE;
         } else {
             return super.getItemDropped(state, rand, fortune);
@@ -77,7 +83,7 @@ public abstract class MixinBlockFlower extends BlockBush implements Shearable {
 
     @Override
     public boolean isShearable(Location location, @Nonnull ItemStack tool) {
-        return (Object)this instanceof BlockRedFlower || (Object)this instanceof BlockYellowFlower;
+        return CraftConfig.tweaks.flowersAndMushroomsRequireShears && (Object)this instanceof BlockRedFlower || (Object)this instanceof BlockYellowFlower;
     }
 
     @Override
@@ -88,7 +94,7 @@ public abstract class MixinBlockFlower extends BlockBush implements Shearable {
 
     @Override
     public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-        if ((Object)this instanceof BlockRedFlower || (Object)this instanceof BlockYellowFlower) {
+        if (CraftConfig.tweaks.flowersAndMushroomsRequireShears && (Object)this instanceof BlockRedFlower || (Object)this instanceof BlockYellowFlower) {
             return new ItemStack(this, 1, state.getValue(getTypeProperty()).getMeta());
         } else {
             return super.getPickBlock(state, target, world, pos, player);

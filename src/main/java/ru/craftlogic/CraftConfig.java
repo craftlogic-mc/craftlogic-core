@@ -96,6 +96,8 @@ public class CraftConfig {
         public boolean enableStoneCracking = true;
         @Config.Comment("Enable sticks from leaf")
         public boolean enableSticksFromLeaf = true;
+        @Config.Comment("Flowers and mushrooms require shears to collect them")
+        public boolean flowersAndMushroomsRequireShears = false;
         @Config.Comment("Enable torch burnout")
         @Config.RequiresMcRestart
         public boolean enableTorchBurning = true;

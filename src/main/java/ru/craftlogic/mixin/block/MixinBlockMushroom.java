@@ -12,6 +12,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.IShearable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import ru.craftlogic.CraftConfig;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -47,7 +48,7 @@ public class MixinBlockMushroom extends BlockBush implements IShearable {
 
     @Override
     public boolean isShearable(@Nonnull ItemStack tool, IBlockAccess blockAccessor, BlockPos pos) {
-        return true;
+        return CraftConfig.tweaks.flowersAndMushroomsRequireShears;
     }
 
     @Nonnull
@@ -58,6 +59,10 @@ public class MixinBlockMushroom extends BlockBush implements IShearable {
 
     @Override
     public Item getItemDropped(IBlockState state, Random random, int fortune) {
-        return null;
+        if (CraftConfig.tweaks.flowersAndMushroomsRequireShears) {
+            return null;
+        } else {
+            return super.getItemDropped(state, random, fortune);
+        }
     }
 }
