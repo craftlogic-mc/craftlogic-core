@@ -1,39 +1,41 @@
-package ru.craftlogic.mixin.block;
+package ru.craftlogic.common.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
-import net.minecraft.block.BlockDoor.*;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
 
-import static net.minecraft.block.BlockDoor.*;
-
-@Mixin(BlockDoor.class)
-public abstract class MixinBlockDoor extends Block {
-    protected MixinBlockDoor(Material material) {
+public class BlockHangingDoor extends BlockDoor {
+    public BlockHangingDoor(Material material) {
         super(material);
+        if (material == Material.WOOD) {
+            setSoundType(SoundType.WOOD);
+        } else if (material == Material.IRON) {
+            setSoundType(SoundType.METAL);
+        } else {
+            setSoundType(SoundType.STONE);
+        }
+        disableStats();
     }
 
-    /**
-     * @author Radviger
-     * @reason Custom doors' features
-     */
-    @Overwrite
+    @Override
     public boolean canPlaceBlockAt(World world, BlockPos pos) {
         return pos.getY() < world.getHeight() - 1;
     }
 
-    /**
-     * @author Radviger
-     * @reason Custom doors' features
-     */
-    @Overwrite
+    protected int getCloseSound() {
+        return this.material == Material.IRON ? 1011 : 1012;
+    }
+
+    protected int getOpenSound() {
+        return this.material == Material.IRON ? 1005 : 1006;
+    }
+
+    @Override
     public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighborBlock, BlockPos neighborPos) {
         EnumFacing facing = state.getValue(FACING).rotateY();
         if (state.getValue(HALF) == EnumDoorHalf.UPPER) {
@@ -59,7 +61,7 @@ public abstract class MixinBlockDoor extends Block {
             }
 
             if (!world.isSideSolid(pos.offset(facing), facing.getOpposite())
-                    || !world.isSideSolid(upPos.offset(facing), facing.getOpposite())) {
+                || !world.isSideSolid(upPos.offset(facing), facing.getOpposite())) {
 
                 invalidState = true;
                 world.playEvent(2001, pos, Block.getStateId(state));
@@ -87,10 +89,4 @@ public abstract class MixinBlockDoor extends Block {
             }
         }
     }
-
-    @Shadow
-    protected abstract int getCloseSound();
-
-    @Shadow
-    protected abstract int getOpenSound();
 }

@@ -104,6 +104,9 @@ public class CraftConfig {
         @Config.Comment("Enable diagonal fences")
         @Config.RequiresMcRestart
         public boolean enableDiagonalFences = true;
+        @Config.Comment("Enable hanging doors")
+        @Config.RequiresMcRestart
+        public boolean enableHangingDoors = false;
         @Config.Comment("Enable fancy gourd blocks growing stages (pumpkins & melons)")
         @Config.RequiresMcRestart
         public boolean enableFancyGourd = true;

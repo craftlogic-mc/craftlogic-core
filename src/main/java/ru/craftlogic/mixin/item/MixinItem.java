@@ -2,6 +2,7 @@ package ru.craftlogic.mixin.item;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFlower;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.RegistryNamespaced;
@@ -42,6 +43,48 @@ public class MixinItem {
                 case "milk_bucket": {
                     if (CraftConfig.tweaks.enableMilkBucketTweaks) {
                         item = new ItemMilkBucket().setCreativeTab(null);
+                    }
+                    break;
+                }
+                case "iron_door": {
+                    if (CraftConfig.tweaks.enableHangingDoors) {
+                        item = new ItemHangingDoor(Blocks.IRON_DOOR);
+                    }
+                    break;
+                }
+                case "wooden_door": {
+                    if (CraftConfig.tweaks.enableHangingDoors) {
+                        item = new ItemHangingDoor(Blocks.OAK_DOOR);
+                    }
+                    break;
+                }
+                case "spruce_door": {
+                    if (CraftConfig.tweaks.enableHangingDoors) {
+                        item = new ItemHangingDoor(Blocks.SPRUCE_DOOR);
+                    }
+                    break;
+                }
+                case "birch_door": {
+                    if (CraftConfig.tweaks.enableHangingDoors) {
+                        item = new ItemHangingDoor(Blocks.BIRCH_DOOR);
+                    }
+                    break;
+                }
+                case "jungle_door": {
+                    if (CraftConfig.tweaks.enableHangingDoors) {
+                        item = new ItemHangingDoor(Blocks.JUNGLE_DOOR);
+                    }
+                    break;
+                }
+                case "acacia_door": {
+                    if (CraftConfig.tweaks.enableHangingDoors) {
+                        item = new ItemHangingDoor(Blocks.ACACIA_DOOR);
+                    }
+                    break;
+                }
+                case "dark_oak_door": {
+                    if (CraftConfig.tweaks.enableHangingDoors) {
+                        item = new ItemHangingDoor(Blocks.DARK_OAK_DOOR);
                     }
                     break;
                 }

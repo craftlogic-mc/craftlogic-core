@@ -112,6 +112,62 @@ public class MixinBlock {
                 block.setHardness(3F);
                 break;
             }
+            case "minecraft:wooden_door": {
+                if (CraftConfig.tweaks.enableHangingDoors) {
+                    block = new BlockHangingDoor(Material.WOOD)
+                        .setHardness(3)
+                        .setTranslationKey("doorOak");
+                }
+                break;
+            }
+            case "minecraft:spruce_door": {
+                if (CraftConfig.tweaks.enableHangingDoors) {
+                    block = new BlockHangingDoor(Material.WOOD)
+                        .setHardness(3)
+                        .setTranslationKey("doorSpruce");
+                }
+                break;
+            }
+            case "minecraft:birch_door": {
+                if (CraftConfig.tweaks.enableHangingDoors) {
+                    block = new BlockHangingDoor(Material.WOOD)
+                        .setHardness(3)
+                        .setTranslationKey("doorBirch");
+                }
+                break;
+            }
+            case "minecraft:jungle_door": {
+                if (CraftConfig.tweaks.enableHangingDoors) {
+                    block = new BlockHangingDoor(Material.WOOD)
+                        .setHardness(3)
+                        .setTranslationKey("doorJungle");
+                }
+                break;
+            }
+            case "minecraft:acacia_door": {
+                if (CraftConfig.tweaks.enableHangingDoors) {
+                    block = new BlockHangingDoor(Material.WOOD)
+                        .setHardness(3)
+                        .setTranslationKey("doorAcacia");
+                }
+                break;
+            }
+            case "minecraft:dark_oak_door": {
+                if (CraftConfig.tweaks.enableHangingDoors) {
+                    block = new BlockHangingDoor(Material.WOOD)
+                        .setHardness(3)
+                        .setTranslationKey("doorDarkOak");
+                }
+                break;
+            }
+            case "minecraft:iron_door": {
+                if (CraftConfig.tweaks.enableHangingDoors) {
+                    block = new BlockHangingDoor(Material.IRON)
+                        .setHardness(5)
+                        .setTranslationKey("doorIron");
+                }
+                break;
+            }
         }
         block.setRegistryName(name);
         REGISTRY.register(id, name, block);
