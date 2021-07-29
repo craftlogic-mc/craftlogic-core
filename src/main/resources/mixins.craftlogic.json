@@ -6,9 +6,9 @@
     "mixins": [
         "MixinNettyPacketEncoder", "MixinServerHangWatchdog", "advancement.MixinAdvancementManager", "block.MixinBlock",
         "block.MixinBlockBasePressurePlate", "block.MixinBlockBed", "block.MixinBlockButton", "block.MixinBlockCarpet",
-        "block.MixinBlockChest", "block.MixinBlockDispenser", "block.MixinBlockDoublePlant",
-        "block.MixinBlockDropper", "block.MixinBlockDynamicLiquid", "block.MixinBlockFarmland",
-        "block.MixinBlockFenceGate", "block.MixinBlockFlower", "block.MixinBlockFluidClassic", "block.MixinBlockGrass",
+        "block.MixinBlockChest", "block.MixinBlockDispenser", "block.MixinBlockDoublePlant", "block.MixinBlockDropper",
+        "block.MixinBlockDynamicLiquid", "block.MixinBlockFarmland", "block.MixinBlockFenceGate",
+        "block.MixinBlockFire", "block.MixinBlockFlower", "block.MixinBlockFluidClassic", "block.MixinBlockGrass",
         "block.MixinBlockLeaves", "block.MixinBlockLeavesNew", "block.MixinBlockLeavesOld", "block.MixinBlockLever",
         "block.MixinBlockLilyPad", "block.MixinBlockLog", "block.MixinBlockLogNew", "block.MixinBlockLogOld",
         "block.MixinBlockMelon", "block.MixinBlockMushroom", "block.MixinBlockObserver", "block.MixinBlockPlanks",
