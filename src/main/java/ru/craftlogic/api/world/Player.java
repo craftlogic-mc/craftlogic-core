@@ -367,6 +367,15 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
         pendingCallbacks.put(id, callback);
     }
 
+    public void sendToastQuestion(String id, Text<?, ?> question, int color, int timeout, BooleanConsumer callback) {
+        sendToastQuestion(id, question.build(), timeout, color, callback);
+    }
+
+    public void sendToastQuestion(String id, ITextComponent question, int color, int timeout, BooleanConsumer callback) {
+        sendPacket(new MessageToastQuestion(id, question, color, timeout));
+        pendingCallbacks.put(id, callback);
+    }
+
     public boolean hasQuestion(String id) {
         return pendingCallbacks.containsKey(id);
     }

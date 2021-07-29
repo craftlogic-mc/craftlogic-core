@@ -14,6 +14,9 @@ death.fallIntoLeaves=%1$s упал в листву и был пронзён ве
 gui.reconnect.stop=Сервер остановился
 gui.reconnect.crash=Сервер аварийно закрылся
 gui.reconnect.in=Повтор соединения через %s...
+gui.confirmation=%s - Да, %s - Нет
+key.accept=Принять
+key.decline=Отклонить
 
 fluid.milk=Молоко
 fluid.oil=Нефть
@@ -172,7 +175,7 @@ commands.gamemode.adventure=Приключение
 commands.info.usage=/info <игрок> - Информация об игроке
 commands.tpa.usage=/tpa <игрок> - Запрос на телепортацию к игроку
 
-commands.request_teleport.question=%s хочет к вам телепортироваться. Разрешить?
+commands.request_teleport.question=%s хочет телепортироваться
 commands.request_teleport.pending=Запрос на телепортацию к %s уже отправлен
 commands.request_teleport.accepted=Запрос на телепортацию подтверждён
 commands.request_teleport.declined=Запрос на телепортацию отколнён

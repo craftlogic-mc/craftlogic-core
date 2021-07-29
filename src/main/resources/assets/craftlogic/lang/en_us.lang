@@ -14,6 +14,9 @@ death.fallIntoLeaves=%1$s fell into leaves and was impaled by branches
 gui.reconnect.stop=Server is stopped
 gui.reconnect.crash=Server is crashed
 gui.reconnect.in=Reconnect in %s...
+gui.confirmation=%s - Yes, %s - No
+key.accept=Accept
+key.decline=Decline
 
 fluid.milk=Milk
 fluid.oil=Oil
@@ -172,7 +175,7 @@ commands.gamemode.adventure=Adventure
 commands.info.usage=/info <player> - Player information
 commands.tpa.usage=/tpa <player> - Player teleport request
 
-commands.request_teleport.question=%s wats to teleport to you. Do you want to allow?
+commands.request_teleport.question=%s wants to teleport
 commands.request_teleport.pending=Teleport request is already sent to %s
 commands.request_teleport.accepted=Teleportation request accepted
 commands.request_teleport.declined=Teleportation request denied

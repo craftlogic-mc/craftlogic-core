@@ -26,7 +26,7 @@ public final class CommandRequestTeleport extends CommandBase {
             throw new CommandException("commands.request_teleport.pending", target.getName());
         } else {
             Text<?, ?> title = Text.translation("commands.request_teleport.question").arg(sender.getName());
-            target.sendQuestion("tpa", title, 60, accepted -> {
+            target.sendToastQuestion("tpa", title, 0x404040, 30, accepted -> {
                 if (sender.isOnline() && target.isOnline()) {
                     if (accepted) {
                         if (sender.getWorld().getDimension() != target.getWorld().getDimension()) {

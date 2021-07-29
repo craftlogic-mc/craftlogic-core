@@ -6,4 +6,6 @@ import java.util.function.Predicate;
 
 public interface AdvancedToast {
     void remove(Predicate<IToast> filter);
+
+    <T extends IToast> T getFirst(Class<? extends T> type);
 }

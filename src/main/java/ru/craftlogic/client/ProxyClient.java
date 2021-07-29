@@ -9,6 +9,7 @@ import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.toasts.GuiToast;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,11 +23,14 @@ import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Keyboard;
 import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.CraftSounds;
@@ -42,6 +46,7 @@ import ru.craftlogic.client.particle.ParticleTeleport;
 import ru.craftlogic.client.screen.ScreenPlayerInfo;
 import ru.craftlogic.client.screen.ScreenQuestion;
 import ru.craftlogic.client.screen.ScreenReconnect;
+import ru.craftlogic.client.screen.toast.ToastConfirmation;
 import ru.craftlogic.client.screen.toast.ToastCountdown;
 import ru.craftlogic.client.screen.toast.ToastText;
 import ru.craftlogic.common.ProxyCommon;
@@ -62,6 +67,8 @@ public class ProxyClient extends ProxyCommon {
     private final ExecutorService taskScheduler = Executors.newSingleThreadExecutor(
         r -> new Thread(r, "Client task scheduler")
     );
+    public static final KeyBinding keyBindAccept = new KeyBinding("key.accept", Keyboard.KEY_Y, "key.categories.multiplayer");
+    public static final KeyBinding keyBindDecline = new KeyBinding("key.decline", Keyboard.KEY_N, "key.categories.multiplayer");
     private Teleport teleportInProcess;
 
     public void addTask(Consumer<Minecraft> task) {
@@ -88,12 +95,31 @@ public class ProxyClient extends ProxyCommon {
 
     @Override
     public void init() {
+        ClientRegistry.registerKeyBinding(keyBindAccept);
+        ClientRegistry.registerKeyBinding(keyBindDecline);
         super.init();
     }
 
     @Override
     public void postInit() {
         super.postInit();
+    }
+
+    @SubscribeEvent
+    public void onKeyInput(InputEvent.KeyInputEvent event) {
+        boolean accept = keyBindAccept.isPressed();
+        boolean decline = keyBindDecline.isPressed();
+        if (accept || decline) {
+            ToastConfirmation c = ((AdvancedToast) client.getToastGui()).getFirst(ToastConfirmation.class);
+            if (c != null) {
+                if (accept) {
+                    c.confirm(true);
+                }
+                if (decline) {
+                    c.confirm(false);
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -315,6 +341,21 @@ public class ProxyClient extends ProxyCommon {
                 client.player.closeScreen();
             }
             client.displayGuiScreen(screen);
+        });
+        return null;
+    }
+
+    @Override
+    protected AdvancedMessage handleToastQuestion(MessageToastQuestion message, MessageContext context) {
+        String id = message.getId();
+        syncTask(context, () -> {
+            GuiToast toasts = client.getToastGui();
+            ToastConfirmation c = toasts.getToast(ToastConfirmation.class, id);
+            if (c != null) {
+                c.resetTimer();
+            } else {
+                toasts.add(new ToastConfirmation(id, message.getQuestion(), message.getTimeout(), message.getColor()));
+            }
         });
         return null;
     }

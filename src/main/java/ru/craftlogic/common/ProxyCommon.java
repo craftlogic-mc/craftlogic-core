@@ -53,6 +53,7 @@ public class ProxyCommon extends AdvancedMessageHandler {
         NETWORK.registerMessage(this::handleToast, MessageToast.class, Side.CLIENT);
         NETWORK.registerMessage(this::handleCountdown, MessageCountdown.class, Side.CLIENT);
         NETWORK.registerMessage(this::handleQuestion, MessageQuestion.class, Side.CLIENT);
+        NETWORK.registerMessage(this::handleToastQuestion, MessageToastQuestion.class, Side.CLIENT);
         NETWORK.registerMessage(this::handleConfirmation, MessageConfirmation.class, Side.SERVER);
         NETWORK.registerMessage(this::handlePlayerInfo, MessagePlayerInfo.class, Side.CLIENT);
         NETWORK.registerMessage(this::handleTimedTeleportStart, MessageTimedTeleportStart.class, Side.CLIENT);
@@ -131,6 +132,10 @@ public class ProxyCommon extends AdvancedMessageHandler {
     }
 
     protected AdvancedMessage handleQuestion(MessageQuestion message, MessageContext context) {
+        return null;
+    }
+
+    protected AdvancedMessage handleToastQuestion(MessageToastQuestion message, MessageContext context) {
         return null;
     }
 

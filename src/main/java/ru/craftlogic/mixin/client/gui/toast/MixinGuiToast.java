@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import ru.craftlogic.api.screen.toast.AdvancedToast;
 import ru.craftlogic.util.Reflection;
 
+import javax.annotation.Nullable;
 import java.util.Deque;
 import java.util.function.Predicate;
 
@@ -31,5 +32,38 @@ public class MixinGuiToast implements AdvancedToast {
             }
         }
         this.toastsQueue.removeIf(filter);
+    }
+
+
+    @Nullable
+    @Override
+    public <T extends IToast> T getFirst(Class<? extends T> type) {
+        Object[] visible = Reflection.getField(GuiToast.class, (GuiToast) (Object) this, "visible", "field_191791_g");
+        if (visible != null) {
+            for (Object o : visible) {
+                if (o != null) {
+                    IToast toast = (IToast) Reflection.getField((Class) o.getClass(), o, "toast", "field_193688_b");
+                    if (type.isAssignableFrom(toast.getClass())) {
+                        return (T) toast;
+                    }
+                }
+            }
+        }
+        Deque<Object> queue = Reflection.getField(GuiToast.class, (GuiToast) (Object) this, "toastsQueue", "field_191792_h");
+        if (queue != null) {
+            for (Object o : queue) {
+                IToast toast = (IToast) Reflection.getField((Class) o.getClass(), o, "toast", "field_193688_b");
+                if (type.isAssignableFrom(toast.getClass())) {
+                    return (T) toast;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    @Mixin(targets = "net/minecraft/client/gui/toasts/GuiToast$ToastInstance")
+    static class MixinToastInstance {
+
     }
 }
