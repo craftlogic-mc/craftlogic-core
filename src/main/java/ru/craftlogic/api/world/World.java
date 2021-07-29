@@ -25,6 +25,7 @@ public class World {
         GameRules rules = getRules();
         rules.addGameRule("hidePlayerJoinMessages", "false", GameRules.ValueType.BOOLEAN_VALUE);
         rules.addGameRule("hidePlayerLeaveMessages", "false", GameRules.ValueType.BOOLEAN_VALUE);
+        rules.addGameRule("doFireSpread", "true", GameRules.ValueType.BOOLEAN_VALUE);
     }
 
     public static World fromVanilla(Server server, net.minecraft.world.World world) {
