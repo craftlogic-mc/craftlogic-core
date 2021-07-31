@@ -14,10 +14,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.event.player.PlayerJoinedMessageEvent;
 import ru.craftlogic.api.network.AdvancedNetHandlerPlayServer;
+import ru.craftlogic.api.server.Server;
 
 @Mixin(NetHandlerPlayServer.class)
 public class MixinNetHandlerPlayServer implements AdvancedNetHandlerPlayServer {
@@ -69,4 +72,14 @@ public class MixinNetHandlerPlayServer implements AdvancedNetHandlerPlayServer {
 
     @Shadow
     private void captureCurrentPosition() {}
+
+    @Inject(method = "update", at = @At("HEAD"))
+    private void onUpdateStart(CallbackInfo ci) {
+        Server.from(server).currentlyProcessingPlayer(player.getUniqueID());
+    }
+
+    @Inject(method = "update", at = @At("RETURN"))
+    private void onUpdateEnd(CallbackInfo ci) {
+        Server.from(server).currentlyProcessingPlayer(null);
+    }
 }

@@ -34,10 +34,10 @@
         "tileentity.MixinTileEntityStructure", "util.text.MixinITextComponent$Serializer",
         "world.MixinAnvilChunkLoader", "world.MixinChunk", "world.MixinChunkCache", "world.MixinChunkProviderServer",
         "world.MixinCommandHandler", "world.MixinExtendedBlockStorage", "world.MixinSPacketChunkData",
-        "world.MixinWorld", "world.biome.MixinBiome", "world.biome.MixinBiomeManager", "world.biome.MixinBiomeSwamp",
-        "world.biome.MixinBiomeTaiga", "world.gen.structure.MixinJungleTemple", "world.gen.structure.MixinVillage",
-        "world.gen.structure.MixinVillageHouseBlacksmith", "world.gen.structure.MixinVillageHouseChurch",
-        "world.storage.MixinSaveHandler"
+        "world.MixinWorld", "world.MixinWorldServer", "world.biome.MixinBiome", "world.biome.MixinBiomeManager",
+        "world.biome.MixinBiomeSwamp", "world.biome.MixinBiomeTaiga", "world.gen.structure.MixinJungleTemple",
+        "world.gen.structure.MixinVillage", "world.gen.structure.MixinVillageHouseBlacksmith",
+        "world.gen.structure.MixinVillageHouseChurch", "world.storage.MixinSaveHandler"
     ],
     "client": [
         "client.MixinMinecraft", "client.audio.MixinSoundManager", "client.entity.MixinEntityPlayerSP",

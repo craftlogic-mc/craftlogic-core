@@ -38,6 +38,7 @@ public class Server implements CommandSender {
         r -> new Thread(r, "Server task scheduler")
     );
     private final Set<UUID> cancelledTasks = new HashSet<>();
+    private UUID currentlyProcessingPlayer;
 
     public Server(MinecraftServer handle) {
         this.handle = handle;
@@ -218,6 +219,14 @@ public class Server implements CommandSender {
                 }
             }
         });
+    }
+
+    public UUID currentlyProcessingPlayer() {
+        return currentlyProcessingPlayer;
+    }
+
+    public void currentlyProcessingPlayer(UUID player) {
+        currentlyProcessingPlayer = player;
     }
 
     public boolean isSinglePlayer() {
