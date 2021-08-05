@@ -1,6 +1,7 @@
 package ru.craftlogic.common.world;
 
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeForest;
@@ -45,7 +46,7 @@ public final class CraftWorldGenerator implements IWorldGenerator {
 
     @Override
     public void generate(Random rand, int chunkX, int chunkZ, World world, IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
-        if (CraftConfig.items.enableRocks) {
+        if (CraftConfig.items.enableRocks && world.provider.getDimensionType() == DimensionType.OVERWORLD) {
             for (int i = 0; i < 1; ++i) {
                 int x = chunkX * 16 + rand.nextInt(16) + 8;
                 int z = chunkZ * 16 + rand.nextInt(16) + 8;
