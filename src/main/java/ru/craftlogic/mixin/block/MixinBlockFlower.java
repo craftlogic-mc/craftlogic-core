@@ -77,7 +77,7 @@ public abstract class MixinBlockFlower extends BlockBush implements Shearable {
         if (CraftConfig.tweaks.flowersAndMushroomsRequireShears && ((Object)this instanceof BlockRedFlower || (Object)this instanceof BlockYellowFlower)) {
             return Items.DYE;
         } else {
-            return super.getItemDropped(state, rand, fortune);
+            return Item.REGISTRY.getObject(getRegistryName());
         }
     }
 
@@ -89,15 +89,17 @@ public abstract class MixinBlockFlower extends BlockBush implements Shearable {
     @Override
     public List<ItemStack> onSheared(Location location, int fortune, @Nonnull ItemStack tool) {
         BlockFlower.EnumFlowerType type = location.getBlockProperty(getTypeProperty());
-        return NonNullList.withSize(1, new ItemStack(this, 1, type.getMeta()));
+        Item item = Item.REGISTRY.getObject(getRegistryName());
+        return NonNullList.withSize(1, new ItemStack(item, 1, type.getMeta()));
     }
 
     @Override
     public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+        Item item = Item.REGISTRY.getObject(getRegistryName());
         if (CraftConfig.tweaks.flowersAndMushroomsRequireShears && (Object)this instanceof BlockRedFlower || (Object)this instanceof BlockYellowFlower) {
-            return new ItemStack(this, 1, state.getValue(getTypeProperty()).getMeta());
+            return new ItemStack(item, 1, state.getValue(getTypeProperty()).getMeta());
         } else {
-            return super.getPickBlock(state, target, world, pos, player);
+            return new ItemStack(item);
         }
     }
 }

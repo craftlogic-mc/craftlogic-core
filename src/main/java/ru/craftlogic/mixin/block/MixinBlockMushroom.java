@@ -54,7 +54,8 @@ public class MixinBlockMushroom extends BlockBush implements IShearable {
     @Nonnull
     @Override
     public List<ItemStack> onSheared(@Nonnull ItemStack tool, IBlockAccess blockAccessor, BlockPos pos, int i) {
-        return Collections.singletonList(new ItemStack(Item.REGISTRY.getObject(getRegistryName())));
+        Item item = Item.REGISTRY.getObject(getRegistryName());
+        return Collections.singletonList(new ItemStack(item));
     }
 
     @Override
@@ -62,7 +63,7 @@ public class MixinBlockMushroom extends BlockBush implements IShearable {
         if (CraftConfig.tweaks.flowersAndMushroomsRequireShears) {
             return null;
         } else {
-            return super.getItemDropped(state, random, fortune);
+            return Item.REGISTRY.getObject(getRegistryName());
         }
     }
 }
