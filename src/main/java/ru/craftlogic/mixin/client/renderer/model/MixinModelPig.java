@@ -18,8 +18,10 @@ public class MixinModelPig extends ModelQuadruped {
     @Override
     public void setLivingAnimations(EntityLivingBase entity, float p_setLivingAnimations_2_, float p_setLivingAnimations_3_, float p) {
         super.setLivingAnimations(entity, p_setLivingAnimations_2_, p_setLivingAnimations_3_, p);
-        this.head.rotationPointY = 12F + ((Pig)entity).getHeadRotationPointY(p) * 9F;
-        this.headRotationAngleX = ((Pig)entity).getHeadRotationAngleX(p);
+        if (entity instanceof Pig) {
+            this.head.rotationPointY = 12F + ((Pig)entity).getHeadRotationPointY(p) * 9F;
+            this.headRotationAngleX = ((Pig)entity).getHeadRotationAngleX(p);
+        }
     }
 
     @Override

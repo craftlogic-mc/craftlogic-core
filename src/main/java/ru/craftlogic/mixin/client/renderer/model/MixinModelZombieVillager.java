@@ -40,24 +40,25 @@ public abstract class MixinModelZombieVillager extends ModelBiped {
     public void setRotationAngles(float limbSwing, float limbSwingMod, float rotation, float deltaYaw, float pitch, float scale, Entity entity) {
         super.setRotationAngles(limbSwing, limbSwingMod, rotation, deltaYaw, pitch, scale, entity);
         ItemStack heldItem = ((EntityLivingBase)entity).getHeldItemMainhand();
-        Zombie zombie = (Zombie)entity;
-        if (zombie.isSwingingArms() && (heldItem.isEmpty() || heldItem.getItem() != Items.BOW)) {
-            float lvt_10_1_ = MathHelper.sin(this.swingProgress * 3.1415927F);
-            float lvt_11_1_ = MathHelper.sin((1F - (1F - this.swingProgress) * (1F - this.swingProgress)) * 3.1415927F);
-            this.bipedRightArm.rotateAngleZ = 0F;
-            this.bipedLeftArm.rotateAngleZ = 0F;
-            this.bipedRightArm.rotateAngleY = -(0.1F - lvt_10_1_ * 0.6F);
-            this.bipedLeftArm.rotateAngleY = 0.1F - lvt_10_1_ * 0.6F;
-            this.bipedRightArm.rotateAngleX = -1.5707964F;
-            this.bipedLeftArm.rotateAngleX = -1.5707964F;
-            this.bipedRightArm.rotateAngleX -= lvt_10_1_ * 1.2F - lvt_11_1_ * 0.4F;
-            this.bipedLeftArm.rotateAngleX -= lvt_10_1_ * 1.2F - lvt_11_1_ * 0.4F;
-            this.bipedRightArm.rotateAngleZ += MathHelper.cos(rotation * 0.09F) * 0.05F + 0.05F;
-            this.bipedLeftArm.rotateAngleZ -= MathHelper.cos(rotation * 0.09F) * 0.05F + 0.05F;
-            this.bipedRightArm.rotateAngleX += MathHelper.sin(rotation * 0.067F) * 0.05F;
-            this.bipedLeftArm.rotateAngleX -= MathHelper.sin(rotation * 0.067F) * 0.05F;
+        if (entity instanceof Zombie) {
+            Zombie zombie = (Zombie)entity;
+            if (zombie.isSwingingArms() && (heldItem.isEmpty() || heldItem.getItem() != Items.BOW)) {
+                float lvt_10_1_ = MathHelper.sin(this.swingProgress * 3.1415927F);
+                float lvt_11_1_ = MathHelper.sin((1F - (1F - this.swingProgress) * (1F - this.swingProgress)) * 3.1415927F);
+                this.bipedRightArm.rotateAngleZ = 0F;
+                this.bipedLeftArm.rotateAngleZ = 0F;
+                this.bipedRightArm.rotateAngleY = -(0.1F - lvt_10_1_ * 0.6F);
+                this.bipedLeftArm.rotateAngleY = 0.1F - lvt_10_1_ * 0.6F;
+                this.bipedRightArm.rotateAngleX = -1.5707964F;
+                this.bipedLeftArm.rotateAngleX = -1.5707964F;
+                this.bipedRightArm.rotateAngleX -= lvt_10_1_ * 1.2F - lvt_11_1_ * 0.4F;
+                this.bipedLeftArm.rotateAngleX -= lvt_10_1_ * 1.2F - lvt_11_1_ * 0.4F;
+                this.bipedRightArm.rotateAngleZ += MathHelper.cos(rotation * 0.09F) * 0.05F + 0.05F;
+                this.bipedLeftArm.rotateAngleZ -= MathHelper.cos(rotation * 0.09F) * 0.05F + 0.05F;
+                this.bipedRightArm.rotateAngleX += MathHelper.sin(rotation * 0.067F) * 0.05F;
+                this.bipedLeftArm.rotateAngleX -= MathHelper.sin(rotation * 0.067F) * 0.05F;
+            }
         }
-
     }
 
     @Override
