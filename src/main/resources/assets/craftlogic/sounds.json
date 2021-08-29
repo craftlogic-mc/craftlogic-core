@@ -106,7 +106,11 @@
   "opening_failed": {
     "category": "player",
     "subtitle": "craftlogic.subtitle.opening_failed",
-    "sounds": [ "craftlogic:opening_failed" ]
+    "sounds": [
+      "craftlogic:locked1",
+      "craftlogic:locked2",
+      "craftlogic:locked3"
+    ]
   },
   "squash": {
     "category": "player",
