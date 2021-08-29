@@ -1,8 +1,10 @@
 package ru.craftlogic.common.command;
 
 import net.minecraft.command.CommandException;
+import net.minecraftforge.common.MinecraftForge;
 import ru.craftlogic.api.command.CommandBase;
 import ru.craftlogic.api.command.CommandContext;
+import ru.craftlogic.api.event.player.PlayerTeleportRequestEvent;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.world.Player;
 
@@ -24,7 +26,7 @@ public final class CommandRequestTeleport extends CommandBase {
         }
         if (target.hasQuestion("tpa")) {
             throw new CommandException("commands.request_teleport.pending", target.getName());
-        } else {
+        } else if (!MinecraftForge.EVENT_BUS.post(new PlayerTeleportRequestEvent(sender, target, ctx))) {
             Text<?, ?> title = Text.translation("commands.request_teleport.question").arg(sender.getName());
             target.sendToastQuestion("tpa", title, 0x404040, 30, accepted -> {
                 if (sender.isOnline() && target.isOnline()) {

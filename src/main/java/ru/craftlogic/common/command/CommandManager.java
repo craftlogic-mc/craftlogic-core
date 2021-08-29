@@ -1,16 +1,14 @@
 package ru.craftlogic.common.command;
 
 import com.google.gson.JsonObject;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.CommandHandler;
-import net.minecraft.command.ICommand;
-import net.minecraft.command.ICommandSender;
+import net.minecraft.command.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.GameType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.command.*;
+import ru.craftlogic.api.command.CommandBase;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.util.CheckedFunction;
 import ru.craftlogic.api.util.ConfigurableManager;
