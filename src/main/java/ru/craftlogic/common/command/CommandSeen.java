@@ -10,7 +10,7 @@ import ru.craftlogic.api.world.*;
 
 public final class CommandSeen extends CommandBase {
     CommandSeen() {
-        super("info", 1, "<username:OfflinePlayer>");
+        super("seen", 1, "<username:OfflinePlayer>");
     }
 
     @Override
