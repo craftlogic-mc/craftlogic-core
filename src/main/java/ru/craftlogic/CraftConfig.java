@@ -119,6 +119,9 @@ public class CraftConfig {
         @Config.Comment("Disable log breaking by hand")
         @Config.RequiresWorldRestart
         public boolean disableHandLogBreaking = false;
+        @Config.Comment("Disable damage indicator particles")
+        @Config.RequiresWorldRestart
+        public boolean disableDamageParticles = false;
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID)
