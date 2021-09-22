@@ -2,6 +2,7 @@ package ru.craftlogic.api.world;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -23,6 +24,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.GameType;
 import net.minecraft.world.IInteractionObject;
+import net.minecraftforge.common.util.ITeleporter;
 import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.api.block.holders.ScreenHolder;
@@ -111,16 +113,19 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
     }
 
     public boolean teleport(Location location) {
-        return this.teleport(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+        return teleport(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch(), location.getDimensionId());
     }
 
-    public boolean teleport(double x, double y, double z, float yaw, float pitch) {
+    public boolean teleport(double x, double y, double z, float yaw, float pitch, int dimension) {
         EntityPlayerMP entity = getEntity();
         Set<SPacketPlayerPosLook.EnumFlags> lookFlags = EnumSet.noneOf(SPacketPlayerPosLook.EnumFlags.class);
         yaw = MathHelper.wrapDegrees(yaw);
         pitch = MathHelper.wrapDegrees(pitch);
 
         entity.dismountRidingEntity();
+        if (entity.dimension != dimension) {
+            entity.changeDimension(dimension, new Teleporter(x, y, z));
+        }
         entity.connection.setPlayerLocation(x, y, z, yaw, pitch, lookFlags);
         ((AdvancedNetHandlerPlayServer)entity.connection).resetPosition();
         entity.setRotationYawHead(yaw);
@@ -398,5 +403,20 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
 
     public Set<UUID> getPendingTeleports() {
         return this.pendingTeleports;
+    }
+
+    private static class Teleporter implements ITeleporter {
+        private final double x, y, z;
+
+        private Teleporter(double x, double y, double z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+
+        @Override
+        public void placeEntity(net.minecraft.world.World world, Entity entity, float yaw) {
+            entity.setLocationAndAngles(x, y, z, yaw, entity.rotationPitch);
+        }
     }
 }

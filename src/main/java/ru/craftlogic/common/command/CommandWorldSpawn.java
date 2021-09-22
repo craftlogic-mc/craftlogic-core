@@ -9,9 +9,9 @@ import ru.craftlogic.api.world.Player;
 
 import java.util.function.Consumer;
 
-public final class CommandSpawn extends CommandBase {
-    CommandSpawn() {
-        super("spawn", 0, "", "<target:Player>");
+public final class CommandWorldSpawn extends CommandBase {
+    CommandWorldSpawn() {
+        super("worldspawn", 0, "", "<target:Player>");
     }
 
     @Override
