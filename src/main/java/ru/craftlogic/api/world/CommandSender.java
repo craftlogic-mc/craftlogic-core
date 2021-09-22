@@ -10,6 +10,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import ru.craftlogic.api.server.AdvancedServer;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.text.Text;
+import ru.craftlogic.api.util.BooleanConsumer;
 import ru.craftlogic.util.WrappedCommandSender;
 
 public interface CommandSender extends Permissible {
@@ -38,6 +39,14 @@ public interface CommandSender extends Permissible {
 
     default void sendMessage(String format, Object... args) {
         unwrap().sendMessage(new TextComponentTranslation(format, args));
+    }
+
+    default void sendQuestionIfPlayer(String id, Text<?, ?> question, int timeout, BooleanConsumer callback) {
+        sendQuestionIfPlayer(id, question.build(), timeout, callback);
+    }
+
+    default void sendQuestionIfPlayer(String id, ITextComponent question, int timeout, BooleanConsumer callback) {
+        callback.accept(true);
     }
 
     ICommandSender unwrap();
