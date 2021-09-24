@@ -69,14 +69,14 @@ public abstract class ConfigurableManager extends ServerManager {
                             }
                         }
                         getLogger().info("Loaded defaults!");
-                        try (Reader reader = Files.newBufferedReader(configFile)) {
+                        try (Reader reader = Files.newBufferedReader(configFile, StandardCharsets.UTF_8)) {
                             root = GSON.fromJson(reader, JsonObject.class);
                         }
                     }
                 }
             }
         } else {
-            try (Reader reader = Files.newBufferedReader(configFile)) {
+            try (Reader reader = Files.newBufferedReader(configFile, StandardCharsets.UTF_8)) {
                 root = GSON.fromJson(reader, JsonObject.class);
             }
         }
