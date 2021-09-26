@@ -40,12 +40,6 @@ public class MixinItem {
                     item.setCreativeTab(null);
                     break;
                 }
-                case "milk_bucket": {
-                    if (CraftConfig.tweaks.enableMilkBucketTweaks) {
-                        item = new ItemMilkBucket().setCreativeTab(null);
-                    }
-                    break;
-                }
                 case "iron_door": {
                     if (CraftConfig.tweaks.enableHangingDoors) {
                         item = new ItemHangingDoor(Blocks.IRON_DOOR);
