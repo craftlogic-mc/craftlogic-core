@@ -55,6 +55,6 @@ public abstract class MixinGuiIngameForge extends GuiIngame {
 
     @Redirect(method = "renderAir", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayer;isInsideOfMaterial(Lnet/minecraft/block/material/Material;)Z"))
     protected boolean onCheckAirSupply(EntityPlayer player, Material material) {
-        return player.getAir() < 300 | player.isInsideOfMaterial(material);
+        return player.getAir() < 300 || player.isInsideOfMaterial(material);
     }
 }
