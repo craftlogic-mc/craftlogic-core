@@ -58,9 +58,9 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
     public int executeCommand(ICommandSender sender, String rawString) {
         String line = rawString.trim();
 
-        boolean wrongKeyLayout = false;
+        boolean sendTextIfNoSuchCommand = false;
         if (line.matches("[/|.][\u0410-\u044F\u0401\u0451]+($|\\s)")) {
-            wrongKeyLayout = true;
+            sendTextIfNoSuchCommand = line.startsWith(".");
             line = fixLayout(line.substring(1));
         } else if (line.startsWith("/")) {
             line = line.substring(1);
@@ -77,7 +77,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
 
         try {
             if (container == null) {
-                if (wrongKeyLayout && sender instanceof EntityPlayerMP) {
+                if (sendTextIfNoSuchCommand && sender instanceof EntityPlayerMP) {
                     EntityPlayerMP player = (EntityPlayerMP) sender;
                     ITextComponent msg = new TextComponentTranslation("chat.type.text", player.getDisplayName(), ForgeHooks.newChatWithLinks(rawString));
                     ITextComponent m = ForgeHooks.onServerChatEvent(player.connection, rawString, msg);
