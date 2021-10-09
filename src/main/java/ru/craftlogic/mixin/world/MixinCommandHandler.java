@@ -4,9 +4,13 @@ import com.google.common.base.Throwables;
 import net.minecraft.command.*;
 import net.minecraft.command.CommandResultStats.Type;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
 import org.apache.logging.log4j.Logger;
@@ -31,18 +35,39 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
     private final Map<String, List<ResourceLocation>> aliases = new HashMap<>();
     private final Map<ResourceLocation, CommandContainer> registry = new HashMap<>();
 
+    private static final String LAYOUT_ENG = "qwertyuiop[]asdfghjkl;'zxcvbnm,.`";
+    private static final String LAYOUT_RUS = "\u0439\u0446\u0443\u043A\u0435\u043D\u0433\u0448\u0449\u0437\u0445\u044A\u0444\u044B\u0432\u0430\u043F\u0440\u043E\u043B\u0434\u0436\u044D\u044F\u0447\u0441\u043C\u0438\u0442\u044C\u0431\u044E\u0451";
+
+    private String fixLayout(String text) {
+        StringBuilder result = new StringBuilder(text);
+        for (int i = 0; i < text.length(); i++) {
+            char oldChar = text.charAt(i);
+            int index = LAYOUT_RUS.indexOf(oldChar);
+            if (index != -1) {
+                result.setCharAt(i, LAYOUT_ENG.charAt(index));
+            }
+        }
+        return result.toString();
+    }
+
     /**
      * @author Radviger
      * @reason Extended commands' features
      */
     @Overwrite
     public int executeCommand(ICommandSender sender, String rawString) {
-        rawString = rawString.trim();
-        if (rawString.startsWith("/")) {
-            rawString = rawString.substring(1);
+        String line = rawString.trim();
+
+        boolean wrongKeyLayout = false;
+        if (line.startsWith("/")) {
+            line = line.substring(1);
+        } else if (line.matches("\\.[\u0410-\u044F\u0401\u0451]+($|\\s)")) {
+            wrongKeyLayout = true;
+            line = fixLayout(line.substring(1));
         }
 
-        String[] args = rawString.split(" ");
+
+        String[] args = line.split(" ");
         String commandName = args[0];
         args = dropFirstString(args);
 
@@ -52,7 +77,18 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
 
         try {
             if (container == null) {
-                sender.sendMessage(Text.translation("commands.generic.notFound").red().build());
+                if (wrongKeyLayout && sender instanceof EntityPlayerMP) {
+                    EntityPlayerMP player = (EntityPlayerMP) sender;
+                    ITextComponent msg = new TextComponentTranslation("chat.type.text", player.getDisplayName(), ForgeHooks.newChatWithLinks(rawString));
+                    ITextComponent m = ForgeHooks.onServerChatEvent(player.connection, rawString, msg);
+                    if (m == null) {
+                        return 0;
+                    }
+
+                    getServer().getPlayerList().sendMessage(m, false);
+                } else {
+                    sender.sendMessage(Text.translation("commands.generic.notFound").red().build());
+                }
             } else if (container.checkPermission(getServer(), sender, args, false)) {
                 ICommand command = container.command;
                 int usernameIndex = getUsernameIndex(command, args);
@@ -79,7 +115,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
 
                     for (Entity entity : entities) {
                         args[usernameIndex] = entity.getCachedUniqueIdString();
-                        if (tryExecute(sender, args, command, rawString)) {
+                        if (tryExecute(sender, args, command, line)) {
                             ++i;
                         }
                     }
@@ -87,7 +123,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
                     args[usernameIndex] = s1;
                 } else {
                     sender.setCommandStat(Type.AFFECTED_ENTITIES, 1);
-                    if (tryExecute(sender, args, command, rawString)) {
+                    if (tryExecute(sender, args, command, line)) {
                         ++i;
                     }
                 }

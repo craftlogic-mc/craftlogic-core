@@ -60,6 +60,11 @@ public class MixinNetHandlerPlayServer implements AdvancedNetHandlerPlayServer {
         return MathHelper.clamp(value, min, max);
     }
 
+    @Redirect(method = "processChatMessage", at = @At(value = "INVOKE", target = "Ljava/lang/String;startsWith(Ljava/lang/String;)Z"))
+    protected boolean onCheckForSlashCommand(String value, String prefix) {
+        return value.startsWith(prefix) || value.matches("\\.[\u0410-\u044F\u0401\u0451]+($|\\s)");
+    }
+
     @Override
     public MinecraftServer getServer() {
         return server;
