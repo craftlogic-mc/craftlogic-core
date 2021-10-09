@@ -59,7 +59,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
         String line = rawString.trim();
 
         boolean wrongKeyLayout = false;
-        if (line.matches("\\[/|\\.][\u0410-\u044F\u0401\u0451]+($|\\s)")) {
+        if (line.matches("[/|.][\u0410-\u044F\u0401\u0451]+($|\\s)")) {
             wrongKeyLayout = true;
             line = fixLayout(line.substring(1));
         } else if (line.startsWith("/")) {
