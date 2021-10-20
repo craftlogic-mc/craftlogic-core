@@ -7,6 +7,7 @@ import java.lang.annotation.*;
 @Repeatable(RemoteDependencies.class)
 public @interface RemoteDependency {
     String value();
+    String checkClass();
     String[] mirrors() default {};
     String[] transformerExclusions() default {};
 }

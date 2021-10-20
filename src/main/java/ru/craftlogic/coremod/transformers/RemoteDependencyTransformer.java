@@ -46,6 +46,7 @@ public class RemoteDependencyTransformer implements ObfuscatedClassTransformer {
                 loadRemoteDependency(
                     (String[]) params.getOrDefault("mirrors", new String[0]),
                     (String) params.get("value"),
+                    (String) params.get("checkClass"),
                     (String[]) params.getOrDefault("transformerExclusions", new String[0])
                 );
             }
@@ -53,7 +54,7 @@ public class RemoteDependencyTransformer implements ObfuscatedClassTransformer {
         return basicClass;
     }
 
-    private static void loadRemoteDependency(String[] userMirrors, String value, String[] transformerExclusions) {
+    private static void loadRemoteDependency(String[] userMirrors, String value, String checkClass, String[] transformerExclusions) {
         ArtifactInfo info = new ArtifactInfo(value);
 
         String fileName = info.artifactId + "-" + info.getClassifiedVersion() + "." + info.extension;
@@ -62,6 +63,10 @@ public class RemoteDependencyTransformer implements ObfuscatedClassTransformer {
         }
         List<String> ignoredMods = CoreModManager.getIgnoredMods();
         ignoredMods.add(fileName);
+        try {
+            Class.forName(checkClass);
+            return;
+        } catch (ClassNotFoundException ignored) {}
 
         Repository repo = LibraryManager.getDefaultRepo();
 
