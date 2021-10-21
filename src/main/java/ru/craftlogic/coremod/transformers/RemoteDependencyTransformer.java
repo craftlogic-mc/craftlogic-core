@@ -57,16 +57,17 @@ public class RemoteDependencyTransformer implements ObfuscatedClassTransformer {
     private static void loadRemoteDependency(String[] userMirrors, String value, String checkClass, String[] transformerExclusions) {
         ArtifactInfo info = new ArtifactInfo(value);
 
+        LaunchClassLoader cl = (LaunchClassLoader) RemoteDependencyTransformer.class.getClassLoader();
+        if (cl.findResource(checkClass.replace(',', '/').concat(".class")) != null) {
+            return;
+        }
+
         String fileName = info.artifactId + "-" + info.getClassifiedVersion() + "." + info.extension;
         if (LOADED_DEPENDENCIES.contains(fileName)) {
             return;
         }
         List<String> ignoredMods = CoreModManager.getIgnoredMods();
         ignoredMods.add(fileName);
-        try {
-            Class.forName(checkClass);
-            return;
-        } catch (ClassNotFoundException ignored) {}
 
         Repository repo = LibraryManager.getDefaultRepo();
 
@@ -84,8 +85,6 @@ public class RemoteDependencyTransformer implements ObfuscatedClassTransformer {
                 LOGGER.info("Downloading done!");
             }
         }
-
-        LaunchClassLoader cl = (LaunchClassLoader) RemoteDependencyTransformer.class.getClassLoader();
         try {
             cl.addURL(lib.toURI().toURL());
             LOADED_DEPENDENCIES.add(fileName);
