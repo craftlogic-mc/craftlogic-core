@@ -58,7 +58,7 @@ public class RemoteDependencyTransformer implements ObfuscatedClassTransformer {
         ArtifactInfo info = new ArtifactInfo(value);
 
         LaunchClassLoader cl = (LaunchClassLoader) RemoteDependencyTransformer.class.getClassLoader();
-        if (cl.findResource(checkClass.replace(',', '/').concat(".class")) != null) {
+        if (cl.findResource(checkClass.replace('.', '/').concat(".class")) != null) {
             return;
         }
 
