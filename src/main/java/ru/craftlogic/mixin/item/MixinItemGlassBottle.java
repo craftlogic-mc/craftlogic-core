@@ -40,9 +40,7 @@ public abstract class MixinItemGlassBottle extends Item {
             return new ActionResult<>(EnumActionResult.SUCCESS, this.turnBottleIntoItem(heldItem, player, new ItemStack(Items.DRAGON_BREATH)));
         } else {
             RayTraceResult rayTraceResult = this.rayTrace(world, player, true);
-            if (rayTraceResult == null) {
-                return new ActionResult<>(EnumActionResult.PASS, heldItem);
-            } else {
+            if (rayTraceResult != null) {
                 if (rayTraceResult.typeOfHit == RayTraceResult.Type.BLOCK) {
                     BlockPos pos = rayTraceResult.getBlockPos();
                     if (!world.isBlockModifiable(player, pos) || !player.canPlayerEdit(pos.offset(rayTraceResult.sideHit), rayTraceResult.sideHit, heldItem)) {
@@ -55,8 +53,8 @@ public abstract class MixinItemGlassBottle extends Item {
                     }*/
                 }
 
-                return new ActionResult<>(EnumActionResult.PASS, heldItem);
             }
+            return new ActionResult<>(EnumActionResult.PASS, heldItem);
         }
     }
 }

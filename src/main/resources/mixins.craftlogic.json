@@ -24,7 +24,7 @@
         "entity.player.MixinEntityPlayerMP", "entity.projectile.MixinEntityEgg",
         "entity.projectile.MixinEntityExpBottle", "forge.MixinCraftingHelper", "forge.MixinUsernameCache",
         "inventory.MixinContainerPlayer", "item.MixinItem", "item.MixinItemBucket", "item.MixinItemBucketMilk",
-        "item.MixinItemCompass$1", "item.MixinItemDoor", "item.MixinItemGlassBottle", "item.MixinItemHoe",
+        "item.MixinItemCompass$1", "item.MixinItemDoor", "item.MixinItemHoe",
         "item.MixinItemLilyPad", "item.MixinItemMinecart", "item.MixinItemSeeds", "item.MixinItemStack",
         "item.MixinItemSword", "item.MixinItemTool", "item.MixinItemUniversalBucket",
         "item.crafting.MixinCraftingManager", "item.crafting.MixinFurnaceRecipes", "network.MixinNetHandlerLoginServer",
