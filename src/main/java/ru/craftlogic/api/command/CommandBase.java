@@ -21,8 +21,8 @@ import java.util.regex.Pattern;
 
 public abstract class CommandBase implements ICommand {
     private static final Pattern VARARG_PATTERN = Pattern.compile("<([a-zA-Z0-9:]+)>\\.\\.\\.");
-    private static final Pattern ARG_PATTERN = Pattern.compile("<([a-zA-Z0-9:]+)>");
-    private static final Pattern ACTION_PATTERN = Pattern.compile("([a-zA-Z0-9|]+)");
+    private static final Pattern ARG_PATTERN = Pattern.compile("<([a-zA-Z0-9_:]+)>");
+    private static final Pattern ACTION_PATTERN = Pattern.compile("([a-zA-Z0-9_|]+)");
 
     private final String name;
     private final int opLevel;
