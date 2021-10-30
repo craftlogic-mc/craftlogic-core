@@ -23,9 +23,15 @@ public class World {
         this.dimension = Dimension.fromVanilla(handle.provider.getDimensionType());
         this.handle = new WeakReference<>(handle);
         GameRules rules = getRules();
-        rules.addGameRule("hidePlayerJoinMessages", "false", GameRules.ValueType.BOOLEAN_VALUE);
-        rules.addGameRule("hidePlayerLeaveMessages", "false", GameRules.ValueType.BOOLEAN_VALUE);
-        rules.addGameRule("doFireSpread", "true", GameRules.ValueType.BOOLEAN_VALUE);
+        if (!rules.hasRule("hidePlayerJoinMessages")) {
+            rules.addGameRule("hidePlayerJoinMessages", "false", GameRules.ValueType.BOOLEAN_VALUE);
+        }
+        if (!rules.hasRule("hidePlayerLeaveMessages")) {
+            rules.addGameRule("hidePlayerLeaveMessages", "false", GameRules.ValueType.BOOLEAN_VALUE);
+        }
+        if (!rules.hasRule("doFireSpread")) {
+            rules.addGameRule("doFireSpread", "true", GameRules.ValueType.BOOLEAN_VALUE);
+        }
     }
 
     public static World fromVanilla(Server server, net.minecraft.world.World world) {
