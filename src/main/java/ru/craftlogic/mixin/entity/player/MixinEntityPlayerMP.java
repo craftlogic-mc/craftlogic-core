@@ -2,11 +2,13 @@ package ru.craftlogic.mixin.entity.player;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.UserListOpsEntry;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -15,6 +17,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.craftlogic.api.entity.AdvancedPlayer;
+import ru.craftlogic.api.event.player.PlayerEnterCombat;
+import ru.craftlogic.api.event.player.PlayerExitCombat;
 import ru.craftlogic.api.permission.PermissionManager;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.world.Player;
@@ -75,6 +79,16 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
     @Override
     public Player wrapped() {
         return Server.from(this.server).getPlayerManager().getOnline(this.getUniqueID());
+    }
+
+    @Inject(method = "sendEnterCombat", at = @At("HEAD"))
+    public void onCombatStart(CallbackInfo ci) {
+        MinecraftForge.EVENT_BUS.post(new PlayerEnterCombat((EntityPlayer) (Object) this));
+    }
+
+    @Inject(method = "sendEndCombat", at = @At("HEAD"))
+    public void onCombatEnd(CallbackInfo ci) {
+        MinecraftForge.EVENT_BUS.post(new PlayerExitCombat((EntityPlayer) (Object) this));
     }
 
     /**
