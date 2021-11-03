@@ -112,6 +112,8 @@ commands.home.teleport.you=Welcome home!
 commands.home.teleport.other=Welcome to %s's home!
 commands.home.missing.you=Your home bed is missing or obstructed!
 commands.home.missing.other=%s's home bed is missing or obstructed!
+tooltip.home_teleport.obstructed.you=Your home bed is obstructed! Do you really want to teleport?
+tooltip.home_teleport.obstructed.other=%s's home bed is obstructed! Do you really want to teleport?
 
 commands.heal.self=You've healed yourself!
 commands.heal.other=You've healed %s!

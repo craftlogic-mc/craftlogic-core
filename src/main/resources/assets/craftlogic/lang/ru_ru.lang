@@ -112,6 +112,8 @@ commands.home.teleport.you=Добро пожаловать домой!
 commands.home.teleport.other=Добро пожаловать в дом %s!
 commands.home.missing.you=Ваша кровать отсутствует или доступ к ней затруднён!
 commands.home.missing.other=Кровать %s отсутствует или доступ к ней затруднён!
+tooltip.home_teleport.obstructed.you=Доступ к вашей кровати затруднён! Уверены, что хотите телепортироваться?
+tooltip.home_teleport.obstructed.other=Доступ к кровати %s затруднён! Уверены, что хотите телепортироваться?
 
 commands.heal.self=Вы вылечили себя!
 commands.heal.other=Вы вылечили %s!
