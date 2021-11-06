@@ -31,7 +31,7 @@
         "server.MixinMinecraftServer", "server.management.MixinPlayerList", "server.management.MixinPlayerProfileCache",
         "server.management.MixinPlayerProfileCache$ProfileEntry", "tileentity.MixinTileEntity",
         "tileentity.MixinTileEntityChest", "tileentity.MixinTileEntityDispenser", "tileentity.MixinTileEntityFurnace",
-        "tileentity.MixinTileEntityStructure", "util.text.MixinITextComponent$Serializer",
+        "tileentity.MixinTileEntityStructure", "util.MixinCombatTracker", "util.text.MixinITextComponent$Serializer",
         "world.MixinAnvilChunkLoader", "world.MixinChunk", "world.MixinChunkCache", "world.MixinChunkProviderServer",
         "world.MixinCommandHandler", "world.MixinExtendedBlockStorage", "world.MixinSPacketChunkData",
         "world.MixinWorld", "world.MixinWorldServer", "world.biome.MixinBiome", "world.biome.MixinBiomeManager",
