@@ -77,7 +77,7 @@ public final class CommandHome extends CommandBase {
         Location safeLocation = adjustBedLocation(bedLocation);
         if (safeLocation != null) {
             startTeleportation(ctx, sender, target, safeLocation, offline);
-        } else if (sender.hasPermission("commands.home.obstructed.teleport")) {
+        } else if (sender.hasPermission("commands.home.obstructed.teleport") && bedLocation != null) {
             Text<?, ?> question = sender.getId().equals(targetProfile.getId()) ?
                 Text.translation("tooltip.home_teleport.obstructed.you") :
                 Text.translation("tooltip.home_teleport.obstructed.other");
