@@ -89,7 +89,7 @@ public class World {
     public Set<Player> getPlayers() {
         Set<Player> result = new HashSet<>();
         for (Player player : server.getPlayerManager().getAllOnline()) {
-            if (player.unwrap() != null && player.getWorld().equals(this)) {
+            if (player.unwrap() != null && player.getWorld() != null && player.getWorld().equals(this)) {
                 result.add(player);
             }
         }
