@@ -24,6 +24,7 @@ import ru.craftlogic.api.world.Location;
 import java.net.SocketAddress;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +37,10 @@ public class CraftMessages {
         UserListIPBans bannedIps = playerList.getBannedIPs();
         if (bannedPlayers.isBanned(profile)) {
             UserListBansEntry entry = bannedPlayers.getEntry(profile);
+            if (entry.getBanEndDate().before(new Date())) {
+                bannedPlayers.removeEntry(profile);
+                return null;
+            }
             return getBanMessage(entry, false);
         } else if (bannedIps.isBanned(remoteAddress)) {
             UserListIPBansEntry entry = bannedIps.getBanEntry(remoteAddress);
