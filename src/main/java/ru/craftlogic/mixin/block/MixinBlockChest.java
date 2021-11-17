@@ -320,6 +320,10 @@ public abstract class MixinBlockChest extends BlockContainer {
         }
     }
 
+    public ILockableContainer createDoubleContainer(String name, ILockableContainer left, ILockableContainer right) {
+        return new InventoryLargeChest(name, left, right);
+    }
+
     /**
      * @author Radviger
      * @reason Separable chests
@@ -342,9 +346,9 @@ public abstract class MixinBlockChest extends BlockContainer {
                         if (offsetState.getValue(PART) == part.opposite()) {
                             switch (part) {
                                 case LEFT:
-                                    return new InventoryLargeChest("container.chestDouble", chest, offsetChest);
+                                    return createDoubleContainer("container.chestDouble", chest, offsetChest);
                                 case RIGHT:
-                                    return new InventoryLargeChest("container.chestDouble", offsetChest, chest);
+                                    return createDoubleContainer("container.chestDouble", offsetChest, chest);
                             }
                         }
                     }
