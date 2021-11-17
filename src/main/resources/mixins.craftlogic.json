@@ -36,7 +36,7 @@
         "world.biome.MixinBiome", "world.biome.MixinBiomeManager", "world.biome.MixinBiomeSwamp",
         "world.biome.MixinBiomeTaiga", "world.gen.structure.MixinJungleTemple", "world.gen.structure.MixinVillage",
         "world.gen.structure.MixinVillageHouseBlacksmith", "world.gen.structure.MixinVillageHouseChurch",
-        "world.storage.MixinSaveHandler"
+        "world.storage.MixinBlockStateContainer", "world.storage.MixinSaveHandler"
     ],
     "client": [
         "client.MixinMinecraft", "client.audio.MixinSoundManager", "client.entity.MixinEntityPlayerSP",
