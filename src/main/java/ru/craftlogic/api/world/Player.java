@@ -24,11 +24,13 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.GameType;
 import net.minecraft.world.IInteractionObject;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ITeleporter;
 import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.api.block.holders.ScreenHolder;
 import ru.craftlogic.api.entity.AdvancedPlayer;
+import ru.craftlogic.api.event.player.PlayerTimedTeleportEvent;
 import ru.craftlogic.api.inventory.InventoryHolder;
 import ru.craftlogic.api.network.AdvancedMessage;
 import ru.craftlogic.api.network.AdvancedNetHandlerPlayServer;
@@ -142,11 +144,13 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
         Consumer<Server> task = server -> {
             if (isOnline()) {
                 sendPacket(new MessageTimedTeleportEnd(target));
-                if (freeze) {
-                    getEntity().sendPlayerAbilities();
+                if (!MinecraftForge.EVENT_BUS.post(new PlayerTimedTeleportEvent(this, target))) {
+                    if (freeze) {
+                        getEntity().sendPlayerAbilities();
+                    }
+                    teleport(target);
+                    callback.accept(server);
                 }
-                teleport(target);
-                callback.accept(server);
             }
         };
         double distance = target.distance(getLocation());

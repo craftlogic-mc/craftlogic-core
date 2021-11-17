@@ -4,6 +4,7 @@ import net.minecraft.command.CommandException;
 import net.minecraftforge.common.MinecraftForge;
 import ru.craftlogic.api.command.CommandBase;
 import ru.craftlogic.api.command.CommandContext;
+import ru.craftlogic.api.event.player.PlayerTeleportReplyEvent;
 import ru.craftlogic.api.event.player.PlayerTeleportRequestEvent;
 import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.world.Player;
@@ -30,20 +31,23 @@ public final class CommandRequestTeleport extends CommandBase {
             Text<?, ?> title = Text.translation("commands.request_teleport.question").arg(sender.getName());
             target.sendToastQuestion("tpa", title, 0x404040, 30, accepted -> {
                 if (sender.isOnline() && target.isOnline()) {
-                    if (accepted) {
-                        if (sender.getWorld().getDimension() != target.getWorld().getDimension()) {
-                            sender.sendMessage(Text.translation("commands.tp.notSameDimension").red());
+                    if (!MinecraftForge.EVENT_BUS.post(new PlayerTeleportReplyEvent(sender, target, accepted, ctx))) {
+                        if (accepted) {
+                            if (sender.getWorld().getDimension() != target.getWorld().getDimension()) {
+                                sender.sendMessage(Text.translation("commands.tp.notSameDimension").red());
+                            } else {
+                                Text<?, ?> message = Text.translation("commands.request_teleport.accepted").green();
+                                sender.sendMessage(message);
+                                target.sendMessage(message);
+                                Text<?, ?> toast = Text.translation("tooltip.request_teleport").arg(target.getName());
+                                sender.teleportDelayed(server -> {
+                                }, "tpa", toast, target.getLocation(), 5, true);
+                            }
                         } else {
-                            Text<?, ?> message = Text.translation("commands.request_teleport.accepted").green();
+                            Text<?, ?> message = Text.translation("commands.request_teleport.declined").red();
                             sender.sendMessage(message);
                             target.sendMessage(message);
-                            Text<?, ?> toast = Text.translation("tooltip.request_teleport").arg(target.getName());
-                            sender.teleportDelayed(server -> {}, "tpa", toast, target.getLocation(), 5, true);
                         }
-                    } else {
-                        Text<?, ?> message = Text.translation("commands.request_teleport.declined").red();
-                        sender.sendMessage(message);
-                        target.sendMessage(message);
                     }
                 }
             });
