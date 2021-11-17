@@ -3,6 +3,7 @@ package ru.craftlogic.mixin.server.management;
 import com.mojang.authlib.GameProfile;
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -31,6 +32,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Slice;
 import ru.craftlogic.api.entity.AdvancedPlayer;
 import ru.craftlogic.api.event.player.PlayerLeftMessageEvent;
 import ru.craftlogic.api.server.AdvancedPlayerFileData;
@@ -42,10 +44,12 @@ import java.util.UUID;
 
 @Mixin(PlayerList.class)
 public abstract class MixinPlayerList implements AdvancedPlayerList {
-    @Shadow @Final
+    @Shadow
+    @Final
     private static Logger LOGGER;
 
-    @Shadow @Final
+    @Shadow
+    @Final
     private MinecraftServer server;
 
     @Shadow
@@ -112,11 +116,11 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
             player.dimension = 0;
             playerWorld = this.server.getWorld(0);
             BlockPos spawnPoint = playerWorld.provider.getRandomizedSpawnPoint();
-            player.setPositionAndUpdate((double)spawnPoint.getX(), (double)spawnPoint.getY(), (double)spawnPoint.getZ());
+            player.setPositionAndUpdate((double) spawnPoint.getX(), (double) spawnPoint.getY(), (double) spawnPoint.getZ());
         }
 
         player.setWorld(playerWorld);
-        player.interactionManager.setWorld((WorldServer)player.world);
+        player.interactionManager.setWorld((WorldServer) player.world);
         String s1 = "local";
         if (netManager.getRemoteAddress() != null) {
             s1 = netManager.getRemoteAddress().toString();
@@ -135,7 +139,7 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
         this.updatePermissionLevel(player);
         player.getStatFile().markAllDirty();
         player.getRecipeBook().init(player);
-        this.sendScoreboard((ServerScoreboard)world.getScoreboard(), player);
+        this.sendScoreboard((ServerScoreboard) world.getScoreboard(), player);
         this.server.refreshStatusNextTick();
 
         TextComponentTranslation message;
@@ -226,4 +230,38 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
 
     @Shadow
     public abstract int getMaxPlayers();
+
+    // Fixes MC-92916
+    @Redirect(method = "transferEntityToWorld(Lnet/minecraft/entity/Entity;ILnet/minecraft/world/WorldServer;Lnet/minecraft/world/WorldServer;Lnet/minecraftforge/common/util/ITeleporter;)V",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/WorldServer;updateEntityWithOptionalForce(Lnet/minecraft/entity/Entity;Z)V"),
+        slice = @Slice(from = @At(value = "CONSTANT", args = "stringValue=moving"), to = @At(value = "CONSTANT", args = "stringValue=placing")))
+    public void doPrepareLeaveDimension(WorldServer world, Entity entity, boolean forceUpdate) {
+        if (entity instanceof EntityPlayer) {
+            entity.lastTickPosX = entity.posX;
+            entity.lastTickPosY = entity.posY;
+            entity.lastTickPosZ = entity.posZ;
+            entity.prevRotationYaw = entity.rotationYaw;
+            entity.prevRotationPitch = entity.rotationPitch;
+        } else {
+            world.updateEntityWithOptionalForce(entity, forceUpdate);
+        }
+    }
+
+    // Fixes MC-92916
+    // This is needed for Forge
+    @Redirect(method = "transferEntityToWorld(Lnet/minecraft/entity/Entity;ILnet/minecraft/world/WorldServer;Lnet/minecraft/world/WorldServer;Lnet/minecraftforge/common/util/ITeleporter;)V",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/WorldServer;updateEntityWithOptionalForce(Lnet/minecraft/entity/Entity;Z)V", ordinal = 0),
+        slice = @Slice(from = @At(value = "CONSTANT", args = "stringValue=placing"),
+            to = @At(value = "INVOKE", target = "Lnet/minecraftforge/common/util/ITeleporter;placeEntity(Lnet/minecraft/world/World;Lnet/minecraft/entity/Entity;F)V", remap = false)))
+    public void doPrepareLeaveDimensionForge(WorldServer world, Entity entity, boolean forceUpdate) {
+        if (entity instanceof EntityPlayer) {
+            entity.lastTickPosX = entity.posX;
+            entity.lastTickPosY = entity.posY;
+            entity.lastTickPosZ = entity.posZ;
+            entity.prevRotationYaw = entity.rotationYaw;
+            entity.prevRotationPitch = entity.rotationPitch;
+        } else {
+            world.updateEntityWithOptionalForce(entity, forceUpdate);
+        }
+    }
 }
