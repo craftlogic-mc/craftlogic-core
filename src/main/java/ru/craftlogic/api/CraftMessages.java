@@ -37,7 +37,7 @@ public class CraftMessages {
         UserListIPBans bannedIps = playerList.getBannedIPs();
         if (bannedPlayers.isBanned(profile)) {
             UserListBansEntry entry = bannedPlayers.getEntry(profile);
-            if (entry.getBanEndDate().before(new Date())) {
+            if (entry.getBanEndDate() != null && entry.getBanEndDate().before(new Date())) {
                 bannedPlayers.removeEntry(profile);
                 return null;
             }
