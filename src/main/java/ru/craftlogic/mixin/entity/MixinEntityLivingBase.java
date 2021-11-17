@@ -30,7 +30,11 @@ public abstract class MixinEntityLivingBase extends Entity implements Creature {
 
     @Override
     public int increaseAirSupply(int air) {
-        int i = EnchantmentHelper.getRespirationModifier((EntityLivingBase) (Object) this);
-        return Math.min(300, i > 0 && this.rand.nextInt(i + 1) > 0 ? air + 8 : air + 4);
+        if (air < 300) {
+            int i = EnchantmentHelper.getRespirationModifier((EntityLivingBase) (Object) this);
+            return Math.min(300, i > 0 && this.rand.nextInt(i + 1) > 0 ? air + 8 : air + 4);
+        } else {
+            return 300;
+        }
     }
 }
