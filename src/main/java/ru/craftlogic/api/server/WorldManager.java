@@ -3,10 +3,12 @@ package ru.craftlogic.api.server;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.apache.logging.log4j.LogManager;
+import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.util.ServerManager;
 import ru.craftlogic.api.world.Dimension;
 import ru.craftlogic.api.world.World;
@@ -29,6 +31,9 @@ public class WorldManager extends ServerManager {
     public void onWorldLoaded(WorldEvent.Load event) {
         net.minecraft.world.World world = event.getWorld();
         if (world instanceof WorldServer) {
+            if (CraftConfig.tweaks.keepDimensionsLoaded) {
+                DimensionManager.keepDimensionLoaded(world.provider.getDimension(), true);
+            }
             World w = new World(this.server, (WorldServer) world);
             this.loadedWorlds.put(world.provider.getDimensionType(), w);
         }

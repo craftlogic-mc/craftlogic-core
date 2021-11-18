@@ -122,6 +122,9 @@ public class CraftConfig {
         @Config.Comment("Disable damage indicator particles")
         @Config.RequiresWorldRestart
         public boolean disableDamageParticles = false;
+        @Config.Comment("Keep other dimensions from unloading to prevent load/unload lag")
+        @Config.RequiresWorldRestart
+        public boolean keepDimensionsLoaded = true;
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID)
