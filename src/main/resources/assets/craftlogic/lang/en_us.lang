@@ -84,6 +84,7 @@ commands.generic.locatableOnly=This command can only be used by an inworld sende
 commands.generic.userNeverPlayed=Player '%s' have not played on this server yet
 commands.generic.ip.invalid=Invalid IP-address format: %s
 commands.generic.world.notFound=World %s cannot be found
+commands.generic.dimension.notFound=Dimension %s cannot be found
 commands.generic.wrongTimeFormat=Wrong time format: %s
 commands.generic.yes=yes
 commands.generic.no=no

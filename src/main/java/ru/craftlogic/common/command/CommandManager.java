@@ -1,14 +1,17 @@
 package ru.craftlogic.common.command;
 
 import com.google.gson.JsonObject;
-import net.minecraft.command.*;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.CommandHandler;
+import net.minecraft.command.ICommand;
+import net.minecraft.command.ICommandSender;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.command.*;
-import ru.craftlogic.api.command.CommandBase;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.util.CheckedFunction;
 import ru.craftlogic.api.util.ConfigurableManager;
@@ -45,6 +48,9 @@ public class CommandManager extends ConfigurableManager {
         );
         commandManager.registerArgumentType("World", false, ctx ->
             ctx.server().getWorldManager().getAllLoadedNames()
+        );
+        commandManager.registerArgumentType("Dimension", false, cxt ->
+            Stream.of(DimensionType.values()).map(DimensionType::getName).collect(Collectors.toSet())
         );
         commandManager.registerArgumentType("Player", true, ctx ->
             ctx.server().getPlayerManager().getAllOnlineNames()

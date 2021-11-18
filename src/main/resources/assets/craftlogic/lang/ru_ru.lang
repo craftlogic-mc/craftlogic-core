@@ -82,6 +82,7 @@ commands.generic.locatableOnly=Эту команду может использо
 commands.generic.userNeverPlayed=Игрок '%s' ещё ни разу не играл на этом сервере
 commands.generic.ip.invalid=Неправильный формат IP-адреса: %s
 commands.generic.world.notFound=Мир '%s' не существует!
+commands.generic.dimension.notFound=Измерение '%s' не существует!
 commands.generic.wrongTimeFormat=Неправильный формат времени: %s
 commands.generic.yes=да
 commands.generic.no=нет

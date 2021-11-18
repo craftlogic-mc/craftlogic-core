@@ -9,6 +9,7 @@ import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.DimensionType;
 import ru.craftlogic.api.CraftMessages;
 import ru.craftlogic.api.server.PlayerManager;
 import ru.craftlogic.api.server.Server;
@@ -257,6 +258,14 @@ public class CommandContext {
                 throw new CommandException("commands.generic.world.notFound", value);
             }
             return world;
+        }
+
+        public DimensionType asDimension() throws CommandException {
+            try {
+                return DimensionType.byName(value);
+            } catch (IllegalArgumentException e) {
+                throw new CommandException("commands.generic.world.notFound", value);
+            }
         }
 
         public int asInt() throws CommandException {
