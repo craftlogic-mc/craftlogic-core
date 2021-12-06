@@ -10,6 +10,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.GameType;
 import ru.craftlogic.api.CraftMessages;
 import ru.craftlogic.api.server.PlayerManager;
 import ru.craftlogic.api.server.Server;
@@ -174,10 +175,13 @@ public class CommandContext {
         public static final Pattern IP_PATTERN = Pattern.compile("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 
         private CommandContext context;
-        private final String name, value;
+        private final CommandSender sender;
+        private final String name;
+        private final String value;
         private final boolean vararg;
 
-        public Argument(String name, String value, boolean vararg) {
+        public Argument(CommandSender sender, String name, String value, boolean vararg) {
+            this.sender = sender;
             this.name = name;
             this.value = value;
             this.vararg = vararg;
@@ -234,7 +238,7 @@ public class CommandContext {
         @Nonnull
         public Player asPlayer() throws CommandException {
             Player player = context.server.getPlayerManager().getOnline(value);
-            if (player == null) {
+            if (player == null || player.getGameMode() == GameType.SPECTATOR && !sender.hasPermission("command.completion.spectators")) {
                 throw new CommandException("commands.generic.player.notFound", value);
             }
             return player;

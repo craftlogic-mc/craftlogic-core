@@ -316,7 +316,8 @@ public abstract class CommandBase implements ICommand {
             return MatchLevel.FULL;
         }
 
-        public CommandContext parse(Server server, ICommandSender sender, ICommand command, String[] rawArgs) {
+        public CommandContext parse(Server server, ICommandSender _sender, ICommand command, String[] rawArgs) {
+            CommandSender sender = CommandSender.from(server, _sender);
             List<CommandContext.Argument> args = new ArrayList<>();
 
             for (int i = 0; i < this.args.size(); i++) {
@@ -327,10 +328,10 @@ public abstract class CommandBase implements ICommand {
                 } else {
                     value = rawArgs[i];
                 }
-                args.add(arg.parse(value));
+                args.add(arg.parse(sender, value));
             }
 
-            return new CommandContext(server, CommandSender.from(server, sender), command, args);
+            return new CommandContext(server, sender, command, args);
         }
 
         public List<String> complete(Server server, CommandSender sender, String[] rawArgs, @Nullable BlockPos targetPos) {
@@ -360,8 +361,8 @@ public abstract class CommandBase implements ICommand {
                 return false;
             }
 
-            public CommandContext.Argument parse(String value) {
-                return new CommandContext.Argument(this.name, value, this.isVararg);
+            public CommandContext.Argument parse(CommandSender sender, String value) {
+                return new CommandContext.Argument(sender, this.name, value, this.isVararg);
             }
         }
     }
