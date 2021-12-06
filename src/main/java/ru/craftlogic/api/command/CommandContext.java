@@ -87,6 +87,10 @@ public class CommandContext {
         return has(name) ? get(name).asPlayer() : senderAsPlayer();
     }
 
+    public OfflinePlayer senderAsOfflinePlayerOrArg(String name) throws CommandException {
+        return has(name) ? get(name).asOfflinePlayer() : senderAsPlayer();
+    }
+
     public String action(int index) {
         return this.get("action:" + index).asString();
     }

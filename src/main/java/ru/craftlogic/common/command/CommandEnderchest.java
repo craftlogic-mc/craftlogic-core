@@ -11,14 +11,14 @@ import ru.craftlogic.api.world.World;
 
 public final class CommandEnderchest extends CommandBase {
     CommandEnderchest() {
-        super("enderchest", 2, "<target:Player>", "");
+        super("enderchest", 2, "<player:Player>", "");
         this.aliases.add("ec");
     }
 
     @Override
     protected void execute(CommandContext ctx) throws CommandException {
         Player viewer = ctx.senderAsPlayer();
-        OfflinePlayer target = ctx.has("target") ? ctx.get("target").asOfflinePlayer() : viewer;
+        OfflinePlayer target = ctx.senderAsOfflinePlayerOrArg("player");
         if (viewer != target) {
             ctx.checkPermission(true, "commands.enderchest.other", 2);
         }
