@@ -12,10 +12,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.command.*;
+import ru.craftlogic.api.server.PlayerManager;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.util.CheckedFunction;
 import ru.craftlogic.api.util.ConfigurableManager;
 import ru.craftlogic.api.world.Location;
+import ru.craftlogic.api.world.Player;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -52,9 +54,16 @@ public class CommandManager extends ConfigurableManager {
         commandManager.registerArgumentType("Dimension", false, cxt ->
             Stream.of(DimensionType.values()).map(DimensionType::getName).collect(Collectors.toSet())
         );
-        commandManager.registerArgumentType("Player", true, ctx ->
-            ctx.server().getPlayerManager().getAllOnlineNames()
-        );
+        commandManager.registerArgumentType("Player", true, ctx -> {
+            PlayerManager playerManager = ctx.server().getPlayerManager();
+            Set<String> names = new HashSet<>();
+            for (Player p : playerManager.getAllOnline()) {
+                if (p.getGameMode() != GameType.SPECTATOR || ctx.sender().hasPermission("command.completion.spectators")) {
+                    names.add(p.getName());
+                }
+            }
+            return names;
+        });
         commandManager.registerArgumentType("OfflinePlayer", true, ctx ->
             ctx.server().getPlayerManager().getAllOfflineNames()
         );
@@ -157,7 +166,7 @@ public class CommandManager extends ConfigurableManager {
     }
 
     public boolean unregisterCommand(ICommand command) {
-        return ((AdvancedCommandManager)commandHandler).unregisterCommand(command);
+        return ((AdvancedCommandManager) commandHandler).unregisterCommand(command);
     }
 
     public static class ArgType implements CheckedFunction<ArgCompletionContext, Collection<String>, Throwable> {
