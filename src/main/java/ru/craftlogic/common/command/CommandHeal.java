@@ -10,14 +10,17 @@ import ru.craftlogic.api.world.Player;
 public final class CommandHeal extends CommandBase {
     CommandHeal() {
         super("heal", 1,
-            "<target:Player>",
+            "<player:Player>",
             ""
         );
     }
 
     @Override
     protected void execute(CommandContext ctx) throws CommandException {
-        Player target = ctx.senderAsPlayerOrArg("target");
+        Player target = ctx.senderAsPlayerOrArg("player");
+        if (ctx.sender() != target) {
+            ctx.checkPermission(true, "commands.heal.other", 2);
+        }
         if (target.heal()) {
             target.playSound(CraftSounds.HEAL, 1F, ctx.randomFloat(0.7F));
             if (ctx.sender() == target) {

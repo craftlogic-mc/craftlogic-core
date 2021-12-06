@@ -27,7 +27,7 @@ public final class CommandFly extends CommandBase {
                 Text.translation("commands.fly.self").gray()
                     .argTranslate(mode, Text::darkGray)
             );
-        } else {
+        } else if (ctx.checkPermission(true, "commands.fly.other", 2))  {
             ctx.sendNotification(
                 Text.translation("commands.fly.other").gray()
                     .argTranslate(mode, Text::darkGray)

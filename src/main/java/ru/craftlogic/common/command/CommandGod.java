@@ -27,7 +27,7 @@ public final class CommandGod extends CommandBase {
                 Text.translation("commands.god.self").gray()
                     .argTranslate(mode, Text::darkGray)
             );
-        } else {
+        } else if (ctx.checkPermission(true, "commands.god.other", 2)) {
             ctx.sendNotification(
                 Text.translation("commands.god.other").gray()
                     .argTranslate(mode, Text::darkGray)

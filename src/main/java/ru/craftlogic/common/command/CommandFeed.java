@@ -18,6 +18,9 @@ public final class CommandFeed extends CommandBase {
     @Override
     protected void execute(CommandContext ctx) throws CommandException {
         Player target = ctx.senderAsPlayerOrArg("target");
+        if (ctx.sender() != target) {
+            ctx.checkPermission(true, "commands.feed.other", 2);
+        }
         if (target.feed()) {
             target.playSound(SoundEvents.ENTITY_PLAYER_BURP, 1F, ctx.randomFloat(0.7F));
             if (ctx.sender() == target) {
