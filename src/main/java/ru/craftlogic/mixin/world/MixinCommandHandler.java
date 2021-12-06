@@ -259,7 +259,9 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
                 }
             }
         } catch (Throwable t) {
-            if (t.getCause() instanceof CommandException) {
+            if (t instanceof CommandException) {
+                sender.sendMessage(Text.translation((CommandException)t).red().build());
+            } else if (t.getCause() instanceof CommandException) {
                 sender.sendMessage(Text.translation((CommandException)t.getCause()).red().build());
             } else {
                 sender.sendMessage(Text.translation("commands.generic.exception").red().build());
