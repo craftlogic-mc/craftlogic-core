@@ -10,6 +10,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.InventoryEnderChest;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.play.server.SPacketPlayerPosLook;
 import net.minecraft.network.play.server.SPacketSoundEffect;
@@ -27,6 +28,7 @@ import net.minecraft.world.IInteractionObject;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.ITeleporter;
 import ru.craftlogic.api.CraftAPI;
+import ru.craftlogic.api.CraftMessages;
 import ru.craftlogic.api.CraftSounds;
 import ru.craftlogic.api.block.holders.ScreenHolder;
 import ru.craftlogic.api.entity.AdvancedPlayer;
@@ -39,6 +41,7 @@ import ru.craftlogic.api.text.Text;
 import ru.craftlogic.api.util.BooleanConsumer;
 import ru.craftlogic.network.message.*;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
@@ -304,6 +307,37 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
 
     public long getFirstPlayed() {
         return ((AdvancedPlayer)getEntity()).getFirstPlayed();
+    }
+
+    private static final String CMD_COOLDOWN_KEY = "CL:CMD";
+
+    public boolean checkCommandCooldown(@Nonnull String name, boolean replenish, boolean notify, int def) {
+        EntityPlayerMP entity = getEntity();
+        long duration = 1000L * getPermissionMetadata("cooldown.commands." + name, def, Integer::parseInt);
+        if (entity != null && duration > 0) {
+            NBTTagCompound data = entity.getEntityData();
+            NBTTagCompound cooldown = data.getCompoundTag(CMD_COOLDOWN_KEY);
+            if (!data.hasKey(CMD_COOLDOWN_KEY)) {
+                data.setTag(CMD_COOLDOWN_KEY, cooldown);
+            }
+            long now = System.currentTimeMillis();
+            long lastUsed = cooldown.getLong(name);
+            long delta = now - lastUsed;
+            if (delta > duration) {
+                if (replenish) {
+                    cooldown.setLong(name, now);
+                } else {
+                    cooldown.removeTag(name);
+                }
+                return true;
+            }
+            if (notify) {
+                sendMessage(Text.translation("commands.generic.cooldown").red()
+                    .arg(CraftMessages.parseDuration(duration - delta).darkRed()));
+            }
+            return false;
+        }
+        return true;
     }
 
     public void sendPacket(AdvancedMessage packet) {

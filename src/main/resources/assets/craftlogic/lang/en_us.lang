@@ -107,6 +107,7 @@ commands.generic.second.single=%d second
 commands.generic.second.plural.a=%d seconds
 commands.generic.second.plural.b=%d seconds
 commands.generic.uuid.invalidFormat=Invalid UUID format: %s
+commands.generic.cooldown=You cannot use that command for another %s
 
 commands.spawn.teleport=Welcome to spawn!
 commands.home.teleport.you=Welcome home!

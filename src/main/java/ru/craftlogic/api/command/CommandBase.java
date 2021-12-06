@@ -4,6 +4,7 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -12,6 +13,7 @@ import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.world.CommandSender;
 import ru.craftlogic.api.world.LocatableCommandSender;
 import ru.craftlogic.api.world.Location;
+import ru.craftlogic.api.world.Player;
 import ru.craftlogic.common.command.CommandManager;
 
 import javax.annotation.Nullable;
@@ -69,6 +71,12 @@ public abstract class CommandBase implements ICommand {
             if (pattern.matches(rawArgs) == MatchLevel.FULL) {
                 CommandContext ctx = pattern.parse(server, _sender, this, rawArgs);
                 try {
+                    if (_sender instanceof EntityPlayerMP) {
+                        Player player = Player.from(((EntityPlayerMP) _sender));
+                        if (!player.checkCommandCooldown(name, true, true, 0)) {
+                            return;
+                        }
+                    }
                     execute(ctx);
                 } catch (CommandException e) {
                     throw e;

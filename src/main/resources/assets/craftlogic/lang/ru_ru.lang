@@ -105,6 +105,7 @@ commands.generic.second.single=%d секунда
 commands.generic.second.plural.a=%d секунды
 commands.generic.second.plural.b=%d секунд
 commands.generic.uuid.invalidFormat=Неправильный формат UUID: %s
+commands.generic.cooldown=Вы не можете использовать эту команду еще %s
 
 commands.stop.delayed=Выключение сервера через %s
 
