@@ -19,6 +19,9 @@ public final class CommandEnderchest extends CommandBase {
     protected void execute(CommandContext ctx) throws CommandException {
         Player viewer = ctx.senderAsPlayer();
         OfflinePlayer target = ctx.has("target") ? ctx.get("target").asOfflinePlayer() : viewer;
+        if (viewer != target) {
+            ctx.checkPermission(true, "commands.enderchest.other", 2);
+        }
         World requesterWorld = viewer.getWorld();
         PhantomPlayer ph = target.asPhantom(requesterWorld);
         if (target.isOnline() || ph.hasData(requesterWorld)) {
