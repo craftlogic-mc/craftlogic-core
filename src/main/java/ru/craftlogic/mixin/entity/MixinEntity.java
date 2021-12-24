@@ -1,16 +1,22 @@
 package ru.craftlogic.mixin.entity;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityBoat;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import ru.craftlogic.api.event.entity.EntityTriggerWalkingEvent;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -113,5 +119,12 @@ public abstract class MixinEntity {
         }
 
         return this.inWater;
+    }
+
+    @Redirect(method = "move", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;onEntityWalk(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;)V"))
+    public void onTriggerWalking(Block block, World world, BlockPos pos, Entity entity) {
+        if (!MinecraftForge.EVENT_BUS.post(new EntityTriggerWalkingEvent(entity, block, pos))) {
+            block.onEntityWalk(world, pos, entity);
+        }
     }
 }
