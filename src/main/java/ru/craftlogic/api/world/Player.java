@@ -163,7 +163,7 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
         } else {
             sendPacket(new MessageTimedTeleportStart(target, timeout, freeze));
             sendCountdown(teleportId, toastMessage, timeout);
-            return server.addDelayedTask(task, timeout * 1000 + 250);
+            return server.addDelayedTask(task, timeout * 1000L + 250);
         }
     }
 
@@ -309,7 +309,7 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
         return ((AdvancedPlayer)getEntity()).getFirstPlayed();
     }
 
-    private static final String CMD_COOLDOWN_KEY = "CL:CMD";
+    public static final String CMD_COOLDOWN_KEY = "CL:CMD";
 
     public boolean checkCommandCooldown(@Nonnull String name, boolean replenish, boolean notify, int def) {
         EntityPlayerMP entity = getEntity();

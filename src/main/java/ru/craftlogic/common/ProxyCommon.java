@@ -2,6 +2,8 @@ package ru.craftlogic.common;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.terraingen.DecorateBiomeEvent;
 import net.minecraftforge.event.terraingen.OreGenEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
@@ -84,6 +86,15 @@ public class ProxyCommon extends AdvancedMessageHandler {
     public void registerFluid(FluidRegistry.FluidRegisterEvent event) {
         System.out.println("Registered fluid '" + event.getFluidName() + "' with id: " + event.getFluidID());
         CraftFluids.FLUID_NAME_TO_ID.put(event.getFluidName(), event.getFluidID());
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public void onPlayerClone(PlayerEvent.Clone event) {
+        EntityPlayer original = event.getOriginal();
+        NBTTagCompound originalEntityData = original.getEntityData();
+        EntityPlayer player = event.getEntityPlayer();
+        NBTTagCompound entityData = player.getEntityData();
+        entityData.setTag(Player.CMD_COOLDOWN_KEY, originalEntityData.getCompoundTag(Player.CMD_COOLDOWN_KEY));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
