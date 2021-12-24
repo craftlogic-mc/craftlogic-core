@@ -16,7 +16,7 @@ import java.util.Map;
 public class CraftLogicCoremod implements IFMLLoadingPlugin {
     private static final Logger LOGGER = LogManager.getLogger("CLC");
 
-    private static final String MIXIN_VERSION = "0.7.8-SNAPSHOT";
+    private static final String MIXIN_VERSION = "0.8.4-SNAPSHOT";
 
     public CraftLogicCoremod() {
         if (!MIXIN_VERSION.startsWith(MixinBootstrap.VERSION)) {
