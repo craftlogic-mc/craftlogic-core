@@ -77,6 +77,8 @@ item.strawberry.name=Strawberry
 
 commands.stop.delayed=Stopping the server in %s
 
+commands.generic.no_block=No block in sight
+commands.generic.no_item=No item in main hand
 commands.generic.unknownFailure=Unknown failure! See console for more details.
 commands.generic.noPermission=You don't have required permission: %s
 commands.generic.playerOnly=This command can only be used by a player!

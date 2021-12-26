@@ -75,6 +75,8 @@ item.raspberry.name=Малина
 item.blackberry.name=Ежевика
 item.strawberry.name=Земляника
 
+commands.generic.no_block=Нет блока в поле зрения
+commands.generic.no_item=Нет предмета в ведущей руке
 commands.generic.unknownFailure=Неизвестная ошибка! Смотрите делали в консоли.
 commands.generic.noPermission=У вас нет необходимого разрешения: %s
 commands.generic.playerOnly=Эту команду может использовать только игрок!

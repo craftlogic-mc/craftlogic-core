@@ -5,8 +5,13 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.DimensionType;
@@ -113,6 +118,33 @@ public class CommandContext {
             return Optional.of(mapper.apply(value.get()));
         }
         return Optional.empty();
+    }
+
+    public Block getPlayerLookingBlock() throws CommandException {
+        Player player = senderAsPlayer();
+        EntityPlayerMP entity = player.getEntity();
+        boolean creative = entity.capabilities.isCreativeMode;
+        double distance = creative ? 5 : 4.5;
+        Vec3d eyes = entity.getPositionEyes(1);
+        Vec3d look = entity.getLook(1);
+        Vec3d end = eyes.add(look.x * distance, look.y * distance, look.z * distance);
+        RayTraceResult target = entity.world.rayTraceBlocks(eyes, end, false, false, true);
+
+        if (target != null && target.typeOfHit == RayTraceResult.Type.BLOCK) {
+            return entity.world.getBlockState(target.getBlockPos()).getBlock();
+        } else {
+            throw new CommandException("commands.generic.no_block");
+        }
+    }
+
+    public Item getPlayerHeldItem() throws CommandException {
+        Player player = senderAsPlayer();
+        ItemStack heldItem = player.getHeldItem(EnumHand.MAIN_HAND);
+        if (!heldItem.isEmpty()) {
+            return heldItem.getItem();
+        } else {
+            throw new CommandException("commands.generic.no_item");
+        }
     }
 
     public Argument get(String name) {
