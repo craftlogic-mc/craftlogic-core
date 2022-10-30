@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import ru.craftlogic.CraftConfig;
 
 public class ItemFlower extends ItemMultiTexture {
     public ItemFlower(BlockFlower.EnumFlowerColor color) {
@@ -16,6 +17,7 @@ public class ItemFlower extends ItemMultiTexture {
 
     @Override
     public boolean canPlaceBlockOnSide(World world, BlockPos pos, EnumFacing side, EntityPlayer player, ItemStack stack) {
-        return false;
+        return CraftConfig.items.enableFlowerPlacing;
     }
+
 }

@@ -10,6 +10,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.CraftSounds;
 
 import javax.annotation.Nullable;
@@ -18,12 +22,14 @@ import java.util.Random;
 
 @Mixin(BlockLilyPad.class)
 public abstract class MixinBlockLilyPad extends BlockBush {
-    /**
-     * @author Radviger
-     * @reason No collision box on waterlily
-     */
-    @Overwrite
-    public void addCollisionBoxToList(IBlockState state, World world, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, @Nullable Entity entity, boolean isActualState) {}
+
+    @Inject(method = "addCollisionBoxToList", at = @At("HEAD"), cancellable = true)
+    public void onAddCollisions(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox, List<AxisAlignedBB> collidingBoxes, Entity entityIn, boolean isActualState, CallbackInfo ci) {
+        if (!CraftConfig.blocks.enableLilyPadCollisions) {
+            ci.cancel();
+        }
+    }
+
 
     @Override
     public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {

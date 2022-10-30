@@ -10,7 +10,10 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import ru.craftlogic.CraftConfig;
 
 @Mixin(ItemLilyPad.class)
 public abstract class MixinItemLilyPad extends ItemBlock {
@@ -18,12 +21,10 @@ public abstract class MixinItemLilyPad extends ItemBlock {
         super(block);
     }
 
-    /**
-     * @author Radviger
-     * @reason Disable waterlily placing
-     */
-    @Overwrite
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        return new ActionResult<>(EnumActionResult.PASS, player.getHeldItem(hand));
+    @Inject(method = "onItemRightClick", at = @At("HEAD"), cancellable = true)
+    public void disablePlacing(World world, EntityPlayer player, EnumHand hand, CallbackInfoReturnable<ActionResult<ItemStack>> cir) {
+        if (!CraftConfig.items.enableFlowerPlacing) {
+            cir.setReturnValue(new ActionResult<>(EnumActionResult.PASS, player.getHeldItem(hand)));
+        }
     }
 }

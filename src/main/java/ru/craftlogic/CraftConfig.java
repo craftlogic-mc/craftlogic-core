@@ -25,6 +25,10 @@ public class CraftConfig {
         public boolean enableMoss = true;
 
         @Config.RequiresMcRestart
+        @Config.Comment("Enable placing flowers, lily pads, etc.")
+        public boolean enableFlowerPlacing = true;
+
+        @Config.RequiresMcRestart
         @Config.Comment("Enable item slot information (damage, cooldown, etc.)")
         public boolean enableInform = true;
 
@@ -60,6 +64,10 @@ public class CraftConfig {
         @Config.RequiresMcRestart
         @Config.Comment("Enable vine climbing")
         public boolean enableVineLadder = false;
+
+        @Config.RequiresMcRestart
+        @Config.Comment("Enable lily pad collisions")
+        public boolean enableLilyPadCollisions = false;
 
         @Config.Comment("Enable barrels (composting & liquid storage)")
         @Config.RequiresMcRestart
