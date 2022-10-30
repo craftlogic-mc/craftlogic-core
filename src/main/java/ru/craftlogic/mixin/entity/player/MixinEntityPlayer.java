@@ -14,17 +14,16 @@ import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.event.player.PlayerCheckCanEditEvent;
 import ru.craftlogic.api.event.player.PlayerSneakEvent;
 
 @Mixin(EntityPlayer.class)
 public abstract class MixinEntityPlayer extends Entity {
-    @Shadow public PlayerCapabilities capabilities;
+    @Shadow
+    public PlayerCapabilities capabilities;
 
     public MixinEntityPlayer(World world) {
         super(world);
@@ -36,7 +35,7 @@ public abstract class MixinEntityPlayer extends Entity {
      */
     @Overwrite
     public boolean canPlayerEdit(BlockPos pos, EnumFacing side, ItemStack item) {
-        if (MinecraftForge.EVENT_BUS.post(new PlayerCheckCanEditEvent((EntityPlayer) (Object)this, pos, side, item))) {
+        if (MinecraftForge.EVENT_BUS.post(new PlayerCheckCanEditEvent((EntityPlayer) (Object) this, pos, side, item))) {
             return false;
         } else if (this.capabilities.allowEdit) {
             return true;
@@ -51,7 +50,7 @@ public abstract class MixinEntityPlayer extends Entity {
 
     @Override
     public void setSneaking(boolean sneaking) {
-        MinecraftForge.EVENT_BUS.post(new PlayerSneakEvent((EntityPlayer)(Object)this, sneaking));
+        MinecraftForge.EVENT_BUS.post(new PlayerSneakEvent((EntityPlayer) (Object) this, sneaking));
         super.setSneaking(sneaking);
     }
 
@@ -64,6 +63,17 @@ public abstract class MixinEntityPlayer extends Entity {
     public void onSpawnDamageIndicator(WorldServer world, EnumParticleTypes particle, double x, double y, double z, int count, double vx, double vy, double vz, double velocity, int[] args) {
         if (!CraftConfig.tweaks.disableDamageParticles) {
             world.spawnParticle(particle, x, y, z, count, vx, vy, vz, velocity, args);
+        }
+    }
+
+    /**
+     * @author Pudo
+     * @reason Removable attack cooldown
+     */
+    @Inject(method = "getCooldownPeriod", at = @At("HEAD"), cancellable = true)
+    public void getCooldownPeriod(CallbackInfoReturnable<Float> cir) {
+        if (!CraftConfig.tweaks.enableAttackCooldown) {
+            cir.setReturnValue(1F);
         }
     }
 }

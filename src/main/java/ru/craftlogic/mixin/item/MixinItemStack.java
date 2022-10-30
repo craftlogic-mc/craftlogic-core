@@ -9,6 +9,9 @@ import net.minecraft.util.text.event.HoverEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import ru.craftlogic.CraftConfig;
 
 @Mixin(ItemStack.class)
 public abstract class MixinItemStack {
@@ -40,4 +43,10 @@ public abstract class MixinItemStack {
 
         return display;
     }
+
+    @ModifyConstant(method = "getTooltip", constant = @Constant(intValue = 0, ordinal = 2))
+    public int defaultTooltipFlag(int old) {
+        return CraftConfig.items.enableInform ? 0 : 2;
+    }
+
 }

@@ -25,6 +25,10 @@ public class CraftConfig {
         public boolean enableMoss = true;
 
         @Config.RequiresMcRestart
+        @Config.Comment("Enable item slot information (damage, cooldown, etc.)")
+        public boolean enableInform = true;
+
+        @Config.RequiresMcRestart
         @Config.Comment("Enable ability to get a stone brick item from block variant & rocks")
         public boolean enableStoneBricks = true;
 
@@ -75,6 +79,8 @@ public class CraftConfig {
         @Config.Comment("Chicken egg lay delay (in ticks; used as %delay% + random[0, %delay%])")
         public int chickenEggLayDelay = 6000;
 
+        @Config.Comment("Enable attack cooldown")
+        public boolean enableAttackCooldown = true;
         @Config.Comment("Enable milk bucket tweaks")
         public boolean enableMilkBucketTweaks = true;
         @Config.Comment("Enable cow milking tweaks")
