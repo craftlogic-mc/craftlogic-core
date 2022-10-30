@@ -40,6 +40,7 @@ public class CraftConfig {
         @Config.Comment("Enable poor rock drop from stone & cobblestone")
         public boolean enableRocksDrop = false;
 
+
         @Config.RequiresMcRestart
         @Config.Comment("Enable ability to break eggs into raw ones by throwing them")
         public boolean enableRawEggs = false;
@@ -52,6 +53,10 @@ public class CraftConfig {
     public static Blocks blocks = new Blocks();
 
     public static class Blocks {
+        @Config.RequiresMcRestart
+        @Config.Comment("Enable vine climbing")
+        public boolean enableVineLadder = false;
+
         @Config.Comment("Enable barrels (composting & liquid storage)")
         @Config.RequiresMcRestart
         public boolean enableBarrels = true;

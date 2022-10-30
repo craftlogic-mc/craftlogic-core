@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import ru.craftlogic.CraftConfig;
 
 @Mixin(BlockVine.class)
 public abstract class MixinBlockVine extends Block {
@@ -22,6 +23,6 @@ public abstract class MixinBlockVine extends Block {
      */
     @Overwrite(remap = false)
     public boolean isLadder(IBlockState state, IBlockAccess world, BlockPos pos, EntityLivingBase entity) {
-        return false;
+        return CraftConfig.blocks.enableVineLadder;
     }
 }
