@@ -12,7 +12,7 @@
         "block.MixinBlockLeaves", "block.MixinBlockLeavesNew", "block.MixinBlockLeavesOld", "block.MixinBlockLever",
         "block.MixinBlockLilyPad", "block.MixinBlockLog", "block.MixinBlockLogNew", "block.MixinBlockLogOld",
         "block.MixinBlockMelon", "block.MixinBlockMushroom", "block.MixinBlockObserver", "block.MixinBlockPlanks",
-        "block.MixinBlockRailBase", "block.MixinBlockRedstoneTorch", "block.MixinBlockSapling", "block.MixinBlockStone",
+        "block.MixinBlockRailBase", "block.MixinBlockRedstoneTorch", "block.MixinBlockSapling",
         "block.MixinBlockTallGrass", "block.MixinBlockTNT", "block.MixinBlockTrapDoor", "block.MixinBlockVine",
         "block.MixinBlockWeb", "block.state.MixinBlockPistonStructureHelper", "capability.MixinDoubleChestItemHandler",
         "entity.MixinEntity", "entity.MixinEntityIronGolem", "entity.MixinEntityLiving", "entity.MixinEntityLivingBase",
