@@ -34,6 +34,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import ru.craftlogic.api.entity.AdvancedPlayer;
+import ru.craftlogic.api.event.player.PlayerInitialSpawnEvent;
 import ru.craftlogic.api.event.player.PlayerJoinedMessageEvent;
 import ru.craftlogic.api.event.player.PlayerLeftMessageEvent;
 import ru.craftlogic.api.server.AdvancedPlayerFileData;
@@ -117,7 +118,9 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
             player.dimension = 0;
             playerWorld = this.server.getWorld(0);
             BlockPos spawnPoint = playerWorld.provider.getRandomizedSpawnPoint();
-            player.setPositionAndUpdate((double) spawnPoint.getX(), (double) spawnPoint.getY(), (double) spawnPoint.getZ());
+            PlayerInitialSpawnEvent event = new PlayerInitialSpawnEvent(spawnPoint, profile);
+            spawnPoint = event.spawnPos;
+            player.setPositionAndUpdate(spawnPoint.getX(), spawnPoint.getY(), spawnPoint.getZ());
         }
 
         player.setWorld(playerWorld);
