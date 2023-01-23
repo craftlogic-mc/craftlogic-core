@@ -6,9 +6,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.management.PlayerInteractionManager;
 import net.minecraft.server.management.UserListOpsEntry;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,13 +41,14 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
         super(world);
     }
 
-    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayerMP;moveToBlockPosAndAngles(Lnet/minecraft/util/math/BlockPos;FF)V"))
-    public void onCreate(EntityPlayerMP player, BlockPos pos, float yaw, float pitch) {
-        PlayerInitialSpawnEvent event = new PlayerInitialSpawnEvent(pos, pitch, yaw, player.world, player.getGameProfile());
+    @Inject(method = "<init>", at = @At("RETURN"))
+    public void onCreate(MinecraftServer server, WorldServer world, GameProfile profile, PlayerInteractionManager manager, CallbackInfo ci) {
+        BlockPos pos = world.provider.getRandomizedSpawnPoint();
+        PlayerInitialSpawnEvent event = new PlayerInitialSpawnEvent(pos, 0, 0, world, profile);
         MinecraftForge.EVENT_BUS.post(event);
-        player.world = event.world;
-        player.dimension = event.world.provider.getDimension();
-        player.moveToBlockPosAndAngles(event.spawnPos, event.yaw, event.pitch);
+        this.world = event.world;
+        this.dimension = event.world.provider.getDimension();
+        this.moveToBlockPosAndAngles(event.spawnPos, event.yaw, event.pitch);
     }
 
     @Inject(method = "readEntityFromNBT", at = @At("RETURN"))
