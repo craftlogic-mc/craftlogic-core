@@ -3,8 +3,10 @@ package ru.craftlogic.api.command;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
+import net.minecraft.command.NumberInvalidException;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -428,6 +430,10 @@ public class CommandContext {
                 }
             }
             return state;
+        }
+
+        public double asCoord(double relative) throws CommandException {
+            return CommandBase.parseDouble(relative, value, true);
         }
 
         @Override

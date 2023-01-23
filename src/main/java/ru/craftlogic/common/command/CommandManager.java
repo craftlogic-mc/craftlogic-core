@@ -99,6 +99,8 @@ public class CommandManager extends ConfigurableManager {
         commandManager.registerCommand(new CommandEnderchest());
         commandManager.registerCommand(new CommandTime());
         commandManager.registerCommand(new CommandRequestTeleport());
+        commandManager.registerCommand(new CommandYourselfTeleport());
+        commandManager.registerCommand(new CommandTeleport());
 
         if (server.isDedicated()) {
             commandManager.registerCommand(new CommandInfo());
