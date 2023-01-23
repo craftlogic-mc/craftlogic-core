@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.UserListOpsEntry;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Final;
@@ -15,10 +16,12 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.craftlogic.api.entity.AdvancedPlayer;
 import ru.craftlogic.api.event.player.PlayerEnterCombat;
 import ru.craftlogic.api.event.player.PlayerExitCombat;
+import ru.craftlogic.api.event.player.PlayerInitialSpawnEvent;
 import ru.craftlogic.api.permission.PermissionManager;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.world.Player;
@@ -28,11 +31,21 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
     @Shadow
     private long playerLastActiveTime;
     @Shadow @Final public MinecraftServer server;
+    @Shadow public int ping;
     private long firstPlayed;
     private long timePlayed;
 
     public MixinEntityPlayerMP(World world) {
         super(world);
+    }
+
+    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayerMP;moveToBlockPosAndAngles(Lnet/minecraft/util/math/BlockPos;FF)V"))
+    public void onCreate(EntityPlayerMP player, BlockPos pos, float yaw, float pitch) {
+        PlayerInitialSpawnEvent event = new PlayerInitialSpawnEvent(pos, pitch, yaw, player.world, player.getGameProfile());
+        MinecraftForge.EVENT_BUS.post(event);
+        player.world = event.world;
+        player.dimension = event.world.provider.getDimension();
+        player.moveToBlockPosAndAngles(event.spawnPos, event.yaw, event.pitch);
     }
 
     @Inject(method = "readEntityFromNBT", at = @At("RETURN"))
