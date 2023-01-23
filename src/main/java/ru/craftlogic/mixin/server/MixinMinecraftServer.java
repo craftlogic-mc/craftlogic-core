@@ -1,5 +1,6 @@
 package ru.craftlogic.mixin.server;
 
+import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandManager;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -67,8 +68,10 @@ public abstract class MixinMinecraftServer implements AdvancedServer {
             List<EntityPlayerMP> players = this.playerList.getPlayers();
             CommandSender s = CommandSender.from(wrapper, sender);
             for (EntityPlayerMP player : players) {
-                if (player.interactionManager.getGameType() != GameType.SPECTATOR || s.hasPermission("command.completion.spectators")) {
-                    result.add(player.getName());
+                if (CommandBase.doesStringStartWith(firstArg, player.getName())) {
+                    if (player.interactionManager.getGameType() != GameType.SPECTATOR || s.hasPermission("command.completion.spectators")) {
+                        result.add(player.getName());
+                    }
                 }
             }
         } else {
