@@ -118,8 +118,9 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
             player.dimension = 0;
             playerWorld = this.server.getWorld(0);
             BlockPos spawnPoint = playerWorld.provider.getRandomizedSpawnPoint();
-            PlayerInitialSpawnEvent event = new PlayerInitialSpawnEvent(spawnPoint, profile);
+            PlayerInitialSpawnEvent event = new PlayerInitialSpawnEvent(spawnPoint, playerWorld, profile);
             spawnPoint = event.spawnPos;
+            playerWorld = event.world;
             player.setPositionAndUpdate(spawnPoint.getX(), spawnPoint.getY(), spawnPoint.getZ());
         }
 
