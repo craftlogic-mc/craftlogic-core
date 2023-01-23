@@ -8,6 +8,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerInteractionManager;
 import net.minecraft.server.management.UserListOpsEntry;
+import net.minecraft.stats.StatBase;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -32,23 +33,20 @@ import ru.craftlogic.api.world.Player;
 public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlayer {
     @Shadow
     private long playerLastActiveTime;
-    @Shadow @Final public MinecraftServer server;
-    @Shadow public int ping;
+    @Shadow
+    @Final
+    public MinecraftServer server;
+    @Shadow
+    public int ping;
+
+    @Shadow
+    public abstract void takeStat(StatBase p_takeStat_1_);
+
     private long firstPlayed;
     private long timePlayed;
 
     public MixinEntityPlayerMP(World world) {
         super(world);
-    }
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    public void onCreate(MinecraftServer server, WorldServer world, GameProfile profile, PlayerInteractionManager manager, CallbackInfo ci) {
-        BlockPos pos = world.provider.getRandomizedSpawnPoint();
-        PlayerInitialSpawnEvent event = new PlayerInitialSpawnEvent(pos, 0, 0, world, profile);
-        MinecraftForge.EVENT_BUS.post(event);
-        this.world = event.world;
-        this.dimension = event.world.provider.getDimension();
-        this.moveToBlockPosAndAngles(event.spawnPos, event.yaw, event.pitch);
     }
 
     @Inject(method = "readEntityFromNBT", at = @At("RETURN"))

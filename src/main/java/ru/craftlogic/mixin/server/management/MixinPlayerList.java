@@ -31,12 +31,13 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import ru.craftlogic.api.entity.AdvancedPlayer;
 import ru.craftlogic.api.event.player.PlayerInitialSpawnEvent;
 import ru.craftlogic.api.event.player.PlayerJoinedMessageEvent;
-import ru.craftlogic.api.event.player.PlayerLeftMessageEvent;
 import ru.craftlogic.api.server.AdvancedPlayerFileData;
 import ru.craftlogic.api.server.AdvancedPlayerList;
 
@@ -92,6 +93,17 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
             dir.mkdir();
         }
         return new UserListWhitelist(new File(dir, file.getName()));
+    }
+
+    @Inject(method = "createPlayerForUser", at = @At(value = "RETURN"))
+    public void onCreatePlayer(GameProfile profile, CallbackInfoReturnable<EntityPlayerMP> cir) {
+        EntityPlayerMP player = cir.getReturnValue();
+        BlockPos pos = player.world.provider.getRandomizedSpawnPoint();
+        PlayerInitialSpawnEvent event = new PlayerInitialSpawnEvent(pos, 0, 0, player.world, profile);
+        MinecraftForge.EVENT_BUS.post(event);
+        player.world = event.world;
+        player.dimension = event.world.provider.getDimension();
+        player.moveToBlockPosAndAngles(event.spawnPos, event.yaw, event.pitch);
     }
 
     /**
