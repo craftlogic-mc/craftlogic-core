@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.event.player.PlayerJoinedMessageEvent;
+import ru.craftlogic.api.event.player.PlayerLeftMessageEvent;
 import ru.craftlogic.api.network.AdvancedNetHandlerPlayServer;
 import ru.craftlogic.api.server.Server;
 
@@ -40,7 +41,7 @@ public class MixinNetHandlerPlayServer implements AdvancedNetHandlerPlayServer {
         LOGGER.info("{} lost connection: {}", this.player.getName(), reason.getUnformattedText());
         this.server.refreshStatusNextTick();
         TextComponentTranslation message = new TextComponentTranslation("multiplayer.player.left", this.player.getDisplayName());
-        PlayerJoinedMessageEvent event = new PlayerJoinedMessageEvent(this.player, message);
+        PlayerLeftMessageEvent event = new PlayerLeftMessageEvent(this.player, message);
         if (!MinecraftForge.EVENT_BUS.post(event)) {
             message.getStyle().setColor(TextFormatting.YELLOW);
             this.server.getPlayerList().sendMessage(message);

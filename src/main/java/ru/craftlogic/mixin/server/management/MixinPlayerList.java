@@ -34,6 +34,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import ru.craftlogic.api.entity.AdvancedPlayer;
+import ru.craftlogic.api.event.player.PlayerJoinedMessageEvent;
 import ru.craftlogic.api.event.player.PlayerLeftMessageEvent;
 import ru.craftlogic.api.server.AdvancedPlayerFileData;
 import ru.craftlogic.api.server.AdvancedPlayerList;
@@ -150,7 +151,7 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
         }
         message.getStyle().setColor(TextFormatting.YELLOW);
 
-        PlayerLeftMessageEvent event = new PlayerLeftMessageEvent(player, message);
+        PlayerJoinedMessageEvent event = new PlayerJoinedMessageEvent(player, message);
 
         if (!MinecraftForge.EVENT_BUS.post(event)) {
             this.sendMessage(message);
