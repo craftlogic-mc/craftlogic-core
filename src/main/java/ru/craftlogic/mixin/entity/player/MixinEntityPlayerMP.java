@@ -6,12 +6,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.PlayerInteractionManager;
 import net.minecraft.server.management.UserListOpsEntry;
 import net.minecraft.stats.StatBase;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.WorldProvider;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,7 +23,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.craftlogic.api.entity.AdvancedPlayer;
 import ru.craftlogic.api.event.player.PlayerEnterCombat;
 import ru.craftlogic.api.event.player.PlayerExitCombat;
-import ru.craftlogic.api.event.player.PlayerInitialSpawnEvent;
 import ru.craftlogic.api.permission.PermissionManager;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.world.Player;
@@ -47,6 +45,11 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
 
     public MixinEntityPlayerMP(World world) {
         super(world);
+    }
+
+    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/WorldProvider;getRandomizedSpawnPoint()Lnet/minecraft/util/math/BlockPos;"))
+    public BlockPos onCreate(WorldProvider instance) {
+        return instance.getSpawnPoint();
     }
 
     @Inject(method = "readEntityFromNBT", at = @At("RETURN"))
