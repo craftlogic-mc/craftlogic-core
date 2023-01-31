@@ -12,10 +12,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.craftlogic.api.CraftAPI;
 import ru.craftlogic.api.command.*;
+import ru.craftlogic.api.permission.PermissionManager;
 import ru.craftlogic.api.server.PlayerManager;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.util.CheckedFunction;
 import ru.craftlogic.api.util.ConfigurableManager;
+import ru.craftlogic.api.world.CommandSender;
 import ru.craftlogic.api.world.Location;
 import ru.craftlogic.api.world.Player;
 
@@ -197,11 +199,22 @@ public class CommandManager extends ConfigurableManager {
             this.command = command;
         }
 
-        public boolean checkPermission(MinecraftServer server, ICommandSender sender, String[] args, boolean partial) throws CommandException {
+        public boolean checkPermission(MinecraftServer _server, ICommandSender _sender, String[] args, boolean partial) throws CommandException {
             if (command instanceof CommandBase) {
-                return ((CommandBase) command).checkPermission(server, sender, args, partial);
+                return ((CommandBase) command).checkPermission(_server, _sender, args, partial);
             } else {
-                return command.checkPermission(server, sender);
+                if (_server.isSinglePlayer() && _sender.getName().equalsIgnoreCase(_server.getServerOwner()) || _sender == _server) {
+                    return true;
+                }
+                Server server = Server.from(_server);
+                CommandSender from = CommandSender.from(server, _sender);
+                PermissionManager permissionManager = server.getPermissionManager();
+                if (permissionManager.isEnabled() && from instanceof Player) {
+                    if (!permissionManager.hasPermission(((Player) from).getProfile(), "commands." + command.getName())) {
+                        return false;
+                    }
+                }
+                return command.checkPermission(_server, _sender);
             }
         }
     }
