@@ -221,6 +221,34 @@ public class Server implements CommandSender {
         });
     }
 
+    public UUID addScheduledTask(Consumer<Server> task, long delay, long interval) {
+        UUID id = UUID.randomUUID();
+        addScheduledTask(id, task, delay, interval);
+        return id;
+    }
+
+    private void addScheduledTask(UUID id, Consumer<Server> task, long delay, long interval) {
+        addDelayedTask(id, task.andThen(server -> {
+            addRepeatedTask(id, task, interval);
+        }), delay);
+    }
+
+    public UUID addRepeatedTask(Consumer<Server> task, long interval) {
+        UUID id = UUID.randomUUID();
+        addRepeatedTask(id, task, interval);
+        return id;
+    }
+
+    private void addRepeatedTask(UUID id, Consumer<Server> task, long interval) {
+        if (!cancelledTasks.remove(id)) {
+            addTask(task.andThen(server -> {
+                addDelayedTask(id, s -> {
+                    addRepeatedTask(id, task, interval);
+                }, interval);
+            }));
+        }
+    }
+
     public UUID currentlyProcessingPlayer() {
         return currentlyProcessingPlayer;
     }
