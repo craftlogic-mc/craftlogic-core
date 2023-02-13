@@ -228,9 +228,7 @@ public class Server implements CommandSender {
     }
 
     private void addScheduledTask(UUID id, Consumer<Server> task, long delay, long interval) {
-        addDelayedTask(id, task.andThen(server -> {
-            addRepeatedTask(id, task, interval);
-        }), delay);
+        addDelayedTask(id, s -> addRepeatedTask(id, task, interval), delay);
     }
 
     public UUID addRepeatedTask(Consumer<Server> task, long interval) {

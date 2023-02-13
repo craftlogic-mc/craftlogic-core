@@ -33,9 +33,9 @@
         "tileentity.MixinTileEntity", "tileentity.MixinTileEntityChest", "tileentity.MixinTileEntityDispenser",
         "tileentity.MixinTileEntityFurnace", "tileentity.MixinTileEntityStructure", "util.MixinCombatTracker",
         "util.text.MixinITextComponent$Serializer", "world.MixinChunkCache", "world.MixinCommandHandler",
-        "world.MixinTeleporter", "world.MixinWorld", "world.MixinWorldServer", "world.biome.MixinBiome",
-        "world.biome.MixinBiomeManager", "world.biome.MixinBiomeSwamp", "world.biome.MixinBiomeTaiga",
-        "world.gen.structure.MixinJungleTemple", "world.gen.structure.MixinVillage",
+        "world.MixinEntitySpawner", "world.MixinTeleporter", "world.MixinWorld", "world.MixinWorldServer",
+        "world.biome.MixinBiome", "world.biome.MixinBiomeManager", "world.biome.MixinBiomeSwamp",
+        "world.biome.MixinBiomeTaiga", "world.gen.structure.MixinJungleTemple", "world.gen.structure.MixinVillage",
         "world.gen.structure.MixinVillageHouseBlacksmith", "world.gen.structure.MixinVillageHouseChurch",
         "world.storage.MixinBlockStateContainer", "world.storage.MixinSaveHandler"
     ],

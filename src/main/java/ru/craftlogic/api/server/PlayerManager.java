@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class PlayerManager extends ServerManager {
-    private final Set<Player> onlinePlayers = new HashSet<>();
+    public final Set<Player> onlinePlayers = new HashSet<>();
 
     public PlayerManager(Server server, Path settingsDirectory) {
         super(server, LogManager.getLogger("PlayerManager"));

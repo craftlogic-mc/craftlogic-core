@@ -36,6 +36,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import ru.craftlogic.api.entity.AdvancedPlayer;
+import ru.craftlogic.api.event.player.PlayerConnectionAttemptEvent;
 import ru.craftlogic.api.event.player.PlayerInitialSpawnEvent;
 import ru.craftlogic.api.event.player.PlayerJoinedMessageEvent;
 import ru.craftlogic.api.server.AdvancedPlayerFileData;
@@ -43,6 +44,7 @@ import ru.craftlogic.api.server.AdvancedPlayerList;
 
 import javax.annotation.Nullable;
 import java.io.File;
+import java.net.SocketAddress;
 import java.util.UUID;
 
 @Mixin(PlayerList.class)
@@ -106,12 +108,21 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
         player.moveToBlockPosAndAngles(event.spawnPos, event.yaw, event.pitch);
     }
 
+    @Inject(method = "allowUserToConnect", at = @At("HEAD"), cancellable = true)
+    public void checkConnect(SocketAddress address, GameProfile profile, CallbackInfoReturnable<String> cir) {
+        PlayerConnectionAttemptEvent event = new PlayerConnectionAttemptEvent(address, profile);
+        if (MinecraftForge.EVENT_BUS.post(event)) {
+            cir.setReturnValue(event.getDisconnectReason());
+        }
+    }
+
     /**
      * @author Radviger
      * @reason Ability to edit/disable player join messages
      */
     @Overwrite(remap = false)
     public void initializeConnectionToPlayer(NetworkManager netManager, EntityPlayerMP player, NetHandlerPlayServer netHandler) {
+
         GameProfile profile = player.getGameProfile();
         PlayerProfileCache profileCache = this.server.getPlayerProfileCache();
         GameProfile cachedProfile = profileCache.getProfileByUUID(profile.getId());
