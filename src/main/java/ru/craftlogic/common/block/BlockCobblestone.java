@@ -53,7 +53,7 @@ public class BlockCobblestone extends BlockFalling implements Mossable {
 
     @Override
     public void randomTick(World world, BlockPos pos, IBlockState state, Random rand) {
-        if (!world.isRemote) {
+        if (!world.isRemote && world.isAreaLoaded(pos, 3)) {
             int humidity = 0;
             int heat = 0;
             for (int x = -1; x <= 1; x++) {
