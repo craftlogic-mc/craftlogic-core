@@ -2,6 +2,7 @@ package ru.craftlogic.api.world;
 
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.play.client.CPacketChatMessage;
 import net.minecraft.network.rcon.RConConsoleSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.CommandBlockBaseLogic;
@@ -47,6 +48,17 @@ public interface CommandSender extends Permissible {
 
     default void sendQuestionIfPlayer(String id, ITextComponent question, int timeout, BooleanConsumer callback) {
         callback.accept(true);
+    }
+
+    default void chat(String message) {
+        ICommandSender unwrapped = unwrap();
+        if (unwrapped instanceof EntityPlayerMP) {
+            EntityPlayerMP player = (EntityPlayerMP) unwrapped;
+            player.connection.processChatMessage(new CPacketChatMessage(message));
+        } else if (unwrapped instanceof MinecraftServer) {
+            MinecraftServer server = (MinecraftServer) unwrapped;
+            server.getCommandManager().executeCommand(server, message);
+        }
     }
 
     ICommandSender unwrap();
