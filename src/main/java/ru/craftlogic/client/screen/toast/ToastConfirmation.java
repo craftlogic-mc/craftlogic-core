@@ -80,7 +80,7 @@ public class ToastConfirmation extends AdvancedToast {
         float progress = 1F - (float)(delta / (double)timeout / 1000);
 
         if (counter > 0) {
-            Gui.drawRect(3, 28, (int) (3 + 154 * progress), 29, 0xFF555555);
+            Gui.drawRect(3, 28, (int) (3 + 154 * progress), 29, 0xFF000000 | color);
             counter = timeout - (int)(delta / 1000);
         } else if (!done) {
             confirm(false);
