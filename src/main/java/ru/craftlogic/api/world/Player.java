@@ -44,10 +44,12 @@ import ru.craftlogic.network.message.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class Player extends OfflinePlayer implements LocatableCommandSender {
-    private final Map<String, BooleanConsumer> pendingCallbacks = new HashMap<>();
+    private final Map<String, BooleanConsumer> pendingCallbacks = new ConcurrentHashMap<>();
     private final Set<UUID> pendingTeleports = new HashSet<>();
 
     public Player(Server server, GameProfile profile) {
@@ -408,7 +410,7 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
 
     public void sendQuestion(String id, ITextComponent question, int timeout, BooleanConsumer callback) {
         sendPacket(new MessageQuestion(id, question, timeout));
-        pendingCallbacks.put(id, callback);
+        pendingCallbacks.put(id, spoilingCallback(id, callback, timeout));
     }
 
     @Override
@@ -422,7 +424,21 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
 
     public void sendToastQuestion(String id, ITextComponent question, int color, int timeout, BooleanConsumer callback) {
         sendPacket(new MessageToastQuestion(id, question, color, timeout));
-        pendingCallbacks.put(id, callback);
+        pendingCallbacks.put(id, spoilingCallback(id, callback, timeout));
+    }
+
+    private BooleanConsumer spoilingCallback(String id, BooleanConsumer callback, int timeout) {
+        AtomicBoolean valid = new AtomicBoolean(true);
+        BooleanConsumer checked = response -> {
+            if (valid.get()) {
+                callback.accept(response);
+            }
+        };
+        server.addDelayedTask(s -> {
+            valid.set(false);
+            pendingCallbacks.remove(id, checked);
+        }, timeout * 1000L);
+        return checked;
     }
 
     public boolean hasQuestion(String id) {
