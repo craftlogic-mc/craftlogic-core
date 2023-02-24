@@ -151,9 +151,11 @@ public class ProxyCommon extends AdvancedMessageHandler {
     }
 
     protected AdvancedMessage handleConfirmation(MessageConfirmation message, MessageContext context) {
-        EntityPlayer entity = getPlayer(context);
-        Player player = ((AdvancedPlayer)entity).wrapped();
-        player.confirm(message.getId(), message.getChoice());
+        syncTask(context, () -> {
+            EntityPlayer entity = getPlayer(context);
+            Player player = ((AdvancedPlayer)entity).wrapped();
+            player.confirm(message.getId(), message.getChoice());
+        });
         return null;
     }
 

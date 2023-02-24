@@ -192,7 +192,13 @@ task deobfJar(type: Jar) {
     from sourceSets.main.output
     classifier = 'dev'
     manifest {
-        attributes(commonManifest)
+        attributes([
+            'FMLAT'        : 'craftlogic_at.cfg',
+            'TweakClass'   : 'org.spongepowered.asm.launch.MixinTweaker',
+            'TweakOrder'   : '0',
+            'MixinConfigs' : 'mixins.craftlogic.json',
+            'FMLCorePlugin': 'ru.craftlogic.coremod.CraftLogicCoremod'
+        ])
     }
 }
 
