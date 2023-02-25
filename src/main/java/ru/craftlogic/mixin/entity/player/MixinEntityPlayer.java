@@ -59,6 +59,11 @@ public abstract class MixinEntityPlayer extends Entity {
         return 0.1F;
     }
 
+    @ModifyConstant(method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/item/EntityItem;", constant = @Constant(intValue = 40))
+    public int itemPickUpDelay(int old) {
+        return 20;
+    }
+    
     @Redirect(method = "attackTargetEntityWithCurrentItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/WorldServer;spawnParticle(Lnet/minecraft/util/EnumParticleTypes;DDDIDDDD[I)V"))
     public void onSpawnDamageIndicator(WorldServer world, EnumParticleTypes particle, double x, double y, double z, int count, double vx, double vy, double vz, double velocity, int[] args) {
         if (!CraftConfig.tweaks.disableDamageParticles) {

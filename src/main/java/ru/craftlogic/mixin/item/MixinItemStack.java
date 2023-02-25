@@ -29,8 +29,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.Constant;
-import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import ru.craftlogic.CraftConfig;
 
 import javax.annotation.Nullable;
@@ -91,6 +92,16 @@ public abstract class MixinItemStack {
         }
 
         return display;
+    }
+
+    @Inject(method = "<init>(Lnet/minecraft/nbt/NBTTagCompound;)V", at = @At(value = "RETURN"))
+    public void constructor(NBTTagCompound compound, CallbackInfo ci) {
+        this.itemDamage = compound.getInteger("Damage");
+    }
+
+    @Inject(method = "writeToNBT", at = @At(value = "RETURN"))
+    public void save(NBTTagCompound nbt, CallbackInfoReturnable<NBTTagCompound> cir) {
+        nbt.setInteger("Damage", this.itemDamage);
     }
 
 //    @ModifyConstant(method = "getTooltip", constant = @Constant(intValue = 0, ordinal = 2))
@@ -193,14 +204,13 @@ public abstract class MixinItemStack {
                 if (this.hasTagCompound()) {
                     list.add("");
                 }
-//                list.add(I18n.translateToLocal("item.modifiers." + entityequipmentslot.getName()));
 
                 for (Map.Entry<String, AttributeModifier> entry : multimap.entries()) {
-                    AttributeModifier attributemodifier = entry.getValue();
-                    double d0 = attributemodifier.getAmount();
+                    AttributeModifier attribute = entry.getValue();
+                    double d0 = attribute.getAmount();
                     boolean flag = false;
                     if (playerIn != null) {
-                       if (attributemodifier.getID() == Item.ATTACK_DAMAGE_MODIFIER) {
+                       if (attribute.getID() == Item.ATTACK_DAMAGE_MODIFIER) {
                            d0 += playerIn.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getBaseValue();
                            d0 += EnchantmentHelper.getModifierForCreature((ItemStack) (Object) this, EnumCreatureAttribute.UNDEFINED);
                            flag = true;
@@ -208,7 +218,7 @@ public abstract class MixinItemStack {
                     }
 
                     double d1;
-                    if (attributemodifier.getOperation() != 1 && attributemodifier.getOperation() != 2) {
+                    if (attribute.getOperation() != 1 && attribute.getOperation() != 2) {
                         d1 = d0;
                     } else {
                         d1 = d0 * 100.0;
@@ -220,10 +230,12 @@ public abstract class MixinItemStack {
                             list.add(I18n.translateToLocalFormatted("tooltip.durability") + " " + TextFormatting.GREEN + use);
                         }
                         if (d1 > 1) {
-                            list.add(TextFormatting.BLUE + " +" + I18n.translateToLocalFormatted("attribute.modifier.equals." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), I18n.translateToLocal("attribute.name." + entry.getKey())));
+                            list.add(TextFormatting.BLUE + " +" + I18n.translateToLocalFormatted("attribute.modifier.equals." + attribute.getOperation(), DECIMALFORMAT.format(d1), I18n.translateToLocal("attribute.name." + entry.getKey())));
                         }
                     } else if (d0 > 0.0) {
-                        list.add(TextFormatting.BLUE + " " + I18n.translateToLocalFormatted("attribute.modifier.plus." + attributemodifier.getOperation(), DECIMALFORMAT.format(d1), I18n.translateToLocal("attribute.name." + entry.getKey())));
+                        if (attribute.getName().equals("Armor modifier")) {
+                            list.add(TextFormatting.BLUE + " " + I18n.translateToLocalFormatted("attribute.modifier.plus.0", DECIMALFORMAT.format(d1), I18n.translateToLocal("attribute.name.generic.armor")));
+                        }
                     }
                 }
             }
