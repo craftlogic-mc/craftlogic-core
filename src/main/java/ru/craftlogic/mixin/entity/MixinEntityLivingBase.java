@@ -4,15 +4,19 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.world.World;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import ru.craftlogic.api.entity.Creature;
 
 @Mixin(EntityLivingBase.class)
 public abstract class MixinEntityLivingBase extends Entity implements Creature {
-    @Shadow protected boolean isJumping;
+    @Shadow
+    protected boolean isJumping;
 
     public MixinEntityLivingBase(World world) {
         super(world);
@@ -36,5 +40,10 @@ public abstract class MixinEntityLivingBase extends Entity implements Creature {
         } else {
             return 300;
         }
+    }
+
+    @Redirect(method = "attackEntityFrom", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;lastDamage:F", opcode = Opcodes.GETFIELD))
+    public float lastDamage(EntityLivingBase instance) {
+        return Float.MAX_VALUE;
     }
 }
