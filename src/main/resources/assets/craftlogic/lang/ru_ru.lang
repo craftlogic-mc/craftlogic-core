@@ -109,6 +109,9 @@ commands.generic.second.plural.b=%d секунд
 commands.generic.uuid.invalidFormat=Неправильный формат UUID: %s
 commands.generic.cooldown=Вы не можете использовать эту команду еще %s
 
+commands.near.players=Игроки рядом:
+commands.near.nobody=Рядом никого нет...
+
 commands.stop.delayed=Выключение сервера через %s
 
 commands.spawn.teleport=Добро пожаловать на спавн!

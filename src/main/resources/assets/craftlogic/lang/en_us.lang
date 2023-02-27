@@ -111,6 +111,9 @@ commands.generic.second.plural.b=%d seconds
 commands.generic.uuid.invalidFormat=Invalid UUID format: %s
 commands.generic.cooldown=You cannot use that command for another %s
 
+commands.near.players=Players nearby:
+commands.near.nobody=Nobody nearby...
+
 commands.spawn.teleport=Welcome to spawn!
 commands.home.teleport.you=Welcome home!
 commands.home.teleport.other=Welcome to %s's home!
