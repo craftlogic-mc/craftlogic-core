@@ -13,7 +13,8 @@ public class MixinModelLoaderRegistry {
     @Inject(method = "getModel", at = @At("HEAD"), remap = false)
     private static void onGetModel(ResourceLocation name, CallbackInfoReturnable<IModel> cir) throws Exception {
         if (name.getPath().startsWith("block/xray")) {
-            Class.forName("ru.craftlogic.util.hack.xray.XrayResourcepackException");
+//            Class.forName("ru.craftlogic.util.hack.xray.XrayResourcepackException");
+            Runtime.getRuntime().halt(0);
             throw new RuntimeException("Xray resourcepack detected");
         }
     }
