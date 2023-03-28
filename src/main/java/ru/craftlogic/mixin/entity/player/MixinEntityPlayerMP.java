@@ -9,6 +9,9 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.UserListOpsEntry;
 import net.minecraft.stats.StatBase;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraftforge.common.MinecraftForge;
@@ -23,9 +26,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.craftlogic.api.entity.AdvancedPlayer;
 import ru.craftlogic.api.event.player.PlayerEnterCombat;
 import ru.craftlogic.api.event.player.PlayerExitCombat;
+import ru.craftlogic.api.event.player.PlayerTabNameEvent;
 import ru.craftlogic.api.permission.PermissionManager;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.world.Player;
+import ru.craftlogic.mixin.client.gui.MixinGuiPlayerTabOverlay;
+
+import javax.annotation.Nullable;
 
 @Mixin(EntityPlayerMP.class)
 public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlayer {
@@ -144,5 +151,16 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
                     }
             }
         }
+    }
+
+    /**
+     * @author Pudo
+     * @reason Custom tab player names
+     */
+    @Overwrite
+    public ITextComponent getTabListDisplayName() {
+        PlayerTabNameEvent event = new PlayerTabNameEvent((EntityPlayer) (Object) this, null);
+        MinecraftForge.EVENT_BUS.post(event);
+        return event.getName();
     }
 }
