@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.command.CommandException;
+import net.minecraft.init.MobEffects;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 import ru.craftlogic.api.command.CommandBase;
@@ -24,17 +25,23 @@ public final class CommandHome extends CommandBase {
         super("home", 0, "", "<target:Player>");
     }
 
+
     @Override
     protected void execute(CommandContext ctx) throws CommandException {
         Player sender = ctx.senderAsPlayer();
-        OfflinePlayer target = ctx.has("target") ? ctx.get("target").asOfflinePlayer() : sender;
-        if (target.isOnline()) {
-            Location bedLocation = target.asOnline().getBedLocation(sender.getWorld());
-            teleportHome(ctx, sender, target, bedLocation, false);
+        if (ctx.has("target") && sender.hasPermission("commands.home.other")) {
+            OfflinePlayer target = ctx.get("target").asOfflinePlayer();
+            if (target.isOnline()) {
+                Location bedLocation = target.asOnline().getBedLocation(sender.getWorld());
+                teleportHome(ctx, sender, target, bedLocation, false);
+            } else {
+                PhantomPlayer fake = target.asPhantom(sender.getWorld());
+                Location bedLocation = fake.getBedLocation(sender.getWorld());
+                teleportHome(ctx, sender, fake, bedLocation, true);
+            }
         } else {
-            PhantomPlayer fake = target.asPhantom(sender.getWorld());
-            Location bedLocation = fake.getBedLocation(sender.getWorld());
-            teleportHome(ctx, sender, fake, bedLocation, true);
+            Location location = sender.getBedLocation();
+            teleportHome(ctx, sender, sender, location, false);
         }
     }
 
