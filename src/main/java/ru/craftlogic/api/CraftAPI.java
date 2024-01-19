@@ -14,6 +14,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.relauncher.Side;
+import ru.craftlogic.Tags;
 import ru.craftlogic.api.block.holders.ScreenHolder;
 import ru.craftlogic.api.network.AdvancedNetwork;
 import ru.craftlogic.network.message.MessageShowScreen;
@@ -27,8 +28,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class CraftAPI {
-    public static final String MOD_ID = "{@mod:id}";
-    public static final String MOD_VERSION = "{@mod:version}";
+    public static final String MOD_ID = Tags.MODID;
+    public static final String MOD_VERSION = Tags.VERSION;
     public static final AdvancedNetwork NETWORK = new AdvancedNetwork(MOD_ID);
 
     public static final DamageSource DAMAGE_SOURCE_FALL_INTO_LEAVES = new DamageSource("fallIntoLeaves") {

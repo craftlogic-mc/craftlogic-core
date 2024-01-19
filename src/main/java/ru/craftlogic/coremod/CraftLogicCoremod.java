@@ -4,28 +4,19 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.spongepowered.asm.launch.MixinBootstrap;
-import org.spongepowered.asm.mixin.Mixins;
+import ru.craftlogic.Tags;
+import zone.rong.mixinbooter.IEarlyMixinLoader;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-@IFMLLoadingPlugin.MCVersion("{@mc:version}")
-@IFMLLoadingPlugin.Name("{@mod:id}-coremod")
+@IFMLLoadingPlugin.MCVersion("1.12.2")
+@IFMLLoadingPlugin.Name(Tags.MODID + "-coremod")
 @IFMLLoadingPlugin.SortingIndex(1002)
-public class CraftLogicCoremod implements IFMLLoadingPlugin {
+public class CraftLogicCoremod implements IFMLLoadingPlugin, IEarlyMixinLoader {
     private static final Logger LOGGER = LogManager.getLogger("CLC");
-
-    private static final String MIXIN_VERSION = "0.8.4-SNAPSHOT";
-
-    public CraftLogicCoremod() {
-        if (!MIXIN_VERSION.startsWith(MixinBootstrap.VERSION)) {
-            LOGGER.warn("Your classpath contains different version of sponge-mixin. Things may go wrong!");
-        }
-
-        MixinBootstrap.init();
-        Mixins.addConfiguration("mixins.craftlogic.json");
-    }
 
     @Override
     public String[] getASMTransformerClass() {
@@ -61,4 +52,8 @@ public class CraftLogicCoremod implements IFMLLoadingPlugin {
         return null;
     }
 
+    @Override
+    public List<String> getMixinConfigs() {
+        return Collections.singletonList("mixins.craftlogic.json");
+    }
 }
