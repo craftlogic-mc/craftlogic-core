@@ -145,10 +145,10 @@ public abstract class MixinBlockLeaves extends Block {
      * @author Radviger
      * @reason No shearable leaves
      */
-    @Overwrite(remap = false)
-    public boolean isShearable(@Nonnull ItemStack item, IBlockAccess world, BlockPos pos) {
-        return false;
-    }
+//    @Overwrite(remap = false)
+//    public boolean isShearable(@Nonnull ItemStack item, IBlockAccess world, BlockPos pos) {
+//        return false;
+//    }
 
     @Inject(method = "updateTick", at = @At("HEAD"))
     public void onUpdateTick(World world, BlockPos pos, IBlockState state, Random rand, CallbackInfo ci) {

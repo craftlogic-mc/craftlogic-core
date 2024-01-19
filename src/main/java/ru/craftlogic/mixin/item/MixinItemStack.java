@@ -111,7 +111,7 @@ public abstract class MixinItemStack {
 
     /**
      * @author Pudo
-     * @reason Meow
+     * @reason Rewrited tooltip
      */
 
     @Overwrite

@@ -46,6 +46,8 @@
     "block.MixinBlockWeb",
     "block.state.MixinBlockPistonStructureHelper",
     "capability.MixinDoubleChestItemHandler",
+    "client.gui.MixinGuiLanguage$List",
+    "client.renderer.entity.MixinLayerArmorBase",
     "entity.MixinEntity",
     "entity.MixinEntityIronGolem",
     "entity.MixinEntityLiving",

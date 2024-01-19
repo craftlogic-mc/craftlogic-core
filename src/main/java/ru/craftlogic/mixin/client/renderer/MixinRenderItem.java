@@ -63,7 +63,7 @@ public abstract class MixinRenderItem {
             EntityPlayerSP player = Minecraft.getMinecraft().player;
             float cooldown = player == null ? 0.0F : player.getCooldownTracker().getCooldown(stack.getItem(), Minecraft.getMinecraft().getRenderPartialTicks());
 
-            if (cooldown > 0.0F) {
+            if (cooldown > 0.0F && !stack.getItem().getClass().getName().endsWith("ItemHealingSword")) {
                 GlStateManager.disableLighting();
                 GlStateManager.disableDepth();
                 GlStateManager.disableTexture2D();
