@@ -22,8 +22,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -34,10 +32,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.entity.Chicken;
 import ru.craftlogic.api.entity.ai.EntityAIMateBird;
-import ru.craftlogic.util.ReflectiveUsage;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Set;
 
 @Mixin(EntityChicken.class)
@@ -57,12 +53,6 @@ public abstract class MixinEntityChicken extends EntityAnimal implements Chicken
 
     public MixinEntityChicken(World world) {
         super(world);
-    }
-
-    @ReflectiveUsage
-    @SideOnly(Side.CLIENT)
-    private static void addEggInfo(NBTTagCompound compound, List<String> info, @Nullable World world) {
-        info.add("Variant: " + compound.getInteger("variant"));
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
