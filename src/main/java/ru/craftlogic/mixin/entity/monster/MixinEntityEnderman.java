@@ -1,38 +1,18 @@
 package ru.craftlogic.mixin.entity.monster;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(EntityEnderman.class)
-public abstract class MixinEntityEnderman extends EntityMob {
-    public MixinEntityEnderman(World world) {
-        super(world);
-    }
-
-    /**
-     * @author Radviger
-     * @reason
-     */
-    @Overwrite
-    private boolean shouldAttackPlayer(EntityPlayer player) {
-        ItemStack helm = player.inventory.armorInventory.get(3);
-        if (helm.getItem() == Item.getItemFromBlock(Blocks.LIT_PUMPKIN)) {
-            return false;
-        } else {
-            Vec3d look = player.getLook(1.0F).normalize();
-            Vec3d eyeHeight = new Vec3d(this.posX - player.posX, this.getEntityBoundingBox().minY + (double)this.getEyeHeight() - (player.posY + (double)player.getEyeHeight()), this.posZ - player.posZ);
-            double d0 = eyeHeight.length();
-            eyeHeight = eyeHeight.normalize();
-            double distance = look.dotProduct(eyeHeight);
-            return distance > 1.0D - 0.025D / d0 && player.canEntityBeSeen(this);
-        }
+public class MixinEntityEnderman {
+    @Redirect(method = "shouldAttackPlayer", at = @At(value = "FIELD", target = "Lnet/minecraft/init/Blocks;PUMPKIN:Lnet/minecraft/block/Block;", opcode = Opcodes.GETSTATIC))
+    private Block maskBlock(EntityPlayer target) {
+        return Blocks.LIT_PUMPKIN;
     }
 }
