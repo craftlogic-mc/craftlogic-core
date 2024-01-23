@@ -1,5 +1,6 @@
 package ru.craftlogic.api.entity;
 
+import com.mojang.authlib.GameProfile;
 import ru.craftlogic.api.world.Player;
 
 public interface AdvancedPlayer {
@@ -8,4 +9,5 @@ public interface AdvancedPlayer {
     void setTimePlayed(long timePlayed);
     long getTimePlayed();
     Player wrapped();
+    void initialize(GameProfile profile);
 }

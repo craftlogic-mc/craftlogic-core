@@ -122,7 +122,7 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
      */
     @Overwrite(remap = false)
     public void initializeConnectionToPlayer(NetworkManager netManager, EntityPlayerMP player, NetHandlerPlayServer netHandler) {
-
+        AdvancedPlayer ap = (AdvancedPlayer) player;
         GameProfile profile = player.getGameProfile();
         PlayerProfileCache profileCache = this.server.getPlayerProfileCache();
         GameProfile cachedProfile = profileCache.getProfileByUUID(profile.getId());
@@ -130,7 +130,6 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
         profileCache.addEntry(profile);
         NBTTagCompound playerData = this.readPlayerDataFromFile(player);
         if (playerData == null) {
-            AdvancedPlayer ap = (AdvancedPlayer) player;
             if (ap.getFirstPlayed() == 0) {
                 ap.setFirstPlayed(System.currentTimeMillis());
             }
@@ -223,6 +222,8 @@ public abstract class MixinPlayerList implements AdvancedPlayerList {
         }
 
         player.addSelfToInternalCraftingInventory();
+        ap.initialize(profile);
+
         FMLCommonHandler.instance().firePlayerLoggedIn(player);
     }
 

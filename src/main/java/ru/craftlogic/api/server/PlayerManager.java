@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import org.apache.logging.log4j.LogManager;
+import ru.craftlogic.api.entity.AdvancedPlayer;
 import ru.craftlogic.api.event.player.PlayerJoinedMessageEvent;
 import ru.craftlogic.api.event.player.PlayerLeftMessageEvent;
 import ru.craftlogic.api.util.ServerManager;
@@ -29,8 +30,7 @@ public class PlayerManager extends ServerManager {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPlayerJoined(PlayerEvent.PlayerLoggedInEvent event) {
-        Player player = new Player(this.server, event.player.getGameProfile());
-        this.onlinePlayers.add(player);
+        this.onlinePlayers.add(((AdvancedPlayer) event.player).wrapped());
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -128,7 +128,8 @@ public class PlayerManager extends ServerManager {
     }
 
     public OfflinePlayer getOffline(@Nonnull GameProfile profile) {
-        return isOnline(profile) ? getOnline(profile) : new OfflinePlayer(this.server, profile);
+        Player online = getOnline(profile);
+        return online != null ? online : new OfflinePlayer(this.server, profile);
     }
 
     public OfflinePlayer getOffline(@Nonnull UUID id) {

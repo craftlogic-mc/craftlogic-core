@@ -265,7 +265,7 @@ public abstract class MixinCommandHandler implements AdvancedCommandManager {
                 sender.sendMessage(Text.translation((CommandException)t.getCause()).red().build());
             } else {
                 sender.sendMessage(Text.translation("commands.generic.exception").red().build());
-                LOGGER.warn("Couldn't process command completion: " + rawCommandName, t);
+                LOGGER.warn("[" + sender.getName() + "] Couldn't process command completion: " + rawCommandName, t);
             }
         }
         return Collections.emptyList();

@@ -8,6 +8,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.CommandBlockBaseLogic;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
+import ru.craftlogic.api.entity.AdvancedPlayer;
 import ru.craftlogic.api.server.AdvancedServer;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.text.Text;
@@ -65,7 +66,7 @@ public interface CommandSender extends Permissible {
 
     static CommandSender from(Server server, ICommandSender sender) {
         if (sender instanceof EntityPlayerMP) {
-            return server.getPlayerManager().getOnline(((EntityPlayerMP) sender).getGameProfile());
+            return ((AdvancedPlayer) sender).wrapped();
         } else if (sender instanceof MinecraftServer) {
             return ((AdvancedServer)sender).wrapped();
         } else if (sender instanceof CommandBlockBaseLogic || sender instanceof RConConsoleSource) {

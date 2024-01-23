@@ -10,15 +10,10 @@ import net.minecraft.server.management.UserListOpsEntry;
 import net.minecraft.stats.StatBase;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
 import net.minecraftforge.common.MinecraftForge;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -30,9 +25,6 @@ import ru.craftlogic.api.event.player.PlayerTabNameEvent;
 import ru.craftlogic.api.permission.PermissionManager;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.world.Player;
-import ru.craftlogic.mixin.client.gui.MixinGuiPlayerTabOverlay;
-
-import javax.annotation.Nullable;
 
 @Mixin(EntityPlayerMP.class)
 public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlayer {
@@ -43,6 +35,8 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
     public MinecraftServer server;
     @Shadow
     public int ping;
+    @Unique
+    public Player wrapper;
 
     @Shadow
     public abstract void takeStat(StatBase p_takeStat_1_);
@@ -78,6 +72,7 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
         AdvancedPlayer oldAp = (AdvancedPlayer) from;
         this.setFirstPlayed(oldAp.getFirstPlayed());
         this.setTimePlayed(oldAp.getTimePlayed());
+        this.wrapper = oldAp.wrapped();
     }
 
     @Override
@@ -102,7 +97,12 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
 
     @Override
     public Player wrapped() {
-        return Server.from(this.server).getPlayerManager().getOnline(this.getUniqueID());
+        return wrapper;
+    }
+
+    @Override
+    public void initialize(GameProfile profile) {
+        wrapper = new Player(Server.from(server), profile);
     }
 
     @Inject(method = "sendEnterCombat", at = @At("HEAD"))
