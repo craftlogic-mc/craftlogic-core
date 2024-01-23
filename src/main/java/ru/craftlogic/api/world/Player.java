@@ -48,7 +48,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-public class Player extends OfflinePlayer implements LocatableCommandSender {
+public abstract class Player extends OfflinePlayer implements LocatableCommandSender {
     private final Map<String, BooleanConsumer> pendingCallbacks = new ConcurrentHashMap<>();
     private final Set<UUID> pendingTeleports = new HashSet<>();
 
@@ -214,9 +214,7 @@ public class Player extends OfflinePlayer implements LocatableCommandSender {
         return getEntity().getDisplayName();
     }
 
-    public EntityPlayerMP getEntity() {
-        return this.server.unwrap().getPlayerList().getPlayerByUUID(this.profile.getId());
-    }
+    public abstract EntityPlayerMP getEntity();
 
     public boolean isHurt() {
         EntityPlayerMP entity = getEntity();

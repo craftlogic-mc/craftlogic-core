@@ -22,9 +22,12 @@ import ru.craftlogic.api.entity.AdvancedPlayer;
 import ru.craftlogic.api.event.player.PlayerEnterCombat;
 import ru.craftlogic.api.event.player.PlayerExitCombat;
 import ru.craftlogic.api.event.player.PlayerTabNameEvent;
+import ru.craftlogic.api.impl.entity.PlayerImpl;
 import ru.craftlogic.api.permission.PermissionManager;
 import ru.craftlogic.api.server.Server;
 import ru.craftlogic.api.world.Player;
+
+import java.lang.ref.WeakReference;
 
 @Mixin(EntityPlayerMP.class)
 public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlayer {
@@ -73,6 +76,7 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
         this.setFirstPlayed(oldAp.getFirstPlayed());
         this.setTimePlayed(oldAp.getTimePlayed());
         this.wrapper = oldAp.wrapped();
+        ((PlayerImpl) this.wrapper).entity = new WeakReference<>((EntityPlayerMP) (Object) this);
     }
 
     @Override
@@ -102,7 +106,7 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
 
     @Override
     public void initialize(GameProfile profile) {
-        wrapper = new Player(Server.from(server), profile);
+        wrapper = new PlayerImpl(Server.from(server), profile, (EntityPlayerMP) (Object) this);
     }
 
     @Inject(method = "sendEnterCombat", at = @At("HEAD"))
@@ -163,4 +167,5 @@ public abstract class MixinEntityPlayerMP extends Entity implements AdvancedPlay
         MinecraftForge.EVENT_BUS.post(event);
         return event.getName();
     }
+
 }
