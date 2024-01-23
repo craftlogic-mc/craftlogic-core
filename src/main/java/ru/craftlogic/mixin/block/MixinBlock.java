@@ -199,6 +199,6 @@ public class MixinBlock {
      */
     @Overwrite(remap = false)
     public boolean addLandingEffects(IBlockState state, net.minecraft.world.WorldServer worldObj, BlockPos blockPosition, IBlockState iblockstate, EntityLivingBase entity, int numberOfParticles ) {
-        return entity instanceof EntityPlayer && entity.getActivePotionEffect(MobEffects.INVISIBILITY) != null;
+        return entity instanceof EntityPlayer && entity.isInvisible();
     }
 }

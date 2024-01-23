@@ -82,7 +82,7 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
 
     @Override
     public void spawnRunningParticles() {
-        if (getActivePotionEffect(MobEffects.INVISIBILITY) == null) {
+        if (!isInvisible()) {
             super.spawnRunningParticles();
         }
     }

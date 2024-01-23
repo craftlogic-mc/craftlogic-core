@@ -14,7 +14,7 @@ public class MixinLayerArmorBase {
 
     @Inject(method = "doRenderLayer", at = @At("HEAD"), cancellable = true)
     public void onRender(EntityLivingBase entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, CallbackInfo ci) {
-        if (entity instanceof EntityPlayer && entity.getActivePotionEffect(MobEffects.INVISIBILITY) != null) {
+        if (entity instanceof EntityPlayer && entity.isInvisible()) {
             ci.cancel();
         }
     }
