@@ -14,8 +14,10 @@ import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.*;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import ru.craftlogic.CraftConfig;
 import ru.craftlogic.api.event.player.PlayerCheckCanEditEvent;
 import ru.craftlogic.api.event.player.PlayerSneakEvent;
@@ -54,13 +56,6 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
         super.setSneaking(sneaking);
     }
 
-    @Override
-    public void spawnRunningParticles() {
-        if (!isInvisible()) {
-            super.spawnRunningParticles();
-        }
-    }
-
     @ModifyConstant(method = "dropItem(Lnet/minecraft/item/ItemStack;ZZ)Lnet/minecraft/entity/item/EntityItem;", constant = @Constant(floatValue = 0.5F))
     public float itemVelocity(float old) {
         return 0.1F;
@@ -75,17 +70,6 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
     public void onSpawnDamageIndicator(WorldServer world, EnumParticleTypes particle, double x, double y, double z, int count, double vx, double vy, double vz, double velocity, int[] args) {
         if (!CraftConfig.tweaks.disableDamageParticles) {
             world.spawnParticle(particle, x, y, z, count, vx, vy, vz, velocity, args);
-        }
-    }
-
-    /**
-     * @author Pudo
-     * @reason Removable attack cooldown
-     */
-    @Inject(method = "getCooldownPeriod", at = @At("HEAD"), cancellable = true)
-    public void getCooldownPeriod(CallbackInfoReturnable<Float> cir) {
-        if (!CraftConfig.tweaks.enableAttackCooldown) {
-            cir.setReturnValue(1F);
         }
     }
 }
