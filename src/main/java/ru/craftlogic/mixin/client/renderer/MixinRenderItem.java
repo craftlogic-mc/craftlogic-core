@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -82,8 +83,8 @@ public abstract class MixinRenderItem {
         buffer.pos(x + 8, y + 8, 0).color(red, green, blue, alpha).endVertex();
         buffer.pos(x + 8, y, 0).color(red, green, blue, alpha).endVertex();
         double angle = (-cooldown * 2 * Math.PI - Math.PI / 2);
-        double ex = 8 + Math.cos(angle) * 8;
-        double ey = 8 + Math.sin(angle) * 8;
+        double ex = 8 + Math.cos(angle) * 8 * MathHelper.SQRT_2;
+        double ey = 8 + Math.sin(angle) * 8 * MathHelper.SQRT_2;
         if (cooldown > 0.125) {
             buffer.pos(x, y, 0).color(red, green, blue, alpha).endVertex();
         }
