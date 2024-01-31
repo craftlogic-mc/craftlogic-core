@@ -731,11 +731,13 @@ public class BlockBase extends Block implements ModelRegistrar {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public boolean addHitEffects(IBlockState state, World world, RayTraceResult target, ParticleManager particleManager) {
         return super.addHitEffects(state, world, target, particleManager);
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public boolean addDestroyEffects(World world, BlockPos pos, ParticleManager particleManager) {
         return super.addDestroyEffects(world, pos, particleManager);
     }
